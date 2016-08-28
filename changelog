@@ -1,0 +1,4 @@
+28.08.2016 - 1.0.2
+- Enviando estrutura básica para a criação dos três servidores com ServerSocket.
+	- Foi utilizado ainda ServerListener para permitir algumas operações em determinados momentos.
+	- Algumas funcionalidades e mensagens ainda deverão ser implementadas para melhor acompanhamento.
