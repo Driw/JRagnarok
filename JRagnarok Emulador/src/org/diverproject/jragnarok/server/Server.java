@@ -1,13 +1,13 @@
-package org.diverproject.jragnarok;
+package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.ServerState.CREATE;
-import static org.diverproject.jragnarok.ServerState.CREATED;
-import static org.diverproject.jragnarok.ServerState.DESTROY;
-import static org.diverproject.jragnarok.ServerState.DESTROYED;
-import static org.diverproject.jragnarok.ServerState.NONE;
-import static org.diverproject.jragnarok.ServerState.RUNNING;
-import static org.diverproject.jragnarok.ServerState.STOPED;
-import static org.diverproject.jragnarok.ServerState.STOPPING;
+import static org.diverproject.jragnarok.server.ServerState.CREATE;
+import static org.diverproject.jragnarok.server.ServerState.CREATED;
+import static org.diverproject.jragnarok.server.ServerState.DESTROY;
+import static org.diverproject.jragnarok.server.ServerState.DESTROYED;
+import static org.diverproject.jragnarok.server.ServerState.NONE;
+import static org.diverproject.jragnarok.server.ServerState.RUNNING;
+import static org.diverproject.jragnarok.server.ServerState.STOPED;
+import static org.diverproject.jragnarok.server.ServerState.STOPPING;
 import static org.diverproject.log.LogSystem.logExeception;
 
 import java.io.IOException;

@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.character.CharServer;
 import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.map.MapServer;

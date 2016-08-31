@@ -1,3 +1,8 @@
+31.08.2016 - 1.0.3
+- Movendo Server, ServerListener e ServerState para um sub pacote 'server'.
+	- Outras classes gerais de todos os servidores serão adicionadas aqui.
+	- No pacote raiz serão adicionadas classes gerais do emulador ao invés dos servidores.
+
 28.08.2016 - 1.0.2
 - Enviando estrutura básica para a criação dos três servidores com ServerSocket.
 	- Foi utilizado ainda ServerListener para permitir algumas operações em determinados momentos.

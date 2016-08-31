@@ -5,8 +5,8 @@ import static org.diverproject.util.MessageUtil.die;
 import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.Server;
-import org.diverproject.jragnarok.ServerListener;
+import org.diverproject.jragnarok.server.Server;
+import org.diverproject.jragnarok.server.ServerListener;
 
 public class CharServer extends Server implements ServerListener
 {
