@@ -35,9 +35,10 @@ public class CharServer extends Server implements ServerListener
 		setListener(this);
 	}
 
-	public static CharServer getInstance()
+	@Override
+	protected CharConfig setServerConfig()
 	{
-		return INSTANCE;
+		return new CharConfig();
 	}
 
 	@Override
@@ -112,5 +113,10 @@ public class CharServer extends Server implements ServerListener
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	public static CharServer getInstance()
+	{
+		return INSTANCE;
 	}
 }

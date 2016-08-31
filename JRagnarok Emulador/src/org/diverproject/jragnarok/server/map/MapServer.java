@@ -35,9 +35,10 @@ public class MapServer extends Server implements ServerListener
 		setListener(this);
 	}
 
-	public static MapServer getInstance()
+	@Override
+	protected MapConfig setServerConfig()
 	{
-		return INSTANCE;
+		return new MapConfig();
 	}
 
 	@Override
@@ -112,5 +113,10 @@ public class MapServer extends Server implements ServerListener
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	public static MapServer getInstance()
+	{
+		return INSTANCE;
 	}
 }

@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.sleep;
 import static org.diverproject.jragnarok.server.ServerState.CREATE;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
 import static org.diverproject.jragnarok.server.ServerState.DESTROY;
@@ -9,15 +10,21 @@ import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.ServerState.STOPED;
 import static org.diverproject.jragnarok.server.ServerState.STOPPING;
 import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logInfo;
+import static org.diverproject.log.LogSystem.logNotice;
+import static org.diverproject.log.LogSystem.logWarning;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnaork.configuration.ConfigLoad;
 import org.diverproject.util.lang.IntUtil;
+import org.diverproject.util.sql.MySQL;
 
 public abstract class Server
 {
@@ -30,6 +37,8 @@ public abstract class Server
 	private ServerState state;
 	private ServerSocket serverSocket;
 	private ServerListener listener;
+	private ServerConfig configs;
+	private MySQL sql;
 
 	public Server(int port) throws RagnarokException
 	{
@@ -41,11 +50,20 @@ public abstract class Server
 
 		this.port = port;
 		this.state = NONE;
+		this.configs = setServerConfig();
+		this.sql = new MySQL();
 	}
 
 	public void setListener(ServerListener listener)
 	{
 		this.listener = listener;
+	}
+
+	protected abstract ServerConfig setServerConfig();
+
+	public ServerConfig getConfigs()
+	{
+		return configs;
 	}
 
 	protected void changeState(ServerState newState) throws RagnarokException
@@ -99,6 +117,8 @@ public abstract class Server
 				throw new RagnarokException("state %s inválido", newState);
 		}
 
+		logInfo("alterando estado de %s para %s.\n", state, newState);
+
 		state = newState;
 	}
 
@@ -111,52 +131,15 @@ public abstract class Server
 	{
 		changeState(CREATE);
 		{
-			try {
-
-				listener.onCreate();
-				{
-					Server self = this;
-					InetAddress address = InetAddress.getByName(getAddress());
-
-					serverSocket = new ServerSocket(port, SOCKET_BACKLOG, address);
-					thread = new Thread(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							while (state == RUNNING)
-							{
-								try {
-
-									Socket socket = serverSocket.accept();
-
-									dispatchSocket(socket);
-
-								} catch (IOException e) {
-									logExeception(e);
-								}
-							}
-
-							Thread.interrupted();
-						}
-
-						@Override
-						public String toString()
-						{
-							return self.toString();
-						}
-					});
-					thread.setName(getThreadName());
-					thread.setPriority(getThreadPriority());
-					thread.setDaemon(false);
-				}
-				listener.onCreated();
-
-			} catch (UnknownHostException e) {
-				throw new RagnarokException("host '%s' desconhecido", getAddress());
-			} catch (IOException e) {
-				throw new RagnarokException(e.getMessage());
+			listener.onCreate();
+			{
+				initConfigs();
+				initSqlConnection();
+				initTimer();
+				initThread();
+				initSocket();
 			}
+			listener.onCreated();
 		}
 		changeState(CREATED);
 	}
@@ -224,4 +207,108 @@ public abstract class Server
 	protected abstract String getAddress();
 
 	protected abstract void dispatchSocket(Socket socket);
+
+	protected void initConfigs() throws RagnarokException
+	{
+		ConfigLoad load = new ConfigLoad();
+		load.setConfigurations(configs.getMap());
+		load.setFilePath("config/SqlConnection.conf");
+		load.read();
+	}
+
+	private void initSqlConnection() throws RagnarokException
+	{
+		try {
+
+			if (sql.getConnection() != null && !sql.getConnection().isClosed())
+				throw new RagnarokException("conexão já estabelecida");
+
+		} catch (SQLException e) {
+			logWarning("falha ao verificar existência da conexão MySQL");
+		}
+
+		String host = configs.getString("sql.host");
+		String username = configs.getString("sql.username");
+		String password = configs.getString("sql.password");
+		String database = configs.getString("sql.database");
+		int port = configs.getInt("sql.port");
+
+		sql.setHost(host);
+		sql.setUsername(username);
+		sql.setPassword(password);
+		sql.setDatabase(database);
+		sql.setPort(port);
+
+		try {
+			sql.connect();
+		} catch (ClassNotFoundException e) {
+			throw new RagnarokException("biblioteca MySQL Connector não encontrada");
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+
+		logNotice("conexão MySQL estabelecida (%s:%d).\n", host, port);
+	}
+
+	private void initTimer() throws RagnarokException
+	{
+		// TODO ainda não sei exatamente o que é esse timer (algo com ticks provavelmente)
+	}
+
+	private void initThread() throws RagnarokException
+	{
+		Server self = this;
+
+		thread = new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				while (state != DESTROYED)
+				{
+					if (state != RUNNING)
+						sleep(1000);
+
+					try {
+
+						Socket socket = serverSocket.accept();
+
+						dispatchSocket(socket);
+
+					} catch (IOException e) {
+						logExeception(e);
+					}
+				}
+
+				Thread.interrupted();
+			}
+
+			@Override
+			public String toString()
+			{
+				return self.toString();
+			}
+		});
+		thread.setName(getThreadName());
+		thread.setPriority(getThreadPriority());
+		thread.setDaemon(false);
+
+		logNotice("thread do servidor criada.\n");
+	}
+
+	private void initSocket() throws RagnarokException
+	{
+		try {
+
+			InetAddress address = InetAddress.getByName(getAddress());
+			serverSocket = new ServerSocket(port, SOCKET_BACKLOG, address);
+
+			logNotice("conexão estabelecida com êxito (porta: %d).\n", port);
+
+		} catch (UnknownHostException e) {
+			throw new RagnarokException("host desconhecido");
+		} catch (IOException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
 }

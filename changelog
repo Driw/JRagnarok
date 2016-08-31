@@ -1,3 +1,15 @@
+31.08.2016 - 1.0.5
+- Chamado dos métodos para funcionamento da aplicação para registrar informações (logs).
+- ServerConfig irá armazenar configurações e possui método para inicializá-las, definir as existentes.
+	- Para cada servidor foi criado um que segue como: LoginConfig, CharConfig e MapConfig.
+- Agora Server irá possuir configurações com ServerConfig e conexão com o banco de dados por MySQL.
+	- Adicionando algumas mensagens através do sistema de logs para algumas funções.
+	- Separando algumas operações em create() para métodos initThread() e initSocket().
+	- Novos métodos init*() adicionados para realizar outras funções:
+		- Inicialização das configurações por initConfigs().
+		- Inicialização da conexão com o banco de dados MySQL por initSqlConnection().
+		- Inicialização do temporizador (ainda não estruturado) por initTimer().
+
 31.08.2016 - 1.0.4
 - Sistema para leitura de arquivos contendo configurações: ConfigLoad.
 	- As configurações são definidas por Config e podem ser ConfigString, ConfigInt e ConfigBoolean.

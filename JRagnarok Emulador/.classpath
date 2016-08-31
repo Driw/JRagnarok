@@ -5,5 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JRagnarok API"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Util Log"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Util Primitive"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MySQL Connector 5.1.38"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

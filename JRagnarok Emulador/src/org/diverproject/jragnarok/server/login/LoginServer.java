@@ -35,9 +35,10 @@ public class LoginServer extends Server implements ServerListener
 		setListener(this);
 	}
 
-	public static LoginServer getInstance()
+	@Override
+	protected LoginConfig setServerConfig()
 	{
-		return INSTANCE;
+		return new LoginConfig();
 	}
 
 	@Override
@@ -112,5 +113,10 @@ public class LoginServer extends Server implements ServerListener
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	public static LoginServer getInstance()
+	{
+		return INSTANCE;
 	}
 }
