@@ -1,3 +1,9 @@
+31.08.2016 - 1.0.4
+- Sistema para leitura de arquivos contendo configurações: ConfigLoad.
+	- As configurações são definidas por Config e podem ser ConfigString, ConfigInt e ConfigBoolean.
+- JRagnarokLogListener adicionado para repassar os registros (logs) para o console do Java.
+- JRagnarokUtil irá conter diversos métodos estáticos para facilitar as codificações.
+
 31.08.2016 - 1.0.3
 - Movendo Server, ServerListener e ServerState para um sub pacote 'server'.
 	- Outras classes gerais de todos os servidores serão adicionadas aqui.
