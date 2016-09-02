@@ -1,6 +1,9 @@
 package org.diverproject.jragnarok.server;
 
+import java.net.Socket;
+
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.SocketUtil;
 import org.diverproject.util.lang.IntUtil;
 
 public class InternetProtocol
@@ -21,6 +24,17 @@ public class InternetProtocol
 		setSecond(second);
 		setThird(third);
 		setFourth(fourth);
+	}
+
+	public InternetProtocol(Socket socket)
+	{
+		String ip = SocketUtil.socketIP(socket);
+		String numbers[] = ip.split(".");
+
+		setFirst(IntUtil.parse(numbers[0]));
+		setSecond(IntUtil.parse(numbers[1]));
+		setThird(IntUtil.parse(numbers[2]));
+		setFourth(IntUtil.parse(numbers[3]));
 	}
 
 	private void validate(int value)

@@ -1,3 +1,21 @@
+02.09.2016 - 1.0.8
+- JRagnarokUtil recebe um novo método que permite liberar memória de objetos não usados.
+	- Utiliza o próprio Garbage Collector do java e registra uma mensagem do espaço liberado.
+- InternetProtocol agora irá permitir uma nova instância de si a partir de um Socket.
+- Sistema de temporizadores adicionado como TimerSystem tendo Timer como temporizador.
+
+02.09.2016 - 1.0.7
+- Problema ao usar : em uma configuração resolvido em ConfigLoad.
+- Outros tipos de configurações podem ser criadas, como por exemplo ConfigIP.
+	- Deve ser especificado setObject quando receber um string para funcionar.
+- Configuração login.ip_sync_interval não estava com um valor definido.
+- Porta de conexão agora é obtido por método para ser especificado nas configurações.
+- Atualizando ServerConfig para funcionar com os tipos de configurações: ConfigObject.
+- ConfigClientHash e ConfigIP adicionados para especificar configurações de objetos.
+	- Respectivas classes estáticas ConfigClient e ConfigLogin atualizadas.
+- Listando em LoginConfig as configurações necessárias para LoginServer funcionar.
+- LoginServer agora irá ler os arquivos de configurações e assumir seus valores.
+
 02.09.2016 - 1.0.6
 - Adicionando diversas classes contendo objetos para armazenar configurações.
 - JRagnarokConstants irá armazenar todas as constantes que forem necessárias de uso geral.

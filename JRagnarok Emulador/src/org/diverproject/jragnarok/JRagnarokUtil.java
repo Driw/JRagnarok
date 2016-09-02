@@ -1,6 +1,12 @@
 package org.diverproject.jragnarok;
 
+import static org.diverproject.log.LogSystem.log;
+import static org.diverproject.log.LogSystem.setUpSource;
+
 import java.util.Locale;
+
+import org.diverproject.util.SizeUtil;
+import org.diverproject.util.SystemUtil;
 
 public class JRagnarokUtil
 {
@@ -40,5 +46,19 @@ public class JRagnarokUtil
 			return String.format(Locale.US, "%dh%dm%ds", (int) ms/3600000, (int) ms/60000, (int) ms/1000);
 
 		return String.format(Locale.US, "%d%dh%dm", (int) ms/86400000, (int) ms/3600000, (int) ms/60000);
+	}
+
+	public static void free()
+	{
+		long totalFreeMemory = SystemUtil.getTotalFreeMemory();
+
+		System.gc();
+
+		long newTotalFreeMemory = SystemUtil.getFreeMemory();
+		long freeMemory = newTotalFreeMemory - totalFreeMemory;
+
+		setUpSource(1);
+
+		log("%s liberado pelo GC.\n", SizeUtil.toString(freeMemory));
 	}
 }
