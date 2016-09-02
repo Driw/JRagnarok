@@ -1,3 +1,8 @@
+02.09.2016 - 1.0.6
+- Adicionando diversas classes contendo objetos para armazenar configurações.
+- JRagnarokConstants irá armazenar todas as constantes que forem necessárias de uso geral.
+- LoginServer irá definir algumas das configurações padrões quando for criado.
+
 31.08.2016 - 1.0.5
 - Chamado dos métodos para funcionamento da aplicação para registrar informações (logs).
 - ServerConfig irá armazenar configurações e possui método para inicializá-las, definir as existentes.

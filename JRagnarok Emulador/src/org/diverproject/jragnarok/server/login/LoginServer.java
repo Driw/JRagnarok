@@ -1,12 +1,20 @@
 package org.diverproject.jragnarok.server.login;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_BILLING;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_VIP;
 import static org.diverproject.util.MessageUtil.die;
 
 import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
+import org.diverproject.jragnarok.server.config.ConfigClient;
+import org.diverproject.jragnarok.server.config.ConfigIpBan;
+import org.diverproject.jragnarok.server.config.ConfigLog;
+import org.diverproject.jragnarok.server.config.ConfigLogin;
 
 public class LoginServer extends Server implements ServerListener
 {
@@ -44,8 +52,37 @@ public class LoginServer extends Server implements ServerListener
 	@Override
 	public void onCreate() throws RagnarokException
 	{
-		// TODO Auto-generated method stub
-		
+		setDefaultConfigs();
+	}
+
+	private void setDefaultConfigs()
+	{
+		ConfigLogin.getIp().setValue(new InternetProtocol());
+		ConfigLogin.getPort().setValue(6900);
+		ConfigLogin.getIpSyncinterval().setValue(0);
+		ConfigLogin.getDateformat().setValue("YY-mm-dd HH:MM:SS");
+		ConfigLogin.getConsole().setValue(true);
+		ConfigLogin.getNewAccountFlag().setValue(true);
+		ConfigLogin.getNewAccountLengthLimit().setValue(true);
+		ConfigLogin.getUseMD5password().setValue(false);
+		ConfigLogin.getGroupToConnect().setValue(-1);
+		ConfigLogin.getMinGroup().setValue(-1);
+		ConfigLogin.getAllowedRegs().setValue(1);
+		ConfigLogin.getTimeAllowed().setValue(10);
+
+		ConfigIpBan.getEnableService().setValue(true);
+		ConfigIpBan.getCleanupinterval().setValue(60);
+		ConfigIpBan.getPassFailureInterval().setValue(5);
+		ConfigIpBan.getPassFailureLimit().setValue(7);
+		ConfigIpBan.getPassFailureDuration().setValue(5);
+
+		ConfigLog.getLogLogin().setValue(true);
+
+		ConfigClient.getCheckVersion().setValue(false);
+		ConfigClient.getVersion().setValue(50); // TODO date2version(PACKETVER)
+		ConfigClient.getHashCheck().setValue(0);
+		ConfigClient.getHashNodes().setValue(null);
+		ConfigClient.getCharPerAccount().setValue(MAX_CHARS - MAX_CHAR_VIP - MAX_CHAR_BILLING);
 	}
 
 	@Override

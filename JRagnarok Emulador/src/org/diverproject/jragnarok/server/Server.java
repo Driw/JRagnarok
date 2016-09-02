@@ -66,6 +66,11 @@ public abstract class Server
 		return configs;
 	}
 
+	public MySQL getMySQL()
+	{
+		return sql;
+	}
+
 	protected void changeState(ServerState newState) throws RagnarokException
 	{
 		if (newState == state)

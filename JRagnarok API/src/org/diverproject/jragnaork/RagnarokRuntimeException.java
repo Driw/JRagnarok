@@ -1,6 +1,6 @@
 package org.diverproject.jragnaork;
 
-import org.diverproject.util.UtilException;
+import org.diverproject.util.UtilRuntimeException;
 
 /**
  * <h1>Exceção de Ragnarok</h1>
@@ -9,13 +9,13 @@ import org.diverproject.util.UtilException;
  * Utilizado pelas classes utilitárias ou outras classes do conjunto da biblioteca API do Ragnarok.
  * Todas exceções que forem geradas nesse projeto terão essa classe como mãe ou root na hierarquia.</p>
  *
- * @see UtilException
+ * @see UtilRuntimeException
  *
  * @author Andrew
  */
 
 @SuppressWarnings("serial")
-public class RagnarokRuntimeException extends UtilException
+public class RagnarokRuntimeException extends UtilRuntimeException
 {
 	/**
 	 * Constrói uma nova exceção de ragnarok sendo necessário definir uma mensagem.

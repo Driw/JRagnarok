@@ -1,9 +1,12 @@
 package org.diverproject.jragnarok.server.login;
 
 import org.diverproject.jragnaork.configuration.Config;
-import org.diverproject.jragnaork.configuration.ConfigInt;
-import org.diverproject.jragnaork.configuration.ConfigString;
 import org.diverproject.jragnarok.server.ServerConfig;
+import org.diverproject.jragnarok.server.config.ConfigClient;
+import org.diverproject.jragnarok.server.config.ConfigIpBan;
+import org.diverproject.jragnarok.server.config.ConfigLog;
+import org.diverproject.jragnarok.server.config.ConfigLogin;
+import org.diverproject.jragnarok.server.config.ConfigSQL;
 
 public class LoginConfig extends ServerConfig
 {
@@ -12,11 +15,38 @@ public class LoginConfig extends ServerConfig
 	{
 		return new Config<?>[]
 		{
-			new ConfigString("sql.host", "localhost"),
-			new ConfigString("sql.username", "jragnarok"),
-			new ConfigString("sql.password", "jragnarok"),
-			new ConfigString("sql.database", "jragnarok"),
-			new ConfigInt("sql.port", 3306),
+			ConfigSQL.getHost(),
+			ConfigSQL.getUsername(),
+			ConfigSQL.getPassword(),
+			ConfigSQL.getDatabase(),
+			ConfigSQL.getPort(),
+
+			ConfigLogin.getIp(),
+			ConfigLogin.getPort(),
+			ConfigLogin.getIpSyncinterval(),
+			ConfigLogin.getDateformat(),
+			ConfigLogin.getConsole(),
+			ConfigLogin.getNewAccountFlag(),
+			ConfigLogin.getNewAccountLengthLimit(),
+			ConfigLogin.getUseMD5password(),
+			ConfigLogin.getGroupToConnect(),
+			ConfigLogin.getMinGroup(),
+			ConfigLogin.getAllowedRegs(),
+			ConfigLogin.getTimeAllowed(),
+
+			ConfigIpBan.getEnableService(),
+			ConfigIpBan.getCleanupinterval(),
+			ConfigIpBan.getPassFailureInterval(),
+			ConfigIpBan.getPassFailureLimit(),
+			ConfigIpBan.getPassFailureDuration(),
+
+			ConfigLog.getLogLogin(),
+
+			ConfigClient.getCheckVersion(),
+			ConfigClient.getVersion(),
+			ConfigClient.getHashCheck(),
+			ConfigClient.getHashNodes(),
+			ConfigClient.getCharPerAccount(),
 		};
 	}
 }
