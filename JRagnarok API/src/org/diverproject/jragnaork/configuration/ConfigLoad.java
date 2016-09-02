@@ -80,7 +80,11 @@ public class ConfigLoad
 				if (line.isEmpty() || line.startsWith("//"))
 					continue;
 
-				String columns[] = line.split(":");
+				String columns[] = new String[]
+				{
+					line.substring(0, line.indexOf(':')),
+					line.substring(line.indexOf(':') + 1),
+				};
 
 				if (columns.length != 2)
 					logWarning("formato inválido (linha: %d).\n", i);
@@ -103,7 +107,7 @@ public class ConfigLoad
 				}
 			}
 
-			logInfo("lido %d configurações de %s.\n", read, file.getPath());
+			logInfo("%d configurações lidas de %s.\n", read, file.getPath());
 
 			reader.close();
 
@@ -124,7 +128,11 @@ public class ConfigLoad
 			config.setObject((Object) BooleanUtil.parse(value));
 
 		else
-			return false;
+			try {
+				config.setObject((Object) value);
+			} catch (IllegalArgumentException e) {
+				return false;
+			}
 
 		return true;
 	}

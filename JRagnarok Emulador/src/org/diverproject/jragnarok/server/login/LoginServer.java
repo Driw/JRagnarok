@@ -3,24 +3,25 @@ package org.diverproject.jragnarok.server.login;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_BILLING;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_VIP;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.util.MessageUtil.die;
 
 import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnaork.configuration.ConfigLoad;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.config.ConfigClient;
+import org.diverproject.jragnarok.server.config.ConfigFiles;
 import org.diverproject.jragnarok.server.config.ConfigIpBan;
 import org.diverproject.jragnarok.server.config.ConfigLog;
 import org.diverproject.jragnarok.server.config.ConfigLogin;
 
 public class LoginServer extends Server implements ServerListener
 {
-	private static final String HOST = "localhost";
-	private static final int PORT = 6900;
-
 	private static final LoginServer INSTANCE;
 
 	static
@@ -38,8 +39,6 @@ public class LoginServer extends Server implements ServerListener
 
 	public LoginServer() throws RagnarokException
 	{
-		super(PORT);
-
 		setListener(this);
 	}
 
@@ -53,6 +52,7 @@ public class LoginServer extends Server implements ServerListener
 	public void onCreate() throws RagnarokException
 	{
 		setDefaultConfigs();
+		readConfigFiles();
 	}
 
 	private void setDefaultConfigs()
@@ -72,6 +72,7 @@ public class LoginServer extends Server implements ServerListener
 
 		ConfigIpBan.getEnableService().setValue(true);
 		ConfigIpBan.getCleanupinterval().setValue(60);
+		ConfigIpBan.getPassFailureEnable().setValue(true);
 		ConfigIpBan.getPassFailureInterval().setValue(5);
 		ConfigIpBan.getPassFailureLimit().setValue(7);
 		ConfigIpBan.getPassFailureDuration().setValue(5);
@@ -83,6 +84,42 @@ public class LoginServer extends Server implements ServerListener
 		ConfigClient.getHashCheck().setValue(0);
 		ConfigClient.getHashNodes().setValue(null);
 		ConfigClient.getCharPerAccount().setValue(MAX_CHARS - MAX_CHAR_VIP - MAX_CHAR_BILLING);
+
+		ConfigFiles.getLoginConfig().setValue("config/Login.conf");
+		ConfigFiles.getIpBanConfig().setValue("config/IpBan.conf");
+		ConfigFiles.getLogConfig().setValue("config/Log.conf");
+		ConfigFiles.getClientConfig().setValue("config/Client.conf");
+	}
+
+	private void readConfigFiles()
+	{
+		String fileKey = "";
+
+		ConfigLoad load = new ConfigLoad();
+		load.setConfigurations(getConfigs().getMap());
+
+		try {
+
+			fileKey = ConfigFiles.getLoginConfig().getName();
+			load.setFilePath(ConfigFiles.getLoginConfig().getValue());
+			load.read();
+
+			fileKey = ConfigFiles.getIpBanConfig().getName();
+			load.setFilePath(ConfigFiles.getIpBanConfig().getValue());
+			load.read();
+
+			fileKey = ConfigFiles.getLogConfig().getName();
+			load.setFilePath(ConfigFiles.getLogConfig().getValue());
+			load.read();
+
+			fileKey = ConfigFiles.getClientConfig().getName();
+			load.setFilePath(ConfigFiles.getClientConfig().getValue());
+			load.read();
+
+		} catch (RagnarokException e) {
+			logError("falha durante a leitura de %s.\n", fileKey);
+			logExeception(e);
+		}
 	}
 
 	@Override
@@ -142,7 +179,13 @@ public class LoginServer extends Server implements ServerListener
 	@Override
 	protected String getAddress()
 	{
-		return HOST;
+		return ((InternetProtocol) getConfigs().getObject("login.ip")).get();
+	}
+
+	@Override
+	protected int getPort()
+	{
+		return getConfigs().getInt("login.port");
 	}
 
 	@Override

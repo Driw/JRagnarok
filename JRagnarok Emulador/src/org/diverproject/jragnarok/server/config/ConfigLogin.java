@@ -2,13 +2,12 @@ package org.diverproject.jragnarok.server.config;
 
 import org.diverproject.jragnaork.configuration.ConfigBoolean;
 import org.diverproject.jragnaork.configuration.ConfigInt;
-import org.diverproject.jragnaork.configuration.ConfigObject;
 import org.diverproject.jragnaork.configuration.ConfigString;
-import org.diverproject.jragnarok.server.InternetProtocol;
+import org.diverproject.jragnarok.server.config.specific.ConfigIP;
 
 public class ConfigLogin
 {
-	private static final ConfigObject<InternetProtocol> IP;
+	private static final ConfigIP IP;
 	private static final ConfigInt PORT;
 	private static final ConfigInt IP_SYNC_INTERVAL;
 	private static final ConfigString DATE_FORMAT;
@@ -23,7 +22,7 @@ public class ConfigLogin
 
 	static
 	{
-		IP = new ConfigObject<>("login.ip");
+		IP = new ConfigIP("login.ip");
 		PORT = new ConfigInt("login.port");
 		IP_SYNC_INTERVAL = new ConfigInt("login.ip_sync_interval");
 		DATE_FORMAT = new ConfigString("login.date_format");
@@ -37,7 +36,7 @@ public class ConfigLogin
 		TIME_ALLOWED = new ConfigInt("login.time_allowed");
 	}
 
-	public static ConfigObject<InternetProtocol> getIp()
+	public static ConfigIP getIp()
 	{
 		return IP;
 	}

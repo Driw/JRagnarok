@@ -30,8 +30,6 @@ public class MapServer extends Server implements ServerListener
 
 	public MapServer() throws RagnarokException
 	{
-		super(PORT);
-
 		setListener(this);
 	}
 
@@ -106,6 +104,12 @@ public class MapServer extends Server implements ServerListener
 	protected String getAddress()
 	{
 		return HOST;
+	}
+
+	@Override
+	protected int getPort()
+	{
+		return PORT;
 	}
 
 	@Override

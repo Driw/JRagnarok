@@ -14,6 +14,7 @@ public abstract class ServerConfig
 	private static final boolean DEFAULT_BOOLEAN = false;
 	private static final int DEFAULT_INTEGER = 0;
 	private static final String DEFAULT_STRING = "";
+	private static final Object DEFAULT_OBJECT = new Object();
 
 	private Map<String, Config<?>> configurations;
 
@@ -22,9 +23,10 @@ public abstract class ServerConfig
 		configurations = new StringSimpleMap<>();
 
 		for (Config<?> config : getInitialConfigs())
-			if (config != null && !config.getName().isEmpty() && config.getValue() != null)
+			if (config != null && !config.getName().isEmpty())
 				if (!configurations.add(config.getName(), config))
 					logWarning("configuração '%s' repetindo.\n", config.getName());
+
 	}
 
 	public Map<String, Config<?>> getMap()
@@ -60,6 +62,16 @@ public abstract class ServerConfig
 			return ((ConfigString) config).getValue();
 
 		return DEFAULT_STRING;
+	}
+
+	public Object getObject(String name)
+	{
+		Config<?> config = configurations.get(name);
+
+		if (config instanceof Config)
+			return (Object) config.getValue();
+
+		return DEFAULT_OBJECT;
 	}
 
 	protected abstract Config<?>[] getInitialConfigs();

@@ -36,6 +36,7 @@ public class LoginConfig extends ServerConfig
 
 			ConfigIpBan.getEnableService(),
 			ConfigIpBan.getCleanupinterval(),
+			ConfigIpBan.getPassFailureEnable(),
 			ConfigIpBan.getPassFailureInterval(),
 			ConfigIpBan.getPassFailureLimit(),
 			ConfigIpBan.getPassFailureDuration(),

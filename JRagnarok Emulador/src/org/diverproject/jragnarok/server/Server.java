@@ -32,7 +32,6 @@ public abstract class Server
 	private static final int MAX_PORT = 65535;
 	private static final int SOCKET_BACKLOG = 50;
 
-	private int port;
 	private Thread thread;
 	private ServerState state;
 	private ServerSocket serverSocket;
@@ -40,15 +39,11 @@ public abstract class Server
 	private ServerConfig configs;
 	private MySQL sql;
 
-	public Server(int port) throws RagnarokException
+	public Server() throws RagnarokException
 	{
-		if (!IntUtil.interval(port, MIN_PORT, MAX_PORT))
-			throw new RagnarokException("porta %d inválida");
-
 		if (listener != null)
 			throw new RagnarokException("listener não definido");
 
-		this.port = port;
 		this.state = NONE;
 		this.configs = setServerConfig();
 		this.sql = new MySQL();
@@ -211,6 +206,8 @@ public abstract class Server
 
 	protected abstract String getAddress();
 
+	protected abstract int getPort();
+
 	protected abstract void dispatchSocket(Socket socket);
 
 	protected void initConfigs() throws RagnarokException
@@ -304,6 +301,11 @@ public abstract class Server
 	private void initSocket() throws RagnarokException
 	{
 		try {
+
+			int port = getPort();
+
+			if (!IntUtil.interval(port, MIN_PORT, MAX_PORT))
+				throw new RagnarokException("porta %d inválida");
 
 			InetAddress address = InetAddress.getByName(getAddress());
 			serverSocket = new ServerSocket(port, SOCKET_BACKLOG, address);

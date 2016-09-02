@@ -1,11 +1,11 @@
 package org.diverproject.jragnarok.server;
 
-public class ClientHas
+public class ClientHash
 {
 	private int groupID;
 	private final byte hash[];
 
-	public ClientHas()
+	public ClientHash()
 	{
 		hash = new byte[16];
 	}

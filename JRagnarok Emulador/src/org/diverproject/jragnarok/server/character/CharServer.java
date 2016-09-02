@@ -30,8 +30,6 @@ public class CharServer extends Server implements ServerListener
 
 	public CharServer() throws RagnarokException
 	{
-		super(PORT);
-
 		setListener(this);
 	}
 
@@ -106,6 +104,12 @@ public class CharServer extends Server implements ServerListener
 	protected String getAddress()
 	{
 		return HOST;
+	}
+
+	@Override
+	protected int getPort()
+	{
+		return PORT;
 	}
 
 	@Override
