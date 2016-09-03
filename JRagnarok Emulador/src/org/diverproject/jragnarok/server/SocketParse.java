@@ -4,5 +4,5 @@ import org.diverproject.jragnaork.RagnarokException;
 
 public interface SocketParse
 {
-	void parse(Client client) throws RagnarokException;
+	void parse(ClientPlayer player) throws RagnarokException;
 }

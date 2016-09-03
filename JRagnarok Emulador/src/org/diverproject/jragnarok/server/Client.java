@@ -12,7 +12,7 @@ import org.diverproject.util.stream.StreamException;
 import org.diverproject.util.stream.implementation.input.InputPacket;
 import org.diverproject.util.stream.implementation.output.OutputPacket;
 
-public class Client
+public abstract class Client
 {
 	private int id;
 	private Socket socket;
@@ -21,7 +21,7 @@ public class Client
 	private boolean interrupted;
 	private Thread thread;
 
-	public Client(Socket socket)
+	Client(Socket socket)
 	{
 		if (socket == null)
 			throw new NullPointerException();
@@ -116,6 +116,8 @@ public class Client
 	{
 		this.thread = thread;
 	}
+
+	public abstract String getUsername();
 
 	protected void toString(ObjectDescription description)
 	{

@@ -4,47 +4,14 @@ import java.net.Socket;
 
 import org.diverproject.util.ObjectDescription;
 
-public class ClientCharServer extends Client
+public class ClientCharServer extends ClientServer
 {
-	private String name;
-	private short port;
-	private short users;
 	private CharServerType type;
 	private short newValue;
 
 	public ClientCharServer(Socket socket)
 	{
 		super(socket);
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public short getPort()
-	{
-		return port;
-	}
-
-	public void setPort(short port)
-	{
-		this.port = port;
-	}
-
-	public short getUsers()
-	{
-		return users;
-	}
-
-	public void setUsers(short users)
-	{
-		this.users = users;
 	}
 
 	public CharServerType getType()
@@ -71,5 +38,8 @@ public class ClientCharServer extends Client
 	protected void toString(ObjectDescription description)
 	{
 		super.toString(description);
+
+		description.append("type", type);
+		description.append("new", newValue);
 	}
 }

@@ -40,6 +40,7 @@ public abstract class Server
 	private ServerListener listener;
 	private ServerConfig configs;
 	private SocketParse defaultParser;
+	private ClientServer client;
 	private MySQL sql;
 
 	public Server() throws RagnarokException
@@ -77,6 +78,11 @@ public abstract class Server
 	public MySQL getMySQL()
 	{
 		return sql;
+	}
+
+	protected Client getClient()
+	{
+		return client;
 	}
 
 	protected void changeState(ServerState newState) throws RagnarokException
@@ -151,6 +157,7 @@ public abstract class Server
 				initTimer();
 				initThread();
 				initSocket();
+				initClient();
 			}
 			listener.onCreated();
 		}
@@ -285,21 +292,21 @@ public abstract class Server
 					try {
 
 						Socket socket = serverSocket.accept();
-						Client client = new Client(socket);
+						ClientPlayer player = new ClientPlayer(socket);
 
 						Thread thread = new Thread(new Runnable()
 						{
 							@Override
 							public void run()
 							{
-								while (client.isConnected())
+								while (player.isConnected())
 								{
-									while (!client.isInterrupted())
+									while (!player.isInterrupted())
 									{
 										try {
-											defaultParser.parse(client);
+											defaultParser.parse(player);
 										} catch (RagnarokException e) {
-											logError("falha com um cliente (ip: %s)", client.getIP());
+											logError("falha com um cliente (ip: %s)", player.getIP());
 											logExeception(e);
 										}
 									}
@@ -310,10 +317,10 @@ public abstract class Server
 						});
 						thread.setDaemon(false);
 						thread.setPriority(Thread.MIN_PRIORITY);
-						thread.setName(format("Login:%s", client.getIP()));
+						thread.setName(format("Login:%s", player.getIP()));
 						thread.run();
 
-						client.setThread(thread);
+						player.setThread(thread);
 
 					} catch (IOException e) {
 						logExeception(e);
@@ -354,6 +361,29 @@ public abstract class Server
 			throw new RagnarokException("host desconhecido");
 		} catch (IOException e) {
 			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	private void initClient()
+	{
+		String username = getConfigs().getString("login.username");
+		String password = getConfigs().getString("password");
+		short port = (short) getConfigs().getInt("login.port");
+		short users = 0;
+
+		try {
+
+			Socket socket = new Socket(getAddress(), getPort());
+
+			client = new ClientServer(socket);
+			client.setID(1);
+			client.setUsername(username);
+			client.setPassword(password);
+			client.setUsers(users);
+			client.setPort(port);
+
+		} catch (IOException e) {
+			logExeception(e);
 		}
 	}
 }
