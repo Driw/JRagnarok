@@ -26,6 +26,7 @@ public class TimerSystem
 
 	private TimerSystem()
 	{
+		tick = new TimerTick(1);
 		timers = new IntegerLittleMap<>();
 		listeners = new StringSimpleMap<>();
 	}
@@ -63,10 +64,7 @@ public class TimerSystem
 		Timer timer = timers.get(id);
 
 		if (timer == null)
-		{
 			timer = acquireTimer();
-			timers.remove(timer);
-		}
 
 		timer.setID(id);
 		timer.setTick(tick);
@@ -88,10 +86,7 @@ public class TimerSystem
 		Timer timer = timers.get(id);
 
 		if (timer == null)
-		{
 			timer = acquireTimer();
-			timers.remove(timer);
-		}
 
 		timer.setID(id);
 		timer.setTick(tick);

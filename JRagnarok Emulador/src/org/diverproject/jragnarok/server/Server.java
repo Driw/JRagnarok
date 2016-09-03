@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.sleep;
 import static org.diverproject.jragnarok.server.ServerState.CREATE;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
@@ -9,6 +10,7 @@ import static org.diverproject.jragnarok.server.ServerState.NONE;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.ServerState.STOPED;
 import static org.diverproject.jragnarok.server.ServerState.STOPPING;
+import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
@@ -37,6 +39,7 @@ public abstract class Server
 	private ServerSocket serverSocket;
 	private ServerListener listener;
 	private ServerConfig configs;
+	private SocketParse defaultParser;
 	private MySQL sql;
 
 	public Server() throws RagnarokException
@@ -59,6 +62,16 @@ public abstract class Server
 	public ServerConfig getConfigs()
 	{
 		return configs;
+	}
+
+	public SocketParse getDefaultParser()
+	{
+		return defaultParser;
+	}
+
+	public void setDefaultParser(SocketParse defaultParser)
+	{
+		this.defaultParser = defaultParser;
 	}
 
 	public MySQL getMySQL()
@@ -208,8 +221,6 @@ public abstract class Server
 
 	protected abstract int getPort();
 
-	protected abstract void dispatchSocket(Socket socket);
-
 	protected void initConfigs() throws RagnarokException
 	{
 		ConfigLoad load = new ConfigLoad();
@@ -274,8 +285,35 @@ public abstract class Server
 					try {
 
 						Socket socket = serverSocket.accept();
+						Client client = new Client(socket);
 
-						dispatchSocket(socket);
+						Thread thread = new Thread(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								while (client.isConnected())
+								{
+									while (!client.isInterrupted())
+									{
+										try {
+											defaultParser.parse(client);
+										} catch (RagnarokException e) {
+											logError("falha com um cliente (ip: %s)", client.getIP());
+											logExeception(e);
+										}
+									}
+
+									Thread.interrupted();
+								}
+							}
+						});
+						thread.setDaemon(false);
+						thread.setPriority(Thread.MIN_PRIORITY);
+						thread.setName(format("Login:%s", client.getIP()));
+						thread.run();
+
+						client.setThread(thread);
 
 					} catch (IOException e) {
 						logExeception(e);

@@ -7,8 +7,6 @@ import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.util.MessageUtil.die;
 
-import java.net.Socket;
-
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.ConfigLoad;
 import org.diverproject.jragnarok.server.InternetProtocol;
@@ -186,13 +184,6 @@ public class LoginServer extends Server implements ServerListener
 	protected int getPort()
 	{
 		return getConfigs().getInt("login.port");
-	}
-
-	@Override
-	protected void dispatchSocket(Socket socket)
-	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	public static LoginServer getInstance()

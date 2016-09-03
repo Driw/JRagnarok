@@ -2,8 +2,6 @@ package org.diverproject.jragnarok.server.map;
 
 import static org.diverproject.util.MessageUtil.die;
 
-import java.net.Socket;
-
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
@@ -110,13 +108,6 @@ public class MapServer extends Server implements ServerListener
 	protected int getPort()
 	{
 		return PORT;
-	}
-
-	@Override
-	protected void dispatchSocket(Socket socket)
-	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	public static MapServer getInstance()

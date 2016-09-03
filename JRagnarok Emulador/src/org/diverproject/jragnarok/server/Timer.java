@@ -16,7 +16,7 @@ public class Timer
 	private int id;
 	private long tick;
 	private int interval;
-	private int data;
+	private int data; // TODO quando/onde usa? remover?
 	private BitWise type;
 	private TimerListener listener;
 
