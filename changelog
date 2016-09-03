@@ -1,3 +1,11 @@
+03.09.2016 - 1.0.11
+- Adicionando todos os serviços que compõe projedo do servidor de acesso.
+	- Irá usar LoginServerService como base para criação dos serviços abaixo:
+	- Serviços para: servidor de personagem, cliente, ip ban, log.
+- LoginServer atualizado conforme os serviços adicionados.
+	- Adicionando ainda alguns temporizadores e processos para iniciar.
+		- A maioria ainda será implementado nas próximas revisões.
+
 03.09.2016 - 1.0.10
 - Dois tipos de clientes adicionado: ClientCharServer e ClientPlayer.
 	- ClientCharServer representa os servidores de personagens disponíveis.

@@ -3,24 +3,42 @@ package org.diverproject.jragnarok.server.login;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_BILLING;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_VIP;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.util.MessageUtil.die;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.ConfigLoad;
+import org.diverproject.jragnarok.server.ClientCharServer;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
+import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerListener;
+import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.config.ConfigClient;
 import org.diverproject.jragnarok.server.config.ConfigFiles;
 import org.diverproject.jragnarok.server.config.ConfigIpBan;
 import org.diverproject.jragnarok.server.config.ConfigLog;
 import org.diverproject.jragnarok.server.config.ConfigLogin;
+import org.diverproject.jragnarok.server.login.services.LoginCharacterService;
+import org.diverproject.jragnarok.server.login.services.LoginClientService;
+import org.diverproject.jragnarok.server.login.services.LoginIpBanService;
+import org.diverproject.jragnarok.server.login.services.LoginLogService;
+import org.diverproject.util.collection.List;
+import org.diverproject.util.collection.abstraction.LoopList;
 
 public class LoginServer extends Server implements ServerListener
 {
 	private static final LoginServer INSTANCE;
+
+	private List<ClientCharServer> charServers;
+	private LoginLogService logService;
+	private LoginClientService clientService;
+	private LoginCharacterService charService;
+	private LoginIpBanService ipBanService;
 
 	static
 	{
@@ -38,6 +56,18 @@ public class LoginServer extends Server implements ServerListener
 	public LoginServer() throws RagnarokException
 	{
 		setListener(this);
+
+		charServers = new LoopList<>(MAX_SERVERS);
+
+		logService = new LoginLogService(this);
+		clientService = new LoginClientService(this);
+		charService = new LoginCharacterService(this);
+		ipBanService = new LoginIpBanService(this);
+	}
+
+	public List<ClientCharServer> getCharServers()
+	{
+		return charServers;
 	}
 
 	@Override
@@ -45,6 +75,24 @@ public class LoginServer extends Server implements ServerListener
 	{
 		return new LoginConfig();
 	}
+
+	private TimerListener waitingDisconnectTimer = new TimerListener()
+	{
+		@Override
+		public void onCall(Timer timer, long tick)
+		{
+			
+		}
+	};
+
+	private TimerListener onlineDataCleanup = new TimerListener()
+	{
+		@Override
+		public void onCall(Timer timer, long tick)
+		{
+			
+		}
+	};
 
 	@Override
 	public void onCreate() throws RagnarokException
@@ -123,43 +171,52 @@ public class LoginServer extends Server implements ServerListener
 	@Override
 	public void onCreated() throws RagnarokException
 	{
-		// TODO Auto-generated method stub
-		
+		if (getConfigs().getBool("log.login"))
+			logService.init();
+
+		if (getConfigs().getBool("ipban.enabled"))
+			ipBanService.init();
+
+		TimerSystem ts = TimerSystem.getInstance();
+		ts.addListener(waitingDisconnectTimer, "waitingDisconnectTimer");
+
+		setDefaultParser(clientService.parse);
+
+		ts.addListener(onlineDataCleanup, "onlineDataCleanup");
+		ts.addTimerInterval(ts.tick() + 600*1000, onlineDataCleanup, 0, 0, 600*100);
 	}
 
 	@Override
 	public void onRunning() throws RagnarokException
 	{
-		// TODO Auto-generated method stub
-		
+		logInfo("o servidor de acesso está pronto (porta: %d).\n", getPort());
+
+		logService.log(new InternetProtocol(), "login server", 100, "login server started");
 	}
 
 	@Override
 	public void onStop() throws RagnarokException
 	{
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onStoped() throws RagnarokException
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onDestroy() throws RagnarokException
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onDestroyed() throws RagnarokException
 	{
-		// TODO Auto-generated method stub
-		
+		charService.shutdown();
+		//ClientSystem.flushBuffers();		
 	}
 
 	@Override

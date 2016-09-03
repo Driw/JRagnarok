@@ -1,0 +1,27 @@
+[Log] LogSystem.initialize: Log: Inicialização efetuado com êxito (horário: 2016/09/02 19:46:29, arquivo: log).
+[Info] Server.changeState: alterando estado de NONE para CREATE.
+[Info] ConfigLoad.read: 12 configurações lidas de config\Login.conf.
+[Info] ConfigLoad.read: 6 configurações lidas de config\IpBan.conf.
+[Info] ConfigLoad.read: 1 configurações lidas de config\Log.conf.
+[Info] ConfigLoad.read: 5 configurações lidas de config\Client.conf.
+[Info] ConfigLoad.read: 5 configurações lidas de config\SqlConnection.conf.
+[Notice] Server.initSqlConnection: conexão MySQL estabelecida (localhost:3306).
+[Notice] Server.initThread: thread do servidor criada.
+[Notice] Server.initSocket: conexão estabelecida com êxito (porta: 6900).
+[Info] Server.changeState: alterando estado de CREATE para CREATED.
+[Info] LoginServer.onRunning: o servidor de acesso está pronto (porta: 6900).
+[Info] Server.changeState: alterando estado de CREATED para RUNNING.
+[Info] Server.changeState: alterando estado de NONE para CREATE.
+[Info] ConfigLoad.read: 5 configurações lidas de config\SqlConnection.conf.
+[Notice] Server.initSqlConnection: conexão MySQL estabelecida (localhost:3306).
+[Notice] Server.initThread: thread do servidor criada.
+[Notice] Server.initSocket: conexão estabelecida com êxito (porta: 6121).
+[Info] Server.changeState: alterando estado de CREATE para CREATED.
+[Info] Server.changeState: alterando estado de CREATED para RUNNING.
+[Info] Server.changeState: alterando estado de NONE para CREATE.
+[Info] ConfigLoad.read: 5 configurações lidas de config\SqlConnection.conf.
+[Notice] Server.initSqlConnection: conexão MySQL estabelecida (localhost:3306).
+[Notice] Server.initThread: thread do servidor criada.
+[Notice] Server.initSocket: conexão estabelecida com êxito (porta: 5121).
+[Info] Server.changeState: alterando estado de CREATE para CREATED.
+[Info] Server.changeState: alterando estado de CREATED para RUNNING.
