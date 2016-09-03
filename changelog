@@ -1,3 +1,10 @@
+03.09.2016 - 1.0.10
+- Dois tipos de clientes adicionado: ClientCharServer e ClientPlayer.
+	- ClientCharServer representa os servidores de personagens disponíveis.
+	- ClientPlayer um jogador que já solicitou a conexão com o servidor.	
+		- Ainda há atributos para ser implementado mas será usado.
+- ServerService será usado para criar os diversos serviços internos do emulador.
+
 03.09.2016 - 1.0.9
 - Removido dispatchSocket() de Server, agora irá usar uma interface SocketParser.
 - Pequenos ajustes em TimerSystem para evitar NullPointerExceptions e chamados desnecessários.
