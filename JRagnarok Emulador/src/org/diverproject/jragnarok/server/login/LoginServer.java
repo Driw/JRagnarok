@@ -191,7 +191,7 @@ public class LoginServer extends Server implements ServerListener
 	{
 		logInfo("o servidor de acesso está pronto (porta: %d).\n", getPort());
 
-		logService.log(new InternetProtocol(), "login server", 100, "login server started");
+		logService.addLoginLog(getClient(), 100, "login server started");
 	}
 
 	@Override

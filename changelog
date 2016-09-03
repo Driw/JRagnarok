@@ -1,3 +1,7 @@
+03.09.2016 - 1.0.14
+- Implementação de LoginLogService com ControllerLoginLog.
+- Atualizando LoginClientService conforme rev12.
+
 03.09.2016 - 1.0.13
 - Impossibilitando instâncias de:
 	- JRagnarokConstants, JRagnarokLogListener e JRagnarokUtil.
