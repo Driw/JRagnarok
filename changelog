@@ -1,3 +1,7 @@
+03.09.2016 - 1.0.13
+- Impossibilitando instâncias de:
+	- JRagnarokConstants, JRagnarokLogListener e JRagnarokUtil.
+
 03.09.2016 - 1.0.12
 - AbstractController para criar todos os controles no emulador.
 - ClientServer adicionado para representar os servidores.

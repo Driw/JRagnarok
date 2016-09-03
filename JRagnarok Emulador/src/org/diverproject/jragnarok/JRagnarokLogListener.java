@@ -7,6 +7,11 @@ public class JRagnarokLogListener implements LogListener
 {
 	private static final LogListener INSTANCE = new JRagnarokLogListener();
 
+	private JRagnarokLogListener()
+	{
+		
+	}
+
 	@Override
 	public void onMessage(Log log)
 	{

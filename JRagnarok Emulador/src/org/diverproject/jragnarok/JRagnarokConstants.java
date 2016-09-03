@@ -11,4 +11,9 @@ public class JRagnarokConstants
 	public static final int MAX_CHARS = 9;
 	public static final int MAX_CHAR_VIP = 0;
 	public static final int MAX_CHAR_BILLING = 0;
+
+	private JRagnarokConstants()
+	{
+		
+	}
 }

@@ -10,6 +10,11 @@ import org.diverproject.util.SystemUtil;
 
 public class JRagnarokUtil
 {
+	private JRagnarokUtil()
+	{
+		
+	}
+
 	public static void sleep(long mileseconds)
 	{
 		try {
