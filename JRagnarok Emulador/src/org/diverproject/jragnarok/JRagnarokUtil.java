@@ -1,10 +1,14 @@
 package org.diverproject.jragnarok;
 
 import static org.diverproject.log.LogSystem.log;
+import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.setUpSource;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
+import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.util.SizeUtil;
 import org.diverproject.util.SystemUtil;
 
@@ -65,5 +69,49 @@ public class JRagnarokUtil
 		setUpSource(1);
 
 		log("%s liberado pelo GC.\n", SizeUtil.toString(freeMemory));
+	}
+
+	public static String strcap(String string, int length)
+	{
+		if (string == null)
+			return "";
+
+		if (string.length() > length)
+			return string.substring(0, length);
+
+		return string;
+	}
+
+	public static String md5Encrypt(String string)
+	{
+		try {
+
+			MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+			byte encrypted[] = messageDigest.digest(string.getBytes());
+			String md5String =  new String(encrypted);
+
+			return md5String;
+
+		} catch (NoSuchAlgorithmException e) {
+
+			setUpSource(1);
+			logExeception(e);
+
+			throw new RagnarokRuntimeException(e.getMessage());
+		}
+	}
+
+	public static String binToHex(String string, int count)
+	{
+		String output = "";
+		String toHex = "0123456789abcdef";
+
+		for (int i = 0; i < count; i++)
+		{
+			output += toHex.charAt(string.charAt(i) & 0xF0 >> 4);
+			output += toHex.charAt(string.charAt(i) & 0x0F >> 0);
+		}
+
+		return output;
 	}
 }

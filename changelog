@@ -1,3 +1,7 @@
+04.09.2016 - 1.0.16
+- Subindo as constantes que não foram enviadas na rev15.
+- Também está sendo adicionando alguns métodos utilitários usados ou que serão usados.
+
 04.09.2016 - 1.0.15
 - Adicionando todas as estruturas que serão usadas pelo servidor de acesso.
 	- AccountState e ClientType terá suas enumerações adicionadsa em breve.
