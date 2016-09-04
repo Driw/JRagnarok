@@ -234,7 +234,7 @@ public class LoginServer extends Server implements ServerListener
 	@Override
 	protected String getAddress()
 	{
-		return ((InternetProtocol) getConfigs().getObject("login.ip")).get();
+		return ((InternetProtocol) getConfigs().getObject("login.ip")).getString();
 	}
 
 	@Override

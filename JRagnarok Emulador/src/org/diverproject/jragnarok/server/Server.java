@@ -1,6 +1,5 @@
 package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.sleep;
 import static org.diverproject.jragnarok.server.ServerState.CREATE;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
@@ -10,7 +9,6 @@ import static org.diverproject.jragnarok.server.ServerState.NONE;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.ServerState.STOPED;
 import static org.diverproject.jragnarok.server.ServerState.STOPPING;
-import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
@@ -40,7 +38,6 @@ public abstract class Server
 	private ServerListener listener;
 	private ServerConfig configs;
 	private SocketParse defaultParser;
-	private ClientServer client;
 	private MySQL sql;
 
 	public Server() throws RagnarokException
@@ -51,6 +48,16 @@ public abstract class Server
 		this.state = NONE;
 		this.configs = setServerConfig();
 		this.sql = new MySQL();
+	}
+
+	public ServerState getState()
+	{
+		return state;
+	}
+
+	public boolean isState(ServerState state)
+	{
+		return state.equals(state);
 	}
 
 	public void setListener(ServerListener listener)
@@ -78,11 +85,6 @@ public abstract class Server
 	public MySQL getMySQL()
 	{
 		return sql;
-	}
-
-	protected Client getClient()
-	{
-		return client;
 	}
 
 	protected void changeState(ServerState newState) throws RagnarokException
@@ -157,7 +159,6 @@ public abstract class Server
 				initTimer();
 				initThread();
 				initSocket();
-				initClient();
 			}
 			listener.onCreated();
 		}
@@ -292,35 +293,10 @@ public abstract class Server
 					try {
 
 						Socket socket = serverSocket.accept();
-						ClientPlayer player = new ClientPlayer(socket);
+						FileDecriptor fileDecriptor = new FileDecriptor(socket);
 
-						Thread thread = new Thread(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								while (player.isConnected())
-								{
-									while (!player.isInterrupted())
-									{
-										try {
-											defaultParser.parse(player);
-										} catch (RagnarokException e) {
-											logError("falha com um cliente (ip: %s)", player.getIP());
-											logExeception(e);
-										}
-									}
-
-									Thread.interrupted();
-								}
-							}
-						});
-						thread.setDaemon(false);
-						thread.setPriority(Thread.MIN_PRIORITY);
-						thread.setName(format("Login:%s", player.getIP()));
-						thread.run();
-
-						player.setThread(thread);
+						ServerThread thread = new ServerThread(self, fileDecriptor);
+						thread.start();
 
 					} catch (IOException e) {
 						logExeception(e);
@@ -361,29 +337,6 @@ public abstract class Server
 			throw new RagnarokException("host desconhecido");
 		} catch (IOException e) {
 			throw new RagnarokException(e.getMessage());
-		}
-	}
-
-	private void initClient()
-	{
-		String username = getConfigs().getString("login.username");
-		String password = getConfigs().getString("password");
-		short port = (short) getConfigs().getInt("login.port");
-		short users = 0;
-
-		try {
-
-			Socket socket = new Socket(getAddress(), getPort());
-
-			client = new ClientServer(socket);
-			client.setID(1);
-			client.setUsername(username);
-			client.setPassword(password);
-			client.setUsers(users);
-			client.setPort(port);
-
-		} catch (IOException e) {
-			logExeception(e);
 		}
 	}
 }

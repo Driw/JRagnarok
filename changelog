@@ -1,3 +1,11 @@
+04.09.2016 - 1.0.17
+- FileDecriptor e FileDecriptorListener adicionados.
+	- Serão usados no lugar de Client e outras classes filhas.
+- Server: adicionando método que permite obter o estado ou compará-lo.
+	- Removido initClient, será usado um ServerThread junto de FileDecriptor.
+- SocketParser agora irá receber um FileDecriptor ao invés de um Client.
+- Agora get() passa a ser getString() em InternetProtocol para get() retornar int.
+
 04.09.2016 - 1.0.16
 - Subindo as constantes que não foram enviadas na rev15.
 - Também está sendo adicionando alguns métodos utilitários usados ou que serão usados.

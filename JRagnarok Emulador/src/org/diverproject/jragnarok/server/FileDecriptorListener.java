@@ -2,7 +2,7 @@ package org.diverproject.jragnarok.server;
 
 import org.diverproject.jragnaork.RagnarokException;
 
-public interface SocketParse
+public interface FileDecriptorListener
 {
-	void parse(FileDecriptor decriptor) throws RagnarokException;
+	void onCall(FileDecriptor decriptor) throws RagnarokException;
 }

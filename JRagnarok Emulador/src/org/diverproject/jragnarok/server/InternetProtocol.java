@@ -4,6 +4,7 @@ import java.net.Socket;
 
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.SocketUtil;
+import org.diverproject.util.lang.ByteUtil;
 import org.diverproject.util.lang.IntUtil;
 
 public class InternetProtocol
@@ -41,6 +42,26 @@ public class InternetProtocol
 	{
 		if (!IntUtil.interval(first, 0, 255))
 			throw new IllegalArgumentException();
+	}
+
+	public String getString()
+	{
+		return String.format("%d.%d.%d.%d", first, second, third, fourth);
+	}
+
+	public int get()
+	{
+		return IntUtil.parseBytes(new byte[] { first, second, third, fourth });
+	}
+
+	public void set(int intIP)
+	{
+		byte numbers[] = ByteUtil.parseInt(intIP);
+
+		setFirst(numbers[0]);
+		setSecond(numbers[1]);
+		setThird(numbers[2]);
+		setFourth(numbers[3]);
 	}
 
 	public byte getFirst()
@@ -91,11 +112,6 @@ public class InternetProtocol
 		this.fourth = (byte) fourth;
 	}
 
-	public String get()
-	{
-		return String.format("%d.%d.%d.%d", first, second, third, fourth);
-	}
-
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -129,7 +145,7 @@ public class InternetProtocol
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append(get());
+		description.append(getString());
 
 		return description.toString();
 	}
