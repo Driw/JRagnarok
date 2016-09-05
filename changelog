@@ -1,3 +1,10 @@
+05.09.2016 - 1.0.22
+- LoginServer atualizado conforme atualizações em LoginLogService.
+	- Também foi adicionado a ele todos os serviços e os métodos getters.
+- Adicionando LoginLog para armazenar dados de uma tabela do banco de dados.
+- Será usado por LoginLogService passa a criar internamente LoginLog.
+- ControllerLoginLog deverá receber LoginLog para atender como classe de controle.
+
 05.09.2016 - 1.0.21
 - Pequenos ajustes em CharServerType, ClientCharServer, ClientHash e Login.
 - ClientType implementado, ainda será confirmado se estas são as verdadeiras variáveis.

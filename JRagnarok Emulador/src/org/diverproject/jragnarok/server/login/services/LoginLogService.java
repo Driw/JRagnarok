@@ -4,9 +4,9 @@ import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.server.Client;
-import org.diverproject.jragnarok.server.ClientPlayer;
 import org.diverproject.jragnarok.server.login.LoginServer;
+import org.diverproject.jragnarok.server.login.structures.Login;
+import org.diverproject.util.SocketUtil;
 
 public class LoginLogService extends LoginServerService
 {
@@ -27,27 +27,30 @@ public class LoginLogService extends LoginServerService
 		}
 	}
 
-	public void addLoginLog(Client client, int rcode, String message)
+	public void addLoginLog(String ip, Login login, int code, String message)
 	{
-		if (!client.isConnected())
-			return;
-
 		try {
-			controller.log(client, rcode, message);
+
+			LoginLog log = new LoginLog();
+			log.getIP().set(SocketUtil.socketIPInt(ip));
+			log.setUser(login.getUsername());
+			log.setRCode(code);
+			log.setMessage(message);
+
+			if (!controller.add(log))
+				logWarning("falha ao registrar log (ip: %s, username: %s)", ip, login.getUsername());
+
 		} catch (RagnarokException e) {
 			logExeception(e);
 		}
 	}
 
-	public int getFailedAttempts(ClientPlayer player, int minutes)
+	public int getFailedAttempts(String ip, int minutes)
 	{
-		if (!player.isConnected())
-			return 0;
-
 		int failures = 0;
 
 		try {
-			failures = controller.countFailedAttempts(player, minutes);
+			failures = controller.countFailedAttempts(ip, minutes);
 		} catch (RagnarokException e) {
 			logExeception(e);
 		}

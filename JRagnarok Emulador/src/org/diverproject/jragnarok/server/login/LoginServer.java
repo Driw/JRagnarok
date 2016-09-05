@@ -11,7 +11,6 @@ import static org.diverproject.util.MessageUtil.die;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.ConfigLoad;
-import org.diverproject.jragnarok.server.ClientCharServer;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
@@ -27,6 +26,10 @@ import org.diverproject.jragnarok.server.login.services.LoginCharacterService;
 import org.diverproject.jragnarok.server.login.services.LoginClientService;
 import org.diverproject.jragnarok.server.login.services.LoginIpBanService;
 import org.diverproject.jragnarok.server.login.services.LoginLogService;
+import org.diverproject.jragnarok.server.login.services.LoginService;
+import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
+import org.diverproject.jragnarok.server.login.structures.Login;
+import org.diverproject.jragnarok.server.login.structures.Sex;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.LoopList;
 
@@ -39,6 +42,7 @@ public class LoginServer extends Server implements ServerListener
 	private LoginClientService clientService;
 	private LoginCharacterService charService;
 	private LoginIpBanService ipBanService;
+	private LoginService loginService;
 
 	static
 	{
@@ -63,6 +67,7 @@ public class LoginServer extends Server implements ServerListener
 		clientService = new LoginClientService(this);
 		charService = new LoginCharacterService(this);
 		ipBanService = new LoginIpBanService(this);
+		loginService = new LoginService(this);
 	}
 
 	public List<ClientCharServer> getCharServers()
@@ -74,6 +79,31 @@ public class LoginServer extends Server implements ServerListener
 	protected LoginConfig setServerConfig()
 	{
 		return new LoginConfig();
+	}
+
+	public LoginLogService getLogService()
+	{
+		return logService;
+	}
+
+	public LoginClientService getClientService()
+	{
+		return clientService;
+	}
+
+	public LoginCharacterService getCharService()
+	{
+		return charService;
+	}
+
+	public LoginIpBanService getIpBanService()
+	{
+		return ipBanService;
+	}
+
+	public LoginService getLoginService()
+	{
+		return loginService;
 	}
 
 	private TimerListener waitingDisconnectTimer = new TimerListener()
@@ -191,7 +221,12 @@ public class LoginServer extends Server implements ServerListener
 	{
 		logInfo("o servidor de acesso está pronto (porta: %d).\n", getPort());
 
-		logService.addLoginLog(getClient(), 100, "login server started");
+		Login login = new Login();
+		login.setSex(Sex.SERVER);
+		login.setUsername(getConfigs().getString("login.username"));
+		login.setPassword(getConfigs().getString("login.password"));
+
+		logService.addLoginLog(getAddress(), login, 100, "login server started");
 	}
 
 	@Override
