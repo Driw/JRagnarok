@@ -7,10 +7,14 @@ import static org.diverproject.log.LogSystem.setUpSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
+import java.util.Random;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnaork.messages.Messages;
+import org.diverproject.jragnarok.server.FileDecriptor;
 import org.diverproject.util.SizeUtil;
 import org.diverproject.util.SystemUtil;
+import org.diverproject.util.collection.List;
 
 public class JRagnarokUtil
 {
@@ -18,6 +22,8 @@ public class JRagnarokUtil
 	{
 		
 	}
+
+	private static final Random random = new Random();
 
 	public static void sleep(long mileseconds)
 	{
@@ -101,6 +107,16 @@ public class JRagnarokUtil
 		}
 	}
 
+	public static String md5Salt(int length)
+	{
+		byte bytes[] = new byte[length];
+
+		for (int i = 0; i < bytes.length; i++)
+			bytes[i] = (byte) (1 + random() % 255);
+
+		return new String(bytes);
+	}
+
 	public static String binToHex(String string, int count)
 	{
 		String output = "";
@@ -113,5 +129,97 @@ public class JRagnarokUtil
 		}
 
 		return output;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static int indexOn(List list, Object target)
+	{
+		for (int i = 0; i < list.size(); i++)
+			if (list.get(i).equals(target))
+				return i + 1;
+
+		return 0;
+	}
+
+	public static void skip(FileDecriptor fd, boolean input, int bytes)
+	{
+		if (input)
+			fd.newInput("SkipPacket").skipe(bytes);
+		else
+			fd.newOutput("SkipPacket").skipe(bytes);
+	}
+
+	public static int random()
+	{
+		int i = random.nextInt();
+
+		return i > 0 ? i : i * -1;
+	}
+
+	public static String loginMessage(int number)
+	{
+		return Messages.getInstance().getLoginMessages().get(number);
+	}
+
+	public static String charMessage(int number)
+	{
+		return Messages.getInstance().getCharMessages().get(number);
+	}
+
+	public static String mapMessage(int number)
+	{
+		return Messages.getInstance().getMapMessages().get(number);
+	}
+
+	public static int dateToVersion(int date)
+	{
+			 if(date < 20040906) return 5;
+		else if(date < 20040920) return 10;
+		else if(date < 20041005) return 11;
+		else if(date < 20041025) return 12;
+		else if(date < 20041129) return 13;
+		else if(date < 20050110) return 14;
+		else if(date < 20050509) return 15;
+		else if(date < 20050628) return 16;
+		else if(date < 20050718) return 17;
+		else if(date < 20050719) return 18;
+		else if(date < 20060327) return 19;
+		else if(date < 20070108) return 20;
+		else if(date < 20070212) return 21;
+		else if(date < 20080910) return 22;
+		else if(date < 20080827) return 23;
+		else if(date < 20080910) return 24;
+		else if(date < 20101124) return 25;
+		else if(date < 20111005) return 26;
+		else if(date < 20111102) return 27;
+		else if(date < 20120307) return 28;
+		else if(date < 20120410) return 29;
+		else if(date < 20120418) return 30;
+		else if(date < 20120618) return 31;
+		else if(date < 20120702) return 32;
+		else if(date < 20130320) return 33;
+		else if(date < 20130515) return 34;
+		else if(date < 20130522) return 35;
+		else if(date < 20130529) return 36;
+		else if(date < 20130605) return 37;
+		else if(date < 20130612) return 38;
+		else if(date < 20130618) return 39;
+		else if(date < 20130626) return 40;
+		else if(date < 20130703) return 41;
+		else if(date < 20130710) return 42;
+		else if(date < 20130717) return 43;
+		else if(date < 20130807) return 44;
+		else if(date < 20131223) return 45;
+		else if(date < 20140212) return 46;
+		else if(date < 20140613) return 47;
+		else if(date < 20141016) return 48;
+		else if(date < 20141022) return 50;
+		else if(date < 20150513) return 51;
+		else if(date < 20150916) return 52;
+		else if(date < 20151001) return 53;
+		else if(date < 20151104) return 54;
+		else if(date >= 20151104) return 55;
+
+		else return 30;
 	}
 }

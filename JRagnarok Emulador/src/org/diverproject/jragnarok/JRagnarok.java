@@ -1,7 +1,10 @@
 package org.diverproject.jragnarok;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.server.FileDecriptor;
 import org.diverproject.jragnarok.server.Server;
+import org.diverproject.jragnarok.server.ServerState;
+import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.CharServer;
 import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.map.MapServer;
@@ -17,6 +20,9 @@ public class JRagnarok
 		LogSystem.initialize();
 		LogSystem.addListener(JRagnarokLogListener.getInstance());
 
+		TimerSystem timer = TimerSystem.getInstance();
+		timer.init();
+
 		Server loginServer = LoginServer.getInstance();
 		loginServer.create();
 		loginServer.run();
@@ -28,5 +34,13 @@ public class JRagnarok
 		Server mapServer = MapServer.getInstance();
 		mapServer.create();
 		mapServer.run();
+
+		while (!loginServer.isState(ServerState.DESTROYED) &&
+				!charServer.isState(ServerState.DESTROYED) &&
+				!mapServer.isState(ServerState.DESTROYED))
+		{
+			long next = timer.update(timer.tick());
+			FileDecriptor.update(next);
+		}
 	}
 }

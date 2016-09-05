@@ -37,7 +37,7 @@ public abstract class Server
 	private ServerSocket serverSocket;
 	private ServerListener listener;
 	private ServerConfig configs;
-	private SocketParse defaultParser;
+	private FileDecriptorListener defaultParser;
 	private MySQL sql;
 
 	public Server() throws RagnarokException
@@ -72,12 +72,12 @@ public abstract class Server
 		return configs;
 	}
 
-	public SocketParse getDefaultParser()
+	public FileDecriptorListener getDefaultParser()
 	{
 		return defaultParser;
 	}
 
-	public void setDefaultParser(SocketParse defaultParser)
+	public void setDefaultParser(FileDecriptorListener defaultParser)
 	{
 		this.defaultParser = defaultParser;
 	}
@@ -293,10 +293,7 @@ public abstract class Server
 					try {
 
 						Socket socket = serverSocket.accept();
-						FileDecriptor fileDecriptor = new FileDecriptor(socket);
-
-						ServerThread thread = new ServerThread(self, fileDecriptor);
-						thread.start();
+						FileDecriptor.newFileDecriptor(socket);
 
 					} catch (IOException e) {
 						logExeception(e);

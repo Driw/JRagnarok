@@ -20,6 +20,7 @@ public class TimerSystem
 
 	private long started;
 	private long lastTick;
+	private long lastTickCount;
 	private TimerTick tick;
 	private Map<Integer, Timer> timers;
 	private Map<String, TimerListener> listeners;
@@ -137,10 +138,18 @@ public class TimerSystem
 
 	public long tick()
 	{
-		return (lastTick = tick.getTicks());
+		lastTick = tick.getTicks();
+		lastTickCount = tick.getTicksCount();
+
+		return lastTickCount;
 	}
 
 	public long getLastTick()
+	{
+		return lastTick;
+	}
+
+	public long getLastTickCount()
 	{
 		return lastTick;
 	}

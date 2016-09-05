@@ -1,16 +1,18 @@
 05.09.2016 - 1.0.20
-Pequenos ajustes em ConfigLoad e clear() deverá apenas substituir o map das configurações.
+- TimerSystem corrigido na forma como tick() deveria funcionar e adicionado novo atributo.
+- ServerThread não será mais usado, o emulador não funciona com threads individuais.
+	- Isso também iria resultar em um numero demasiado de threads e poderia privilegiar threads.
+- Como os IPs são usados como int então InternetProtocol terá construtor por parâmetro int.
+- Atualizando FileDecriptor para possuir uma lista com as instâncias internamente por static.
+	- Adicionado ainda atributo para dar um timeout ao objeto para evitar ociosidade.
+
+05.09.2016 - 1.0.19
+- Pequenos ajustes em ConfigLoad e clear() deverá apenas substituir o map das configurações.
 - Enviando também os arquivos contendo as mensagens dos três servidores.
 	- As mensagens foram separadas em dois idiomas: português e inglês.
 
-05.09.2016 - 1.0.19
+05.09.2016 - 1.0.18
 - Sistema para leitura de arquivos com mensagens identificadas numericamente.
-
-04.09.2016 - 1.0.18
-- Removendo Client, ClientServerType, ClientPlayer e ClientServer.
-	- ClientHash e ClientCharServer estão em server.login.strucutres ajustados.
-	- As classes removidas foram transormadas em novas classes mais especícias ().
-- Pequenos ajustes nas classes de serviço do servidor de acesso conforme as atualizações acima.
 
 04.09.2016 - 1.0.17
 - FileDecriptor e FileDecriptorListener adicionados.

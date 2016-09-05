@@ -38,6 +38,17 @@ public class InternetProtocol
 		setFourth(IntUtil.parse(numbers[3]));
 	}
 
+	public InternetProtocol(int intIP)
+	{
+		String ip = SocketUtil.socketIP(intIP);
+		String numbers[] = ip.split(".");
+
+		setFirst(IntUtil.parse(numbers[0]));
+		setSecond(IntUtil.parse(numbers[1]));
+		setThird(IntUtil.parse(numbers[2]));
+		setFourth(IntUtil.parse(numbers[3]));
+	}
+
 	private void validate(int value)
 	{
 		if (!IntUtil.interval(first, 0, 255))

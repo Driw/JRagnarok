@@ -1,14 +1,21 @@
 package org.diverproject.jragnarok.server;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.FD_SETSIZE;
+import static org.diverproject.jragnarok.JRagnarokUtil.indexOn;
 import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
+import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.setUpSource;
 
 import java.io.IOException;
 import java.net.Socket;
 
+import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.collection.List;
+import org.diverproject.util.collection.abstraction.LoopList;
 import org.diverproject.util.stream.StreamException;
 import org.diverproject.util.stream.implementation.input.InputPacket;
 import org.diverproject.util.stream.implementation.output.OutputPacket;
@@ -19,22 +26,19 @@ public class FileDecriptor
 	public static final int FLAG_SERVER = 2;
 	public static final int FLAG_PING = 3;
 
-	private static int AUTO_INCREMENT = 0;
-
 	private int id;
 	private int flag;
+	private int timeout;
 	private Socket socket;
 	private InternetProtocol address;
-	private ServerThread thread;
 	private boolean interrupted;
 	private FileDecriptorListener receiveListener;
 	private FileDecriptorListener sendListener;
 	private FileDecriptorListener parseListener;
 	private Object cache;
 
-	FileDecriptor(Socket socket)
+	private FileDecriptor(Socket socket)
 	{
-		this.id = ++AUTO_INCREMENT;
 		this.socket = socket;
 		this.address = new InternetProtocol(socket);
 	}
@@ -60,6 +64,16 @@ public class FileDecriptor
 			this.flag = flag;
 	}
 
+	public int getTimeout()
+	{
+		return timeout;
+	}
+
+	public void setTimeout(int timeout)
+	{
+		this.timeout = timeout;
+	}
+
 	public int getAddress()
 	{
 		return address.get();
@@ -68,16 +82,6 @@ public class FileDecriptor
 	public String getAddressString()
 	{
 		return address.getString();
-	}
-
-	public ServerThread getThread()
-	{
-		return thread;
-	}
-
-	void setThread(ServerThread thread)
-	{
-		this.thread = thread;
 	}
 
 	public boolean isInterrupted()
@@ -151,6 +155,8 @@ public class FileDecriptor
 
 			socket.close();
 			socket = null;
+			SESSIONS.remove(id);
+			id = 0;
 
 		} catch (IOException e) {
 			logExeception(e);
@@ -170,9 +176,6 @@ public class FileDecriptor
 		description.append("id", id);
 		description.append("address", address.getString());
 
-		if (thread != null)
-			description.append("interrupted", thread.isInterrupted());
-
 		description.append("receive", receiveListener);
 		description.append("send", sendListener);
 		description.append("parse", parseListener);
@@ -181,5 +184,68 @@ public class FileDecriptor
 			description.append("cache", nameOf(cache));
 
 		return description.toString();
+	}
+
+	private static final List<FileDecriptor> SESSIONS = new LoopList<>(FD_SETSIZE);
+
+	public static FileDecriptor newFileDecriptor(Socket socket)
+	{
+		FileDecriptor fd = new FileDecriptor(socket);
+
+		if (!SESSIONS.add(fd))
+		{
+			fd.close();
+
+			return null;
+		}
+
+		fd.setID(indexOn(SESSIONS, fd));
+
+		return fd;
+	}
+
+	public static void update(long next)
+	{
+		TimerSystem timer = TimerSystem.getInstance();
+		long lastTick = timer.getLastTickCount();
+
+		for (FileDecriptor fd : SESSIONS)
+		{
+			if (fd.getTimeout() > 0 && (lastTick - fd.getTimeout()) > 60)
+			{
+				if (fd.getFlag() == FLAG_SERVER && fd.flag != 2)
+					fd.setFlag(FLAG_PING);
+				else
+				{
+					log("sessão #%d terminou (ip: %s).\n", fd.getID(), fd.getAddressString());
+					fd.close();
+				}
+			}
+
+			try {
+
+				fd.getParseListener().onCall(fd);
+				fd.setTimeout(60);
+
+			} catch (RagnarokException e) {
+
+				setUpSource(1);
+				logError("processamento inválido encontrado:\n");
+				logExeception(e);
+
+			} catch (RagnarokRuntimeException e) {
+
+				setUpSource(1);
+				logError("informação inválida encontrada:\n");
+				logExeception(e);
+
+			} catch (Exception e) {
+
+				setUpSource(1);
+				logError("erro inesperado ocorrido:\n");
+				logExeception(e);
+
+			}
+		}
 	}
 }
