@@ -1,3 +1,14 @@
+05.09.2016 - 1.0.19
+- Sistema para leitura de arquivos com mensagens identificadas numericamente.
+- Enviando também os arquivos contendo as mensagens dos três servidores.
+	- As mensagens foram separadas em dois idiomas: português e inglês.
+
+04.09.2016 - 1.0.18
+- Removendo Client, ClientServerType, ClientPlayer e ClientServer.
+	- ClientHash e ClientCharServer estão em server.login.strucutres ajustados.
+	- As classes removidas foram transormadas em novas classes mais especícias ().
+- Pequenos ajustes nas classes de serviço do servidor de acesso conforme as atualizações acima.
+
 04.09.2016 - 1.0.17
 - FileDecriptor e FileDecriptorListener adicionados.
 	- Serão usados no lugar de Client e outras classes filhas.
