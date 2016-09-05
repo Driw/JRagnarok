@@ -13,7 +13,7 @@ public class ClientCharServer
 	private CharServerType type;
 	private short newValue;
 
-	ClientCharServer(FileDecriptor fileDecriptor)
+	public ClientCharServer(FileDecriptor fileDecriptor)
 	{
 		this.fileDecriptor = fileDecriptor;
 	}

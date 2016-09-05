@@ -1,3 +1,9 @@
+05.09.2016 - 1.0.21
+- Pequenos ajustes em CharServerType, ClientCharServer, ClientHash e Login.
+- ClientType implementado, ainda será confirmado se estas são as verdadeiras variáveis.
+- LoginSessionData passa a ser um Login, removendo alguns atributos que já possui em Login.
+	- Atualizado o nome das variáveis estáticas e adicionado dois novos atributos para md5.
+
 05.09.2016 - 1.0.20
 - TimerSystem corrigido na forma como tick() deveria funcionar e adicionado novo atributo.
 - ServerThread não será mais usado, o emulador não funciona com threads individuais.

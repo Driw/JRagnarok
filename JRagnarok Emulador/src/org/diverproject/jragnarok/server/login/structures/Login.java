@@ -14,6 +14,11 @@ public class Login
 	private Sex sex;
 	private String lastLogin;
 
+	public Login()
+	{
+		this.sex = Sex.SERVER;
+	}
+
 	public int getID()
 	{
 		return id;
@@ -62,7 +67,7 @@ public class Login
 
 	public void setLastLogin(String lastLogin)
 	{
-		this.lastLogin = lastLogin;
+		this.lastLogin = strcap(lastLogin, 24);
 	}
 
 	protected void toString(ObjectDescription description)

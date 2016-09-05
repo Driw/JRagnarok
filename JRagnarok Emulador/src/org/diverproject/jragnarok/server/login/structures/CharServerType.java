@@ -17,7 +17,7 @@ public enum CharServerType
 		CODE = code;
 	}
 
-	public CharServerType parse(int code)
+	public static CharServerType parse(int code)
 	{
 		switch (code)
 		{

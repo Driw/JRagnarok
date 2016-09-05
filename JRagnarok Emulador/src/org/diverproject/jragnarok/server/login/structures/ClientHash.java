@@ -13,4 +13,11 @@ public class ClientHash
 	{
 		return hash;
 	}
+
+	public void set(byte[] hashValue)
+	{
+		if (hashValue.length == 16)
+			for (int i = 0; i < hashValue.length; i++)
+				hash[i] = hashValue[i];
+	}
 }

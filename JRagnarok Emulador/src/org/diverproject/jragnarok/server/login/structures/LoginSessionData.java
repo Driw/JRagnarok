@@ -1,7 +1,5 @@
 package org.diverproject.jragnarok.server.login.structures;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokConstants.PASSWORD_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 
@@ -9,10 +7,10 @@ import org.diverproject.jragnarok.server.FileDecriptor;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 
-public class LoginSessionData
+public class LoginSessionData extends Login
 {
-	public static final int DENCRYPT = 1;
-	public static final int DENCRYPT2 = 2;
+	public static final int PASSWORD_DENCRYPT = 1;
+	public static final int PASSWORD_DENCRYPT2 = 2;
 
 	private static final String DENCRYPT_STRING[] = new String[]
 	{
@@ -20,22 +18,18 @@ public class LoginSessionData
 	};
 
 	private FileDecriptor fileDecriptor;
-	private int id;
-	private String username;
-	private String password;
-	private Sex sex;
-	private String lastLogin;
 	private byte group;
 	private ClientType clientType;
 	private int version;
 	private BitWise passDencrypt;
 	private LoginSeed seed;
 	private ClientHash clientHash;
+	private short md5KeyLenght;
+	private String md5Key;
 
 	public LoginSessionData(FileDecriptor fileDecriptor)
 	{
 		this.fileDecriptor = fileDecriptor;
-		this.sex = Sex.SERVER;
 		this.passDencrypt = new BitWise(DENCRYPT_STRING);
 	}
 
@@ -49,55 +43,14 @@ public class LoginSessionData
 		this.fileDecriptor = fileDecriptor;
 	}
 
-	public int getId()
+	public int getAddress()
 	{
-		return id;
+		return fileDecriptor.getID();
 	}
 
-	public void setId(int id)
+	public String getAddressString()
 	{
-		this.id = id;
-	}
-
-	public String getUsername()
-	{
-		return username;
-	}
-
-	public void setUsername(String username)
-	{
-		this.username = strcap(username, NAME_LENGTH);
-	}
-
-	public String getPassword()
-	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = strcap(password, PASSWORD_LENGTH);
-	}
-
-	public Sex getSex()
-	{
-		return sex;
-	}
-
-	public void setSex(Sex sex)
-	{
-		if (sex != null)
-			this.sex = sex;
-	}
-
-	public String getLastLogin()
-	{
-		return lastLogin;
-	}
-
-	public void setLastLogin(String lastLogin)
-	{
-		this.lastLogin = strcap(lastLogin, 24);
+		return fileDecriptor.getAddressString();
 	}
 
 	public byte getGroup()
@@ -155,17 +108,33 @@ public class LoginSessionData
 		this.clientHash = clientHash;
 	}
 
-	@Override
-	public String toString()
+	public short getMd5KeyLenght()
 	{
-		ObjectDescription description = new ObjectDescription(getClass());
+		return md5KeyLenght;
+	}
 
+	public void setMd5KeyLenght(short md5KeyLenght)
+	{
+		this.md5KeyLenght = md5KeyLenght;
+	}
+
+	public String getMd5Key()
+	{
+		return md5Key;
+	}
+
+	public void setMd5Key(String md5Key)
+	{
+		this.md5Key = strcap(md5Key, 20);
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
 		description.append("fd", fileDecriptor.getID());
-		description.append("id", id);
-		description.append("username", username);
-		description.append("password", password);
-		description.append("sex", sex);
-		description.append("lastLogin", lastLogin);
+
+		super.toString(description);
+
 		description.append("group", group);
 		description.append("clientType", clientType);
 		description.append("version", version);
@@ -177,6 +146,10 @@ public class LoginSessionData
 		if (seed != null)
 			description.append("seed", format("%d %d", seed.getFirst(), seed.getSecond()));
 
-		return description.toString();
+		if (md5KeyLenght > 0)
+		{
+			description.append("md5KeyLenght", md5KeyLenght);
+			description.append("md5Key", md5Key);
+		}
 	}
 }
