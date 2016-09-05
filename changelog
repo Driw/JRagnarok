@@ -1,7 +1,10 @@
-05.09.2016 - 1.0.19
-- Sistema para leitura de arquivos com mensagens identificadas numericamente.
+05.09.2016 - 1.0.20
+Pequenos ajustes em ConfigLoad e clear() deverá apenas substituir o map das configurações.
 - Enviando também os arquivos contendo as mensagens dos três servidores.
 	- As mensagens foram separadas em dois idiomas: português e inglês.
+
+05.09.2016 - 1.0.19
+- Sistema para leitura de arquivos com mensagens identificadas numericamente.
 
 04.09.2016 - 1.0.18
 - Removendo Client, ClientServerType, ClientPlayer e ClientServer.

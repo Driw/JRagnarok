@@ -47,7 +47,7 @@ public class ConfigLoad
 
 	public void clearRead()
 	{
-		configurations.clear();
+		configurations = new StringSimpleMap<>();
 		filePath = null;
 	}
 
@@ -143,7 +143,7 @@ public class ConfigLoad
 		ObjectDescription description = new ObjectDescription(getClass());
 
 		description.append("file", filePath);
-		description.append("configCoutn", configurations.size());
+		description.append("configCount", configurations.size());
 
 		return description.toString();
 	}
