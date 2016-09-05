@@ -9,9 +9,23 @@ public class LoginIpBanService extends LoginServerService
 		super(server);
 	}
 
+	public boolean isBanned(String ip)
+	{
+		return false;
+	}
+
+	public void addBanLog(String ip)
+	{
+		
+	}
+
+//	cleanup
+
 	public void init()
 	{
 		// TODO Auto-generated method stub
 		
 	}
+
+//	shutdown
 }

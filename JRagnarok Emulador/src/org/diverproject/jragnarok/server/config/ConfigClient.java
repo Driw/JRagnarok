@@ -1,11 +1,8 @@
 package org.diverproject.jragnarok.server.config;
 
-import org.diverproject.jragnaork.configuration.Config;
 import org.diverproject.jragnaork.configuration.ConfigBoolean;
 import org.diverproject.jragnaork.configuration.ConfigInt;
-import org.diverproject.jragnarok.server.ClientHash;
 import org.diverproject.jragnarok.server.config.specific.ConfigClientHash;
-import org.diverproject.util.collection.Node;
 
 public class ConfigClient
 {
@@ -29,7 +26,7 @@ public class ConfigClient
 		return HASH_CHECK;
 	}
 
-	public static Config<Node<ClientHash>> getHashNodes()
+	public static ConfigClientHash getHashNodes()
 	{
 		return HASH_NODES;
 	}

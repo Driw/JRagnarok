@@ -1,16 +1,17 @@
 package org.diverproject.jragnarok.server.login.services;
 
-import static org.diverproject.jragnarok.server.RagnarokPacketNames.PACKET_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.log.LogSystem.logInfo;
 
-import org.diverproject.jragnarok.server.ClientCharServer;
+import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.jragnarok.packets.SyncronizeAddressPacket;
+import org.diverproject.jragnarok.server.FileDecriptor;
+import org.diverproject.jragnarok.server.FileDecriptorListener;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.login.LoginServer;
-import org.diverproject.util.stream.Buffer;
-import org.diverproject.util.stream.implementation.buffer.BufferArrayData;
-import org.diverproject.util.stream.implementation.output.OutputPacket;
+import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 
 public class LoginCharacterService extends LoginServerService
 {
@@ -19,44 +20,75 @@ public class LoginCharacterService extends LoginServerService
 		super(server);
 	}
 
-	private LoginCharacterService getSelf()
-	{
-		return this;
-	}
-
 	private TimerListener syncronizeIpAddress = new TimerListener()
 	{
-		private LoginCharacterService self = getSelf();
-
 		@Override
 		public void onCall(Timer timer, long tick)
 		{
 			logInfo("Sincronização de IP em progresso...\n");
 
-			Buffer buffer = new BufferArrayData(new byte[2]);
-			buffer.putShort(PACKET_SYNCRONIZE_IPADDRESS);
-			self.sendAllWOS(-1, buffer);
+			SyncronizeAddressPacket packet = new SyncronizeAddressPacket();
+			sendAllWithoutOurSelf(-1, packet);
 		}
 	};
 
-	private int sendAllWOS(int clientIgnore, Buffer buffer)
+	private int sendAllWithoutOurSelf(int ignoreFileDecriptID, ResponsePacket packet)
 	{
 		int count = 0;
 
-		for (ClientCharServer charServer : getServer().getCharServers())
+		for (ClientCharServer server : getServer().getCharServers())
 		{
-			if (charServer.getID() != clientIgnore)
+			if (server.getFileDecriptor().getID() != ignoreFileDecriptID)
 			{
-				OutputPacket output = charServer.newOutputPacket("SyncIpAddress", buffer.length());
-				output.putBytes(buffer.getArrayBuffer());
-				output.flush();
-
+				packet.send(server.getFileDecriptor());
 				count++;
 			}
 		}
 
 		return count;
 	}
+
+	public FileDecriptorListener parse = new FileDecriptorListener()
+	{
+		@Override
+		public void onCall(FileDecriptor fd) throws RagnarokException
+		{
+			// TODO Auto-generated method stub
+			
+		}
+	};
+
+//	keepAlive
+//	onDisconnect
+
+//	serverDestroy
+//	serverInit
+//	serverReset
+
+//	acknologeUserCount
+//	setAccountOffline
+//	setAccountOnline
+//	setAllOffline
+
+//	updateCharIP
+//	updateOnlineDatabase
+//	updatePincode
+
+//	authenticate
+
+//	accountDataResquest
+//	accountDataSend
+//	accountInfo
+//	vipDataResquest
+//	vipDataSend
+//	banAccountRequest
+//	unbanAccountRequest
+//	updateAccountSate
+//	requestChangeEmail
+//	requestChangeSex
+//	pincodeAuthFail
+//	globalAccountRegResquest
+//	globalAccountRegUpdate
 
 	public void init()
 	{

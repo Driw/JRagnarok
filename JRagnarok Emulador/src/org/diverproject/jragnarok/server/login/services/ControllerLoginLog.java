@@ -1,7 +1,5 @@
 package org.diverproject.jragnarok.server.login.services;
 
-import static org.diverproject.log.LogSystem.logWarning;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

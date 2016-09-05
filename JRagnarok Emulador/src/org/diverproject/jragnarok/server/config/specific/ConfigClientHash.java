@@ -1,10 +1,9 @@
 package org.diverproject.jragnarok.server.config.specific;
 
 import org.diverproject.jragnaork.configuration.ConfigObject;
-import org.diverproject.jragnarok.server.ClientHash;
-import org.diverproject.util.collection.Node;
+import org.diverproject.jragnarok.server.login.structures.ClientHashNode;
 
-public class ConfigClientHash extends ConfigObject<Node<ClientHash>>
+public class ConfigClientHash extends ConfigObject<ClientHashNode>
 {
 	public ConfigClientHash(String name)
 	{

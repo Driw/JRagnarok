@@ -1,3 +1,10 @@
+05.09.2016 - 1.0.23
+- ConfigClientHash deverá passar a usar um ClientHashNode ao inves de Node.
+- Atualizando LoginClientService, LoginCharService e LoginIpBanService.
+	- Implementação de diversos métodos iniciais que serão necessários.
+	- Os outros métodos serão implementados nas atualizações seguintes.
+- Novo pacote para possuir todos os tipos de pacotes para comunicação cliente-servidor.
+
 05.09.2016 - 1.0.22
 - LoginServer atualizado conforme atualizações em LoginLogService.
 	- Também foi adicionado a ele todos os serviços e os métodos getters.
