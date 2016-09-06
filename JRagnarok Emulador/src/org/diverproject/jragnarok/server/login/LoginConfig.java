@@ -23,8 +23,10 @@ public class LoginConfig extends ServerConfig
 
 			ConfigLogin.getIp(),
 			ConfigLogin.getPort(),
-			ConfigLogin.getIpSyncinterval(),
-			ConfigLogin.getDateformat(),
+			ConfigLogin.getUsername(),
+			ConfigLogin.getPassword(),
+			ConfigLogin.getIpSyncInterval(),
+			ConfigLogin.getDateFormat(),
 			ConfigLogin.getConsole(),
 			ConfigLogin.getNewAccountFlag(),
 			ConfigLogin.getNewAccountLengthLimit(),

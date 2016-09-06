@@ -1,3 +1,10 @@
+06.09.2016 - 1.0.25
+- Especificando a Login.conf o nome de usuário e senha do servidor de acesso.
+- Constante adicionada para definir o formato de datas padrão: DATE_FORMAT.
+- Adicionando nova tabela usada e inicializando o nome das tabelas em Tables.
+- Documentação de LoginLogService, LoginLog e ControllerLoginLog adicionada.
+- Renomeando add() para insert() e correção na definição das tabelas: ControllerLoginLog.
+
 05.09.2016 - 1.0.24
 - Removendo classes Client e suas relações/filhas pois não serão mais usadas.
 

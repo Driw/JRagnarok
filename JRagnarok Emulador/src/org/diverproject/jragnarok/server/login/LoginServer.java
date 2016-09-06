@@ -135,8 +135,10 @@ public class LoginServer extends Server implements ServerListener
 	{
 		ConfigLogin.getIp().setValue(new InternetProtocol());
 		ConfigLogin.getPort().setValue(6900);
-		ConfigLogin.getIpSyncinterval().setValue(0);
-		ConfigLogin.getDateformat().setValue("YY-mm-dd HH:MM:SS");
+		ConfigLogin.getUsername().setValue("server");
+		ConfigLogin.getPassword().setValue("jragnarok");
+		ConfigLogin.getIpSyncInterval().setValue(0);
+		ConfigLogin.getDateFormat().setValue("YY-mm-dd HH:MM:SS");
 		ConfigLogin.getConsole().setValue(true);
 		ConfigLogin.getNewAccountFlag().setValue(true);
 		ConfigLogin.getNewAccountLengthLimit().setValue(true);

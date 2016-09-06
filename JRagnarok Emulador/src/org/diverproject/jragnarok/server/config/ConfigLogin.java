@@ -9,8 +9,10 @@ public class ConfigLogin
 {
 	private static final ConfigIP IP;
 	private static final ConfigInt PORT;
-	private static final ConfigInt IP_SYNC_INTERVAL;
+	private static final ConfigString USERNAME;
+	private static final ConfigString PASSWORD;
 	private static final ConfigString DATE_FORMAT;
+	private static final ConfigInt IP_SYNC_INTERVAL;
 	private static final ConfigBoolean CONSOLE;
 	private static final ConfigBoolean NEW_ACCOUNT_FLAG;
 	private static final ConfigBoolean NEW_ACCOUNT_LENGTH_LIMIT;
@@ -24,6 +26,8 @@ public class ConfigLogin
 	{
 		IP = new ConfigIP("login.ip");
 		PORT = new ConfigInt("login.port");
+		USERNAME = new ConfigString("login.username");
+		PASSWORD = new ConfigString("login.password");
 		IP_SYNC_INTERVAL = new ConfigInt("login.ip_sync_interval");
 		DATE_FORMAT = new ConfigString("login.date_format");
 		CONSOLE = new ConfigBoolean("login.console");
@@ -46,12 +50,22 @@ public class ConfigLogin
 		return PORT;
 	}
 
-	public static ConfigInt getIpSyncinterval()
+	public static ConfigString getUsername()
+	{
+		return USERNAME;
+	}
+
+	public static ConfigString getPassword()
+	{
+		return PASSWORD;
+	}
+
+	public static ConfigInt getIpSyncInterval()
 	{
 		return IP_SYNC_INTERVAL;
 	}
 
-	public static ConfigString getDateformat()
+	public static ConfigString getDateFormat()
 	{
 		return DATE_FORMAT;
 	}

@@ -8,28 +8,66 @@ import java.sql.SQLException;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractController;
 import org.diverproject.jragnarok.server.Tables;
+import org.diverproject.util.SocketUtil;
+
+/**
+ * <h1>Controlador para Registro de Acesso</h1>
+ *
+ * <p>Esse controlador permite trabalhar com os objetos para Registro de Acessos.
+ * Por ser registros no lado do servidor será interessante a quantidade e inserção.
+ * Para que esse seja criado é necessário definir uma conexão através do construtor.</p>
+ *
+ * @see AbstractController
+ * @see Connection
+ * @see LoginLog
+ *
+ * @author Andrew
+ */
 
 public class ControllerLoginLog extends AbstractController
 {
+	/**
+	 * Cria um novo controlador para trabalhar com os registros de acesso no servidor.
+	 * Necessário a existência de uma conexão com o banco de dados válida e ativa.
+	 * @param connection referência do objeto contendo a conexão com o banco de dados.
+	 */
+
 	public ControllerLoginLog(Connection connection)
 	{
 		super(connection);
 	}
 
+	/**
+	 * Método usado para saber quantas tentativas de acesso sem sucesso foram realizadas.
+	 * Irá considerar um endereço de IP para filtrar os acessos e o tempo de intervalo.
+	 * @param ip string com o endereço de IP da onde deseja obter a quantidade de falhas.
+	 * @param minutes tempo limite em minutos para considerar a contagem das filhas.
+	 * @return aquisição da quantidade de tentativas de acessos falhos.
+	 * @throws RagnarokException parâmetros inválidos, falha de conexão ou sem resultados.
+	 */
+
 	public int countFailedAttempts(String ip, int minutes) throws RagnarokException
 	{
-		String sql = "SELECT COUNT(*) AS count FROM ? WHERE ip = ?"
-					+" AND (rcode = 0 OR rcode = 1) AND time > (NOW() - INTERVAL ? MINUTE)";
+		if (ip == null)
+			throw new RagnarokException("endereço de IP nulo");
+
+		if (!SocketUtil.isIP(ip))
+			throw new RagnarokException("endereço de IP inválido");
+
+		if (minutes < 1)
+			throw new RagnarokException("minutos inválido");
 
 		Tables tables = Tables.getInstance();
 		String table = tables.getLoginLog();
 
+		String sql = "SELECT COUNT(*) AS count FROM " +table+ " WHERE ip = ?"
+				+" AND (rcode = 0 OR rcode = 1) AND time > (NOW() - INTERVAL ? MINUTE)";
+
 		try {
 
 			PreparedStatement ps = prepare(sql);
-			ps.setString(1, table);
-			ps.setString(2, ip);
-			ps.setInt(3, minutes);
+			ps.setString(1, ip);
+			ps.setInt(2, minutes);
 
 			ResultSet rs = ps.executeQuery();
 
@@ -43,19 +81,31 @@ public class ControllerLoginLog extends AbstractController
 		}
 	}
 
-	public boolean add(LoginLog log) throws RagnarokException
+	/**
+	 * Insere um novo registro de acesso em uma tabela no banco de dados.
+	 * @param log referência do objeto de registro de acesso a inserir.
+	 * @return true se tiver conseguido inserir ou false caso contrário.
+	 * @throws RagnarokException parâmetro inválido ou falha de conexão.
+	 * @see Tables
+	 */
+
+	public boolean insert(LoginLog log) throws RagnarokException
 	{
-		String sql = "INSERT INTO ? (time, ip, user, rcode, message) VALUES (NOW(), ?, ?, ?, ?)";
+		if (log == null)
+			throw new RagnarokException("registro nulo");
 
 		Tables tables = Tables.getInstance();
 		String table = tables.getLoginLog();
 
+		String sql = "INSERT INTO " +table+ " (time, ip, username, rcode, message) "
+					+"VALUES (?, ?, ?, ?, ?)";
+
 		try {
 
 			PreparedStatement ps = prepare(sql);
-			ps.setString(1, table);
-			ps.setDate(2, log.getTime().toDateSQL());
-			ps.setString(3, log.getIP().getString());
+			ps.setString(1, log.getTime().toString());
+			ps.setString(2, log.getIP().getString());
+			ps.setString(3, log.getUser());
 			ps.setInt(4, log.getRCode());
 			ps.setString(5, log.getMessage());
 

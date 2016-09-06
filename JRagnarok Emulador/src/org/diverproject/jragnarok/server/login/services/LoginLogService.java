@@ -32,12 +32,13 @@ public class LoginLogService extends LoginServerService
 		try {
 
 			LoginLog log = new LoginLog();
+			log.getTime().set(System.currentTimeMillis());
 			log.getIP().set(SocketUtil.socketIPInt(ip));
 			log.setUser(login.getUsername());
 			log.setRCode(code);
 			log.setMessage(message);
 
-			if (!controller.add(log))
+			if (!controller.insert(log))
 				logWarning("falha ao registrar log (ip: %s, username: %s)", ip, login.getUsername());
 
 		} catch (RagnarokException e) {

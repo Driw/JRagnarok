@@ -9,11 +9,23 @@ public class Tables
 		return INSTANCE;
 	}
 
+	private String login;
 	private String loginLog;
 
 	private Tables()
 	{
-		
+		login = "login";
+		loginLog = "login_log";
+	}
+
+	public String getLogin()
+	{
+		return login;
+	}
+
+	public void setLogin(String login)
+	{
+		this.login = login;
 	}
 
 	public String getLoginLog()
