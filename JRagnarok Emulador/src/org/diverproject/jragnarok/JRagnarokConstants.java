@@ -7,6 +7,7 @@ public class JRagnarokConstants
 	public static final int MAX_SERVERS = 30;
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final int PACKETVER = 20151104;
 
 	public static final int START_ACCOUNT_ID = 2000000;
 	public static final int END_ACCOUNT_ID = 100000000;

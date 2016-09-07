@@ -3,7 +3,6 @@ package org.diverproject.jragnarok.server.config.specific;
 import org.diverproject.jragnaork.configuration.ConfigObject;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.util.SocketUtil;
-import org.diverproject.util.lang.Bits;
 import org.diverproject.util.lang.StringUtil;
 
 public class ConfigIP extends ConfigObject<InternetProtocol>
@@ -27,9 +26,6 @@ public class ConfigIP extends ConfigObject<InternetProtocol>
 
 		int ipAddress = SocketUtil.socketIPInt(string);
 
-		getValue().setFirst(Bits.byteOf(ipAddress, 4));
-		getValue().setSecond(Bits.byteOf(ipAddress, 3));
-		getValue().setThird(Bits.byteOf(ipAddress, 2));
-		getValue().setFourth(Bits.byteOf(ipAddress, 1));
+		getValue().set(ipAddress);
 	}
 }

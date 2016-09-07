@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.server.FileDecriptor;
+import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerState;
 import org.diverproject.jragnarok.server.TimerSystem;
@@ -40,7 +40,7 @@ public class JRagnarok
 				!mapServer.isState(ServerState.DESTROYED))
 		{
 			long next = timer.update(timer.tick());
-			FileDecriptor.update(next);
+			FileDescriptor.update(next);
 		}
 	}
 }

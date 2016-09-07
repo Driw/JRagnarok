@@ -2,6 +2,7 @@ package org.diverproject.jragnarok;
 
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.log.LogSystem.setUpSource;
 
 import java.security.MessageDigest;
@@ -11,27 +12,63 @@ import java.util.Random;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnaork.messages.Messages;
-import org.diverproject.jragnarok.server.FileDecriptor;
+import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.util.SizeUtil;
 import org.diverproject.util.SystemUtil;
 import org.diverproject.util.collection.List;
 
+/**
+ * <h1>Utilitários JRagnarok</h1>
+ *
+ * <p>Classe usada para definir métodos utilitários em todo o projeto o Emulador.
+ * São conjuntos de códigos que são usados diversas vezes, por isso define um método.
+ * Essa classe deve ser importada como favorita para realizar os imports estáticos.</p>
+ *
+ * @author Andrew
+ */
+
 public class JRagnarokUtil
 {
+	/**
+	 * Construtor privado pois não será necessário outras instâncias dessa classe.
+	 */
+
 	private JRagnarokUtil()
 	{
 		
 	}
 
+	/**
+	 * Instância de um objeto Random para ser usado pelos métodos estáticos.
+	 */
+
 	private static final Random random = new Random();
+
+	/**
+	 * Chamado para realizar uma pausa (dormir) na Thread em que a chamar.
+	 * O tempo da pausa será definido através do valor passado por parâmetro.
+	 * Esse método não necessita a realização do try catch como de costume.
+	 * @param mileseconds tempo da duração da pausa em milissegundos.
+	 */
 
 	public static void sleep(long mileseconds)
 	{
+		if (mileseconds < 1)
+			return;
+
 		try {
 			Thread.sleep(mileseconds);
 		} catch (InterruptedException e) {
+			setUpSource(1);
+			logExeception(e);
 		}
 	}
+
+	/**
+	 * Permite obter o nome da classe (getSimpleName) de um determinado objeto.
+	 * @param object referência do objeto do qual deseja saber o nome.
+	 * @return string contendo null ou o nome da classe se for válida.
+	 */
 
 	public static String nameOf(Object object)
 	{
@@ -40,6 +77,13 @@ public class JRagnarokUtil
 
 		return object.getClass().getSimpleName();
 	}
+
+	/**
+	 * Formata uma determinada string conforme o formato e argumentos passado.
+	 * @param format string contendo o formato que a mensagem deverá possuir.
+	 * @param args argumentos referentes a formatação que mensagem possui.
+	 * @return string formatada conforme o formato e valor dos argumentos.
+	 */
 
 	public static String format(String format, Object... args)
 	{
@@ -63,6 +107,11 @@ public class JRagnarokUtil
 		return String.format(Locale.US, "%d%dh%dm", (int) ms/86400000, (int) ms/3600000, (int) ms/60000);
 	}
 
+	/**
+	 * Realiza um chamado forçado do Garbage Collector do java para liberação de memória.
+	 * Além disso irá registrar no console o valor aproximado do espaço que foi liberado.
+	 */
+
 	public static void free()
 	{
 		long totalFreeMemory = SystemUtil.getTotalFreeMemory();
@@ -77,6 +126,14 @@ public class JRagnarokUtil
 		log("%s liberado pelo GC.\n", SizeUtil.toString(freeMemory));
 	}
 
+	/**
+	 * Limite o valor de uma determinada string em um número de caracteres.
+	 * Caso a string não possua um tamanho maior irá continuar igual.
+	 * @param string referência da string que pode vir a ser cortada.
+	 * @param length limite de caracteres que a string deverá possuir.
+	 * @return aquisição da string recortada ou inteira se não tiver o tamanho.
+	 */
+
 	public static String strcap(String string, int length)
 	{
 		if (string == null)
@@ -87,6 +144,12 @@ public class JRagnarokUtil
 
 		return string;
 	}
+
+	/**
+	 * Permite encriptar o valor de uma determinada string no formato MD5.
+	 * @param string referência da string contendo o valor a ser encriptado.
+	 * @return aquisição de uma string com o valor hash do MD5.
+	 */
 
 	public static String md5Encrypt(String string)
 	{
@@ -107,6 +170,12 @@ public class JRagnarokUtil
 		}
 	}
 
+	/**
+	 * Cria um novo valor MD5 aleatório com um valor de caracteres especificados.
+	 * @param length quantidade de caracteres que esse valor MD5 deve possuir.
+	 * @return aquisição de uma string com o valor hash do MD5 gerado.
+	 */
+
 	public static String md5Salt(int length)
 	{
 		byte bytes[] = new byte[length];
@@ -117,12 +186,19 @@ public class JRagnarokUtil
 		return new String(bytes);
 	}
 
+	/**
+	 * Converte o valor binário de uma string para hexadecimal.
+	 * @param string string que terá ao seu valor convertido.
+	 * @param count quantidade de caracteres a considerar.
+	 * @return aquisição de uma string com o valor hexadecimal.
+	 */
+
 	public static String binToHex(String string, int count)
 	{
 		String output = "";
-		String toHex = "0123456789abcdef";
+		String toHex = "0123456789ABCDEF";
 
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < count && i < string.length(); i++)
 		{
 			output += toHex.charAt(string.charAt(i) & 0xF0 >> 4);
 			output += toHex.charAt(string.charAt(i) & 0x0F >> 0);
@@ -131,6 +207,14 @@ public class JRagnarokUtil
 		return output;
 	}
 
+	/**
+	 * Permite obter o número do índice de um determinado objeto dentro de uma lista.
+	 * @param list referência da lista que contém o objeto a ser localizado.
+	 * @param target referência do objeto alvo a ser localizado na lista.
+	 * @return aquisição do índice do objeto alvo na lista passada,
+	 * casso o objeto não se encontre na lista será retornado -1.
+	 */
+
 	@SuppressWarnings("rawtypes")
 	public static int indexOn(List list, Object target)
 	{
@@ -138,16 +222,28 @@ public class JRagnarokUtil
 			if (list.get(i).equals(target))
 				return i + 1;
 
-		return 0;
+		return -1;
 	}
 
-	public static void skip(FileDecriptor fd, boolean input, int bytes)
+	/**
+	 * Permite pular uma determinada quantidade de bytes de um FileDecriptor.
+	 * @param fd referência do FileDecriptor que terá bytes pulados na stream.
+	 * @param input true para pular da entrada de dados ou false para a saída.
+	 * @param bytes quantos bytes deverão ser pulados na stream.
+	 */
+
+	public static void skip(FileDescriptor fd, boolean input, int bytes)
 	{
 		if (input)
 			fd.newInput("SkipPacket").skipe(bytes);
 		else
 			fd.newOutput("SkipPacket").skipe(bytes);
 	}
+
+	/**
+	 * Permite obter um valor numérico inteiro positivo através de Random.
+	 * @return aquisição de um número inteiro e positivo aleatório.
+	 */
 
 	public static int random()
 	{
@@ -156,20 +252,62 @@ public class JRagnarokUtil
 		return i > 0 ? i : i * -1;
 	}
 
+	/**
+	 * Permite obter uma determinada mensagem carregada dos arquivos de mensagens.
+	 * Essa mensagem é referente a uma listada nas mensagens do servidor de acesso.
+	 * @param number código de identificação da mensagem desejada.
+	 * @return aquisição da mensagem no servidor de acesso.
+	 */
+
 	public static String loginMessage(int number)
 	{
-		return Messages.getInstance().getLoginMessages().get(number);
+		String message = Messages.getInstance().getLoginMessages().get(number);
+
+		if (message == null)
+			logWarning("mensagem '%d' não existe no LoginServer");
+
+		return message == null ? "null" : message;
 	}
+
+	/**
+	 * Permite obter uma determinada mensagem carregada dos arquivos de mensagens.
+	 * Essa mensagem é referente a uma listada nas mensagens do servidor de personagens.
+	 * @param number código de identificação da mensagem desejada.
+	 * @return aquisição da mensagem no servidor de personagens.
+	 */
 
 	public static String charMessage(int number)
 	{
-		return Messages.getInstance().getCharMessages().get(number);
+		String message = Messages.getInstance().getCharMessages().get(number);
+
+		if (message == null)
+			logWarning("mensagem '%d' não existe no CharServer");
+
+		return message == null ? "null" : message;
 	}
+
+	/**
+	 * Permite obter uma determinada mensagem carregada dos arquivos de mensagens.
+	 * Essa mensagem é referente a uma listada nas mensagens do servidor de mapas.
+	 * @param number código de identificação da mensagem desejada.
+	 * @return aquisição da mensagem no servidor de mapas.
+	 */
 
 	public static String mapMessage(int number)
 	{
-		return Messages.getInstance().getMapMessages().get(number);
+		String message = Messages.getInstance().getMapMessages().get(number);
+
+		if (message == null)
+			logWarning("mensagem '%d' não existe no MapServer");
+
+		return message == null ? "null" : message;
 	}
+
+	/**
+	 * Permite obter o número da versão do cliente através de uma datada especificada.
+	 * @param date valor numérico da data no formado YYYYMMDD usado em PACKETVER.
+	 * @return aquisição do número da versão referente a data especificada.
+	 */
 
 	public static int dateToVersion(int date)
 	{

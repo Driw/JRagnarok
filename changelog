@@ -1,3 +1,11 @@
+07.09.2016 - 1.0.26
+- Documentando classes, atributos e métodos das classes que estão estabilizadas.
+- TimerSystem atualizado para funcionar conforme a Orientação a Objetos.
+	- Agora timers lista os temporizadores por ID e tickers ordena por tempo de expiração.
+	- Para isso foi implementado uma classe para ordenar os temporizadores: Tickers.
+	- Agora o tempo no servidor será trabalhado com int e não mais long.
+- Corrigindo o nome de FileDecriptor que é FileDescriptor, listener corrigido também.
+
 06.09.2016 - 1.0.25
 - Especificando a Login.conf o nome de usuário e senha do servidor de acesso.
 - Constante adicionada para definir o formato de datas padrão: DATE_FORMAT.

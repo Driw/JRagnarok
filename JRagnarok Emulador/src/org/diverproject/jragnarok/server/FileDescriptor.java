@@ -1,0 +1,436 @@
+package org.diverproject.jragnarok.server;
+
+import static org.diverproject.jragnarok.JRagnarokConstants.FD_SETSIZE;
+import static org.diverproject.jragnarok.JRagnarokUtil.indexOn;
+import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
+import static org.diverproject.log.LogSystem.log;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.setUpSource;
+
+import java.io.IOException;
+import java.net.Socket;
+
+import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.collection.List;
+import org.diverproject.util.collection.abstraction.LoopList;
+import org.diverproject.util.stream.StreamException;
+import org.diverproject.util.stream.implementation.input.InputPacket;
+import org.diverproject.util.stream.implementation.output.OutputPacket;
+
+/**
+ * <h1>Descritor de Arquivo</h1>
+ *
+ * <p>Classe usada para trabalhar com conexões socket recebido de clientes dos servidores.
+ * Através dele será especificado para onde as conexões serão repassadas para operarem.
+ * Além disso nele será possível criar objetos que trabalhem com entrada e saída de dados.</p>
+ *
+ * @see Socket
+ * @see InternetProtocol
+ * @see FileDescriptorListener
+ *
+ * @author Andrew
+ */
+
+public class FileDescriptor
+{
+	/**
+	 * Descritor fechado.
+	 */
+	public static final int FLAG_EOF = 1;
+
+	/**
+	 * Descritor é um servidor.
+	 */
+	public static final int FLAG_SERVER = 2;
+
+	/**
+	 * Descritor é um ping.
+	 */
+	public static final int FLAG_PING = 3;
+
+	/**
+	 * Tempo limite em milissegundos aceito por ociosidade.
+	 */
+	public static final int DEFAULT_TIMEOUT = 60000;
+
+
+	/**
+	 * Código de identificação do descritor no sistema.
+	 */
+	private int id;
+
+	/**
+	 * Flag que determina o tipo de descritor.
+	 */
+	private int flag;
+
+	/**
+	 * Tempo restante para que o descritor seja considerado inativo.
+	 */
+	private int timeout;
+
+	/**
+	 * Conexão socket do cliente com o servidor.
+	 */
+	private Socket socket;
+
+	/**
+	 * Objeto para armazenar detalhadamente o endereço da conexão socket.
+	 */
+	private InternetProtocol address;
+
+	/**
+	 * Listener para receber pacotes de dados.
+	 */
+	private FileDescriptorListener receiveListener;
+
+	/**
+	 * Listener para enviar pacotes de dados.
+	 */
+	private FileDescriptorListener sendListener;
+
+	/**
+	 * Listener para validar conexão.
+	 */
+	private FileDescriptorListener parseListener;
+
+	/**
+	 * Objeto em cache utilizado por esse descritor.
+	 */
+	private Object cache;
+
+	/**
+	 * Cria um novo Descriptor de Arquivo baseado em uma conexão socket.
+	 * @param socket referência da conexão do cliente com o servidor.
+	 */
+
+	private FileDescriptor(Socket socket)
+	{
+		this.socket = socket;
+		this.address = new InternetProtocol(socket);
+	}
+
+	/**
+	 * A identificação do descritor é única por cliente conectado.
+	 * @return aquisição da identificação do cliente com o servidor.
+	 */
+
+	public int getID()
+	{
+		return id;
+	}
+
+	/**
+	 * Flag define o tipo de conexão do descritor (EOF, SERVER ou PING).
+	 * @return aquisição da relação do descritor com o servidor.
+	 */
+
+	public int getFlag()
+	{
+		return flag;
+	}
+
+	/**
+	 * Permite definir o tipo da conexão do descritor (EOF, SERVER ou PING).
+	 * @param flag relação do descritor com o servidor:
+	 * FLAG_EOF, FLAG_SERVER ou FLAG_PING, encontrado em FileDescriptor.
+	 */
+
+	public void setFlag(int flag)
+	{
+		if (flag >= FLAG_EOF && flag <= FLAG_PING)
+			this.flag = flag;
+	}
+
+	/**
+	 * O tempo de expiração da conexão é usado para garantir que não haja conexões ociosas.
+	 * A ociosidade é feita a partir da criação de pacotes para entrada ou saída de dados.
+	 * @return aquisição do tick em que o descriptor será considerado ocioso no servidor.
+	 */
+
+	public int getTimeout()
+	{
+		return timeout;
+	}
+
+	/**
+	 * O tempo de expiração da conexão é usado para garantir que não haja conexões ociosas.
+	 * A ociosidade é feita a partir da criação de pacotes para entrada ou saída de dados.
+	 * @param timeout tick em que o descriptor será considerado ocioso no servidor.
+	 */
+
+	public void setTimeout(int timeout)
+	{
+		this.timeout = timeout;
+	}
+
+	/**
+	 * Endereço é referente ao IP da conexão socket do cliente estabeleceu com o servidor.
+	 * @return aquisição do endereço de IP armazenado em um número inteiro.
+	 */
+
+	public int getAddress()
+	{
+		return address.get();
+	}
+
+	/**
+	 * Endereço é referente ao IP da conexão socket do cliente estabeleceu com o servidor.
+	 * @return aquisição do endereço de IP da conexão formatada em String.
+	 */
+
+	public String getAddressString()
+	{
+		return address.getString();
+	}
+
+	/**
+	 * Listener de recebimento possui um método para receber dados do socket.
+	 * @return aquisição do listener usado para receber dados do socket.
+	 */
+
+	public FileDescriptorListener getReceiveListener()
+	{
+		return receiveListener;
+	}
+
+	/**
+	 * Listener de recebimento possui um método para receber dados do socket.
+	 * @param receiveListener listener usado para receber dados do socket.
+	 */
+
+	public void setReceiveListener(FileDescriptorListener receiveListener)
+	{
+		this.receiveListener = receiveListener;
+	}
+
+	/**
+	 * Listener de recebimento possui um método para enviar dados por socket.
+	 * @return aquisição do listener usado para receber dados por socket.
+	 */
+
+	public FileDescriptorListener getSendListener()
+	{
+		return sendListener;
+	}
+
+	/**
+	 * Listener de recebimento possui um método para enviar dados por socket.
+	 * @param sendListener listener usado para receber dados por socket.
+	 */
+
+	public void setSendListener(FileDescriptorListener sendListener)
+	{
+		this.sendListener = sendListener;
+	}
+
+	/**
+	 * Listener que possui um método para analisar o despache do socket no servidor.
+	 * @return aquisição do listener usado para despachar o socket no servidor.
+	 */
+
+	public FileDescriptorListener getParseListener()
+	{
+		return parseListener;
+	}
+
+	/**
+	 * Listener que possui um método para analisar o despache do socket no servidor.
+	 * @param parseListener listener usado para despachar o socket no servidor.
+	 */
+
+	public void setParseListener(FileDescriptorListener parseListener)
+	{
+		this.parseListener = parseListener;
+	}
+
+	/**
+	 * Cache permite vincular um determinado objeto para que possa ser usado.
+	 * @return aquisição do objeto em cache no descritor.
+	 */
+
+	public Object getCache()
+	{
+		return cache;
+	}
+
+	/**
+	 * Cache permite vincular um determinado objeto para que possa ser usado.
+	 * @param cache referência do objeto a armazenar em cache.
+	 */
+
+	public void setCache(Object cache)
+	{
+		this.cache = cache;
+	}
+
+	/**
+	 * Instancia uma nova stream para criar uma entrada de dados por socket.
+	 * @param name nome que será usado para identificar o pacote.
+	 * @return aquisição de um objeto para entrada de dados por socket.
+	 */
+
+	public InputPacket newInput(String name)
+	{
+		timeout = TimerSystem.getInstance().getLastTickCount() + DEFAULT_TIMEOUT;
+
+		try {
+			return new InputPacket(socket, 0, name);
+		} catch (StreamException e ) {
+			logError("falha ao criar InputPacket para %s (ip: %s)", name, address.getString());
+			throw new RagnarokRuntimeException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Instancia uma nova stream para criar uma saída de dados por socket.
+	 * @param name nome que será usado para identificar o pacote.
+	 * @return aquisição de um objeto para saída de dados por socket.
+	 */
+
+	public OutputPacket newOutput(String name)
+	{
+		timeout = TimerSystem.getInstance().getLastTickCount() + DEFAULT_TIMEOUT;
+
+		try {
+			return new OutputPacket(socket, 0, name);
+		} catch (StreamException e ) {
+			logError("falha ao criar OutputPacket para %s (ip: %s)", name, address.getString());
+			throw new RagnarokRuntimeException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Solicita o fechamento da conexão socket do cliente com o servidor.
+	 * Também remove o descritor das sessões existentes no sistema.
+	 */
+
+	public void close()
+	{
+		try {
+
+			socket.close();
+			socket = null;
+			cache = null;
+			sendListener = null;
+			receiveListener = null;
+			parseListener = null;
+
+			SESSIONS.remove(id);
+
+			id = 0;
+
+		} catch (IOException e) {
+			logExeception(e);
+		}
+	}
+
+	/**
+	 * Procedimento usado para garantir que a conexão socket ainda existe.
+	 * @return true se o socket estiver conectado ou false caso contrário.
+	 */
+
+	public boolean isConnected()
+	{
+		return socket != null && socket.isConnected();
+	}
+
+	@Override
+	public String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("id", id);
+		description.append("address", address.getString());
+
+		description.append("receive", receiveListener);
+		description.append("send", sendListener);
+		description.append("parse", parseListener);
+
+		if (cache != null)
+			description.append("cache", nameOf(cache));
+
+		return description.toString();
+	}
+
+	/**
+	 * Lista contendo todas as conexões sockets.
+	 */
+	private static final List<FileDescriptor> SESSIONS = new LoopList<>(FD_SETSIZE);
+
+	/**
+	 * Cria um novo Arquivo Descritor a partir de uma conexão socket.
+	 * @param socket referência da conexão socket a considerar.
+	 * @return aquisição de uma novo Arquivo Descritor.
+	 */
+
+	public static FileDescriptor newFileDecriptor(Socket socket)
+	{
+		FileDescriptor fd = new FileDescriptor(socket);
+
+		if (!SESSIONS.add(fd))
+		{
+			fd.close();
+
+			return null;
+		}
+
+		fd.id = indexOn(SESSIONS, fd);
+
+		return fd;
+	}
+
+	/**
+	 * Procedimento estático usado para atualizar todos os Arquivos Descritores.
+	 * Deverá garantir que todas conexões sejam processadas igualmente.
+	 * @param next milissegundos para expirar o próximo temporizador.
+	 */
+
+	public static void update(long next)
+	{
+		TimerSystem timer = TimerSystem.getInstance();
+		long lastTick = timer.getLastTickCount();
+
+		for (FileDescriptor fd : SESSIONS)
+		{
+			if (fd.getTimeout() > 0 && (lastTick - fd.getTimeout()) > 60)
+			{
+				if (fd.getFlag() == FLAG_SERVER && fd.flag != 2)
+					fd.setFlag(FLAG_PING);
+				else
+				{
+					log("sessão #%d terminou (ip: %s).\n", fd.getID(), fd.getAddressString());
+					fd.close();
+				}
+			}
+
+			try {
+
+				fd.getParseListener().onCall(fd);
+				fd.setTimeout(60);
+
+			} catch (RagnarokException e) {
+
+				setUpSource(1);
+				logError("processamento inválido encontrado:\n");
+				logExeception(e);
+
+			} catch (RagnarokRuntimeException e) {
+
+				setUpSource(1);
+				logError("informação inválida encontrada:\n");
+				logExeception(e);
+
+			} catch (Exception e) {
+
+				setUpSource(1);
+				logError("erro inesperado ocorrido:\n");
+				logExeception(e);
+
+			}
+		}
+	}
+}
