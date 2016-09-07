@@ -1,11 +1,11 @@
 package org.diverproject.jragnarok.packets;
 
-import org.diverproject.jragnarok.server.FileDecriptor;
+import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.util.stream.implementation.output.OutputPacket;
 
 public abstract class ResponsePacket extends GenericPacket
 {
-	public final void send(FileDecriptor fd)
+	public final void send(FileDescriptor fd)
 	{
 		OutputPacket output = fd.newOutput(getName());
 		output.putShort(getIdentify());

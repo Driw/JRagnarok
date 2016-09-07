@@ -15,6 +15,7 @@ public class RagnarokPacketList
 	public static final short PACKET_CA_LOGIN3 = 0x01FA;
 	public static final short PACKET_CA_LOGIN4 = 0x027C;
 	public static final short PACKET_CA_SSO_LOGIN_REQ = 0x0825;
+	public static final short PACKET_AC_REFUSE_LOGIN_R2 = 0x083E;
 	public static final short PACKET_CA_REQ_HASH = 0x01DB;
 	public static final short PACKET_CA_REQ_CHAR_CONNECT = 0x2710;
 	public static final short PACKET_CA_RES_CHAR_CONNECT = 0x2711;
