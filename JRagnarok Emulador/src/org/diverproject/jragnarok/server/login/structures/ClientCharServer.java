@@ -1,11 +1,11 @@
 package org.diverproject.jragnarok.server.login.structures;
 
-import org.diverproject.jragnarok.server.FileDecriptor;
+import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
 
 public class ClientCharServer
 {
-	private FileDecriptor fileDecriptor;
+	private FileDescriptor fileDecriptor;
 	private String name;
 	private InternetProtocol serverIP;
 	private short port;
@@ -13,17 +13,17 @@ public class ClientCharServer
 	private CharServerType type;
 	private short newValue;
 
-	public ClientCharServer(FileDecriptor fileDecriptor)
+	public ClientCharServer(FileDescriptor fileDecriptor)
 	{
 		this.fileDecriptor = fileDecriptor;
 	}
 
-	public FileDecriptor getFileDecriptor()
+	public FileDescriptor getFileDecriptor()
 	{
 		return fileDecriptor;
 	}
 
-	public void setFileDecriptor(FileDecriptor fileDecriptor)
+	public void setFileDecriptor(FileDescriptor fileDecriptor)
 	{
 		this.fileDecriptor = fileDecriptor;
 	}

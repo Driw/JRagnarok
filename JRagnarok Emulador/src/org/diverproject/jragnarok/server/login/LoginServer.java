@@ -109,7 +109,7 @@ public class LoginServer extends Server implements ServerListener
 	private TimerListener waitingDisconnectTimer = new TimerListener()
 	{
 		@Override
-		public void onCall(Timer timer, long tick)
+		public void onCall(Timer timer, int tick)
 		{
 			
 		}
@@ -118,7 +118,7 @@ public class LoginServer extends Server implements ServerListener
 	private TimerListener onlineDataCleanup = new TimerListener()
 	{
 		@Override
-		public void onCall(Timer timer, long tick)
+		public void onCall(Timer timer, int tick)
 		{
 			
 		}
@@ -203,6 +203,8 @@ public class LoginServer extends Server implements ServerListener
 	@Override
 	public void onCreated() throws RagnarokException
 	{
+		clientService.init();
+
 		if (getConfigs().getBool("log.login"))
 			logService.init();
 
@@ -215,7 +217,7 @@ public class LoginServer extends Server implements ServerListener
 		setDefaultParser(clientService.parse);
 
 		ts.addListener(onlineDataCleanup, "onlineDataCleanup");
-		ts.addTimerInterval(ts.tick() + 600*1000, onlineDataCleanup, 0, 0, 600*100);
+		ts.addInterval(ts.acquireTimer(), ts.tick() + 600*1000, onlineDataCleanup, 0, 600*100);
 	}
 
 	@Override

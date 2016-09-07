@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.server.login.structures;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 
-import org.diverproject.jragnarok.server.FileDecriptor;
+import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 
@@ -17,7 +17,7 @@ public class LoginSessionData extends Login
 		"DENCRYPT", "DENCRYPT2"
 	};
 
-	private FileDecriptor fileDecriptor;
+	private FileDescriptor fileDecriptor;
 	private byte group;
 	private ClientType clientType;
 	private int version;
@@ -27,18 +27,18 @@ public class LoginSessionData extends Login
 	private short md5KeyLenght;
 	private String md5Key;
 
-	public LoginSessionData(FileDecriptor fileDecriptor)
+	public LoginSessionData(FileDescriptor fileDecriptor)
 	{
 		this.fileDecriptor = fileDecriptor;
 		this.passDencrypt = new BitWise(DENCRYPT_STRING);
 	}
 
-	public FileDecriptor getFileDecriptor()
+	public FileDescriptor getFileDecriptor()
 	{
 		return fileDecriptor;
 	}
 
-	void setFileDecriptor(FileDecriptor fileDecriptor)
+	void setFileDecriptor(FileDescriptor fileDecriptor)
 	{
 		this.fileDecriptor = fileDecriptor;
 	}

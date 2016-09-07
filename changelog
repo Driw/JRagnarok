@@ -1,3 +1,8 @@
+07.09.2016 - 1.0.28
+- Subindo atualização de algumas classes conforme rev26.
+	- ClientCharServer, LoginSessionData, LoginServer, LoginCharacterService e LoginClientService.
+- Novo método adicionado para LoginClientService parseRequestKey() e implementado authFailed().
+
 07.09.2016 - 1.0.27
 - Enviando InternetProtocol atualizado, faltou subir na rev26.
 - ResponsePacket e ReceivePacket também faltaram ser atualizados.

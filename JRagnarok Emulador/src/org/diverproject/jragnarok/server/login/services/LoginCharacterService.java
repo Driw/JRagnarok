@@ -5,8 +5,8 @@ import static org.diverproject.log.LogSystem.logInfo;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.packets.SyncronizeAddressPacket;
-import org.diverproject.jragnarok.server.FileDecriptor;
-import org.diverproject.jragnarok.server.FileDecriptorListener;
+import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerSystem;
@@ -23,7 +23,7 @@ public class LoginCharacterService extends LoginServerService
 	private TimerListener syncronizeIpAddress = new TimerListener()
 	{
 		@Override
-		public void onCall(Timer timer, long tick)
+		public void onCall(Timer timer, int tick)
 		{
 			logInfo("Sincronização de IP em progresso...\n");
 
@@ -48,10 +48,10 @@ public class LoginCharacterService extends LoginServerService
 		return count;
 	}
 
-	public FileDecriptorListener parse = new FileDecriptorListener()
+	public FileDescriptorListener parse = new FileDescriptorListener()
 	{
 		@Override
-		public void onCall(FileDecriptor fd) throws RagnarokException
+		public void onCall(FileDescriptor fd) throws RagnarokException
 		{
 			// TODO Auto-generated method stub
 			
@@ -98,7 +98,7 @@ public class LoginCharacterService extends LoginServerService
 		{
 			TimerSystem ts = TimerSystem.getInstance();
 			ts.addListener(syncronizeIpAddress, "sync_ip_addresses");
-			ts.addTimerInterval(ts.tick() + interval, syncronizeIpAddress, 0, 0, interval);
+			ts.addInterval(ts.acquireTimer(), ts.tick() + interval, syncronizeIpAddress, 0, interval);
 		}
 	}
 

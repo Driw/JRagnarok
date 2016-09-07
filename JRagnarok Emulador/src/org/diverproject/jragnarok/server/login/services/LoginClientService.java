@@ -1,7 +1,10 @@
 package org.diverproject.jragnarok.server.login.services;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
 import static org.diverproject.jragnarok.JRagnarokUtil.binToHex;
+import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.JRagnarokUtil.loginMessage;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Encrypt;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Salt;
 import static org.diverproject.jragnarok.JRagnarokUtil.random;
@@ -18,6 +21,8 @@ import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_RE
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_REQ_HASH;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_SSO_LOGIN_REQ;
 import static org.diverproject.log.LogSystem.log;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 
@@ -34,9 +39,11 @@ import org.diverproject.jragnarok.packets.LoginPacket;
 import org.diverproject.jragnarok.packets.LoginSingleSignOn;
 import org.diverproject.jragnarok.packets.ReceivePacketIDPacket;
 import org.diverproject.jragnarok.packets.RefuseLoginPacket;
+import org.diverproject.jragnarok.packets.RefuseLoginR2Packet;
+import org.diverproject.jragnarok.packets.ReponseCharConnectPacket;
 import org.diverproject.jragnarok.packets.UpdateClientHashPacket;
-import org.diverproject.jragnarok.server.FileDecriptor;
-import org.diverproject.jragnarok.server.FileDecriptorListener;
+import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.ServerState;
 import org.diverproject.jragnarok.server.login.LoginServer;
@@ -47,7 +54,9 @@ import org.diverproject.jragnarok.server.login.structures.ClientType;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
 import org.diverproject.jragnarok.server.login.structures.Sex;
 import org.diverproject.util.SocketUtil;
+import org.diverproject.util.Time;
 import org.diverproject.util.lang.HexUtil;
+import org.diverproject.util.lang.IntUtil;
 
 public class LoginClientService extends LoginServerService
 {
@@ -55,21 +64,27 @@ public class LoginClientService extends LoginServerService
 	private LoginLogService log;
 	private LoginIpBanService ipban;
 	private LoginCharacterService character;
+	private AccountController accountController;
 
 	public LoginClientService(LoginServer server)
 	{
 		super(server);
-
-		log = server.getLogService();
-		ipban = server.getIpBanService();
-		login = server.getLoginService();
-		character = server.getCharService();
 	}
 
-	public FileDecriptorListener parse = new FileDecriptorListener()
+	public void init() throws RagnarokException
+	{
+		log = getServer().getLogService();
+		ipban = getServer().getIpBanService();
+		login = getServer().getLoginService();
+		character = getServer().getCharService();
+
+		accountController = new AccountController(getConnection());
+	}
+
+	public FileDescriptorListener parse = new FileDescriptorListener()
 	{
 		@Override
-		public void onCall(FileDecriptor fd) throws RagnarokException
+		public void onCall(FileDescriptor fd) throws RagnarokException
 		{
 			if (!fd.isConnected())
 			{
@@ -87,7 +102,7 @@ public class LoginClientService extends LoginServerService
 					skip(fd, false, 23);
 
 					RefuseLoginPacket refuseLoginPacket = new RefuseLoginPacket();
-					refuseLoginPacket.setCode(RefuseLoginPacket.REJECTED_FROM_SERVER);
+					refuseLoginPacket.setResult(AuthResult.REJECTED_FROM_SERVER);
 					refuseLoginPacket.setBlockDate("");
 					refuseLoginPacket.send(fd);
 
@@ -141,13 +156,13 @@ public class LoginClientService extends LoginServerService
 		}
 	};
 
-	private void keepAlive(FileDecriptor fd)
+	private void keepAlive(FileDescriptor fd)
 	{
 		KeepAlivePacket keepAlivePacket = new KeepAlivePacket();
 		keepAlivePacket.receive(fd);
 	}
 
-	private void updateClientHash(FileDecriptor fd, LoginSessionData sd)
+	private void updateClientHash(FileDescriptor fd, LoginSessionData sd)
 	{
 		UpdateClientHashPacket updateClientHashPacket = new UpdateClientHashPacket();
 		updateClientHashPacket.receive(fd);
@@ -156,7 +171,25 @@ public class LoginClientService extends LoginServerService
 		sd.getClientHash().set(updateClientHashPacket.getHashValue());
 	}
 
-	private boolean requestAuth(FileDecriptor fd, LoginSessionData sd, short command)
+	private void sentAuthResult(LoginSessionData sd, AuthResult result)
+	{
+		RefuseLoginPacket refuseLoginPacket = new RefuseLoginPacket();
+		refuseLoginPacket.setResult(result);
+		refuseLoginPacket.send(sd.getFileDecriptor());
+	}
+
+	private void parseRequestKey(FileDescriptor fd, LoginSessionData sd)
+	{
+		short md5KeyLength = (short) (12 + (random() % 4));
+		String md5Key = md5Salt(md5KeyLength);
+
+		AcknologeHash packet = new AcknologeHash();
+		packet.setMD5KeyLength(md5KeyLength);
+		packet.setMD5Key(md5Key);
+		packet.send(fd);
+	}
+
+	private boolean requestAuth(FileDescriptor fd, LoginSessionData sd, short command)
 	{
 		boolean usingRawPassword = false;
 
@@ -250,7 +283,7 @@ public class LoginClientService extends LoginServerService
 
 		if (sd.getPassDencrypt().getValue() != 0 && getConfigs().getBool("login.use_md5_password"))
 		{
-			sentAuthResult(sd, RefuseLoginPacket.REJECTED_FROM_SERVER);
+			sentAuthResult(sd, AuthResult.REJECTED_FROM_SERVER);
 			return false;
 		}
 
@@ -271,34 +304,64 @@ public class LoginClientService extends LoginServerService
 
 	private void authFailed(LoginSessionData sd, AuthResult result)
 	{
+		if (getConfigs().getBool("log.login"))
+		{
+			if (IntUtil.interval(result.CODE, 0, 15))
+				log.addLoginLog(sd.getAddressString(), sd, result.CODE, loginMessage(result.CODE));
 
+			else if (IntUtil.interval(result.CODE, 99, 104))
+				log.addLoginLog(sd.getAddressString(), sd, result.CODE, loginMessage(result.CODE-83));
+
+			else
+				log.addLoginLog(sd.getAddressString(), sd, result.CODE, loginMessage(22));
+		}
+
+		if (result.CODE == 0 || result.CODE == 1)
+			ipban.addBanLog(sd.getAddressString());
+
+		String blockDate = "";
+
+		if (result == AuthResult.BANNED_UNTIL)
+		{
+			try {
+
+				Time unbanTime = accountController.getBanTime(sd.getUsername());
+				blockDate = unbanTime.toStringFormat(DATE_FORMAT);
+
+			} catch (RagnarokException e) {
+
+				logError("falha ao obter tempo de ban, enviando mensagem indefinida:\n");
+				logExeception(e);
+
+				blockDate = "Falha de conexão";
+
+			}
+		}
+
+		if (sd.getVersion() >= dateToVersion(20120000))
+		{
+			RefuseLoginR2Packet packet = new RefuseLoginR2Packet();
+			packet.setBlockDate(blockDate);
+			packet.setCode(result);
+			packet.send(sd.getFileDecriptor());
+		}
+
+		else
+		{
+			RefuseLoginPacket packet = new RefuseLoginPacket();
+			packet.setBlockDate("");
+			packet.setResult(result);
+			packet.send(sd.getFileDecriptor());
+		}
 	}
 
-	private void sentAuthResult(LoginSessionData sd, byte code)
+	private void requestCharConnect(FileDescriptor fd, LoginSessionData sd)
 	{
-		RefuseLoginPacket refuseLoginPacket = new RefuseLoginPacket();
-		refuseLoginPacket.setCode(code);
-		refuseLoginPacket.send(sd.getFileDecriptor());
-	}
+		RequestCharConnectPacket rccPacket = new RequestCharConnectPacket();
+		rccPacket.receive(fd);
 
-	private void parseRequestKey(FileDecriptor fd, LoginSessionData sd)
-	{
-		short md5KeyLength = (short) (12 + (random() % 4));
-		String md5Key = md5Salt(md5KeyLength);
-
-		AcknologeHash packet = new AcknologeHash();
-		packet.setMD5KeyLength(md5KeyLength);
-		packet.setMD5Key(md5Key);
-		packet.send(fd);
-	}
-
-	private void requestCharConnect(FileDecriptor fd, LoginSessionData sd)
-	{
-		RequestCharConnectPacket requestCharConnectPacket = new RequestCharConnectPacket();
-		requestCharConnectPacket.receive(fd);
-
-		sd.setUsername(requestCharConnectPacket.getUsername());
-		sd.setPassword(requestCharConnectPacket.getPassword());
+		sd.setUsername(rccPacket.getUsername());
+		sd.setPassword(rccPacket.getPassword());
 
 		if (getConfigs().getBool("login.user_md5_password"))
 			sd.setPassword(md5Encrypt(sd.getPassword()));
@@ -306,11 +369,11 @@ public class LoginClientService extends LoginServerService
 		sd.getPassDencrypt().setValue(0);
 		sd.setVersion(getConfigs().getInt("login.version"));
 
-		String serverName = requestCharConnectPacket.getServerName();
-		int serverIP = requestCharConnectPacket.getServerIP();
-		short serverPort = requestCharConnectPacket.getServerPort();
-		short type = requestCharConnectPacket.getType();
-		short newValue = requestCharConnectPacket.getNewValue();
+		String serverName = rccPacket.getServerName();
+		int serverIP = rccPacket.getServerIP();
+		short serverPort = rccPacket.getServerPort();
+		short type = rccPacket.getType();
+		short newValue = rccPacket.getNewValue();
 
 		logInfo("conexão solicitada do servidor de personagens %s@%s (account: %s, pass: %s, ip: %s)", serverName, serverIP, sd.getUsername(), sd.getPassword(), fd.getAddressString());
 
@@ -338,8 +401,20 @@ public class LoginClientService extends LoginServerService
 			getServer().getCharServers().add(server);
 
 			fd.setParseListener(character.parse);
-			fd.setFlag(FileDecriptor.FLAG_SERVER);
+			fd.setFlag(FileDescriptor.FLAG_SERVER);
 
+			ReponseCharConnectPacket packet = new ReponseCharConnectPacket();
+			packet.setResult(AuthResult.OK);
+			packet.send(fd);
+		}
+
+		else
+		{
+			logNotice("Conexão com o servidor de personagens '%s' RECUSADA.\n", serverName);
+
+			ReponseCharConnectPacket packet = new ReponseCharConnectPacket();
+			packet.setResult(AuthResult.REJECTED_FROM_SERVER);
+			packet.send(fd);
 		}
 	}
 }
