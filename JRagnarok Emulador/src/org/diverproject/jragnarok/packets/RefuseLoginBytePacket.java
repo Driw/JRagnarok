@@ -7,12 +7,12 @@ import org.diverproject.jragnarok.server.login.services.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.implementation.output.OutputPacket;
 
-public class RefuseLoginPacket extends ResponsePacket
+public class RefuseLoginBytePacket extends ResponsePacket
 {
 	private AuthResult result;
 	private String blockDate;
 
-	public RefuseLoginPacket()
+	public RefuseLoginBytePacket()
 	{
 		blockDate = "";
 	}
@@ -21,8 +21,7 @@ public class RefuseLoginPacket extends ResponsePacket
 	protected void sendOutput(OutputPacket output)
 	{
 		output.putByte(result.CODE);
-		output.putBytes(blockDate.getBytes());
-		output.skipe(20 - blockDate.length());
+		output.putString(blockDate, 20);
 	}
 
 	public void setResult(AuthResult result)

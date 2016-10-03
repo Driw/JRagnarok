@@ -1,3 +1,9 @@
+03.10.2016 - 1.0.29
+- Documentação a parte para descrever os detalhes dos pacotes usados.
+- RefuseLoginPacket renomado para RefuseLoginBytePacket conforme o tipo de dado.
+- RefuseLoginIntPacket adicionado, funciona como RefuseLoginBytePacket porém com int.
+- Adicionando AccountController para ser o controlador das contas no jogo.
+
 07.09.2016 - 1.0.28
 - Subindo atualização de algumas classes conforme rev26.
 	- ClientCharServer, LoginSessionData, LoginServer, LoginCharacterService e LoginClientService.

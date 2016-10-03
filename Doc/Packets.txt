@@ -1,0 +1,120 @@
+
+//==============================================================================
+// 0x0064 [PACKET_CA_LOGIN] - Acesso
+//==============================================================================
+
+byte	length	type	name
+
+00		04		int		versão do cliente
+04		24		str		nome de usuário
+28		24		str		senha de acesso
+52		01		byte	tipo de cliente
+
+//==============================================================================
+// 0x006A [PACKET_AC_REFUSE_LOGIN] - Acesso Negado (byte)
+//==============================================================================
+
+byte	length	type	name
+
+00		01		byte	tipo de rejeição
+01		20		str		data para o fim do bloqueio
+
+//==============================================================================
+// 0x200 [PACKET_CA_CONNECT_INFO_CHANGED] - Manter Conectado
+//==============================================================================
+
+byte	length	type	name
+
+00		24		str		identificação
+
+//==============================================================================
+// 0x0204 [PACKET_CA_EXE_HASHCHECK] - Update Client Hash
+//==============================================================================
+
+byte	length	type	name
+
+00		16		byte[]	valor hash
+
+//==============================================================================
+// 0x0277 [PACKET_CA_LOGIN_PCBANG] - Acesso por LAN House
+//==============================================================================
+
+byte	length	type	name
+
+00		04		int		versão do cliente
+04		24		str		nome de usuário
+28		24		str		senha de acesso
+52		16		byte	tipo de cliente
+68		13		str		endereço mac
+
+//==============================================================================
+// 0x02B0 [PACKET_CA_LOGIN_HAN] - Acesso por LAN House (?)
+//==============================================================================
+
+byte	length	type	name
+
+byte	length	type	name
+
+00		04		int		versão do cliente
+04		24		str		nome de usuário
+28		24		str		senha de acesso
+52		16		byte	tipo de cliente
+68		13		str		endereço mac
+81		01		bool	han game user (?)
+
+//==============================================================================
+// 0x01DC [PACKET_AC_ACK_HASH] - Reconhecer Hash
+//==============================================================================
+
+byte	length	type	name
+
+00		02		short	comprimento da chave md5
+02		20		str		valor da chave md5
+
+//==============================================================================
+// 0x083E [PACKET_AC_REFUSE_LOGIN_R2] - Acesso Negado (int)
+//==============================================================================
+
+byte	length	type	name
+
+00		04		int		tipo de rejeição
+04		20		string	data para o fim do bloqueio
+
+//==============================================================================
+// 0x01DB [PACKET_CA_REQ_HASH] - Solicitação do Hash
+//==============================================================================
+
+byte	length	type	name
+
+00		02		short	chave do valor em hash
+02		20		string	código hash em md5
+
+//==============================================================================
+// 0x2710 [PACKET_CA_REQ_CHAR_CONNECT] - Solicitação de Acesso do Char Server
+//==============================================================================
+
+byte	length	type	name
+
+00		24		string	nome do usuário
+24		48		string	senha para o acesso
+48		04		int		endereço de ip
+52		02		short	porta para acesso
+54		20		string	nome do servidor
+64		02		short	tipo de servidor
+66		02		short	? (new value)
+
+//==============================================================================
+// 0x2711 [PACKET_CA_RES_CHAR_CONNECT] - Resposta da Acesso do Char Server
+//==============================================================================
+
+byte	length	type	name
+
+00		01		byte	resultado do acesso
+
+//==============================================================================
+// 0x2735 [PACKET_SYNCRONIZE_IPADDRESS] - Sincronização do Endereço de IP
+//==============================================================================
+
+byte	length	type	name
+
+-

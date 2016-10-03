@@ -38,8 +38,8 @@ import org.diverproject.jragnarok.packets.LoginPCBang;
 import org.diverproject.jragnarok.packets.LoginPacket;
 import org.diverproject.jragnarok.packets.LoginSingleSignOn;
 import org.diverproject.jragnarok.packets.ReceivePacketIDPacket;
-import org.diverproject.jragnarok.packets.RefuseLoginPacket;
-import org.diverproject.jragnarok.packets.RefuseLoginR2Packet;
+import org.diverproject.jragnarok.packets.RefuseLoginBytePacket;
+import org.diverproject.jragnarok.packets.RefuseLoginIntPacket;
 import org.diverproject.jragnarok.packets.ReponseCharConnectPacket;
 import org.diverproject.jragnarok.packets.UpdateClientHashPacket;
 import org.diverproject.jragnarok.server.FileDescriptor;
@@ -101,7 +101,7 @@ public class LoginClientService extends LoginServerService
 					log.addLoginLog(fd.getAddressString(), null, -3, "ip banned");
 					skip(fd, false, 23);
 
-					RefuseLoginPacket refuseLoginPacket = new RefuseLoginPacket();
+					RefuseLoginBytePacket refuseLoginPacket = new RefuseLoginBytePacket();
 					refuseLoginPacket.setResult(AuthResult.REJECTED_FROM_SERVER);
 					refuseLoginPacket.setBlockDate("");
 					refuseLoginPacket.send(fd);
@@ -173,7 +173,7 @@ public class LoginClientService extends LoginServerService
 
 	private void sentAuthResult(LoginSessionData sd, AuthResult result)
 	{
-		RefuseLoginPacket refuseLoginPacket = new RefuseLoginPacket();
+		RefuseLoginBytePacket refuseLoginPacket = new RefuseLoginBytePacket();
 		refuseLoginPacket.setResult(result);
 		refuseLoginPacket.send(sd.getFileDecriptor());
 	}
@@ -340,7 +340,7 @@ public class LoginClientService extends LoginServerService
 
 		if (sd.getVersion() >= dateToVersion(20120000))
 		{
-			RefuseLoginR2Packet packet = new RefuseLoginR2Packet();
+			RefuseLoginIntPacket packet = new RefuseLoginIntPacket();
 			packet.setBlockDate(blockDate);
 			packet.setCode(result);
 			packet.send(sd.getFileDecriptor());
@@ -348,7 +348,7 @@ public class LoginClientService extends LoginServerService
 
 		else
 		{
-			RefuseLoginPacket packet = new RefuseLoginPacket();
+			RefuseLoginBytePacket packet = new RefuseLoginBytePacket();
 			packet.setBlockDate("");
 			packet.setResult(result);
 			packet.send(sd.getFileDecriptor());
