@@ -1,3 +1,11 @@
+08.10.2016 - 1.0.31
+- JRagnarok atualizado para funcionar adequadamente ao atualizar Timer.
+- Novo método que permite limpar uma string usando '\0' como delimitador.
+	- Será usado por diversos pacotes que receber strings.
+- Server.isState e construtor de InternetProtocol estavam com mal funcionamento.
+- Tickers deverá sincronizar a coleção para evitar deadlock nas Threads.
+- TimerSystem não irá sincronizar, não haverá necessidade.
+
 08.10.2016 - 1.0.30
 - Atualizando todos os pacotes até o momento conforme mudanças em JavaUtil rev115.
 	- Essas mudanças irá permitir que os pacotes funcionem adequadamente.

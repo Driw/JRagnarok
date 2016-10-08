@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok;
 
 import static org.diverproject.log.LogSystem.log;
+import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.log.LogSystem.setUpSource;
@@ -16,6 +17,8 @@ import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.util.SizeUtil;
 import org.diverproject.util.SystemUtil;
 import org.diverproject.util.collection.List;
+import org.diverproject.util.stream.StreamException;
+import org.diverproject.util.stream.StreamRuntimeException;
 
 /**
  * <h1>Utilitários JRagnarok</h1>
@@ -146,6 +149,14 @@ public class JRagnarokUtil
 	}
 
 	/**
+	 * Limpa o conteúdo de uma string considerando o limite dela o NUL.
+	 * Irá recortar uma determinada string quando encontrar o byte 0.
+	 * @param string referência da string do qual deseja limpar.
+	 * @return aquisição de uma nova string completamente limpa.
+	 */
+
+
+	/**
 	 * Permite encriptar o valor de uma determinada string no formato MD5.
 	 * @param string referência da string contendo o valor a ser encriptado.
 	 * @return aquisição de uma string com o valor hash do MD5.
@@ -212,7 +223,7 @@ public class JRagnarokUtil
 	 * @param list referência da lista que contém o objeto a ser localizado.
 	 * @param target referência do objeto alvo a ser localizado na lista.
 	 * @return aquisição do índice do objeto alvo na lista passada,
-	 * casso o objeto não se encontre na lista será retornado -1.
+	 * casso o objeto não se encontre na lista será retornado 0.
 	 */
 
 	@SuppressWarnings("rawtypes")
@@ -222,7 +233,7 @@ public class JRagnarokUtil
 			if (list.get(i).equals(target))
 				return i + 1;
 
-		return -1;
+		return 0;
 	}
 
 	/**
@@ -234,10 +245,20 @@ public class JRagnarokUtil
 
 	public static void skip(FileDescriptor fd, boolean input, int bytes)
 	{
-		if (input)
-			fd.newInput("SkipPacket").skipe(bytes);
-		else
-			fd.newOutput("SkipPacket").skipe(bytes);
+		try {
+
+			if (input)
+				fd.getPacketBuilder().newInputPacket("SkipPacket").skipe(bytes);
+			else
+				fd.getPacketBuilder().newInputPacket("SkipPacket").skipe(bytes);
+
+		} catch (StreamException e) {
+
+			setUpSource(1);
+			logError("falha ao pular %d bytes (ip: %s)", bytes, fd.getAddressString());
+
+			throw new StreamRuntimeException(e.getMessage());
+		}
 	}
 
 	/**

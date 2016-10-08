@@ -275,45 +275,42 @@ public class TimerSystem
 	{
 		int diff = MAX_TIMER_INTERVAL;
 
-		synchronized (tickers)
+		for (Timer timer : tickers)
 		{
-			for (Timer timer : tickers)
+			diff = timer.getTick() - tick;
+
+			if (diff > 0)
+				break;
+
+			timer.getType().set(Timer.TIMER_REMOVE);
+
+			if (timer.getListener() != null)
 			{
-				diff = timer.getTick() - tick;
+				if (diff < -MAX_TIMER_INTERVAL)
+					timer.getListener().onCall(timer, tick);
+				else
+					timer.getListener().onCall(timer, timer.getTick());
+			}
 
-				if (diff > 0)
-					break;
+			if (timer.getType().is(Timer.TIMER_REMOVE))
+			{
+				timer.getType().unset(Timer.TIMER_REMOVE);
 
-				timer.getType().set(Timer.TIMER_REMOVE);
-
-				if (timer.getListener() != null)
+				switch (timer.getType().getValue())
 				{
-					if (diff < -MAX_TIMER_INTERVAL)
-						timer.getListener().onCall(timer, tick);
-					else
-						timer.getListener().onCall(timer, timer.getTick());
-				}
+					default:
+					case Timer.TIMER_ONCE_AUTODEL:
+						timer.getType().setValue(0);
+						timers.remove(timer);
+						tickers.remove(timer);
+						break;
 
-				if (timer.getType().is(Timer.TIMER_REMOVE))
-				{
-					timer.getType().unset(Timer.TIMER_REMOVE);
-
-					switch (timer.getType().getValue())
-					{
-						default:
-						case Timer.TIMER_ONCE_AUTODEL:
-							timer.getType().setValue(0);
-							timers.remove(timer);
-							tickers.remove(timer);
-							break;
-
-						case Timer.TIMER_INTERVAL:
-							if (timer.getTick() - tick < -1000)
-								timer.setTick(tick + timer.getInterval());
-							else
-								timer.setTick(timer.getTick() + timer.getInterval());
-							break;
-					}
+					case Timer.TIMER_INTERVAL:
+						if (timer.getTick() - tick < -1000)
+							timer.setTick(tick + timer.getInterval());
+						else
+							timer.setTick(timer.getTick() + timer.getInterval());
+						break;
 				}
 			}
 		}

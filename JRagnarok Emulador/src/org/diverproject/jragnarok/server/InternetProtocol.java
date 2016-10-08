@@ -71,7 +71,7 @@ public class InternetProtocol
 	public InternetProtocol(Socket socket)
 	{
 		String ip = SocketUtil.socketIP(socket);
-		String numbers[] = ip.split(".");
+		String numbers[] = ip.split("\\.");
 
 		this.first = (byte) IntUtil.parse(numbers[0]);
 		this.second = (byte) IntUtil.parse(numbers[1]);
@@ -156,9 +156,9 @@ public class InternetProtocol
 		byte numbers[] = ByteUtil.parseInt(intIP);
 
 		first = numbers[0];
-		first = numbers[1];
-		first = numbers[2];
-		first = numbers[3];
+		second = numbers[1];
+		third = numbers[2];
+		fourth = numbers[3];
 	}
 
 	@Override

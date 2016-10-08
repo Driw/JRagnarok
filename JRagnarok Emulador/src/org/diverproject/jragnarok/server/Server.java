@@ -150,7 +150,7 @@ public abstract class Server
 
 	public boolean isState(ServerState state)
 	{
-		return state.equals(state);
+		return this.state.equals(state);
 	}
 
 	/**

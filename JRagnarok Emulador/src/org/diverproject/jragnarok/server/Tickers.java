@@ -81,6 +81,11 @@ public class Tickers implements Iterable<Timer>
 	@Override
 	public Iterator<Timer> iterator()
 	{
-		return timers.iterator();
+		synchronized (timers)
+		{
+			Iterator<Timer> iterator = timers.iterator();
+
+			return iterator;
+		}
 	}
 }
