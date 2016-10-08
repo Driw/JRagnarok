@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets;
 
 import org.diverproject.util.lang.HexUtil;
-import org.diverproject.util.stream.implementation.input.InputPacket;
+import org.diverproject.util.stream.Input;
 
 public class ReceivePacketIDPacket extends ReceivePacket
 {
@@ -22,14 +22,12 @@ public class ReceivePacketIDPacket extends ReceivePacket
 	}
 
 	@Override
-	protected void receiveInput(InputPacket input)
+	protected void receiveInput(Input input)
 	{
 		packetID = input.getShort();
 
 		if (expectedPacket > 0 && packetID != expectedPacket)
 			throw new UnknowPacketException("esperado %s e recebido %s", getHexIdentify(), HexUtil.parseInt(packetID, 4));
-
-		input.skipe(-2);
 	}
 
 	public short getPacketID()
@@ -47,5 +45,11 @@ public class ReceivePacketIDPacket extends ReceivePacket
 	public short getIdentify()
 	{
 		return expectedPacket;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 2;
 	}
 }

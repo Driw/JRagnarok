@@ -2,7 +2,8 @@ package org.diverproject.jragnarok.packets;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_ACK_HASH;
 
-import org.diverproject.util.stream.implementation.output.OutputPacket;
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.stream.Output;
 
 public class AcknologeHash extends ResponsePacket
 {
@@ -10,7 +11,7 @@ public class AcknologeHash extends ResponsePacket
 	private String md5Key;
 
 	@Override
-	protected void sendOutput(OutputPacket output)
+	protected void sendOutput(Output output)
 	{
 		output.putShort((short) (md5KeyLength + 4));
 		output.putString(md5Key, 20);
@@ -36,5 +37,20 @@ public class AcknologeHash extends ResponsePacket
 	public short getIdentify()
 	{
 		return PACKET_AC_ACK_HASH;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 22;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("md5KeyLength", md5KeyLength);
+		description.append("md5Key", md5Key);
 	}
 }

@@ -2,7 +2,8 @@ package org.diverproject.jragnarok.packets;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_SSO_LOGIN_REQ;
 
-import org.diverproject.util.stream.implementation.input.InputPacket;
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.stream.Input;
 
 public class LoginSingleSignOn extends ReceivePacket
 {
@@ -15,7 +16,7 @@ public class LoginSingleSignOn extends ReceivePacket
 	private String token;
 
 	@Override
-	protected void receiveInput(InputPacket input)
+	protected void receiveInput(Input input)
 	{
 		short tokeLength = input.getShort();
 
@@ -73,5 +74,25 @@ public class LoginSingleSignOn extends ReceivePacket
 	public short getIdentify()
 	{
 		return PACKET_CA_SSO_LOGIN_REQ;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 0;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("version", version);
+		description.append("clientType", clientType);
+		description.append("username", username);
+		description.append("password", password);
+		description.append("macAddress", macAddress);
+		description.append("ip", ip);
+		description.append("token", token);
 	}
 }

@@ -5,7 +5,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_RE
 
 import org.diverproject.jragnarok.server.login.services.AuthResult;
 import org.diverproject.util.ObjectDescription;
-import org.diverproject.util.stream.implementation.output.OutputPacket;
+import org.diverproject.util.stream.Output;
 
 public class RefuseLoginIntPacket extends ResponsePacket
 {
@@ -24,7 +24,7 @@ public class RefuseLoginIntPacket extends ResponsePacket
 	}
 
 	@Override
-	protected void sendOutput(OutputPacket output)
+	protected void sendOutput(Output output)
 	{
 		output.putInt(code);
 		output.putString(blockDate, 20);
@@ -59,8 +59,16 @@ public class RefuseLoginIntPacket extends ResponsePacket
 	}
 
 	@Override
+	protected int length()
+	{
+		return 24;
+	}
+
+	@Override
 	protected void toString(ObjectDescription description)
 	{
+		super.toString(description);
+
 		description.append(CODE_STRINGS[code]);
 		description.append(blockDate);
 	}

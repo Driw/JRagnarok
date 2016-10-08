@@ -2,7 +2,8 @@ package org.diverproject.jragnarok.packets;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN_PCBANG;
 
-import org.diverproject.util.stream.implementation.input.InputPacket;
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.stream.Input;
 
 public class LoginPCBang extends ReceivePacket
 {
@@ -14,7 +15,7 @@ public class LoginPCBang extends ReceivePacket
 	private String macAddress;
 
 	@Override
-	protected void receiveInput(InputPacket input)
+	protected void receiveInput(Input input)
 	{
 		version = input.getInt();
 		username = input.getString(24);
@@ -64,5 +65,24 @@ public class LoginPCBang extends ReceivePacket
 	public short getIdentify()
 	{
 		return PACKET_CA_LOGIN_PCBANG;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 82;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("version", version);
+		description.append("username", username);
+		description.append("password", password);
+		description.append("clientType", clientType);
+		description.append("ip", ip);
+		description.append("macAddress", macAddress);
 	}
 }

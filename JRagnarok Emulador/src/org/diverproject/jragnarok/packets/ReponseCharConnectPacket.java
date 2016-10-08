@@ -3,14 +3,15 @@ package org.diverproject.jragnarok.packets;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_RES_CHAR_CONNECT;
 
 import org.diverproject.jragnarok.server.login.services.AuthResult;
-import org.diverproject.util.stream.implementation.output.OutputPacket;
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.stream.Output;
 
 public class ReponseCharConnectPacket extends ResponsePacket
 {
 	private AuthResult result;
 
 	@Override
-	protected void sendOutput(OutputPacket output)
+	protected void sendOutput(Output output)
 	{
 		output.putByte(result.CODE);
 	}
@@ -30,5 +31,19 @@ public class ReponseCharConnectPacket extends ResponsePacket
 	public short getIdentify()
 	{
 		return PACKET_CA_RES_CHAR_CONNECT;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 1;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("result", result);
 	}
 }

@@ -2,12 +2,12 @@ package org.diverproject.jragnarok.packets;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_SYNCRONIZE_IPADDRESS;
 
-import org.diverproject.util.stream.implementation.output.OutputPacket;
+import org.diverproject.util.stream.Output;
 
 public class SyncronizeAddressPacket extends ResponsePacket
 {
 	@Override
-	protected void sendOutput(OutputPacket output)
+	protected void sendOutput(Output output)
 	{
 		
 	}
@@ -22,5 +22,11 @@ public class SyncronizeAddressPacket extends ResponsePacket
 	public short getIdentify()
 	{
 		return PACKET_SYNCRONIZE_IPADDRESS;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 0;
 	}
 }

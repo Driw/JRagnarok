@@ -1,3 +1,9 @@
+08.10.2016 - 1.0.30
+- Atualizando todos os pacotes até o momento conforme mudanças em JavaUtil rev115.
+	- Essas mudanças irá permitir que os pacotes funcionem adequadamente.
+	- Foi adicionado length() para definir se o pacote é estático ou dinâmico.
+	- Complementando ainda os pacotes com toString afim de auxiliar no debug.
+
 03.10.2016 - 1.0.29
 - Documentação a parte para descrever os detalhes dos pacotes usados.
 - RefuseLoginPacket renomado para RefuseLoginBytePacket conforme o tipo de dado.

@@ -3,7 +3,8 @@ package org.diverproject.jragnarok.packets;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN2;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
-import org.diverproject.util.stream.implementation.input.InputPacket;
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.stream.Input;
 
 public class LoginMD5 extends ReceivePacket
 {
@@ -13,7 +14,7 @@ public class LoginMD5 extends ReceivePacket
 	private byte clientType;
 
 	@Override
-	protected void receiveInput(InputPacket input)
+	protected void receiveInput(Input input)
 	{
 		version = input.getInt();
 		username = input.getString(24);
@@ -51,5 +52,22 @@ public class LoginMD5 extends ReceivePacket
 	public short getIdentify()
 	{
 		return PACKET_CA_LOGIN2;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 45;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("version", version);
+		description.append("username", username);
+		description.append("password", password);
+		description.append("clientType", clientType);
 	}
 }

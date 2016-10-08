@@ -2,7 +2,8 @@ package org.diverproject.jragnarok.packets;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_EXE_HASHCHECK;
 
-import org.diverproject.util.stream.implementation.input.InputPacket;
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.stream.Input;
 
 public class UpdateClientHashPacket extends ReceivePacket
 {
@@ -14,7 +15,7 @@ public class UpdateClientHashPacket extends ReceivePacket
 	}
 
 	@Override
-	protected void receiveInput(InputPacket input)
+	protected void receiveInput(Input input)
 	{
 		input.getBytes(hashValue);
 	}
@@ -34,5 +35,19 @@ public class UpdateClientHashPacket extends ReceivePacket
 	public short getIdentify()
 	{
 		return PACKET_CA_EXE_HASHCHECK;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 16;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("hashValue", new String(hashValue));
 	}
 }

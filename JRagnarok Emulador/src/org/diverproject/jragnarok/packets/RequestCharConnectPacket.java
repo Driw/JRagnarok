@@ -1,8 +1,10 @@
 package org.diverproject.jragnarok.packets;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_REQ_CHAR_CONNECT;
 
-import org.diverproject.util.stream.implementation.input.InputPacket;
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.stream.Input;
 
 public class RequestCharConnectPacket extends ReceivePacket
 {
@@ -15,7 +17,7 @@ public class RequestCharConnectPacket extends ReceivePacket
 	private short newValue;
 
 	@Override
-	protected void receiveInput(InputPacket input)
+	protected void receiveInput(Input input)
 	{
 		username = input.getString(NAME_LENGTH);
 		password = input.getString(NAME_LENGTH);
@@ -66,12 +68,32 @@ public class RequestCharConnectPacket extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "";
+		return "PACKET_CA_REQ_CHAR_CONNECT";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return 0;
+		return PACKET_CA_REQ_CHAR_CONNECT;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 84;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("username", username);
+		description.append("password", password);
+		description.append("serverIP", serverIP);
+		description.append("serverPort", serverPort);
+		description.append("serverName", serverName);
+		description.append("serverType", type);
+		description.append("newValue", newValue);
 	}
 }
