@@ -1,3 +1,14 @@
+08.10.2016 - 1.0.32
+- Atualizações em FileDescriptor conforme PacketBuilder e correções:
+	- O atributo flag de FileDescriptor não foi definido de forma correta.
+		- São três atributos (byte) ao invés de um único atributo int.
+	- PacketBuilder será usado para criar os pacotes de Input e Output.
+	- Agora setFlag não será mais necessário, já que usa um FileDescriptorFlag.
+	- Com PacketBuilder newInput e newOutput também não serão mais necessários.
+	- Condição de validação no close e close não remove de SESSIONS.
+	- Nova verificação para isConnected verificando se a sessão é válida.
+- FileDescriptor.update atualizado conforme correções de flag e listener nulo.
+
 08.10.2016 - 1.0.31
 - JRagnarok atualizado para funcionar adequadamente ao atualizar Timer.
 - Novo método que permite limpar uma string usando '\0' como delimitador.

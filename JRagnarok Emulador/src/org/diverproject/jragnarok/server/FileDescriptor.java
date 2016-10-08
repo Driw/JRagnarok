@@ -16,9 +16,7 @@ import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.LoopList;
-import org.diverproject.util.stream.StreamException;
-import org.diverproject.util.stream.implementation.input.InputPacket;
-import org.diverproject.util.stream.implementation.output.OutputPacket;
+import org.diverproject.util.stream.implementation.PacketBuilder;
 
 /**
  * <h1>Descritor de Arquivo</h1>
@@ -65,7 +63,7 @@ public class FileDescriptor
 	/**
 	 * Flag que determina o tipo de descritor.
 	 */
-	private int flag;
+	private FileDescriptorFlag flag;
 
 	/**
 	 * Tempo restante para que o descritor seja considerado inativo.
@@ -103,6 +101,11 @@ public class FileDescriptor
 	private Object cache;
 
 	/**
+	 * Criador de pacotes.
+	 */
+	private PacketBuilder packetBuilder;
+
+	/**
 	 * Cria um novo Descriptor de Arquivo baseado em uma conexão socket.
 	 * @param socket referência da conexão do cliente com o servidor.
 	 */
@@ -110,7 +113,9 @@ public class FileDescriptor
 	private FileDescriptor(Socket socket)
 	{
 		this.socket = socket;
+		this.flag = new FileDescriptorFlag();
 		this.address = new InternetProtocol(socket);
+		this.packetBuilder = new PacketBuilder(socket);
 	}
 
 	/**
@@ -128,21 +133,9 @@ public class FileDescriptor
 	 * @return aquisição da relação do descritor com o servidor.
 	 */
 
-	public int getFlag()
+	public FileDescriptorFlag getFlag()
 	{
 		return flag;
-	}
-
-	/**
-	 * Permite definir o tipo da conexão do descritor (EOF, SERVER ou PING).
-	 * @param flag relação do descritor com o servidor:
-	 * FLAG_EOF, FLAG_SERVER ou FLAG_PING, encontrado em FileDescriptor.
-	 */
-
-	public void setFlag(int flag)
-	{
-		if (flag >= FLAG_EOF && flag <= FLAG_PING)
-			this.flag = flag;
 	}
 
 	/**
@@ -268,39 +261,16 @@ public class FileDescriptor
 	}
 
 	/**
-	 * Instancia uma nova stream para criar uma entrada de dados por socket.
-	 * @param name nome que será usado para identificar o pacote.
-	 * @return aquisição de um objeto para entrada de dados por socket.
+	 * O construtor de pacotes irá permitir o recebimento e envio de dados por pacote.
+	 * Através dele será possível dizer se é input/output, tamanho e nome do pacote.
+	 * @return aquisição do criador de pacotes desse Descritor de Arquivo.
 	 */
 
-	public InputPacket newInput(String name)
+	public PacketBuilder getPacketBuilder()
 	{
 		timeout = TimerSystem.getInstance().getLastTickCount() + DEFAULT_TIMEOUT;
 
-		try {
-			return new InputPacket(socket, 0, name);
-		} catch (StreamException e ) {
-			logError("falha ao criar InputPacket para %s (ip: %s)", name, address.getString());
-			throw new RagnarokRuntimeException(e.getMessage());
-		}
-	}
-
-	/**
-	 * Instancia uma nova stream para criar uma saída de dados por socket.
-	 * @param name nome que será usado para identificar o pacote.
-	 * @return aquisição de um objeto para saída de dados por socket.
-	 */
-
-	public OutputPacket newOutput(String name)
-	{
-		timeout = TimerSystem.getInstance().getLastTickCount() + DEFAULT_TIMEOUT;
-
-		try {
-			return new OutputPacket(socket, 0, name);
-		} catch (StreamException e ) {
-			logError("falha ao criar OutputPacket para %s (ip: %s)", name, address.getString());
-			throw new RagnarokRuntimeException(e.getMessage());
-		}
+		return packetBuilder;
 	}
 
 	/**
@@ -310,6 +280,9 @@ public class FileDescriptor
 
 	public void close()
 	{
+		if (socket == null)
+			return;
+
 		try {
 
 			socket.close();
@@ -318,8 +291,6 @@ public class FileDescriptor
 			sendListener = null;
 			receiveListener = null;
 			parseListener = null;
-
-			SESSIONS.remove(id);
 
 			id = 0;
 
@@ -335,7 +306,7 @@ public class FileDescriptor
 
 	public boolean isConnected()
 	{
-		return socket != null && socket.isConnected();
+		return socket != null && socket.isConnected() && id > 0;
 	}
 
 	@Override
@@ -396,21 +367,27 @@ public class FileDescriptor
 
 		for (FileDescriptor fd : SESSIONS)
 		{
-			if (fd.getTimeout() > 0 && (lastTick - fd.getTimeout()) > 60)
+			if (fd.getTimeout() > 0 && (lastTick - fd.getTimeout()) > DEFAULT_TIMEOUT)
 			{
-				if (fd.getFlag() == FLAG_SERVER && fd.flag != 2)
-					fd.setFlag(FLAG_PING);
+				if (fd.getFlag().getServer() != 0)
+				{
+					if (fd.getFlag().getPing() != 2)
+						fd.getFlag().setPing((byte) 0);
+				}
+
 				else
 				{
 					log("sessão #%d terminou (ip: %s).\n", fd.getID(), fd.getAddressString());
-					fd.close();
+					fd.getFlag().setEOF((byte) 1);
 				}
 			}
 
 			try {
 
-				fd.getParseListener().onCall(fd);
-				fd.setTimeout(60);
+				if (fd.getParseListener() != null)
+					fd.getParseListener().onCall(fd);
+
+				fd.setTimeout(DEFAULT_TIMEOUT);
 
 			} catch (RagnarokException e) {
 
@@ -432,5 +409,9 @@ public class FileDescriptor
 
 			}
 		}
+
+		for (int i = 0; i < SESSIONS.size(); i++)
+			if (!SESSIONS.get(i).isConnected())
+				SESSIONS.remove(i);
 	}
 }
