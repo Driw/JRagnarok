@@ -155,6 +155,15 @@ public class JRagnarokUtil
 	 * @return aquisição de uma nova string completamente limpa.
 	 */
 
+	public static String strclr(String string)
+	{
+		int index = string.indexOf("\0");
+
+		if (index > 0)
+			return string.substring(0, index);
+
+		return string;
+	}
 
 	/**
 	 * Permite encriptar o valor de uma determinada string no formato MD5.

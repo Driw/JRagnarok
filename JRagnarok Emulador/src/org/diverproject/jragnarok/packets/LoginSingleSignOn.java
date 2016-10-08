@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.packets;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_SSO_LOGIN_REQ;
 
 import org.diverproject.util.ObjectDescription;
@@ -22,9 +23,9 @@ public class LoginSingleSignOn extends ReceivePacket
 
 		version = input.getInt();
 		clientType = input.getByte();
-		username = input.getString(24);
-		password = input.getString(24);
-		macAddress = input.getString(17);
+		username = strclr(input.getString(24));
+		password = strclr(input.getString(24));
+		macAddress = strclr(input.getString(17));
 		ip = input.getString(15);
 		token = input.getString(tokeLength);
 	}

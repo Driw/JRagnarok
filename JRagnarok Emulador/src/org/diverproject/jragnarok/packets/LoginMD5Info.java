@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.packets;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN2;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
@@ -18,8 +19,8 @@ public class LoginMD5Info extends ReceivePacket
 	protected void receiveInput(Input input)
 	{
 		version = input.getInt();
-		username = input.getString(24);
-		password = input.getString(16);
+		username = strclr(input.getString(24));
+		password = strclr(input.getString(16));
 		clientType = input.getByte();
 		clientInfo = input.getByte();
 	}

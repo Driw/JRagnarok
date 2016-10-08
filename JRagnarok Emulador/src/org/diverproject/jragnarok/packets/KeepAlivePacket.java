@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.packets;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_CONNECT_INFO_CHANGED;
 
 import org.diverproject.util.ObjectDescription;
@@ -12,7 +13,7 @@ public class KeepAlivePacket extends ReceivePacket
 	@Override
 	protected void receiveInput(Input input)
 	{
-		identification = input.getString(24);
+		identification = strclr(input.getString(24));
 	}
 
 	public String getIdentification()

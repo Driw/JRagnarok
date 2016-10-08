@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.packets;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN_HAN;
 
 import org.diverproject.util.ObjectDescription;
@@ -19,11 +20,11 @@ public class LoginHan extends ReceivePacket
 	protected void receiveInput(Input input)
 	{
 		version = input.getInt();
-		username = input.getString(24);
-		password = input.getString(24);
+		username = strclr(input.getString(24));
+		password = strclr(input.getString(24));
 		clientType = input.getByte();
-		ip = input.getString(16);
-		macAddress = input.getString(13);		
+		ip = strclr(input.getString(16));
+		macAddress = strclr(input.getString(13));		
 		hanGameUser = input.getByte() == 0;
 	}
 

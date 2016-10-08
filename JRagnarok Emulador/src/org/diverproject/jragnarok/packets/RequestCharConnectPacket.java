@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_REQ_CHAR_CONNECT;
 
 import org.diverproject.util.ObjectDescription;
@@ -19,12 +19,12 @@ public class RequestCharConnectPacket extends ReceivePacket
 	@Override
 	protected void receiveInput(Input input)
 	{
-		username = input.getString(NAME_LENGTH);
-		password = input.getString(NAME_LENGTH);
+		username = strclr(input.getString(24));
+		password = strclr(input.getString(24));
 		input.skipe(4);
 		serverIP = input.getInt();
 		serverPort = input.getShort();
-		serverName = input.getString(20);
+		serverName = strclr(input.getString(20));
 		input.skipe(2);
 		type = input.getShort();
 		newValue = input.getShort();
