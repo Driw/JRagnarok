@@ -283,6 +283,28 @@ public class JRagnarokUtil
 	}
 
 	/**
+	 * Procedimento para efetuar o cast de um valor numérico byte.
+	 * @param value número do tipo inteiro a ser convertido para byte.
+	 * @return aquisição de um valor numérico do tipo byte com base em value.
+	 */
+
+	public static byte b(int value)
+	{
+		return (byte) value;
+	}
+
+	/**
+	 * Procedimento para efetuar o cast de um valor numérico short.
+	 * @param value número do tipo inteiro a ser convertido para short.
+	 * @return aquisição de um valor numérico do tipo short com base em value.
+	 */
+
+	public static short s(int value)
+	{
+		return (short) value;
+	}
+
+	/**
 	 * Permite obter uma determinada mensagem carregada dos arquivos de mensagens.
 	 * Essa mensagem é referente a uma listada nas mensagens do servidor de acesso.
 	 * @param number código de identificação da mensagem desejada.
@@ -294,7 +316,7 @@ public class JRagnarokUtil
 		String message = Messages.getInstance().getLoginMessages().get(number);
 
 		if (message == null)
-			logWarning("mensagem '%d' não existe no LoginServer");
+			logWarning("mensagem '%d' não existe no LoginServer\n", number);
 
 		return message == null ? "null" : message;
 	}
@@ -311,7 +333,7 @@ public class JRagnarokUtil
 		String message = Messages.getInstance().getCharMessages().get(number);
 
 		if (message == null)
-			logWarning("mensagem '%d' não existe no CharServer");
+			logWarning("mensagem '%d' não existe no CharServer\n", number);
 
 		return message == null ? "null" : message;
 	}
@@ -328,7 +350,7 @@ public class JRagnarokUtil
 		String message = Messages.getInstance().getMapMessages().get(number);
 
 		if (message == null)
-			logWarning("mensagem '%d' não existe no MapServer");
+			logWarning("mensagem '%d' não existe no MapServer\n", number);
 
 		return message == null ? "null" : message;
 	}

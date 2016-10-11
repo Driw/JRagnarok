@@ -1,3 +1,7 @@
+11.10.2016 - 1.0.35
+- Removido um byte extra de NAME_LENGTH, PASSWORD_LENGTH e PINCODE_LENGTH por ser Java.
+- Dois nóvos métodos para converter valores int em números do tipo byte e short.
+
 11.10.2016 - 1.0.34
 - Corrigindo ResponsePacket para que envie os pacotes ao cliente corretamente.
 	- Os bytes não estavam indo invertidos, não eram enviados e não tinha o código do pacote.
