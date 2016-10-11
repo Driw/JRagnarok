@@ -1,3 +1,7 @@
+11.10.2016 - 1.0.38
+- Enviando arquivo para atualizar o banco de dados SQL com as novas tabelas.
+	- Também está sendo incluso a alteração de colunas de login_log.
+
 11.10.2016 - 1.0.37
 - Atualizando entidades relacionadas a uma conte de usuário.
 	- Account: movendo atributos para outras classes de dependência e tipos de atributos alterados.
