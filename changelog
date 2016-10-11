@@ -1,3 +1,10 @@
+11.10.2016 - 1.0.36
+- FileDescriptor corrigido para ser desligado do servidor adequadamente.
+	- Algumas operações adicionais e lógicas corrigidas.
+	- O método isConnected poderia causar um deadlock na Thread.
+- FileDescriptorListener.onCall deve agora retornar um booleano.
+	- Se for true significa que deverá remover o listener do FileDescriptor.
+
 11.10.2016 - 1.0.35
 - Removido um byte extra de NAME_LENGTH, PASSWORD_LENGTH e PINCODE_LENGTH por ser Java.
 - Dois nóvos métodos para converter valores int em números do tipo byte e short.

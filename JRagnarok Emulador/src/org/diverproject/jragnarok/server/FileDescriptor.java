@@ -3,10 +3,10 @@ package org.diverproject.jragnarok.server;
 import static org.diverproject.jragnarok.JRagnarokConstants.FD_SETSIZE;
 import static org.diverproject.jragnarok.JRagnarokUtil.indexOn;
 import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
-import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
-import static org.diverproject.log.LogSystem.setUpSource;
+import static org.diverproject.log.LogSystem.logExeceptionSource;
+import static org.diverproject.log.LogSystem.logInfo;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -285,7 +285,10 @@ public class FileDescriptor
 
 		try {
 
+			socket.shutdownInput();
+			socket.shutdownOutput();
 			socket.close();
+
 			socket = null;
 			cache = null;
 			sendListener = null;
@@ -306,7 +309,12 @@ public class FileDescriptor
 
 	public boolean isConnected()
 	{
-		return socket != null && socket.isConnected() && id > 0;
+		if (id <= 0 || flag.getEOF() == 1 || socket == null)
+			return false;
+
+		boolean connected = socket.isConnected();
+
+		return connected;
 	}
 
 	@Override
@@ -363,11 +371,13 @@ public class FileDescriptor
 	public static void update(long next)
 	{
 		TimerSystem timer = TimerSystem.getInstance();
-		long lastTick = timer.getLastTickCount();
+		int lastTick = timer.getLastTickCount();
 
-		for (FileDescriptor fd : SESSIONS)
+		for (int i = 0; i < SESSIONS.size(); i++)
 		{
-			if (fd.getTimeout() > 0 && (lastTick - fd.getTimeout()) > DEFAULT_TIMEOUT)
+			FileDescriptor fd = SESSIONS.get(i);
+
+			if (fd.getTimeout() > 0 && (fd.getTimeout() - lastTick) < 0)
 			{
 				if (fd.getFlag().getServer() != 0)
 				{
@@ -377,41 +387,52 @@ public class FileDescriptor
 
 				else
 				{
-					log("sessão #%d terminou (ip: %s).\n", fd.getID(), fd.getAddressString());
-					fd.getFlag().setEOF((byte) 1);
+					logInfo("sessão #%d terminada por ociosidade (ip: %s).\n", fd.getID(), fd.getAddressString());
+					setEndOfFile(fd);
 				}
 			}
 
 			try {
 
 				if (fd.getParseListener() != null)
-					fd.getParseListener().onCall(fd);
-
-				fd.setTimeout(DEFAULT_TIMEOUT);
+					if (!fd.getParseListener().onCall(fd))
+						fd.setTimeout(lastTick);
 
 			} catch (RagnarokException e) {
 
-				setUpSource(1);
 				logError("processamento inválido encontrado:\n");
-				logExeception(e);
+				logExeceptionSource(e);
+
+				setEndOfFile(fd);
 
 			} catch (RagnarokRuntimeException e) {
 
-				setUpSource(1);
 				logError("informação inválida encontrada:\n");
-				logExeception(e);
+				logExeceptionSource(e);
+
+				setEndOfFile(fd);
 
 			} catch (Exception e) {
 
-				setUpSource(1);
 				logError("erro inesperado ocorrido:\n");
-				logExeception(e);
+				logExeceptionSource(e);
+
+				setEndOfFile(fd);
 
 			}
-		}
 
-		for (int i = 0; i < SESSIONS.size(); i++)
-			if (!SESSIONS.get(i).isConnected())
+			if (!fd.isConnected())
+			{
+				logInfo("sessão encerrada (ip: %s).\n", fd.getAddressString());
+
+				fd.close();
 				SESSIONS.remove(i);
+			}
+		}
+	}
+
+	private static void setEndOfFile(FileDescriptor fd)
+	{
+		fd.getFlag().setEOF((byte) 1);		
 	}
 }

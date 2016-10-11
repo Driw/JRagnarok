@@ -18,8 +18,9 @@ public interface FileDescriptorListener
 	 * Esse método terá uma das três funções a seguir: receber, enviar ou analisar dados.
 	 * Os dados são referentes ao descritor, através da stream de input/output do socket.
 	 * @param fd referência do Arquivo Descritor para criar as streams de input ou output.
+	 * @return true se deve continuar com o mesmo listener ou false caso contrário.
 	 * @throws RagnarokException qualquer problema que não deve passar para registrar.
 	 */
 
-	void onCall(FileDescriptor fd) throws RagnarokException;
+	boolean onCall(FileDescriptor fd) throws RagnarokException;
 }
