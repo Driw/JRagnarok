@@ -29,7 +29,6 @@ import org.diverproject.jragnarok.server.login.services.LoginLogService;
 import org.diverproject.jragnarok.server.login.services.LoginService;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.jragnarok.server.login.structures.Login;
-import org.diverproject.jragnarok.server.login.structures.Sex;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.LoopList;
 
@@ -226,7 +225,6 @@ public class LoginServer extends Server implements ServerListener
 		logInfo("o servidor de acesso está pronto (porta: %d).\n", getPort());
 
 		Login login = new Login();
-		login.setSex(Sex.SERVER);
 		login.setUsername(getConfigs().getString("login.username"));
 		login.setPassword(getConfigs().getString("login.password"));
 

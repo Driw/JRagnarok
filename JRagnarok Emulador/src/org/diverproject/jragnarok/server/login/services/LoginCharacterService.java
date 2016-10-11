@@ -51,10 +51,11 @@ public class LoginCharacterService extends LoginServerService
 	public FileDescriptorListener parse = new FileDescriptorListener()
 	{
 		@Override
-		public void onCall(FileDescriptor fd) throws RagnarokException
+		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
 			// TODO Auto-generated method stub
-			
+
+			return true;
 		}
 	};
 

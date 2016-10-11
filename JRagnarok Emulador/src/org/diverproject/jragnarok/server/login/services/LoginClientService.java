@@ -21,8 +21,6 @@ import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_RE
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_REQ_HASH;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_SSO_LOGIN_REQ;
 import static org.diverproject.log.LogSystem.log;
-import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 
@@ -52,7 +50,6 @@ import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
 import org.diverproject.jragnarok.server.login.structures.ClientType;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
-import org.diverproject.jragnarok.server.login.structures.Sex;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.Time;
 import org.diverproject.util.lang.HexUtil;
@@ -84,12 +81,12 @@ public class LoginClientService extends LoginServerService
 	public FileDescriptorListener parse = new FileDescriptorListener()
 	{
 		@Override
-		public void onCall(FileDescriptor fd) throws RagnarokException
+		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
 			if (!fd.isConnected())
 			{
 				logInfo("Conexão fechada (ip: %s).\n", fd.getAddressString());
-				return;
+				return false;
 			}
 
 			if (fd.getCache() == null)
@@ -136,8 +133,7 @@ public class LoginClientService extends LoginServerService
 				case PACKET_CA_LOGIN2:
 				case PACKET_CA_LOGIN3:
 				case PACKET_CA_LOGIN4:
-					requestAuth(fd, sd, command);
-					break;
+					return requestAuth(fd, sd, command);
 
 				case PACKET_CA_REQ_HASH:
 					parseRequestKey(fd, sd);
@@ -150,9 +146,12 @@ public class LoginClientService extends LoginServerService
 				default:
 					String packet = HexUtil.parseInt(command, 4);
 					String address = fd.getAddressString();
-					logNotice("fim de conexão inesperado (pacote: %s, ip: %s)", packet, address);
+					logNotice("fim de conexão inesperado (pacote: 0x%s, ip: %s)\n", packet, address);
 					fd.close();
+					return false;
 			}
+
+			return true;
 		}
 	};
 
@@ -191,7 +190,7 @@ public class LoginClientService extends LoginServerService
 
 	private boolean requestAuth(FileDescriptor fd, LoginSessionData sd, short command)
 	{
-		boolean usingRawPassword = false;
+		boolean usingRawPassword = true;
 
 		switch (command)
 		{
@@ -264,7 +263,7 @@ public class LoginClientService extends LoginServerService
 
 		if (usingRawPassword)
 		{
-			log("solicitação de conexão de %s (ip: %s, version: %d)", sd.getUsername(), sd.getAddressString(), sd.getVersion());
+			logNotice("solicitação de conexão de %s (ip: %s, version: %d)\n", sd.getUsername(), sd.getAddressString(), sd.getVersion());
 
 			if (getConfigs().getBool("login.use_md5_password"))
 				sd.setPassword(md5Encrypt(sd.getPassword()));
@@ -274,7 +273,7 @@ public class LoginClientService extends LoginServerService
 
 		else
 		{
-			log("solicitação de conexão passdenc de %s (ip: %s, version: %d)", sd.getUsername(), sd.getAddressString(), sd.getVersion());
+			log("solicitação de conexão passdenc de %s (ip: %s, version: %d)\n", sd.getUsername(), sd.getAddressString(), sd.getVersion());
 
 			sd.getPassDencrypt().set(LoginSessionData.PASSWORD_DENCRYPT);
 			sd.getPassDencrypt().set(LoginSessionData.PASSWORD_DENCRYPT2);
@@ -290,11 +289,14 @@ public class LoginClientService extends LoginServerService
 		AuthResult result = login.mmoAuth(sd, false);
 
 		if (result == AuthResult.OK)
+		{
 			authOk(sd);
-		else
-			authFailed(sd, result);
+			return true;
+		}
 
-		return true;
+		authFailed(sd, result);
+
+		return false;
 	}
 
 	private void authOk(LoginSessionData sd)
@@ -323,19 +325,19 @@ public class LoginClientService extends LoginServerService
 
 		if (result == AuthResult.BANNED_UNTIL)
 		{
-			try {
+//			try {
 
-				Time unbanTime = accountController.getBanTime(sd.getUsername());
+				Time unbanTime = new Time(System.currentTimeMillis() + 3600);//accountController.getBanTime(sd.getUsername());
 				blockDate = unbanTime.toStringFormat(DATE_FORMAT);
 
-			} catch (RagnarokException e) {
-
-				logError("falha ao obter tempo de ban, enviando mensagem indefinida:\n");
-				logExeception(e);
-
-				blockDate = "Falha de conexão";
-
-			}
+//			} catch (RagnarokException e) {
+//
+//				logError("falha ao obter tempo de ban, enviando mensagem indefinida:\n");
+//				logExeception(e);
+//
+//				blockDate = "Falha de conexão";
+//
+//			}
 		}
 
 		if (sd.getVersion() >= dateToVersion(20120000))
@@ -349,7 +351,7 @@ public class LoginClientService extends LoginServerService
 		else
 		{
 			RefuseLoginBytePacket packet = new RefuseLoginBytePacket();
-			packet.setBlockDate("");
+			packet.setBlockDate(blockDate);
 			packet.setResult(result);
 			packet.send(sd.getFileDecriptor());
 		}
@@ -384,7 +386,6 @@ public class LoginClientService extends LoginServerService
 
 		if (getServer().isState(ServerState.RUNNING) &&
 			result == AuthResult.OK &&
-			sd.getSex() == Sex.SERVER &&
 			sd.getID() < getServer().getCharServers().size() &&
 			fd.isConnected())
 		{
@@ -401,7 +402,7 @@ public class LoginClientService extends LoginServerService
 			getServer().getCharServers().add(server);
 
 			fd.setParseListener(character.parse);
-			fd.setFlag(FileDescriptor.FLAG_SERVER);
+			fd.getFlag().setServer((byte) 1);
 
 			ReponseCharConnectPacket packet = new ReponseCharConnectPacket();
 			packet.setResult(AuthResult.OK);

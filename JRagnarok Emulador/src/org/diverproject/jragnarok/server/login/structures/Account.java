@@ -1,28 +1,28 @@
 package org.diverproject.jragnarok.server.login.structures;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokConstants.PINCODE_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 
+import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
 
 public class Account extends Login
 {
+	private static final String DEFAULT_EMAIL = "a@a.com";
+	private static final String DEFAULT_BIRTHDATE = "0000-00-00";
+
 	private String email;
-	private int group;
+	private String birthDate;
 	private byte charSlots;
-	private AccountState state;
+	private int loginCount;
+
 	private Time unban;
 	private Time expiration;
-	private int loginCount;
-	private String lastIP;
-	private String birthDate;
-	private boolean usePincode;
-	private String pincode;
-	private Time pincodeChange;
-	private int oldGroup;
-	private Time vipTime;
+	private Pincode pincode;
+	private AccountState state;
+	private AccountGroup group;
+	private InternetProtocol lastIP;
 
 	public String getEmail()
 	{
@@ -31,28 +31,33 @@ public class Account extends Login
 
 	public Account()
 	{
-		group = -1;
+		email = DEFAULT_EMAIL;
+		birthDate = DEFAULT_BIRTHDATE;
+
 		unban = new Time();
 		expiration = new Time();
-		pincodeChange = new Time();
-		vipTime = new Time();
-		birthDate = "0000-00-00";
+		pincode = new Pincode();
+		lastIP = new InternetProtocol();
+		group = new AccountGroup();
+
+		state = AccountState.EMAIL_CONFIRMATION;
 	}
 
 	public void setEmail(String email)
 	{
+		// TODO : validar e-mail
 		this.email = strcap(email, EMAIL_LENGTH);
 	}
 
-	public int getGroup()
+	public String getBirthDate()
 	{
-		return group;
+		return birthDate;
 	}
 
-	public void setGroup(int group)
+	public void setBirthDate(String birthDate)
 	{
-		if (group > 0)
-			this.group = group;
+		// TODO : validar data de aniversário
+		this.birthDate = strcap(birthDate, 10);
 	}
 
 	public byte getCharSlots()
@@ -66,15 +71,15 @@ public class Account extends Login
 			this.charSlots = charSlots;
 	}
 
-	public AccountState getState()
+	public int getLoginCount()
 	{
-		return state;
+		return loginCount;
 	}
 
-	public void setState(AccountState state)
+	public void setLoginCount(int loginCount)
 	{
-		if (state != null)
-			this.state = state;
+		if (loginCount > 0)
+			this.loginCount = loginCount;
 	}
 
 	public Time getUnban()
@@ -87,85 +92,35 @@ public class Account extends Login
 		return expiration;
 	}
 
-	public int getLoginCount()
-	{
-		return loginCount;
-	}
-
-	public void setLoginCount(int loginCount)
-	{
-		if (loginCount > 0)
-			this.loginCount = loginCount;
-	}
-
-	public String getLastIP()
-	{
-		return lastIP;
-	}
-
-	public void setLastIP(String lastIP)
-	{
-		this.lastIP = strcap(lastIP, 16);
-	}
-
-	public void setBirthDate(String birthDate)
-	{
-		this.birthDate = strcap(birthDate, 10 + 1);
-	}
-
-	public String getBirthDate()
-	{
-		return birthDate;
-	}
-
-	public boolean isUsePincode()
-	{
-		return usePincode;
-	}
-
-	public void setUsePincode(boolean usePincode)
-	{
-		this.usePincode = usePincode;
-	}
-
-	public String getPincode()
+	public Pincode getPincode()
 	{
 		return pincode;
 	}
 
-	public void setPincode(String pincode)
+	public AccountState getState()
 	{
-		this.pincode = strcap(pincode, PINCODE_LENGTH + 1);
+		return state;
 	}
 
-	public Time getPincodeChange()
+	public void setState(AccountState state)
 	{
-		return pincodeChange;
+		if (state != null)
+			this.state = state;
 	}
 
-	public void setPincodeChange(Time pincodeChange)
+	public AccountGroup getGroup()
 	{
-		this.pincodeChange = pincodeChange;
+		return group;
 	}
 
-	public int getOldGroup()
+	public void setGroup(AccountGroup group)
 	{
-		return oldGroup;
+		this.group = group;
 	}
 
-	public void setOldGroup(int oldGroup)
+	public InternetProtocol getLastIP()
 	{
-		this.oldGroup = oldGroup;
-	}
-
-	public Time getVipTime()
-	{
-		return vipTime;
-	}
-
-	public void setVipTime(Time vipTime)
-	{
-		this.vipTime = vipTime;
+		return lastIP;
 	}
 
 	@Override
@@ -174,25 +129,25 @@ public class Account extends Login
 		super.toString(description);
 
 		description.append("email", email);
-		description.append("group", group);
-		description.append("charSlots", charSlots);
-		description.append("state", state);
-		description.append("unban", unban);
-		description.append("expiration", expiration);
-		description.append("loginCount", loginCount);
-		description.append("lastIP", lastIP);
 		description.append("birthDate", birthDate);
+		description.append("charSlots", charSlots);
+		description.append("loginCount", loginCount);
+		description.append("state", state);
+		description.append("lastIP", lastIP.getString());
 
-		if (usePincode)
-		{
-			description.append("pincode", pincode);
-			description.append("pincodChange", pincodeChange);
-		}
+		if (group != null)
+			description.append("group", group.getCurrentGroup().getName());
 
-		if (oldGroup != -1)
+		if (unban.get() != 0)
+			description.append("unban", unban);
+
+		if (expiration.get() != 0)
+			description.append("expiration", expiration);
+
+		if (pincode.isEnabled())
 		{
-			description.append("oldGroup", oldGroup);
-			description.append("vipTime", vipTime);
+			description.append("pincode", pincode.getCode());
+			description.append("pincodChange", pincode.getChanged());
 		}
 	}
 }

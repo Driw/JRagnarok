@@ -11,13 +11,7 @@ public class Login
 	private int id;
 	private String username;
 	private String password;
-	private Sex sex;
 	private String lastLogin;
-
-	public Login()
-	{
-		this.sex = Sex.SERVER;
-	}
 
 	public int getID()
 	{
@@ -49,17 +43,6 @@ public class Login
 		this.password = strcap(password, PASSWORD_LENGTH);
 	}
 
-	public Sex getSex()
-	{
-		return sex;
-	}
-
-	public void setSex(Sex sex)
-	{
-		if (sex != null)
-			this.sex = sex;
-	}
-
 	public String getLastLogin()
 	{
 		return lastLogin;
@@ -75,7 +58,6 @@ public class Login
 		description.append("id", id);
 		description.append("username", username);
 		description.append("password", password);
-		description.append("sex", sex);
 		description.append("lastLogin", lastLogin);		
 	}
 

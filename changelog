@@ -1,3 +1,13 @@
+11.10.2016 - 1.0.37
+- Atualizando entidades relacionadas a uma conte de usuário.
+	- Account: movendo atributos para outras classes de dependência e tipos de atributos alterados.
+	- AccountGroup: dependência de Account para armazenar informações do grupo da conta.
+	- Group: deverá representar um grupo de contas e suas propriedades.
+	- Login: não deverá mais possuir Sex, pois isso não será definido na conta.
+	- Pincode e Vip irão armazenar atributos que eram de Account respectivos a seus nomes.
+- LoginClientService atualizado para funcionar com a rev36 onde FileDecriptorListener retorna booleano.
+	- Corrigido ainda problema onde a senha raw era considerada como noRaw.
+
 11.10.2016 - 1.0.36
 - FileDescriptor corrigido para ser desligado do servidor adequadamente.
 	- Algumas operações adicionais e lógicas corrigidas.
