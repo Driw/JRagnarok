@@ -1,3 +1,7 @@
+11.10.2016 - 1.0.34
+- Corrigindo ResponsePacket para que envie os pacotes ao cliente corretamente.
+	- Os bytes não estavam indo invertidos, não eram enviados e não tinha o código do pacote.
+
 08.10.2016 - 1.0.33
 - Novo método que permite limpar uma string usando '\0' como delimitador.
 	- Será usado por diversos pacotes que receber strings.

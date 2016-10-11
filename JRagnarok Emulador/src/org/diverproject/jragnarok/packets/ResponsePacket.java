@@ -20,9 +20,13 @@ public abstract class ResponsePacket extends GenericPacket
 			if (length() == 0)
 				output = builder.newOutputPacket(getName());
 			else
-				output = builder.newOutputPacket(getName(), length());
+				output = builder.newOutputPacket(getName(), length() + 2);
 
+			output.setInvert(true);
+			output.putShort(getIdentify());
 			sendOutput(output);
+
+			output.flush();
 
 		} catch (StreamException e) {
 			throw new StreamRuntimeException("falha ao enviar %s (ip: %s)", nameOf(this), fd.getAddressString());
