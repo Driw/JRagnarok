@@ -1,4 +1,6 @@
 
+DROP TABLE accounts, accounts_vip, commands, groups, groups_commands, groups_permissions, logins, login_log, permissions, pincodes, vip;
+
 CREATE TABLE IF NOT EXISTS logins
 (
 	id INT AUTO_INCREMENT,
