@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS groups
 
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS commands
+CREATE TABLE IF NOT EXISTS group_commands
 (
 	id INT AUTO_INCREMENT,
 	name VARCHAR(24) NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS commands
 
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS permissions
+CREATE TABLE IF NOT EXISTS group_permissions
 (
 	id INT AUTO_INCREMENT,
 	name VARCHAR(24) NOT NULL,
@@ -54,11 +54,10 @@ CREATE TABLE IF NOT EXISTS permissions
 
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS groups_commands
+CREATE TABLE IF NOT EXISTS groups_commands_list
 (
 	groupid INT NOT NULL,
 	command INT NOT NULL,
-	enabled TINYINT(1) NOT NULL DEFAULT 0,
 
 	PRIMARY KEY (groupid, command),
 	FOREIGN KEY (groupid) REFERENCES groups (id),
@@ -66,11 +65,10 @@ CREATE TABLE IF NOT EXISTS groups_commands
 
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS groups_permissions
+CREATE TABLE IF NOT EXISTS groups_permissions_list
 (
 	groupid INT NOT NULL,
 	permission INT NOT NULL,
-	enabled TINYINT(1) NOT NULL DEFAULT 0,
 
 	PRIMARY KEY (groupid, permission),
 	FOREIGN KEY (groupid) REFERENCES groups (id),
@@ -95,8 +93,7 @@ CREATE TABLE IF NOT EXISTS accounts
 (
 	login INT NOT NULL,
 	email VARCHAR(40) NOT NULL DEFAULT 'a@a.com',
-	birthDate CHAR(10) NOT NULL DEFAULT '0000-00-00',
-	char_slots TINYINT NOT NULL DEFAULT 9,
+	birth_date CHAR(10) NOT NULL DEFAULT '0000-00-00',
 	login_count INT NOT NULL DEFAULT 0,
 	unban DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',
 	expiration DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',
@@ -112,7 +109,7 @@ CREATE TABLE IF NOT EXISTS accounts
 
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS accounts_vip
+CREATE TABLE IF NOT EXISTS accounts_groups
 (
 	id INT AUTO_INCREMENT,
 	current_group INT NOT NULL,

@@ -1,3 +1,11 @@
+11.10.2016 - 1.0.40
+- Renomeando algumas tabelas para nomes mais adequados a suas finalidades.
+- Comandos e permissões listados em um grupo sempre estarão habilidades (enabled não é necessário).
+- Renomeado um atributo de accounts para ficar com cara de banco de dados e char_slots removido.
+
+11.10.2016 - 1.0.39
+- Removendo as tabelas anteriores do banco de dados, diversos problemas encontrados.
+
 11.10.2016 - 1.0.38
 - Enviando arquivo para atualizar o banco de dados SQL com as novas tabelas.
 	- Também está sendo incluso a alteração de colunas de login_log.
