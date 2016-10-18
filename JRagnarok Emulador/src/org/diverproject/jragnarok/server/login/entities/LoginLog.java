@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.services;
+package org.diverproject.jragnarok.server.login.entities;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 

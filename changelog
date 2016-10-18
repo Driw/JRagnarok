@@ -1,9 +1,17 @@
-11.10.2016 - 1.0.40
+18.10.2016 - 1.0.41
+- Entidades removidas de login.services para login.entities.
+- As classes de controle e DAO ficarão alocadas em login.controllers.
+- Enviando entidades atualizadas conforme as mudanças já feitas no banco de dados.
+- Os servidores terão DAO e Controller:
+	- DAO irá trabalhar com os objetos e a conexão com o banco de dados.
+	- Controller irá funcionar como cache do banco de dados.
+
+18.10.2016 - 1.0.40
 - Renomeando algumas tabelas para nomes mais adequados a suas finalidades.
 - Comandos e permissões listados em um grupo sempre estarão habilidades (enabled não é necessário).
 - Renomeado um atributo de accounts para ficar com cara de banco de dados e char_slots removido.
 
-11.10.2016 - 1.0.39
+18.10.2016 - 1.0.39
 - Removendo as tabelas anteriores do banco de dados, diversos problemas encontrados.
 
 11.10.2016 - 1.0.38

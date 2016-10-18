@@ -5,6 +5,7 @@ import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.login.LoginServer;
+import org.diverproject.jragnarok.server.login.entities.LoginLog;
 import org.diverproject.jragnarok.server.login.structures.Login;
 import org.diverproject.util.SocketUtil;
 

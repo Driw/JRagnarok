@@ -61,7 +61,6 @@ public class LoginClientService extends LoginServerService
 	private LoginLogService log;
 	private LoginIpBanService ipban;
 	private LoginCharacterService character;
-	private AccountController accountController;
 
 	public LoginClientService(LoginServer server)
 	{
@@ -74,8 +73,6 @@ public class LoginClientService extends LoginServerService
 		ipban = getServer().getIpBanService();
 		login = getServer().getLoginService();
 		character = getServer().getCharService();
-
-		accountController = new AccountController(getConnection());
 	}
 
 	public FileDescriptorListener parse = new FileDescriptorListener()

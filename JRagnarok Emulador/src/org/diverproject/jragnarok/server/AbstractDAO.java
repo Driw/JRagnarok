@@ -19,7 +19,7 @@ import org.diverproject.util.ObjectDescription;
  * @author Andrew
  */
 
-public class AbstractController
+public abstract class AbstractDAO
 {
 	/**
 	 * Referência da conexão com o banco de dados.
@@ -31,7 +31,7 @@ public class AbstractController
 	 * @param connection referência da conexão com o banco de dados.
 	 */
 
-	public AbstractController(Connection connection)
+	public AbstractDAO(Connection connection)
 	{
 		this.connection = connection;
 	}
