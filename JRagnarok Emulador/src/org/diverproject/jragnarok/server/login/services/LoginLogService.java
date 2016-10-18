@@ -5,13 +5,14 @@ import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.login.LoginServer;
+import org.diverproject.jragnarok.server.login.controllers.LoginLogController;
 import org.diverproject.jragnarok.server.login.entities.LoginLog;
 import org.diverproject.jragnarok.server.login.structures.Login;
 import org.diverproject.util.SocketUtil;
 
 public class LoginLogService extends LoginServerService
 {
-	private ControllerLoginLog controller;
+	private LoginLogController controller;
 
 	public LoginLogService(LoginServer server) throws RagnarokException
 	{
@@ -21,7 +22,7 @@ public class LoginLogService extends LoginServerService
 	public void init()
 	{
 		try {
-			controller = new ControllerLoginLog(getConnection());
+			controller = new LoginLogController(getConnection());
 		} catch (RagnarokException e) {
 			logWarning("inicie ou reinicie o servidor, sem conexão MySQL.\n");
 			logExeception(e);
@@ -52,7 +53,7 @@ public class LoginLogService extends LoginServerService
 		int failures = 0;
 
 		try {
-			failures = controller.countFailedAttempts(ip, minutes);
+			failures = controller.getFailedAttempts(ip, minutes);
 		} catch (RagnarokException e) {
 			logExeception(e);
 		}

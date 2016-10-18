@@ -1,4 +1,6 @@
-package org.diverproject.jragnarok.server.login.services;
+package org.diverproject.jragnarok.server.login.controllers;
+
+import static org.diverproject.jragnarok.JRagnarokUtil.format;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,13 +21,12 @@ import org.diverproject.util.SocketUtil;
  * Para que esse seja criado é necessário definir uma conexão através do construtor.</p>
  *
  * @see AbstractDAO
- * @see Connection
  * @see LoginLog
  *
  * @author Andrew
  */
 
-public class ControllerLoginLog extends AbstractDAO
+public class LoginLogController extends AbstractDAO
 {
 	/**
 	 * Cria um novo controlador para trabalhar com os registros de acesso no servidor.
@@ -33,7 +34,7 @@ public class ControllerLoginLog extends AbstractDAO
 	 * @param connection referência do objeto contendo a conexão com o banco de dados.
 	 */
 
-	public ControllerLoginLog(Connection connection)
+	public LoginLogController(Connection connection)
 	{
 		super(connection);
 	}
@@ -47,7 +48,7 @@ public class ControllerLoginLog extends AbstractDAO
 	 * @throws RagnarokException parâmetros inválidos, falha de conexão ou sem resultados.
 	 */
 
-	public int countFailedAttempts(String ip, int minutes) throws RagnarokException
+	public int getFailedAttempts(String ip, int minutes) throws RagnarokException
 	{
 		if (ip == null)
 			throw new RagnarokException("endereço de IP nulo");
@@ -58,11 +59,11 @@ public class ControllerLoginLog extends AbstractDAO
 		if (minutes < 1)
 			throw new RagnarokException("minutos inválido");
 
-		Tables tables = Tables.getInstance();
-		String table = tables.getLoginLog();
-
-		String sql = "SELECT COUNT(*) AS count FROM " +table+ " WHERE ip = ?"
-				+" AND (rcode = 0 OR rcode = 1) AND time > (NOW() - INTERVAL ? MINUTE)";
+		String table = Tables.getInstance().getLoginLog();
+		String sql = format("SELECT COUNT(*) AS count"
+						+ " FROM %s"
+						+ " WHERE ip = ? AND (rcode = 0 OR rcode = 1) AND time > (NOW() - INTERVAL ? MINUTE)",
+						table);
 
 		try {
 

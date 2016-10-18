@@ -1,3 +1,6 @@
+18.10.2016 - 1.0.43
+- ControllerLoginLog renomado para LoginLogController e movido para login.controllers.
+
 18.10.2016 - 1.0.42
 - Enviando entidades e classes para armazenar comandos e permissões dos grupos de jogadores.
 
