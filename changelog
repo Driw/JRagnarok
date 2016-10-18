@@ -1,3 +1,6 @@
+18.10.2016 - 1.0.42
+- Enviando entidades e classes para armazenar comandos e permissões dos grupos de jogadores.
+
 18.10.2016 - 1.0.41
 - Entidades removidas de login.services para login.entities.
 - As classes de controle e DAO ficarão alocadas em login.controllers.
