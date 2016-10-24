@@ -1,3 +1,6 @@
+24.10.2016 - 1.0.48
+- Enumeração de AccountState definido e testado, parse ajustado conforme mudanças.
+
 24.10.2016 - 1.0.47
 - Removendo estruturadas antigas das entidades, já que foram realocadas.
 - LoginServer agora irá usar Login para registrar o seu acesso.
