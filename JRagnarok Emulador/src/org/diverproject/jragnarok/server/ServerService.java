@@ -75,7 +75,7 @@ public class ServerService
 		Connection connection = mysql.getConnection();
 
 		try {
-			if (connection.isClosed())
+			if (connection == null || connection.isClosed())
 				throw new RagnarokException("conexão fecahda");
 		} catch (SQLException e) {
 			throw new RagnarokException(e.getMessage());

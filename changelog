@@ -1,3 +1,8 @@
+24.10.2016 - 1.0.45
+- Problema onde ServerService causa NullPointerExceptions devido a falha de conexão com o banco de dados.
+- Ajuste temporário para o problema de timezone do servidor com o banco de dados.
+- Configuração de sql.legacydatetime adicionado para quando se conectar ao MySQL.
+
 24.10.2016 - 1.0.44
 - Atualizando algumas das configurações:
 	- Versão do cliente de 50 para 55.

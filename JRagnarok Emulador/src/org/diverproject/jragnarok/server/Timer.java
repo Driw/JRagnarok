@@ -38,6 +38,11 @@ public class Timer
 	public static final int TIMER_REMOVE = 0x10;
 
 	/**
+	 * Valor para considerar temporizador inválido.
+	 */
+	public static final int INVALID_TIMER = -1;
+
+	/**
 	 * Vetor contendo o nome de todos os tipos de temporizadores.
 	 */
 	private static final String TIMER_STRINGS[] = new String[]

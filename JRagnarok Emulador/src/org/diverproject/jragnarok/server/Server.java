@@ -419,12 +419,15 @@ public abstract class Server
 		String password = configs.getString("sql.password");
 		String database = configs.getString("sql.database");
 		int port = configs.getInt("sql.port");
+		boolean legacy = configs.getBool("sql.legacydatetime");
 
 		sql.setHost(host);
 		sql.setUsername(username);
 		sql.setPassword(password);
 		sql.setDatabase(database);
 		sql.setPort(port);
+		sql.setUseLegacyDatetimeCode(legacy);
+		sql.setServerTimezone("Africa/Abidjan");
 
 		try {
 			sql.connect();
