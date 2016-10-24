@@ -1,5 +1,7 @@
 package org.diverproject.jragnarok.server.login.structures;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.random;
+
 import org.diverproject.util.ObjectDescription;
 
 public class LoginSeed
@@ -14,7 +16,7 @@ public class LoginSeed
 
 	public void genFirst()
 	{
-		// TODO random
+		first = random() + 1;
 	}
 
 	public long getSecond()
@@ -24,7 +26,7 @@ public class LoginSeed
 
 	public void genSecond()
 	{
-		// TODO random
+		second = random() + 1;
 	}
 
 	@Override

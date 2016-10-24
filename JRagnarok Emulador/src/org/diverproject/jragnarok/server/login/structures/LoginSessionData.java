@@ -4,6 +4,8 @@ import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 
 import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.login.entities.Group;
+import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 
@@ -18,7 +20,7 @@ public class LoginSessionData extends Login
 	};
 
 	private FileDescriptor fileDecriptor;
-	private byte group;
+	private Group group;
 	private ClientType clientType;
 	private int version;
 	private BitWise passDencrypt;
@@ -31,6 +33,7 @@ public class LoginSessionData extends Login
 	{
 		this.fileDecriptor = fileDecriptor;
 		this.passDencrypt = new BitWise(DENCRYPT_STRING);
+		this.seed = new LoginSeed();
 	}
 
 	public FileDescriptor getFileDecriptor()
@@ -53,12 +56,12 @@ public class LoginSessionData extends Login
 		return fileDecriptor.getAddressString();
 	}
 
-	public byte getGroup()
+	public Group getGroup()
 	{
 		return group;
 	}
 
-	public void setGroup(byte group)
+	public void setGroup(Group group)
 	{
 		this.group = group;
 	}
