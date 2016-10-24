@@ -15,6 +15,8 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.List;
+import org.diverproject.util.collection.Queue;
+import org.diverproject.util.collection.abstraction.DynamicQueue;
 import org.diverproject.util.collection.abstraction.LoopList;
 import org.diverproject.util.stream.implementation.PacketBuilder;
 
@@ -52,7 +54,7 @@ public class FileDescriptor
 	/**
 	 * Tempo limite em milissegundos aceito por ociosidade.
 	 */
-	public static final int DEFAULT_TIMEOUT = 60000;
+	public static final int DEFAULT_TIMEOUT = 30000;
 
 
 	/**
@@ -341,6 +343,11 @@ public class FileDescriptor
 	private static final List<FileDescriptor> SESSIONS = new LoopList<>(FD_SETSIZE);
 
 	/**
+	 * Lista contendo todas as ações únicas a se executar.
+	 */
+	private static final Queue<FileDescriptorAction> ACTIONS = new DynamicQueue<>();
+
+	/**
 	 * Cria um novo Arquivo Descritor a partir de uma conexão socket.
 	 * @param socket referência da conexão socket a considerar.
 	 * @return aquisição de uma novo Arquivo Descritor.
@@ -372,6 +379,14 @@ public class FileDescriptor
 	{
 		TimerSystem timer = TimerSystem.getInstance();
 		int lastTick = timer.getLastTickCount();
+
+		while (!ACTIONS.isEmpty())
+		{
+			FileDescriptorAction action = ACTIONS.poll();
+
+			for (FileDescriptor fd : SESSIONS)
+				action.execute(fd);
+		}
 
 		for (int i = 0; i < SESSIONS.size(); i++)
 		{
@@ -434,5 +449,10 @@ public class FileDescriptor
 	private static void setEndOfFile(FileDescriptor fd)
 	{
 		fd.getFlag().setEOF((byte) 1);		
+	}
+
+	public static void execute(FileDescriptorAction action)
+	{
+		ACTIONS.offer(action);
 	}
 }
