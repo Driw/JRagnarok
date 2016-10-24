@@ -1,3 +1,10 @@
+24.10.2016 - 1.0.47
+- Removendo estruturadas antigas das entidades, já que foram realocadas.
+- LoginServer agora irá usar Login para registrar o seu acesso.
+- Também foi corrigido o problema na criação dos servidos de LoginServer.
+- As configurações não estavam sendo lidas corretamente em LoginServer.
+- Pequenas correções de inicializações e restrições nos setters das entidades.
+
 24.10.2016 - 1.0.46
 - FileDescriptor agora permite adicionar ações para serem executados por todos fd.
 	- As ações serão executadas uma única vez.

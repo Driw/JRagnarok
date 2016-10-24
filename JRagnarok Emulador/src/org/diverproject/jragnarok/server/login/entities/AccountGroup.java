@@ -43,7 +43,8 @@ public class AccountGroup
 
 	public void setCurrentGroup(Group currentGroup)
 	{
-		this.currentGroup = currentGroup;
+		if (currentGroup != null)
+			this.currentGroup = currentGroup;
 	}
 
 	public Group getOldGroup()

@@ -6,8 +6,8 @@ import static org.diverproject.log.LogSystem.logWarning;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.login.controllers.LoginLogController;
+import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.entities.LoginLog;
-import org.diverproject.jragnarok.server.login.structures.Login;
 import org.diverproject.util.SocketUtil;
 
 public class LoginLogService extends LoginServerService
@@ -36,7 +36,7 @@ public class LoginLogService extends LoginServerService
 			LoginLog log = new LoginLog();
 			log.getTime().set(System.currentTimeMillis());
 			log.getIP().set(SocketUtil.socketIPInt(ip));
-			log.setUser(login.getUsername());
+			log.setLogin(login);
 			log.setRCode(code);
 			log.setMessage(message);
 

@@ -22,13 +22,13 @@ import org.diverproject.jragnarok.server.config.ConfigFiles;
 import org.diverproject.jragnarok.server.config.ConfigIpBan;
 import org.diverproject.jragnarok.server.config.ConfigLog;
 import org.diverproject.jragnarok.server.config.ConfigLogin;
+import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.services.LoginCharacterService;
 import org.diverproject.jragnarok.server.login.services.LoginClientService;
 import org.diverproject.jragnarok.server.login.services.LoginIpBanService;
 import org.diverproject.jragnarok.server.login.services.LoginLogService;
 import org.diverproject.jragnarok.server.login.services.LoginService;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
-import org.diverproject.jragnarok.server.login.structures.Login;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.LoopList;
 
@@ -61,12 +61,6 @@ public class LoginServer extends Server implements ServerListener
 		setListener(this);
 
 		charServers = new LoopList<>(MAX_SERVERS);
-
-		logService = new LoginLogService(this);
-		clientService = new LoginClientService(this);
-		charService = new LoginCharacterService(this);
-		ipBanService = new LoginIpBanService(this);
-		loginService = new LoginService(this);
 	}
 
 	public List<ClientCharServer> getCharServers()
@@ -162,6 +156,8 @@ public class LoginServer extends Server implements ServerListener
 		ConfigClient.getHashNodes().setValue(null);
 		ConfigClient.getCharPerAccount().setValue(MAX_CHARS - MAX_CHAR_VIP - MAX_CHAR_BILLING);
 
+		ConfigFiles.getSystemConfig().setValue("config/System.conf");
+		ConfigFiles.getSqlConnectionConfig().setValue("config/SqlConnection.conf");
 		ConfigFiles.getLoginConfig().setValue("config/Login.conf");
 		ConfigFiles.getIpBanConfig().setValue("config/IpBan.conf");
 		ConfigFiles.getLogConfig().setValue("config/Log.conf");
@@ -170,38 +166,44 @@ public class LoginServer extends Server implements ServerListener
 
 	private void readConfigFiles()
 	{
-		String fileKey = "";
-
 		ConfigLoad load = new ConfigLoad();
 		load.setConfigurations(getConfigs().getMap());
 
-		try {
+		String fileKeys[] = new String[]
+		{
+			ConfigFiles.getSystemConfig().getName(),
+			ConfigFiles.getSqlConnectionConfig().getName(),
+			ConfigFiles.getLoginConfig().getName(),
+			ConfigFiles.getIpBanConfig().getName(),
+			ConfigFiles.getLogConfig().getName(),
+			ConfigFiles.getClientConfig().getName(),
+		};
 
-			fileKey = ConfigFiles.getLoginConfig().getName();
-			load.setFilePath(ConfigFiles.getLoginConfig().getValue());
-			load.read();
+		for (String fileKey : fileKeys)
+		{
+			String filepath = getConfigs().getString(fileKey);
 
-			fileKey = ConfigFiles.getIpBanConfig().getName();
-			load.setFilePath(ConfigFiles.getIpBanConfig().getValue());
-			load.read();
+			try {
 
-			fileKey = ConfigFiles.getLogConfig().getName();
-			load.setFilePath(ConfigFiles.getLogConfig().getValue());
-			load.read();
+				load.setFilePath(filepath);
+				load.read();
 
-			fileKey = ConfigFiles.getClientConfig().getName();
-			load.setFilePath(ConfigFiles.getClientConfig().getValue());
-			load.read();
-
-		} catch (RagnarokException e) {
-			logError("falha durante a leitura de %s.\n", fileKey);
-			logExeception(e);
+			} catch (RagnarokException e) {
+				logError("falha durante a leitura de '%s' (config: %s).\n", filepath, fileKey);
+				logExeception(e);
+			}
 		}
 	}
 
 	@Override
 	public void onCreated() throws RagnarokException
 	{
+		logService = new LoginLogService(this);
+		clientService = new LoginClientService(this);
+		charService = new LoginCharacterService(this);
+		ipBanService = new LoginIpBanService(this);
+		loginService = new LoginService(this);
+
 		clientService.init();
 
 		if (getConfigs().getBool("log.login"))
@@ -227,6 +229,8 @@ public class LoginServer extends Server implements ServerListener
 		Login login = new Login();
 		login.setUsername(getConfigs().getString("login.username"));
 		login.setPassword(getConfigs().getString("login.password"));
+
+		// TODO confirmar usuário e senha
 
 		logService.addLoginLog(getAddress(), login, 100, "login server started");
 	}

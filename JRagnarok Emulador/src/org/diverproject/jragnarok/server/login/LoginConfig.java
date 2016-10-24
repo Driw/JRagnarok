@@ -8,7 +8,6 @@ import org.diverproject.jragnarok.server.config.ConfigIpBan;
 import org.diverproject.jragnarok.server.config.ConfigLog;
 import org.diverproject.jragnarok.server.config.ConfigLogin;
 import org.diverproject.jragnarok.server.config.ConfigSQL;
-import org.diverproject.jragnarok.server.config.ConfigSystem;
 
 public class LoginConfig extends ServerConfig
 {

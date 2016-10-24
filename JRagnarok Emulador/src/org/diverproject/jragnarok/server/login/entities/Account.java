@@ -25,21 +25,19 @@ public class Account
 	private AccountGroup group;
 	private InternetProtocol lastIP;
 
-	public String getEmail()
-	{
-		return email;
-	}
-
 	public Account()
 	{
 		email = DEFAULT_EMAIL;
 		birthDate = DEFAULT_BIRTHDATE;
 
+		login = new Login();
 		unban = new Time();
 		expiration = new Time();
 		lastIP = new InternetProtocol();
+		pincode = new Pincode();
+		group = new AccountGroup();
 
-		state = AccountState.EMAIL_CONFIRMATION;
+		state = AccountState.NONE;
 	}
 
 	public Login getLogin()
@@ -49,13 +47,21 @@ public class Account
 
 	public void setLogin(Login login)
 	{
-		this.login = login;
+		if (login != null)
+			this.login = login;
+	}
+
+	public String getEmail()
+	{
+		return email;
 	}
 
 	public void setEmail(String email)
 	{
 		// TODO : validar e-mail
-		this.email = strcap(email, EMAIL_LENGTH);
+
+		if (email != null)
+			this.email = strcap(email, EMAIL_LENGTH);
 	}
 
 	public String getBirthDate()
@@ -66,7 +72,9 @@ public class Account
 	public void setBirthDate(String birthDate)
 	{
 		// TODO : validar data de aniversário
-		this.birthDate = strcap(birthDate, 10);
+
+		if (birthDate != null)
+			this.birthDate = strcap(birthDate, 10);
 	}
 
 	public byte getCharSlots()
@@ -108,7 +116,8 @@ public class Account
 
 	public void setPincode(Pincode pincode)
 	{
-		this.pincode = pincode;
+		if (pincode != null)
+			this.pincode = pincode;
 	}
 
 	public AccountState getState()
@@ -129,7 +138,8 @@ public class Account
 
 	public void setGroup(AccountGroup group)
 	{
-		this.group = group;
+		if (group != null)
+			this.group = group;
 	}
 
 	public InternetProtocol getLastIP()
@@ -152,7 +162,7 @@ public class Account
 		description.append("state", state);
 		description.append("lastIP", lastIP.getString());
 
-		if (group != null)
+		if (group != null && group.getCurrentGroup() != null)
 			description.append("group", group.getCurrentGroup().getName());
 
 		if (unban.get() != 0)

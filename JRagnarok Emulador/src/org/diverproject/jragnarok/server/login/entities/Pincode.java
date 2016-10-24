@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.server.login.entities;
 import static org.diverproject.jragnarok.JRagnarokConstants.PINCODE_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
 
 public class Pincode
@@ -56,5 +57,18 @@ public class Pincode
 	public void setChangedNow()
 	{
 		changed.set(System.currentTimeMillis());
+	}
+
+	@Override
+	public String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("id", id);
+		description.append("enabled", enabled);
+		description.append("code", code);
+		description.append("changed", changed);
+
+		return description.toString();
 	}
 }

@@ -31,9 +31,9 @@ public class LoginLog
 	private InternetProtocol ip;
 
 	/**
-	 * Nome de usuário da conta que acessou.
+	 * Informações do usuário a registrar o acesso.
 	 */
-	private String user;
+	private Login login;
 
 	/**
 	 * Código referente ao resultado a ação do acesso.
@@ -78,23 +78,23 @@ public class LoginLog
 	}
 
 	/**
-	 * Nome de usuário permite saber qual a conta que solicitou o acesso.
-	 * @return aquisição do nome de usuário (único) da conta acessada.
+	 * Todo registro de acesso é vinculado a algum usuário que o fez.
+	 * @return aquisição do objeto contendo os dados do acesso.
 	 */
 
-	public String getUser()
+	public Login getLogin()
 	{
-		return user;
+		return login;
 	}
 
 	/**
-	 * Define um novo nome de usuário para esse registro de acesso.
-	 * @param user nome de usuário (único) da conta acessada.
+	 * Todo registro de acesso é vinculado a algum usuário que o fez.
+	 * @param login referência do objeto contendo os dados do acesso.
 	 */
 
-	public void setUser(String user)
+	public void setLogin(Login login)
 	{
-		this.user = strcap(user, 24);
+		this.login = login;
 	}
 
 	/**
@@ -144,9 +144,9 @@ public class LoginLog
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
+		description.append("login", login != null ? login.getUsername() : null);
 		description.append("time", time);
 		description.append("ip", ip.getString());
-		description.append("user", user);
 		description.append("rCode", rCode);
 		description.append("message", message);
 
