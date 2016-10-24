@@ -9,9 +9,11 @@ import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
+import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
+import org.diverproject.util.ObjectDescription;
 
 public class LoginCharacterService extends LoginServerService
 {
@@ -29,6 +31,22 @@ public class LoginCharacterService extends LoginServerService
 
 			SyncronizeAddressPacket packet = new SyncronizeAddressPacket();
 			sendAllWithoutOurSelf(-1, packet);
+		}
+
+		@Override
+		public String getName()
+		{
+			return "syncronizeIpAddress";
+		}
+
+		@Override
+		public String toString()
+		{
+			ObjectDescription description = new ObjectDescription(getClass());
+
+			description.append(getName());
+
+			return description.toString();
 		}
 	};
 
@@ -98,8 +116,13 @@ public class LoginCharacterService extends LoginServerService
 		if (interval > 0)
 		{
 			TimerSystem ts = TimerSystem.getInstance();
-			ts.addListener(syncronizeIpAddress, "sync_ip_addresses");
-			ts.addInterval(ts.acquireTimer(), ts.tick() + interval, syncronizeIpAddress, 0, interval);
+			TimerMap timers = ts.getTimers();
+
+			Timer siaTimer = ts.acquireTimer();
+			siaTimer.setListener(syncronizeIpAddress);
+			siaTimer.setTick(ts.tick() + interval);
+			siaTimer.setInterval(interval);
+			timers.add(siaTimer);
 		}
 	}
 

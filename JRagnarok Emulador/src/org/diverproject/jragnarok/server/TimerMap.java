@@ -63,6 +63,10 @@ public class TimerMap implements Iterable<Timer>
 		{
 			timers.add(timer.getID(), timer);
 			indexes.add(timer.getTick(), timer);
+
+			TimerSystem ts = TimerSystem.getInstance();
+			TimerListeners listeners = ts.getListeners();
+			listeners.add(timer.getListener());
 		}
 	}
 

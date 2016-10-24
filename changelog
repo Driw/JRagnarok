@@ -1,3 +1,8 @@
+24.10.2016 - 1.0.51
+- Alguns ajustes de TimerListener que deveriam ter sido feitos na rev50.
+- LoginServer não irá trabalhar com LoopList e sim com LoginCharServers.
+- TimerMap.add não incluía nos listeners o listener do Timer adicionado.
+
 24.10.2016 - 1.0.50
 - TimerSystem agora irá usar TimerMap para mapear a indexar os temporizadores.
 	- Tickers foi unido a TimerMap afim de seguir a OO.

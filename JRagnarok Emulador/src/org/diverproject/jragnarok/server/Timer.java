@@ -201,7 +201,7 @@ public class Timer
 	 * @param listener listener que deverá ser executado quando expirado.
 	 */
 
-	void setListener(TimerListener listener)
+	public void setListener(TimerListener listener)
 	{
 		this.listener = listener;
 	}

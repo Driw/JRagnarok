@@ -3,7 +3,6 @@ package org.diverproject.jragnarok.server.login;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_BILLING;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_VIP;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
 import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
@@ -12,6 +11,8 @@ import static org.diverproject.util.MessageUtil.die;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.ConfigLoad;
+import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.FileDescriptorAction;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
@@ -31,16 +32,13 @@ import org.diverproject.jragnarok.server.login.services.LoginClientService;
 import org.diverproject.jragnarok.server.login.services.LoginIpBanService;
 import org.diverproject.jragnarok.server.login.services.LoginLogService;
 import org.diverproject.jragnarok.server.login.services.LoginService;
-import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.util.ObjectDescription;
-import org.diverproject.util.collection.List;
-import org.diverproject.util.collection.abstraction.LoopList;
 
 public class LoginServer extends Server implements ServerListener
 {
 	private static final LoginServer INSTANCE;
 
-	private List<ClientCharServer> charServers;
+	private LoginCharServers charServers;
 	private LoginLogService logService;
 	private LoginClientService clientService;
 	private LoginCharacterService charService;
@@ -63,11 +61,9 @@ public class LoginServer extends Server implements ServerListener
 	public LoginServer() throws RagnarokException
 	{
 		setListener(this);
-
-		charServers = new LoopList<>(MAX_SERVERS);
 	}
 
-	public List<ClientCharServer> getCharServers()
+	public LoginCharServers getCharServers()
 	{
 		return charServers;
 	}
@@ -102,56 +98,6 @@ public class LoginServer extends Server implements ServerListener
 	{
 		return loginService;
 	}
-
-	private TimerListener waitingDisconnectTimer = new TimerListener()
-	{
-		@Override
-		public void onCall(Timer timer, int tick)
-		{
-			// TODO
-		}
-
-		@Override
-		public String getName()
-		{
-			return "waitingDisconnectTimer";
-		};
-
-		@Override
-		public String toString()
-		{
-			ObjectDescription description = new ObjectDescription(getClass());
-
-			description.append(getName());
-
-			return description.toString();
-		}
-	};
-
-	private TimerListener onlineDataCleanup = new TimerListener()
-	{
-		@Override
-		public void onCall(Timer timer, int tick)
-		{
-			// TODO
-		}
-
-		@Override
-		public String getName()
-		{
-			return "onlineDataCleanup";
-		};
-
-		@Override
-		public String toString()
-		{
-			ObjectDescription description = new ObjectDescription(getClass());
-
-			description.append(getName());
-
-			return description.toString();
-		}
-	};
 
 	@Override
 	public void onCreate() throws RagnarokException
@@ -300,7 +246,7 @@ public class LoginServer extends Server implements ServerListener
 	public void onDestroyed() throws RagnarokException
 	{
 		charService.shutdown();
-		//ClientSystem.flushBuffers();		
+		FileDescriptor.execute(onDestroyed);
 	}
 
 	@Override
@@ -326,6 +272,77 @@ public class LoginServer extends Server implements ServerListener
 	{
 		return getConfigs().getInt("login.port");
 	}
+
+	private TimerListener waitingDisconnectTimer = new TimerListener()
+	{
+		@Override
+		public void onCall(Timer timer, int tick)
+		{
+			// TODO
+		}
+
+		@Override
+		public String getName()
+		{
+			return "waitingDisconnectTimer";
+		};
+
+		@Override
+		public String toString()
+		{
+			ObjectDescription description = new ObjectDescription(getClass());
+
+			description.append(getName());
+
+			return description.toString();
+		}
+	};
+
+	private TimerListener onlineDataCleanup = new TimerListener()
+	{
+		@Override
+		public void onCall(Timer timer, int tick)
+		{
+			// TODO
+		}
+
+		@Override
+		public String getName()
+		{
+			return "onlineDataCleanup";
+		};
+
+		@Override
+		public String toString()
+		{
+			ObjectDescription description = new ObjectDescription(getClass());
+
+			description.append(getName());
+
+			return description.toString();
+		}
+	};
+
+	private FileDescriptorAction onDestroyed = new FileDescriptorAction()
+	{
+		@Override
+		public void execute(FileDescriptor fd)
+		{
+			// TODO usar algum pacote que avise do desligamento do servidor
+
+			fd.close();
+		}
+
+		@Override
+		public String toString()
+		{
+			ObjectDescription description = new ObjectDescription(getClass());
+
+			description.append("onDestroyed");
+
+			return description.toString();
+		}
+	};
 
 	public static LoginServer getInstance()
 	{
