@@ -1,3 +1,9 @@
+24.10.2016 - 1.0.52
+- Atualizando LoginLogService para receber um InternetProtocol ao invés de String.
+- InternetProtocol agora permite copiar os dados de um outro InternetProtocol.
+- Renomeando alguns atributos de ClientCharServer (fd e ip).
+- Pequenas correções em LoginSessionData.
+
 24.10.2016 - 1.0.51
 - Alguns ajustes de TimerListener que deveriam ter sido feitos na rev50.
 - LoginServer não irá trabalhar com LoopList e sim com LoginCharServers.

@@ -161,6 +161,19 @@ public class InternetProtocol
 		fourth = numbers[3];
 	}
 
+	/**
+	 * Copia as informações de um outro protocolo de internet para esse objeto.
+	 * @param ip referência do protocolo de internet a ser copiado.
+	 */
+
+	public void copy(InternetProtocol ip)
+	{
+		first = ip.first;
+		second = ip.second;
+		third = ip.third;
+		fourth = ip.fourth;
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{

@@ -4,7 +4,6 @@ import org.diverproject.jragnaork.configuration.Config;
 import org.diverproject.jragnarok.server.ServerConfig;
 import org.diverproject.jragnarok.server.config.ConfigFiles;
 import org.diverproject.jragnarok.server.config.ConfigSQL;
-import org.diverproject.jragnarok.server.config.ConfigSystem;
 
 public class MapConfig extends ServerConfig
 {

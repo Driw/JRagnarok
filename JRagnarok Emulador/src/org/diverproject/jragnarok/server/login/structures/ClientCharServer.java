@@ -5,9 +5,9 @@ import org.diverproject.jragnarok.server.InternetProtocol;
 
 public class ClientCharServer
 {
-	private FileDescriptor fileDecriptor;
+	private FileDescriptor fd;
 	private String name;
-	private InternetProtocol serverIP;
+	private InternetProtocol ip;
 	private short port;
 	private short users;
 	private CharServerType type;
@@ -15,17 +15,17 @@ public class ClientCharServer
 
 	public ClientCharServer(FileDescriptor fileDecriptor)
 	{
-		this.fileDecriptor = fileDecriptor;
+		this.fd = fileDecriptor;
 	}
 
 	public FileDescriptor getFileDecriptor()
 	{
-		return fileDecriptor;
+		return fd;
 	}
 
 	public void setFileDecriptor(FileDescriptor fileDecriptor)
 	{
-		this.fileDecriptor = fileDecriptor;
+		this.fd = fileDecriptor;
 	}
 
 	public String getName()
@@ -38,14 +38,14 @@ public class ClientCharServer
 		this.name = name;
 	}
 
-	public InternetProtocol getServerIP()
+	public InternetProtocol getIP()
 	{
-		return serverIP;
+		return ip;
 	}
 
-	public void setServerIP(InternetProtocol serverIP)
+	public void setIP(InternetProtocol serverIP)
 	{
-		this.serverIP = serverIP;
+		this.ip = serverIP;
 	}
 
 	public short getPort()

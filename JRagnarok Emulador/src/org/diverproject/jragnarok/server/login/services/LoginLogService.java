@@ -4,11 +4,11 @@ import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.login.controllers.LoginLogController;
 import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.entities.LoginLog;
-import org.diverproject.util.SocketUtil;
 
 public class LoginLogService extends LoginServerService
 {
@@ -29,13 +29,13 @@ public class LoginLogService extends LoginServerService
 		}
 	}
 
-	public void addLoginLog(String ip, Login login, int code, String message)
+	public void addLoginLog(InternetProtocol ip, Login login, int code, String message)
 	{
 		try {
 
 			LoginLog log = new LoginLog();
 			log.getTime().set(System.currentTimeMillis());
-			log.getIP().set(SocketUtil.socketIPInt(ip));
+			log.getIP().copy(ip);
 			log.setLogin(login);
 			log.setRCode(code);
 			log.setMessage(message);

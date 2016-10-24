@@ -36,7 +36,7 @@ public class LoginSessionData extends Login
 		this.seed = new LoginSeed();
 	}
 
-	public FileDescriptor getFileDecriptor()
+	public FileDescriptor getFileDescriptor()
 	{
 		return fileDecriptor;
 	}
@@ -48,7 +48,7 @@ public class LoginSessionData extends Login
 
 	public int getAddress()
 	{
-		return fileDecriptor.getID();
+		return fileDecriptor.getAddress();
 	}
 
 	public String getAddressString()
