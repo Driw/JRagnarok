@@ -40,7 +40,7 @@ public class JRagnarok
 		while (isRunning())
 			if (isOk())
 			{
-				long next = timer.update(timer.tick());
+				int next = timer.update(timer.tick());
 				FileDescriptor.update(next);
 			}
 	}

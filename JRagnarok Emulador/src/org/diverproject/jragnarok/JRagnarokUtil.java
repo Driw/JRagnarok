@@ -412,4 +412,48 @@ public class JRagnarokUtil
 
 		else return 30;
 	}
+
+	/**
+	 * Método para agilizar a chamada de currentTimeMillis().
+	 * @return aquisição do tempo atual da máquina.
+	 */
+
+	public static long now()
+	{
+		return System.currentTimeMillis();
+	}
+
+	/**
+	 * Converte um valor inteiro passado em segundos para milissegundos.
+	 * @param seconds quantos segundos que devem ser convertidos.
+	 * @return aquisição do tempo passado por parâmetro em milissegundos.
+	 */
+
+	public static int seconds(int seconds)
+	{
+		return seconds * 1000;
+	}
+
+	/**
+	 * Converte um valor inteiro passado em minutos para milissegundos.
+	 * @param minutes quantos minutos que devem ser convertidos.
+	 * @return aquisição do tempo passado por parâmetro em milissegundos.
+	 */
+
+	public static int minutes(int minutes)
+	{
+		return minutes * 60000;
+	}
+
+	/**
+	 * Converte um valor inteiro passado em minutos e segundos para milissegundos.
+	 * @param minutes quantos minutos que devem ser convertidos.
+	 * @param seconds quantos segundos que devem ser convertidos.
+	 * @return aquisição do tempo passado por parâmetro em milissegundos.
+	 */
+
+	public static int minutes(int minutes, int seconds)
+	{
+		return minutes(minutes) + seconds(seconds);
+	}
 }

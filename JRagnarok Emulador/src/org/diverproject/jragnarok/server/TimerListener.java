@@ -19,4 +19,11 @@ public interface TimerListener
 	 */
 
 	void onCall(Timer timer, int tick);
+
+	/**
+	 * O nome dos listeners devem ser únicos e especificar sua finalidade.
+	 * @return aquisição do nome do listener para ser localizado.
+	 */
+
+	String getName();
 }

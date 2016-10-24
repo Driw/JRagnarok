@@ -1,3 +1,12 @@
+24.10.2016 - 1.0.50
+- TimerSystem agora irá usar TimerMap para mapear a indexar os temporizadores.
+	- Tickers foi unido a TimerMap afim de seguir a OO.
+- TimerListener deverá ser encarregado de saber seu próprio nome.
+- Novos métodos para trabalhar com tempos em milissegundos, JRagnarokUtil.
+- Nome dos atributos e definições padrões ao nome das tabelas atualizados, Tables.
+- Removendo algumas constantes que não serão mais usadas em FileDescriptor.
+- Atualizando listeners que usavam TimerListener para implementar getName e toString.
+
 24.10.2016 - 1.0.49
 - ClientHash atualizado para que efetua uma comparação de hash e não de objeto.
 - ClientType não é a definição do idioma do cliente, aparentemente não há definições.

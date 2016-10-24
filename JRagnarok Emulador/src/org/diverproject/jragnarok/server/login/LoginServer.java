@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_BILLING;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_VIP;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
+import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
@@ -16,6 +17,8 @@ import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
+import org.diverproject.jragnarok.server.TimerListeners;
+import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.config.ConfigClient;
 import org.diverproject.jragnarok.server.config.ConfigFiles;
@@ -29,6 +32,7 @@ import org.diverproject.jragnarok.server.login.services.LoginIpBanService;
 import org.diverproject.jragnarok.server.login.services.LoginLogService;
 import org.diverproject.jragnarok.server.login.services.LoginService;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.LoopList;
 
@@ -104,7 +108,23 @@ public class LoginServer extends Server implements ServerListener
 		@Override
 		public void onCall(Timer timer, int tick)
 		{
-			
+			// TODO
+		}
+
+		@Override
+		public String getName()
+		{
+			return "waitingDisconnectTimer";
+		};
+
+		@Override
+		public String toString()
+		{
+			ObjectDescription description = new ObjectDescription(getClass());
+
+			description.append(getName());
+
+			return description.toString();
 		}
 	};
 
@@ -113,7 +133,23 @@ public class LoginServer extends Server implements ServerListener
 		@Override
 		public void onCall(Timer timer, int tick)
 		{
-			
+			// TODO
+		}
+
+		@Override
+		public String getName()
+		{
+			return "onlineDataCleanup";
+		};
+
+		@Override
+		public String toString()
+		{
+			ObjectDescription description = new ObjectDescription(getClass());
+
+			description.append(getName());
+
+			return description.toString();
 		}
 	};
 
@@ -213,12 +249,19 @@ public class LoginServer extends Server implements ServerListener
 			ipBanService.init();
 
 		TimerSystem ts = TimerSystem.getInstance();
-		ts.addListener(waitingDisconnectTimer, "waitingDisconnectTimer");
+		TimerListeners listeners = ts.getListeners();
 
 		setDefaultParser(clientService.parse);
 
-		ts.addListener(onlineDataCleanup, "onlineDataCleanup");
-		ts.addInterval(ts.acquireTimer(), ts.tick() + 600*1000, onlineDataCleanup, 0, 600*100);
+		listeners.add(waitingDisconnectTimer);
+		listeners.add(onlineDataCleanup);
+
+		Timer odcTimer = ts.acquireTimer();
+		odcTimer.setTick(ts.getLastTick() + minutes(10));
+		odcTimer.setInterval(minutes(10));
+
+		TimerMap timers = ts.getTimers();
+		timers.update(odcTimer);
 	}
 
 	@Override

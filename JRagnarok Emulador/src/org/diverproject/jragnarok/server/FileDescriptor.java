@@ -37,27 +37,6 @@ import org.diverproject.util.stream.implementation.PacketBuilder;
 public class FileDescriptor
 {
 	/**
-	 * Descritor fechado.
-	 */
-	public static final int FLAG_EOF = 1;
-
-	/**
-	 * Descritor é um servidor.
-	 */
-	public static final int FLAG_SERVER = 2;
-
-	/**
-	 * Descritor é um ping.
-	 */
-	public static final int FLAG_PING = 3;
-
-	/**
-	 * Tempo limite em milissegundos aceito por ociosidade.
-	 */
-	public static final int DEFAULT_TIMEOUT = 30000;
-
-
-	/**
 	 * Código de identificação do descritor no sistema.
 	 */
 	private int id;
@@ -337,6 +316,12 @@ public class FileDescriptor
 		return description.toString();
 	}
 
+
+	/**
+	 * Tempo limite em milissegundos aceito por ociosidade.
+	 */
+	public static final int DEFAULT_TIMEOUT = 30000;
+
 	/**
 	 * Lista contendo todas as conexões sockets.
 	 */
@@ -375,7 +360,7 @@ public class FileDescriptor
 	 * @param next milissegundos para expirar o próximo temporizador.
 	 */
 
-	public static void update(long next)
+	public static void update(int next)
 	{
 		TimerSystem timer = TimerSystem.getInstance();
 		int lastTick = timer.getLastTickCount();

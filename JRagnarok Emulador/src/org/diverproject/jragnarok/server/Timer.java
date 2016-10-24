@@ -123,7 +123,7 @@ public class Timer
 	 * @param tick momento no tempo para expiração.
 	 */
 
-	void setTick(int tick)
+	public void setTick(int tick)
 	{
 		this.tick = tick;
 	}
@@ -134,7 +134,7 @@ public class Timer
 	 * @return valor em ticks que serão incrementados na expiração.
 	 */
 
-	int getInterval()
+	public int getInterval()
 	{
 		return interval;
 	}
@@ -145,7 +145,7 @@ public class Timer
 	 * @param interval valor em ticks que serão incrementados.
 	 */
 
-	void setInterval(int interval)
+	public void setInterval(int interval)
 	{
 		this.interval = interval;
 	}
@@ -165,7 +165,7 @@ public class Timer
 	 * @param data
 	 */
 
-	void setData(int data)
+	public void setData(int data)
 	{
 		this.data = data;
 	}
