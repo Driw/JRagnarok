@@ -4,6 +4,7 @@ import org.diverproject.jragnaork.configuration.ConfigString;
 
 public class ConfigFiles
 {
+	private static final ConfigString SYSTEM_CONFIG;
 	private static final ConfigString SQL_CONNECTION_CONFIG;
 	private static final ConfigString LAN_CONFIG;
 	private static final ConfigString LOG_CONFIG;
@@ -15,7 +16,8 @@ public class ConfigFiles
 
 	static
 	{
-		SQL_CONNECTION_CONFIG = new ConfigString("files.");
+		SYSTEM_CONFIG = new ConfigString("files.system");
+		SQL_CONNECTION_CONFIG = new ConfigString("files.sql_connection");
 		LAN_CONFIG = new ConfigString("files.lan_config");
 		LOG_CONFIG = new ConfigString("files.log");
 		VIP_CONFIG = new ConfigString("files.vip");
@@ -23,6 +25,11 @@ public class ConfigFiles
 		IP_BAN_CONFIG = new ConfigString("files.ipban");
 		LOGIN_CONFIG = new ConfigString("files.login_config");
 		MESSAGES_CONFIG = new ConfigString("files.messages_config");
+	}
+
+	public static ConfigString getSystemConfig()
+	{
+		return SYSTEM_CONFIG;
 	}
 
 	public static ConfigString getSqlConnectionConfig()

@@ -1,3 +1,12 @@
+24.10.2016 - 1.0.44
+- Atualizando algumas das configurações:
+	- Versão do cliente de 50 para 55.
+	- Renomeando min_group para min_group_to_connect.
+	- Adicionando a opção de legacydatetime para conectar-se com o MySQL.
+	- System.conf adicionado para configurações gerais entre os servidores.
+- CharConfig e MapConfig atualizado para carregar ConfigFiles e ConfigSQL.
+	- LoginConfig também passa por parte das mudanças acima.
+
 18.10.2016 - 1.0.43
 - ControllerLoginLog renomado para LoginLogController e movido para login.controllers.
 

@@ -1,9 +1,10 @@
 package org.diverproject.jragnarok.server.map;
 
 import org.diverproject.jragnaork.configuration.Config;
-import org.diverproject.jragnaork.configuration.ConfigInt;
-import org.diverproject.jragnaork.configuration.ConfigString;
 import org.diverproject.jragnarok.server.ServerConfig;
+import org.diverproject.jragnarok.server.config.ConfigFiles;
+import org.diverproject.jragnarok.server.config.ConfigSQL;
+import org.diverproject.jragnarok.server.config.ConfigSystem;
 
 public class MapConfig extends ServerConfig
 {
@@ -12,11 +13,22 @@ public class MapConfig extends ServerConfig
 	{
 		return new Config<?>[]
 		{
-			new ConfigString("sql.host", "localhost"),
-			new ConfigString("sql.username", "jragnarok"),
-			new ConfigString("sql.password", "jragnarok"),
-			new ConfigString("sql.database", "jragnarok"),
-			new ConfigInt("sql.port", 3306),
+			ConfigFiles.getSystemConfig(),
+			ConfigFiles.getSqlConnectionConfig(),
+			ConfigFiles.getLanConfig(),
+			ConfigFiles.getIpBanConfig(),
+			ConfigFiles.getLogConfig(),
+			ConfigFiles.getMessagesConfig(),
+			ConfigFiles.getLoginConfig(),
+			ConfigFiles.getClientConfig(),
+			ConfigFiles.getVipConfig(),
+
+			ConfigSQL.getHost(),
+			ConfigSQL.getUsername(),
+			ConfigSQL.getPassword(),
+			ConfigSQL.getDatabase(),
+			ConfigSQL.getPort(),
+			ConfigSQL.getLegacyDatetime(),
 		};
 	}
 }
