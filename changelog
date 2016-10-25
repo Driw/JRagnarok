@@ -1,3 +1,6 @@
+25.10.2016 - 1.0.54
+- Problema onde min_group_to_connect não estava sendo carregado desde a rev44 resolvido.
+
 25.10.2016 - 1.0.53
 - JRagnarok irá tratar as exceptions que forem recebidas, as mensagens serão registradas.
 - Algumas documentações adicionadas referentes as classes já existentes.

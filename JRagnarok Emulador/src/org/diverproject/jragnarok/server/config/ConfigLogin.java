@@ -35,7 +35,7 @@ public class ConfigLogin
 		NEW_ACCOUNT_LENGTH_LIMIT = new ConfigBoolean("login.new_account_length_limit");
 		USE_MD5_PASSWORD = new ConfigBoolean("login.use_md5_password");
 		GROUP_TO_CONNECT = new ConfigInt("login.group_to_connnect");
-		MIN_GROUP = new ConfigInt("login.min_group");
+		MIN_GROUP = new ConfigInt("login.min_group_to_connect");
 		ALLOWED_REGS = new ConfigInt("login.allowed_regs");
 		TIME_ALLOWED = new ConfigInt("login.time_allowed");
 	}
