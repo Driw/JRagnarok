@@ -63,10 +63,6 @@ public class TimerMap implements Iterable<Timer>
 		{
 			timers.add(timer.getID(), timer);
 			indexes.add(timer.getTick(), timer);
-
-			TimerSystem ts = TimerSystem.getInstance();
-			TimerListeners listeners = ts.getListeners();
-			listeners.add(timer.getListener());
 		}
 	}
 
@@ -128,12 +124,6 @@ public class TimerMap implements Iterable<Timer>
 
 	public void delete(Timer timer)
 	{
-		if (timer.getListener() != null)
-		{
-			TimerListeners listeners = TimerSystem.getInstance().getListeners();
-			listeners.delete(timer.getListener());
-		}
-
 		timer.setListener(null);
 		timer.getType().set(Timer.TIMER_ONCE_AUTODEL);
 	}

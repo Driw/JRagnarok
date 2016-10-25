@@ -283,7 +283,7 @@ public class JRagnarokUtil
 	}
 
 	/**
-	 * Procedimento para efetuar o cast de um valor numérico byte.
+	 * Procedimento para efetuar o cast para um valor numérico byte.
 	 * @param value número do tipo inteiro a ser convertido para byte.
 	 * @return aquisição de um valor numérico do tipo byte com base em value.
 	 */
@@ -294,7 +294,7 @@ public class JRagnarokUtil
 	}
 
 	/**
-	 * Procedimento para efetuar o cast de um valor numérico short.
+	 * Procedimento para efetuar o cast para um valor numérico short.
 	 * @param value número do tipo inteiro a ser convertido para short.
 	 * @return aquisição de um valor numérico do tipo short com base em value.
 	 */
@@ -302,6 +302,17 @@ public class JRagnarokUtil
 	public static short s(int value)
 	{
 		return (short) value;
+	}
+
+	/**
+	 * Procedimento para efetuar o cast para um valor numérico int.
+	 * @param value número do tipo inteiro a ser convertido para int.
+	 * @return aquisição de um valor numérico do tipo int com base em value.
+	 */
+
+	public static int i(long value)
+	{
+		return (int) value;
 	}
 
 	/**

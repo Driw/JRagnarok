@@ -13,6 +13,7 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.Queue;
@@ -37,6 +38,42 @@ import org.diverproject.util.stream.implementation.PacketBuilder;
 public class FileDescriptor
 {
 	/**
+	 * Flag que define o fim do descritor.
+	 */
+	public static final int FLAG_EOF = 0x01;
+
+	/**
+	 * Flag que define o descritor como servidor.
+	 */
+	public static final int FLAG_SERVER = 0x02;
+
+	/**
+	 * Flag que define o descritor como ping.
+	 */
+	public static final int FLAG_PING = 0x04;
+
+	/**
+	 * Vetor contendo o nome das flags disponíveis.
+	 */
+	public static final String FLAG_STRING[] = new String[] { "EOF", "SERVER", "PING" };
+
+	/**
+	 * Tempo limite em milissegundos aceito por ociosidade.
+	 */
+	public static final int DEFAULT_TIMEOUT = 30000;
+
+	/**
+	 * Lista contendo todas as conexões sockets.
+	 */
+	private static final List<FileDescriptor> SESSIONS = new LoopList<>(FD_SETSIZE);
+
+	/**
+	 * Lista contendo todas as ações únicas a se executar.
+	 */
+	private static final Queue<FileDescriptorAction> ACTIONS = new DynamicQueue<>();
+
+
+	/**
 	 * Código de identificação do descritor no sistema.
 	 */
 	private int id;
@@ -44,7 +81,7 @@ public class FileDescriptor
 	/**
 	 * Flag que determina o tipo de descritor.
 	 */
-	private FileDescriptorFlag flag;
+	private BitWise flag;
 
 	/**
 	 * Tempo restante para que o descritor seja considerado inativo.
@@ -94,7 +131,7 @@ public class FileDescriptor
 	private FileDescriptor(Socket socket)
 	{
 		this.socket = socket;
-		this.flag = new FileDescriptorFlag();
+		this.flag = new BitWise(FLAG_STRING);
 		this.address = new InternetProtocol(socket);
 		this.packetBuilder = new PacketBuilder(socket);
 	}
@@ -110,11 +147,11 @@ public class FileDescriptor
 	}
 
 	/**
-	 * Flag define o tipo de conexão do descritor (EOF, SERVER ou PING).
-	 * @return aquisição da relação do descritor com o servidor.
+	 * Flag define o tipo de conexão do descritor (FLAG_EOF, FLAG_SERVER ou FLAG_PING).
+	 * @return aquisição da atribuição de comportamento do descritor no servidor.
 	 */
 
-	public FileDescriptorFlag getFlag()
+	public BitWise getFlag()
 	{
 		return flag;
 	}
@@ -290,7 +327,7 @@ public class FileDescriptor
 
 	public boolean isConnected()
 	{
-		if (id <= 0 || flag.getEOF() == 1 || socket == null)
+		if (id <= 0 || flag.is(FLAG_EOF) || socket == null)
 			return false;
 
 		boolean connected = socket.isConnected();
@@ -316,21 +353,6 @@ public class FileDescriptor
 		return description.toString();
 	}
 
-
-	/**
-	 * Tempo limite em milissegundos aceito por ociosidade.
-	 */
-	public static final int DEFAULT_TIMEOUT = 30000;
-
-	/**
-	 * Lista contendo todas as conexões sockets.
-	 */
-	private static final List<FileDescriptor> SESSIONS = new LoopList<>(FD_SETSIZE);
-
-	/**
-	 * Lista contendo todas as ações únicas a se executar.
-	 */
-	private static final Queue<FileDescriptorAction> ACTIONS = new DynamicQueue<>();
 
 	/**
 	 * Cria um novo Arquivo Descritor a partir de uma conexão socket.
@@ -379,11 +401,8 @@ public class FileDescriptor
 
 			if (fd.getTimeout() > 0 && (fd.getTimeout() - lastTick) < 0)
 			{
-				if (fd.getFlag().getServer() != 0)
-				{
-					if (fd.getFlag().getPing() != 2)
-						fd.getFlag().setPing((byte) 0);
-				}
+				if (fd.getFlag().is(FLAG_SERVER) && fd.getFlag().is(FLAG_PING))
+					fd.getFlag().unset(FLAG_PING);
 
 				else
 				{
@@ -431,10 +450,21 @@ public class FileDescriptor
 		}
 	}
 
+	/**
+	 * Define o fim dos dados para um descritor de arquivo, assim ele será fechado forçadamente.
+	 * @param fd referência do arquivo descritor do qual será terminado.
+	 */
+
 	private static void setEndOfFile(FileDescriptor fd)
 	{
-		fd.getFlag().setEOF((byte) 1);		
+		fd.getFlag().set(FLAG_EOF);
 	}
+
+	/**
+	 * Executa uma ação para ser processada por todos os descritores de arquivos.
+	 * A ação será executada no primeiro update que for executado pós adição.
+	 * @param action referência do objeto que contém a ação a ser executada.
+	 */
 
 	public static void execute(FileDescriptorAction action)
 	{

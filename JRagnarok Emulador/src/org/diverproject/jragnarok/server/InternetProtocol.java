@@ -87,7 +87,7 @@ public class InternetProtocol
 	public InternetProtocol(int intIP)
 	{
 		String ip = SocketUtil.socketIP(intIP);
-		String numbers[] = ip.split(".");
+		String numbers[] = ip.split("\\.");
 
 		set(IntUtil.parse(numbers[0]), IntUtil.parse(numbers[1]),
 			IntUtil.parse(numbers[2]), IntUtil.parse(numbers[3]));

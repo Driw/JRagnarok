@@ -1,10 +1,12 @@
 package org.diverproject.jragnarok.server;
 
 /**
- * Listener para Temporizador
+ * <h1>Listener para Temporizador</h1>
  *
- * Listener usado para executar comandos/operações de um temporizador.
- * Eles são vinculados ao temporizadores para definir a ação do mesmo.
+ * <p>Listener usado para executar comandos/operações de um temporizador.
+ * Eles são vinculados ao temporizadores para definir a ação do mesmo.</p>
+ *
+ * @see Timer
  *
  * @author Andrew
  */

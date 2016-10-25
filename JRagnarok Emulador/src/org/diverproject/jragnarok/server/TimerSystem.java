@@ -58,8 +58,10 @@ public class TimerSystem
 	 */
 	private TimerTick tick;
 
+	/**
+	 * Mapeador de temporizadores.
+	 */
 	private TimerMap timers;
-	private TimerListeners listeners;
 
 	/**
 	 * Cria um novo Sistema de Temporizadores definindo o mapa de temporizadores e listeners.
@@ -70,17 +72,6 @@ public class TimerSystem
 	{
 		tick = new TimerTick(1);
 		timers = new TimerMap();
-	}
-
-	/**
-	 * O sistema de temporizadores permite adicionar listeners para serem executados.
-	 * Esses listeners ficam armazenados em uma coleção que os mapeia por nomes.
-	 * @return aquisição do mapeador de listeners usado pelo sistema de temporizadores.
-	 */
-
-	public TimerListeners getListeners()
-	{
-		return listeners;
 	}
 
 	/**

@@ -1,3 +1,9 @@
+25.10.2016 - 1.0.53
+- JRagnarok irá tratar as exceptions que forem recebidas, as mensagens serão registradas.
+- Algumas documentações adicionadas referentes as classes já existentes.
+- FileDescriptor agora irá usar flag como um BitWise ao invés de FileDescriptorFlag.
+- TimerListeners não será mais necessário já que todo TimerListener está em um Timer.
+
 24.10.2016 - 1.0.52
 - Atualizando LoginLogService para receber um InternetProtocol ao invés de String.
 - InternetProtocol agora permite copiar os dados de um outro InternetProtocol.
