@@ -63,6 +63,17 @@ public class LoginCharServers implements Iterable<ClientCharServer>
 	}
 
 	/**
+	 * Obtém um determinado servidor da lista de servidores acessados.
+	 * @param id código de identificação do servidor desejado.
+	 * @return objeto contendo os dados do servidor ou null se id inválido.
+	 */
+
+	public ClientCharServer get(int id)
+	{
+		return servers.get(id);
+	}
+
+	/**
 	 * O tamanho dessa coleção representa a quantidade de clientes de
 	 * servidores de personagens que foram listados como acessados no mesmo.
 	 * @return aquisição da quantidade de clientes armazenados.
@@ -71,6 +82,15 @@ public class LoginCharServers implements Iterable<ClientCharServer>
 	public int size()
 	{
 		return servers.size();
+	}
+
+	/**
+	 * Remove todos os servidores de personagens listados.
+	 */
+
+	public void clear()
+	{
+		servers.clear();
 	}
 
 	@Override

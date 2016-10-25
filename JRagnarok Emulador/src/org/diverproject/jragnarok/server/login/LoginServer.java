@@ -18,7 +18,6 @@ import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
-import org.diverproject.jragnarok.server.TimerListeners;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.config.ConfigClient;
@@ -33,6 +32,7 @@ import org.diverproject.jragnarok.server.login.services.LoginIpBanService;
 import org.diverproject.jragnarok.server.login.services.LoginLogService;
 import org.diverproject.jragnarok.server.login.services.LoginService;
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.SocketUtil;
 
 public class LoginServer extends Server implements ServerListener
 {
@@ -61,6 +61,7 @@ public class LoginServer extends Server implements ServerListener
 	public LoginServer() throws RagnarokException
 	{
 		setListener(this);
+		charServers = new LoginCharServers();
 	}
 
 	public LoginCharServers getCharServers()
@@ -194,17 +195,13 @@ public class LoginServer extends Server implements ServerListener
 		if (getConfigs().getBool("ipban.enabled"))
 			ipBanService.init();
 
-		TimerSystem ts = TimerSystem.getInstance();
-		TimerListeners listeners = ts.getListeners();
-
 		setDefaultParser(clientService.parse);
 
-		listeners.add(waitingDisconnectTimer);
-		listeners.add(onlineDataCleanup);
-
+		TimerSystem ts = TimerSystem.getInstance();
 		Timer odcTimer = ts.acquireTimer();
 		odcTimer.setTick(ts.getLastTick() + minutes(10));
 		odcTimer.setInterval(minutes(10));
+		odcTimer.setListener(onlineDataCleanup);
 
 		TimerMap timers = ts.getTimers();
 		timers.update(odcTimer);
@@ -221,7 +218,7 @@ public class LoginServer extends Server implements ServerListener
 
 		// TODO confirmar usuário e senha
 
-		logService.addLoginLog(getAddress(), login, 100, "login server started");
+		logService.addLoginLog(SocketUtil.socketIPInt(getAddress()), login, 100, "login server started");
 	}
 
 	@Override
@@ -273,32 +270,7 @@ public class LoginServer extends Server implements ServerListener
 		return getConfigs().getInt("login.port");
 	}
 
-	private TimerListener waitingDisconnectTimer = new TimerListener()
-	{
-		@Override
-		public void onCall(Timer timer, int tick)
-		{
-			// TODO
-		}
-
-		@Override
-		public String getName()
-		{
-			return "waitingDisconnectTimer";
-		};
-
-		@Override
-		public String toString()
-		{
-			ObjectDescription description = new ObjectDescription(getClass());
-
-			description.append(getName());
-
-			return description.toString();
-		}
-	};
-
-	private TimerListener onlineDataCleanup = new TimerListener()
+	private final TimerListener onlineDataCleanup = new TimerListener()
 	{
 		@Override
 		public void onCall(Timer timer, int tick)
@@ -323,7 +295,7 @@ public class LoginServer extends Server implements ServerListener
 		}
 	};
 
-	private FileDescriptorAction onDestroyed = new FileDescriptorAction()
+	private final FileDescriptorAction onDestroyed = new FileDescriptorAction()
 	{
 		@Override
 		public void execute(FileDescriptor fd)

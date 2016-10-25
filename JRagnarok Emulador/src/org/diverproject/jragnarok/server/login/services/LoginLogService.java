@@ -29,6 +29,11 @@ public class LoginLogService extends LoginServerService
 		}
 	}
 
+	public void addLoginLog(int ip, Login login, int code, String message)
+	{
+		addLoginLog(new InternetProtocol(ip), login, code, message);
+	}
+
 	public void addLoginLog(InternetProtocol ip, Login login, int code, String message)
 	{
 		try {

@@ -1,3 +1,8 @@
+25.10.2016 - 1.0.55
+- Atualizando LoginServer conforme as mudanças feitas na rev53.
+- Agora LoginLogService.add poderá receber um IP como número inteiro.
+- LoginCharServers deve permitir obter um elemento e saber o tamanho da coleção.
+
 25.10.2016 - 1.0.54
 - Problema onde min_group_to_connect não estava sendo carregado desde a rev44 resolvido.
 
