@@ -33,6 +33,20 @@ import org.diverproject.util.stream.StreamRuntimeException;
 public class JRagnarokUtil
 {
 	/**
+	 * Vetor contendo a data de todas as versões de clientes (pacotes) disponíveis.
+	 */
+	private static final int PACKETS_VER[] = new int[]
+	{
+		0,
+		       0,        0,        0,        0, 20040906,        0,        0,        0,        0, 20040920, // 10
+		20041005, 20041025, 20041129, 20050110, 20050509, 20050628, 20050718, 20050719, 20060327, 20070108, // 20
+		20070212, 20080910, 20080827, 20080910, 20101124, 20111005, 20111102, 20120307, 20120410, 20120418, // 30
+		20120618, 20120702, 20130320, 20130515, 20130522, 20130529, 20130605, 20130612, 20130618, 20130626, // 40
+		20130703, 20130710, 20130717, 20130807, 20131223, 20140212, 20140613, 20141016,        0, 20141022, // 50
+		20150513, 20150916, 20151001, 20151104, 20151104 //55
+	};
+
+	/**
 	 * Construtor privado pois não será necessário outras instâncias dessa classe.
 	 */
 
@@ -374,54 +388,13 @@ public class JRagnarokUtil
 
 	public static int dateToVersion(int date)
 	{
-			 if(date < 20040906) return 5;
-		else if(date < 20040920) return 10;
-		else if(date < 20041005) return 11;
-		else if(date < 20041025) return 12;
-		else if(date < 20041129) return 13;
-		else if(date < 20050110) return 14;
-		else if(date < 20050509) return 15;
-		else if(date < 20050628) return 16;
-		else if(date < 20050718) return 17;
-		else if(date < 20050719) return 18;
-		else if(date < 20060327) return 19;
-		else if(date < 20070108) return 20;
-		else if(date < 20070212) return 21;
-		else if(date < 20080910) return 22;
-		else if(date < 20080827) return 23;
-		else if(date < 20080910) return 24;
-		else if(date < 20101124) return 25;
-		else if(date < 20111005) return 26;
-		else if(date < 20111102) return 27;
-		else if(date < 20120307) return 28;
-		else if(date < 20120410) return 29;
-		else if(date < 20120418) return 30;
-		else if(date < 20120618) return 31;
-		else if(date < 20120702) return 32;
-		else if(date < 20130320) return 33;
-		else if(date < 20130515) return 34;
-		else if(date < 20130522) return 35;
-		else if(date < 20130529) return 36;
-		else if(date < 20130605) return 37;
-		else if(date < 20130612) return 38;
-		else if(date < 20130618) return 39;
-		else if(date < 20130626) return 40;
-		else if(date < 20130703) return 41;
-		else if(date < 20130710) return 42;
-		else if(date < 20130717) return 43;
-		else if(date < 20130807) return 44;
-		else if(date < 20131223) return 45;
-		else if(date < 20140212) return 46;
-		else if(date < 20140613) return 47;
-		else if(date < 20141016) return 48;
-		else if(date < 20141022) return 50;
-		else if(date < 20150513) return 51;
-		else if(date < 20150916) return 52;
-		else if(date < 20151001) return 53;
-		else if(date < 20151104) return 54;
-		else if(date >= 20151104) return 55;
+		for (int i = 0; i < PACKETS_VER.length; i++)
+			if (PACKETS_VER[i] == 0)
+				continue;
+			else if (date < PACKETS_VER[i])
+				return i;
 
-		else return 30;
+		return 30;
 	}
 
 	/**
