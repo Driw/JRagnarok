@@ -6,7 +6,9 @@ public class RagnarokPacketList
 
 	public static final short PACKET_CA_LOGIN = 0x0064;
 	public static final short PACKET_AC_REFUSE_LOGIN = 0x006A;
-	public static final short PACKET_CA_CONNECT_INFO_CHANGED = 0x200;
+	public static final short PACKET_AC_ACCEPT_LOGIN = 0x0069;
+	public static final short PACKET_SC_NOTIFY_BAN = 0x0081;
+	public static final short PACKET_CA_CONNECT_INFO_CHANGED = 0x0200;
 	public static final short PACKET_CA_EXE_HASHCHECK = 0x0204;
 	public static final short PACKET_CA_LOGIN_PCBANG = 0x0277;
 	public static final short PACKET_CA_LOGIN_HAN = 0x02B0;
@@ -19,5 +21,6 @@ public class RagnarokPacketList
 	public static final short PACKET_CA_REQ_HASH = 0x01DB;
 	public static final short PACKET_CA_REQ_CHAR_CONNECT = 0x2710;
 	public static final short PACKET_CA_RES_CHAR_CONNECT = 0x2711;
+	public static final short PACKET_ALREADY_ONLINE = 0x2734;
 	public static final short PACKET_SYNCRONIZE_IPADDRESS = 0x2735;
 }

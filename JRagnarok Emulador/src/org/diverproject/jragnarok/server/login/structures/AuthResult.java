@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.services;
+package org.diverproject.jragnarok.server.login.structures;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 

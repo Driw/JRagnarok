@@ -1,5 +1,7 @@
 package org.diverproject.jragnarok.server.login.structures;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.s;
+
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 
 public enum CharServerType
@@ -10,11 +12,11 @@ public enum CharServerType
 	PLAYING(3),
 	P2P(4);
 
-	public final int CODE;
+	public final short CODE;
 
 	private CharServerType(int code)
 	{
-		CODE = code;
+		CODE = s(code);
 	}
 
 	public static CharServerType parse(int code)

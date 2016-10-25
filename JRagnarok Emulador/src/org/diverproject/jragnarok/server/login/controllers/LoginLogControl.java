@@ -26,7 +26,7 @@ import org.diverproject.util.SocketUtil;
  * @author Andrew
  */
 
-public class LoginLogController extends AbstractDAO
+public class LoginLogControl extends AbstractDAO
 {
 	/**
 	 * Cria um novo controlador para trabalhar com os registros de acesso no servidor.
@@ -34,7 +34,7 @@ public class LoginLogController extends AbstractDAO
 	 * @param connection referência do objeto contendo a conexão com o banco de dados.
 	 */
 
-	public LoginLogController(Connection connection)
+	public LoginLogControl(Connection connection)
 	{
 		super(connection);
 	}
@@ -96,18 +96,18 @@ public class LoginLogController extends AbstractDAO
 		if (log == null)
 			throw new RagnarokException("registro nulo");
 
-		Tables tables = Tables.getInstance();
-		String table = tables.getLoginLog();
+		if (log.getLogin() == null)
+			throw new RagnarokException("registro sem acesso");
 
-		String sql = "INSERT INTO " +table+ " (time, ip, username, rcode, message) "
-					+"VALUES (?, ?, ?, ?, ?)";
+		String table = Tables.getInstance().getLoginLog();
+		String sql = format("INSERT INTO %s (time, ip, login, rcode, message) VALUES (?, ?, ?, ?, ?)", table);
 
 		try {
 
 			PreparedStatement ps = prepare(sql);
-			ps.setString(1, log.getTime().toString());
-			ps.setString(2, log.getIP().getString());
-			ps.setString(3, log.getUser());
+			ps.setTimestamp(1, log.getTime().toTimestamp());
+			ps.setInt(2, log.getIP().get());
+			ps.setInt(3, log.getLogin().getID());
 			ps.setInt(4, log.getRCode());
 			ps.setString(5, log.getMessage());
 

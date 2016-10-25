@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.packets;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_REFUSE_LOGIN_R2;
 
-import org.diverproject.jragnarok.server.login.services.AuthResult;
+import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 

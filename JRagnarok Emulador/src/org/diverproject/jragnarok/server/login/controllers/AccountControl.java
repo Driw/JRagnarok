@@ -7,14 +7,19 @@ import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;
 
-public class AccountController
+public class AccountControl
 {
-	private Map<String, Account> accounts;
-	private AccountDAO dao;
+	private static final Map<String, Account> accounts;
 
-	public AccountController(Connection connection)
+	static
 	{
 		accounts = new StringSimpleMap<>();
+	}
+
+	private AccountDAO dao;
+
+	public AccountControl(Connection connection)
+	{
 		dao = new AccountDAO(connection);
 	}
 
@@ -25,9 +30,16 @@ public class AccountController
 		if (account == null)
 		{
 			account = dao.select(username);
-			accounts.add(username, account);
+
+			if (account != null)
+				accounts.add(username, account);
 		}
 
 		return account;
+	}
+
+	public boolean save(Account account) throws RagnarokException
+	{
+		return dao.update(account);
 	}
 }

@@ -1,3 +1,14 @@
+25.10.2016 - 1.1.56
+- Reconhecimento e autenticação de uma conexão solicitada por um cliente (jogador).
+	- Isso inclui implementação de métodos/listeners em LoginClientService e LoginService.
+- AuthResult foi movido para login.structures e CharServerType.CODE alterado de int para short.
+- AccountDAO e LoginLogController atualizados conforme atualizações passadas.
+- LoginLogController renomeado para LoginLogControl e AccountController para AccountControl.
+- Novos controles:
+	- AccountControl é intermediário na persistência de contas e cache de contas.
+	- AuthControl funciona como cache para saber os clientes que já foram autenticados.
+	- OnlineControl funciona como cache para identificar os clientes que estão online.
+
 25.10.2016 - 1.0.55
 - Atualizando LoginServer conforme as mudanças feitas na rev53.
 - Agora LoginLogService.add poderá receber um IP como número inteiro.

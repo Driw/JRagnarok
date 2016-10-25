@@ -31,13 +31,13 @@ public class AccountDAO extends AbstractDAO
 	public Account select(String username) throws RagnarokException
 	{
 		String accountTable = Tables.getInstance().getAccounts();
-		String loginTable = Tables.getInstance().getLogin();
+		String loginTable = Tables.getInstance().getLogins();
 
 		String sql = format("SELECT id, password, last_login, registered,"
 						+ " email, birth_date, login_count, unban, expiration, pincode, groupid, state, last_ip"
 						+ " FROM %s INNER JOIN %s ON %s.id = %s.login"
 						+ " WHERE username = ?",
-						accountTable, loginTable, accountTable);
+						accountTable, loginTable, loginTable, accountTable);
 
 		try {
 
@@ -57,8 +57,8 @@ public class AccountDAO extends AbstractDAO
 				account.setEmail(rs.getString("email"));
 				account.setBirthDate(rs.getString("birth_date"));
 				account.setLoginCount(rs.getInt("login_count"));
-				account.getUnban().set(rs.getDate("unban").getTime());
-				account.getExpiration().set(rs.getDate("expiration").getTime());
+				account.getUnban().set(rs.getTimestamp("unban").getTime());
+				account.getExpiration().set(rs.getTimestamp("expiration").getTime());
 				account.setState(AccountState.parse(rs.getInt("state")));
 				account.getLastIP().set(rs.getInt("last_ip"));
 
@@ -68,11 +68,11 @@ public class AccountDAO extends AbstractDAO
 				return account;
 			}
 
-			throw new RagnarokException("usuário '%s' não encontrado");
-
 		} catch (SQLException e) {
 			throw new RagnarokException(e);
 		}
+
+		return null;
 	}
 
 	private void loadPincode(Pincode pincode, int pincodeID) throws RagnarokException
@@ -121,9 +121,27 @@ public class AccountDAO extends AbstractDAO
 				accountGroup.setID(groupID);
 				accountGroup.getTime().set(rs.getDate("timeout").getTime());
 
-				loadGroup(accountGroup.getCurrentGroup(), rs.getInt("current_group"));
-				loadGroup(accountGroup.getOldGroup(), rs.getInt("old_group"));
-				loadVip(accountGroup.getVip(), rs.getInt("vip"));
+				int currentGroup = rs.getInt("current_group");
+				int oldGroup = rs.getInt("old_group");
+				int vip = rs.getInt("vip");
+
+				if (currentGroup > 0)
+				{
+					accountGroup.setCurrentGroup(new Group());
+					loadGroup(accountGroup.getCurrentGroup(), currentGroup);
+				}
+
+				if (oldGroup > 0)
+				{
+					accountGroup.setOldGroup(new Group());
+					loadGroup(accountGroup.getOldGroup(), oldGroup);
+				}
+
+				if (vip > 0)
+				{
+					accountGroup.setVip(new Vip());
+					loadVip(accountGroup.getVip(), vip);
+				}
 
 				return;
 			}
@@ -155,6 +173,8 @@ public class AccountDAO extends AbstractDAO
 				group.setLogEnabled(rs.getBoolean("log_enabled"));
 
 				int parent = rs.getInt("parent");
+
+				if (parent > 0)
 				{
 					group.setParent(new Group());
 					loadGroup(group.getParent(), parent);
@@ -200,13 +220,13 @@ public class AccountDAO extends AbstractDAO
 			}
 
 		} catch (SQLException e) {
-			new RagnarokException(e);
+			throw new RagnarokException(e);
 		}
 	}
 
 	private void loadGroupCommands(Group group) throws RagnarokException
 	{
-		String table = Tables.getInstance().getGroupPermissionsList();
+		String table = Tables.getInstance().getGroupCommandsList();
 		String commandsTable = Tables.getInstance().getGroupCommands();
 
 		String sql = format("SELECT id, name FROM %s"
@@ -231,7 +251,7 @@ public class AccountDAO extends AbstractDAO
 			}
 
 		} catch (SQLException e) {
-			new RagnarokException(e);
+			throw new RagnarokException(e);
 		}		
 	}
 
@@ -260,7 +280,52 @@ public class AccountDAO extends AbstractDAO
 			}
 
 		} catch (SQLException e) {
-			new RagnarokException(e);
+			throw new RagnarokException(e);
 		}	
+	}
+
+	public boolean update(Account account) throws RagnarokException
+	{
+		return updateLogin(account) && updateAccount(account);
+	}
+
+	public boolean updateLogin(Account account) throws RagnarokException
+	{
+		String table = Tables.getInstance().getLogins();
+		String sql = format("UPDATE %s SET last_login = ? WHERE id = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setTimestamp(1, account.getLogin().getLastLogin().toTimestamp());
+			ps.setInt(2, account.getLogin().getID());
+
+			return ps.executeUpdate() == 1;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e);
+		}
+	}
+
+	public boolean updateAccount(Account account) throws RagnarokException
+	{
+		String table = Tables.getInstance().getAccounts();
+		String sql = format("UPDATE %s SET login_count = ?, unban = ?, expiration = ?, state = ?, last_ip = ? WHERE login = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, account.getLoginCount());
+			ps.setTimestamp(2, account.getUnban().toTimestamp());
+			ps.setTimestamp(3, account.getExpiration().toTimestamp());
+			ps.setInt(4, account.getState().CODE);
+			ps.setInt(5, account.getLastIP().get());
+			ps.setInt(6, account.getLogin().getID());
+
+			return ps.executeUpdate() == 1;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e);
+		}
 	}
 }
