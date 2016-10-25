@@ -1,14 +1,11 @@
 package org.diverproject.jragnarok.server;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.sleep;
-import static org.diverproject.jragnarok.server.ServerState.CREATE;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
-import static org.diverproject.jragnarok.server.ServerState.DESTROY;
 import static org.diverproject.jragnarok.server.ServerState.DESTROYED;
 import static org.diverproject.jragnarok.server.ServerState.NONE;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.ServerState.STOPED;
-import static org.diverproject.jragnarok.server.ServerState.STOPPING;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
@@ -208,75 +205,36 @@ public abstract class Server
 	 * Procedimento interno que permite alterar o estado em que o servidor se encontra.
 	 * Para que um estado seja alterado pode ser necessário encontrar-se em outro.
 	 * Por exemplo, para entrar no estado de CREATED precisa estar em CREATE.
-	 * @param newState novo estado do qual o servidor deverá assumir.
-	 * @throws RagnarokException não está no estado pré-requisitado para ser alterado.
 	 */
 
-	protected void changeState(ServerState newState) throws RagnarokException
+	protected void setNextState()
 	{
-		if (newState == state)
-			return;
+		ServerState old = state;
 
-		switch (newState)
+		switch (state)
 		{
 			case NONE:
-				if (state != DESTROYED)
-					changeStateException(newState);
-				break;
-
-			case CREATE:
-				if (state != NONE && newState != DESTROYED)
-					changeStateException(newState);
+				state = CREATED;
 				break;
 
 			case CREATED:
-				if (state != CREATE)
-					changeStateException(newState);
+				state = RUNNING;
 				break;
 
 			case RUNNING:
-				if (state != CREATED)
-					changeStateException(newState);
-				break;
-
-			case STOPPING:
-				if (state != RUNNING)
-					changeStateException(newState);
+				state = STOPED;
 				break;
 
 			case STOPED:
-				if (state != STOPPING)
-					changeStateException(newState);
-				break;
-
-			case DESTROY:
-				if (state != STOPED)
-					changeStateException(newState);
+				state = DESTROYED;
 				break;
 
 			case DESTROYED:
-				if (state != DESTROY)
-					changeStateException(newState);
+				state = NONE;
 				break;
-
-			default:
-				throw new RagnarokException("state %s inválido", newState);
 		}
 
-		logInfo("alterando estado de %s para %s.\n", state, newState);
-
-		state = newState;
-	}
-
-	/**
-	 * Procedimento interno para facilitar a criação de exception para alteração do estado.
-	 * @param newState novo estado do qual tentou-se alterar o estado atual.
-	 * @throws RagnarokException irá ocorrer sempre (usado para facilitar codificação).
-	 */
-
-	private void changeStateException(ServerState newState) throws RagnarokException
-	{
-		throw new RagnarokException("%s não pode ir para %s", newState, state);
+		logInfo("alterando estado de %s para %s.\n", old, state);
 	}
 
 	/**
@@ -289,19 +247,16 @@ public abstract class Server
 
 	public final void create() throws RagnarokException
 	{
-		changeState(CREATE);
+		listener.onCreate();
 		{
-			listener.onCreate();
-			{
-				initConfigs();
-				initSqlConnection();
-				initTimer();
-				initThread();
-				initSocket();
-			}
-			listener.onCreated();
+			initConfigs();
+			initSqlConnection();
+			initTimer();
+			initThread();
+			initSocket();
 		}
-		changeState(CREATED);
+		listener.onCreated();
+		setNextState();
 	}
 
 	/**
@@ -325,7 +280,7 @@ public abstract class Server
 				thread.start();
 		}
 
-		changeState(RUNNING);
+		setNextState();
 	}
 
 	/**
@@ -340,15 +295,11 @@ public abstract class Server
 		if (thread == null)
 			throw new RagnarokException("thread não encontrada");
 
-		changeState(STOPPING);
+		listener.onStop();
 		{
-			listener.onStop();
-			{
-				thread.interrupt();
-			}
+			thread.interrupt();
 		}
-		listener.onStoped();
-		changeState(ServerState.STOPED);
+		setNextState();
 	}
 
 	/**
@@ -361,25 +312,21 @@ public abstract class Server
 
 	public final void destroy() throws RagnarokException
 	{
-		changeState(DESTROY);
-		{
-			try {
+		try {
 
-				listener.onDestroy();
-				serverSocket.close();
+			listener.onDestroy();
+			serverSocket.close();
 
-				state = ServerState.DESTROYED;
+			state = ServerState.DESTROYED;
 
-				listener.onDestroyed();
+			listener.onDestroyed();
 
-				thread.interrupt();
-				thread = null;
+			thread.interrupt();
+			thread = null;
 
-			} catch (IOException e) {
-				throw new RagnarokException(e.getMessage());
-			}
+		} catch (IOException e) {
+			throw new RagnarokException(e.getMessage());
 		}
-		changeState(ServerState.DESTROYED);
 	}
 
 	/**

@@ -387,13 +387,7 @@ public class FileDescriptor
 		TimerSystem timer = TimerSystem.getInstance();
 		int lastTick = timer.getLastTickCount();
 
-		while (!ACTIONS.isEmpty())
-		{
-			FileDescriptorAction action = ACTIONS.poll();
-
-			for (FileDescriptor fd : SESSIONS)
-				action.execute(fd);
-		}
+		executeActions();
 
 		for (int i = 0; i < SESSIONS.size(); i++)
 		{
@@ -411,34 +405,7 @@ public class FileDescriptor
 				}
 			}
 
-			try {
-
-				if (fd.getParseListener() != null)
-					if (!fd.getParseListener().onCall(fd))
-						fd.setTimeout(lastTick);
-
-			} catch (RagnarokException e) {
-
-				logError("processamento inválido encontrado:\n");
-				logExeceptionSource(e);
-
-				setEndOfFile(fd);
-
-			} catch (RagnarokRuntimeException e) {
-
-				logError("informação inválida encontrada:\n");
-				logExeceptionSource(e);
-
-				setEndOfFile(fd);
-
-			} catch (Exception e) {
-
-				logError("erro inesperado ocorrido:\n");
-				logExeceptionSource(e);
-
-				setEndOfFile(fd);
-
-			}
+			executeListener(fd, lastTick);
 
 			if (!fd.isConnected())
 			{
@@ -447,6 +414,62 @@ public class FileDescriptor
 				fd.close();
 				SESSIONS.remove(i);
 			}
+		}
+	}
+
+	/**
+	 * Procedimento chamado quando solicitado para atualizar os temporizadores.
+	 * Deverá executar todas as ações em file que foram adicionadas no último loop.
+	 * Uma vez que a ação tenha sido executada ela terá sido removido da fila.
+	 */
+
+	private static void executeActions()
+	{
+		while (!ACTIONS.isEmpty())
+		{
+			FileDescriptorAction action = ACTIONS.poll();
+
+			for (FileDescriptor fd : SESSIONS)
+				action.execute(fd);
+		}
+	}
+
+	/**
+	 * Procedimento chamado quando solicitado para atualizar os temporizadores.
+	 * Deverá garantir que o descritor de arquivo chame o seu listener de análise.
+	 * @param fd referência do arquivo descritor que será analisado os dados recebidos.
+	 * @param lastTick tempo atual referente a última atualização (loop) do servidor.
+	 */
+
+	private static void executeListener(FileDescriptor fd, int lastTick)
+	{
+		try {
+
+			if (fd.getParseListener() != null)
+				if (!fd.getParseListener().onCall(fd))
+					fd.setTimeout(lastTick);
+
+		} catch (RagnarokException e) {
+
+			logError("processamento inválido encontrado:\n");
+			logExeceptionSource(e);
+
+			setEndOfFile(fd);
+
+		} catch (RagnarokRuntimeException e) {
+
+			logError("informação inválida encontrada:\n");
+			logExeceptionSource(e);
+
+			setEndOfFile(fd);
+
+		} catch (Exception e) {
+
+			logError("erro inesperado ocorrido:\n");
+			logExeceptionSource(e);
+
+			setEndOfFile(fd);
+
 		}
 	}
 

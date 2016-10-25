@@ -1,5 +1,5 @@
 25.10.2016 - 1.1.57
-- Redução na complexidade ciclomática de JRagnarokUtil.dateToVersion com PACKET_VER[].
+- Redução na complexidade ciclomática de algumas operações.
 
 25.10.2016 - 1.1.56
 - Reconhecimento e autenticação de uma conexão solicitada por um cliente (jogador).

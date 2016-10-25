@@ -215,12 +215,12 @@ public class LoginClientService extends LoginServerService
 				parseRequestKey(fd, sd);
 				break;
 
-			// Solicitação de acesso senha crua
+			// Solicitação de acesso com senha direta
 			case PACKET_CA_LOGIN:
 			case PACKET_CA_LOGIN_PCBANG:
 			case PACKET_CA_LOGIN_HAN:
 			case PACKET_CA_SSO_LOGIN_REQ:
-			// Solicitação de acesso senha MD5
+			// Solicitação de acesso com senha MD5
 			case PACKET_CA_LOGIN2:
 			case PACKET_CA_LOGIN3:
 			case PACKET_CA_LOGIN4:
@@ -228,7 +228,7 @@ public class LoginClientService extends LoginServerService
 
 			case PACKET_CA_REQ_CHAR_CONNECT:
 				requestCharConnect(fd, sd);
-				break;
+				return true;
 
 			default:
 				String packet = HexUtil.parseInt(command, 4);
@@ -461,6 +461,19 @@ public class LoginClientService extends LoginServerService
 				break;
 		}
 
+		return requestAuthConclude(usingRawPassword, sd);
+	}
+
+	/**
+	 * Procedimento que irá fazer a conclusão da autenticação da solicitação de um cliente.
+	 * Neste momentos os dados passados pelo cliente já terão sido lidos e guardados na sessão.
+	 * @param usingRawPassword true se estiver usando senha direta ou false se for md5.
+	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @return true se for autenticado com êxito ou false caso contrário.
+	 */
+
+	private boolean requestAuthConclude(boolean usingRawPassword, LoginSessionData sd)
+	{
 		if (usingRawPassword)
 		{
 			logNotice("solicitação de conexão de %s (ip: %s, version: %d)\n", sd.getUsername(), sd.getAddressString(), sd.getVersion());
@@ -482,7 +495,7 @@ public class LoginClientService extends LoginServerService
 
 		if (sd.getPassDencrypt().getValue() != 0 && getConfigs().getBool("login.use_md5_password"))
 		{
-			sendAuthResult(fd, AuthResult.REJECTED_FROM_SERVER);
+			sendAuthResult(sd.getFileDescriptor(), AuthResult.REJECTED_FROM_SERVER);
 			return false;
 		}
 
@@ -495,7 +508,6 @@ public class LoginClientService extends LoginServerService
 		}
 
 		authFailed(sd, result);
-
 		return false;
 	}
 

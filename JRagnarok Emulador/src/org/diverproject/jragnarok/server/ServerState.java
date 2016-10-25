@@ -18,11 +18,6 @@ public enum ServerState
 	NONE,
 
 	/**
-	 * Criação solicitada.
-	 */
-	CREATE,
-
-	/**
 	 * Criação concluída.
 	 */
 	CREATED,
@@ -33,19 +28,9 @@ public enum ServerState
 	RUNNING,
 
 	/**
-	 * Parada solicitada.
-	 */
-	STOPPING,
-
-	/**
 	 * parada
 	 */
 	STOPED,
-
-	/**
-	 * Destruição solicitada.
-	 */
-	DESTROY,
 
 	/**
 	 * Destruição concluída.
