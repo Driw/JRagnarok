@@ -71,11 +71,6 @@ public class Timer
 	private int interval;
 
 	/**
-	 * TODO what is that?
-	 */
-	private int data;
-
-	/**
 	 * Tipo do temporizador.
 	 */
 	private BitWise type;
@@ -148,26 +143,6 @@ public class Timer
 	public void setInterval(int interval)
 	{
 		this.interval = interval;
-	}
-
-	/**
-	 * TODO what is that?
-	 * @return
-	 */
-
-	public int getData()
-	{
-		return data;
-	}
-
-	/**
-	 * TODO what is that?
-	 * @param data
-	 */
-
-	public void setData(int data)
-	{
-		this.data = data;
 	}
 
 	/**

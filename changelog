@@ -1,3 +1,7 @@
+27.10.2016 - 1.1.61
+- Algumas documentações de classes corrigidas.
+- Removido o atributo data de Timer já que não está sendo usado no momento.
+
 27.10.2016 - 1.1.60
 - Problema onde clone estava tornando configurações específicas em ConfigObject.
 - ConfigClientHash e ConfigIP não aceitava o objeto direto por setObject adequadamente.

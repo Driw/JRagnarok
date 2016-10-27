@@ -19,7 +19,6 @@ import org.diverproject.util.collection.abstraction.IntegerLittleMap;
  * Ou seja, quanto mais perto for do seu próximo horário mais a frente estará indexado,
  * podendo assim ser executado primeiro do que outros temporizadores mais tardios.</p>
  *
- * @see Tickers
  * @see Iterable
  * @see IntegerLittleMap
  * @see DynamicIndex
@@ -113,7 +112,7 @@ public class TimerMap implements Iterable<Timer>
 		}
 
 		else
-			logError("intervalo inválido (timer: %d, listener: %s, data: %d).\n", timer.getID(), timer.getListener().getName(), timer.getData());
+			logError("intervalo inválido (timer: %d, listener: %s).\n", timer.getID(), timer.getListener().getName());
 	}
 
 	/**

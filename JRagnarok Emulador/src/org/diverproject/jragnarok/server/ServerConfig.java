@@ -67,7 +67,7 @@ public abstract class ServerConfig
 	 * Permite obter o mapa que armazena as configurações do servidor diretamente.
 	 * O carregador de configurações irá usar um mapa para alocar as configurações lidas.
 	 * Através dele também é possível obter, iterar, adicionar, alterar e adicionar.
-	 * @return
+	 * @return aquisição do mapeamento das configurações do servidor.
 	 */
 
 	public Map<String, Config<?>> getMap()

@@ -32,7 +32,7 @@ import org.diverproject.util.collection.Node;
  *
  * <p>Esse serviço irá receber uma solicitação de conexão do serviço de acesso para clientes.
  * Essa solicitação deverá ser autenticada conforme os dados da conta passados pelo cliente.
- * Os dados da conta serão obitidas dentor desse serviço durante a autenticação.</p>
+ * Os dados da conta serão obtidas dentro desse serviço durante a autenticação.</p>
  *
  * <p>Consistindo de autenticar o nome de usuário com a palavra chave (senha),
  * tempo de para expiração da conta, tempo restante de banimento, versão do cliente e client hash.

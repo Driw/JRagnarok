@@ -42,7 +42,8 @@ public class InternetProtocol
 	private byte fourth;
 
 	/**
-	 * 
+	 * Cria um novo endereço de IP usando o endereço padrão e local da máquina.
+	 * O valor padrão/local das máquinas sempre são 127.0.0.1 (localhost).
 	 */
 
 	public InternetProtocol()
@@ -51,11 +52,12 @@ public class InternetProtocol
 	}
 
 	/**
-	 * 
-	 * @param first
-	 * @param second
-	 * @param third
-	 * @param fourth
+	 * Cria um novo endereço IP através de números inteiros.
+	 * Cada número irá representar um valor do endereço.
+	 * @param first primeiro valor do endereço de ip.
+	 * @param second segundo valor do endereço de ip.
+	 * @param third terceiro valor do endereço de ip.
+	 * @param fourth quarto valor do endereço de ip.
 	 */
 
 	public InternetProtocol(int first, int second, int third, int fourth)
@@ -64,8 +66,8 @@ public class InternetProtocol
 	}
 
 	/**
-	 * 
-	 * @param socket
+	 * Permite criar um endereço de IP através de uma conexão socket estabelecida.
+	 * @param socket conexão socket que será usado o IP.
 	 */
 
 	public InternetProtocol(Socket socket)
@@ -80,8 +82,10 @@ public class InternetProtocol
 	}
 
 	/**
-	 * 
-	 * @param intIP
+	 * Endereços de IP podem ser armazenados em números do tipo inteiros de 4 bytes.
+	 * Onde cada byte irá representar em valor numérico uma parte do endereço de IP.
+	 * Assim é possível ter o endereço de IP em 4 números de 0 a 255 como de fato é.
+	 * @param intIP valor em número inteiro referente ao endereço de IP.
 	 */
 
 	public InternetProtocol(int intIP)
@@ -94,10 +98,11 @@ public class InternetProtocol
 	}
 
 	/**
-	 * @param first
-	 * @param second
-	 * @param third
-	 * @param fourth
+	 * Permite definir os valores do endereço de IP por números inteiro.
+	 * @param first primeiro valor do endereço de ip.
+	 * @param second segundo valor do endereço de ip.
+	 * @param third terceiro valor do endereço de ip.
+	 * @param fourth quarto valor do endereço de ip.
 	 */
 
 	public void set(int first, int second, int third, int fourth)

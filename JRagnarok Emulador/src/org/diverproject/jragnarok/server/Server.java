@@ -94,10 +94,9 @@ public abstract class Server
 	 * Cria um novo servidor definindo o servidor no estado NONE (nenhum/inicial).
 	 * Também define as configurações do servidor por setServerConfig().
 	 * E por fim instancia o objeto para criar a conexão com o banco de dados.
-	 * @throws RagnarokException
 	 */
 
-	public Server() throws RagnarokException
+	public Server()
 	{
 		this.state = NONE;
 		this.sql = new MySQL();
@@ -250,6 +249,9 @@ public abstract class Server
 
 	public final void create() throws RagnarokException
 	{
+		if (!isState(NONE) && !isState(DESTROYED))
+			throw new RagnarokException("o servidor não pode dar create em %s", state);
+
 		listener.onCreate();
 		{
 			initConfigs();
@@ -266,12 +268,15 @@ public abstract class Server
 	 * Ao ser chamado irá rodar o servidor, para isso irá trabalhar com a thread.
 	 * A thread é iniciada ou retorna a rodar se estiver em STOPPED.
 	 * Após rodar a thread e executar o listener irá entrar em RUNNING.
-	 * @throws RagnarokException
+	 * @throws RagnarokException estado incorreto ou thread não criada.
 	 */
 
 	@SuppressWarnings("deprecation")
 	public final void run() throws RagnarokException
 	{
+		if (!isState(CREATED))
+			throw new RagnarokException("o servidor não pode dar run em %s", state);
+
 		if (thread == null)
 			throw new RagnarokException("thread não criada");
 
@@ -295,6 +300,9 @@ public abstract class Server
 
 	public final void stop() throws RagnarokException
 	{
+		if (!isState(RUNNING))
+			throw new RagnarokException("o servidor não pode dar stop em %s", state);
+
 		if (thread == null)
 			throw new RagnarokException("thread não encontrada");
 
@@ -310,11 +318,14 @@ public abstract class Server
 	 * A destruição consiste no listener que pode solicitar a limpeza de uma coleção.
 	 * Fecha a conexão socket parando de receber novos clientes e interrompe a thread.
 	 * Inicia o processo entrando no estado de DESTROY e termina como DESTROYED.
-	 * @throws RagnarokException
+	 * @throws RagnarokException estado incorreto ou falha ao fechar conexão.
 	 */
 
 	public final void destroy() throws RagnarokException
 	{
+		if (!isState(STOPED))
+			throw new RagnarokException("o servidor não pode dar destroy em %s", state);
+
 		try {
 
 			listener.onDestroy();
