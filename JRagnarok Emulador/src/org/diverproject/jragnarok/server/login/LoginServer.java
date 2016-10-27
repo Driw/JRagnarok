@@ -82,7 +82,7 @@ public class LoginServer extends Server implements ServerListener
 
 	public LoginCharacterService getCharService()
 	{
-		return charService;
+		return charService; 
 	}
 
 	public LoginIpBanService getIpBanService()

@@ -42,9 +42,9 @@ public class ConfigObject<T> extends Config<T>
 	}
 
 	@Override
-	public ConfigObject<Object> clone()
+	public ConfigObject<T> clone()
 	{
-		ConfigObject<Object> config = new ConfigObject<Object>(getName());
+		ConfigObject<T> config = new ConfigObject<T>(getName());
 		config.setValue(getValue());
 
 		return config;

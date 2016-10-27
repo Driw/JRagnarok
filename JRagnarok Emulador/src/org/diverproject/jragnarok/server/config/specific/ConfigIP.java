@@ -17,6 +17,8 @@ public class ConfigIP extends ConfigObject<InternetProtocol>
 	{
 		if (object instanceof String)
 			setRawValue((String) object);
+		else
+			super.setObject(object);
 	}
 
 	private void setRawValue(String string)
@@ -27,5 +29,14 @@ public class ConfigIP extends ConfigObject<InternetProtocol>
 		int ipAddress = SocketUtil.socketIPInt(string);
 
 		getValue().set(ipAddress);
+	}
+
+	@Override
+	public ConfigIP clone()
+	{
+		ConfigIP config = new ConfigIP(getName());
+		config.setObject(getValue());
+
+		return config;
 	}
 }

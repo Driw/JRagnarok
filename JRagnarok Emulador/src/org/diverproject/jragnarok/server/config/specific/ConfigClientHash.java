@@ -15,12 +15,21 @@ public class ConfigClientHash extends ConfigObject<ClientHashNode>
 	{
 		if (object instanceof String)
 			setRawValue((String) object);
-
-		super.setObject(object);
+		else
+			super.setObject(object);
 	}
 
 	private void setRawValue(String string)
 	{
 		// TODO
+	}
+
+	@Override
+	public ConfigClientHash clone()
+	{
+		ConfigClientHash config = new ConfigClientHash(getName());
+		config.setObject(getValue());
+
+		return config;
 	}
 }
