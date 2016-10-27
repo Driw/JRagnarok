@@ -37,4 +37,13 @@ public class ConfigInt extends Config<Integer>
 		if (object != null && object instanceof Integer)
 			setValue((Integer) object);
 	}
+
+	@Override
+	public ConfigInt clone()
+	{
+		ConfigInt config = new ConfigInt(getName());
+		config.setValue(getValue());
+
+		return config;
+	}
 }

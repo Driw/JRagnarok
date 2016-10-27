@@ -40,4 +40,13 @@ public class ConfigObject<T> extends Config<T>
 			logExeception(e);
 		}
 	}
+
+	@Override
+	public ConfigObject<Object> clone()
+	{
+		ConfigObject<Object> config = new ConfigObject<Object>(getName());
+		config.setValue(getValue());
+
+		return config;
+	}
 }

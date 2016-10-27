@@ -33,4 +33,13 @@ public class ConfigString extends Config<String>
 		if (object != null && object instanceof String)
 			setValue((String) object);
 	}
+
+	@Override
+	public ConfigString clone()
+	{
+		ConfigString config = new ConfigString(getName());
+		config.setValue(getValue());
+
+		return config;
+	}
 }

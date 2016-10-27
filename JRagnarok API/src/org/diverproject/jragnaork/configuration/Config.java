@@ -23,6 +23,9 @@ public abstract class Config<T>
 	public abstract void setObject(Object object);
 
 	@Override
+	protected abstract Object clone();
+
+	@Override
 	public String toString()
 	{
 		ObjectDescription description = new ObjectDescription(getClass());

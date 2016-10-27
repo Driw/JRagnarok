@@ -100,7 +100,6 @@ public abstract class Server
 	public Server() throws RagnarokException
 	{
 		this.state = NONE;
-		this.configs = setServerConfig();
 		this.sql = new MySQL();
 	}
 
@@ -161,12 +160,16 @@ public abstract class Server
 	}
 
 	/**
-	 * Procedimento abstrato que deverá criar uma instancia das configurações.
-	 * Chamado pelo construtor e deve definir as configurações do mesmo.
-	 * @return aquisição do objeto que possui as configurações do servidor.
+	 * Permite definir qual será o objeto usado para armazenar as configurações do servidor.
+	 * Pode ser definido apenas uma única vez, logo se já tiver sido definido não terá efeito.
+	 * @param configs referência do objeto contendo as configurações do servidor.
 	 */
 
-	protected abstract ServerConfig setServerConfig();
+	protected void setServerConfig(ServerConfig configs)
+	{
+		if (this.configs == null && configs != null)
+			this.configs = configs;
+	}
 
 	/**
 	 * Permite obter a referência do objeto com as configurações do servidor.

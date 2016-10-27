@@ -37,4 +37,13 @@ public class ConfigBoolean extends Config<Boolean>
 		if (object != null && object instanceof Boolean)
 			setValue((Boolean) object);
 	}
+
+	@Override
+	public ConfigBoolean clone()
+	{
+		ConfigBoolean config = new ConfigBoolean(getName());
+		config.setValue(getValue());
+
+		return config;
+	}
 }

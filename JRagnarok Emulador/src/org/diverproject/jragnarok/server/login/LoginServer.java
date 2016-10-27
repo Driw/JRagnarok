@@ -25,6 +25,7 @@ import org.diverproject.jragnarok.server.config.ConfigFiles;
 import org.diverproject.jragnarok.server.config.ConfigIpBan;
 import org.diverproject.jragnarok.server.config.ConfigLog;
 import org.diverproject.jragnarok.server.config.ConfigLogin;
+import org.diverproject.jragnarok.server.config.ConfigSQL;
 import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.services.LoginCharacterService;
 import org.diverproject.jragnarok.server.login.services.LoginClientService;
@@ -69,12 +70,6 @@ public class LoginServer extends Server implements ServerListener
 		return charServers;
 	}
 
-	@Override
-	protected LoginConfig setServerConfig()
-	{
-		return new LoginConfig();
-	}
-
 	public LoginLogService getLogService()
 	{
 		return logService;
@@ -109,6 +104,20 @@ public class LoginServer extends Server implements ServerListener
 
 	private void setDefaultConfigs()
 	{
+		ConfigFiles.getSystemConfig().setValue("config/System.conf");
+		ConfigFiles.getSqlConnectionConfig().setValue("config/SqlConnection.conf");
+		ConfigFiles.getLoginConfig().setValue("config/Login.conf");
+		ConfigFiles.getIpBanConfig().setValue("config/IpBan.conf");
+		ConfigFiles.getLogConfig().setValue("config/Log.conf");
+		ConfigFiles.getClientConfig().setValue("config/Client.conf");
+
+		ConfigSQL.getHost().setValue("localhost");
+		ConfigSQL.getUsername().setValue("jragnarok");
+		ConfigSQL.getPassword().setValue("jragnarok");
+		ConfigSQL.getDatabase().setValue("jragnarok");
+		ConfigSQL.getPort().setValue(3306);
+		ConfigSQL.getLegacyDatetime().setValue(false);
+
 		ConfigLogin.getIp().setValue(new InternetProtocol());
 		ConfigLogin.getPort().setValue(6900);
 		ConfigLogin.getUsername().setValue("server");
@@ -139,12 +148,7 @@ public class LoginServer extends Server implements ServerListener
 		ConfigClient.getHashNodes().setValue(null);
 		ConfigClient.getCharPerAccount().setValue(MAX_CHARS - MAX_CHAR_VIP - MAX_CHAR_BILLING);
 
-		ConfigFiles.getSystemConfig().setValue("config/System.conf");
-		ConfigFiles.getSqlConnectionConfig().setValue("config/SqlConnection.conf");
-		ConfigFiles.getLoginConfig().setValue("config/Login.conf");
-		ConfigFiles.getIpBanConfig().setValue("config/IpBan.conf");
-		ConfigFiles.getLogConfig().setValue("config/Log.conf");
-		ConfigFiles.getClientConfig().setValue("config/Client.conf");
+		setServerConfig(new LoginConfig());
 	}
 
 	private void readConfigFiles()

@@ -12,22 +12,22 @@ public class MapConfig extends ServerConfig
 	{
 		return new Config<?>[]
 		{
-			ConfigFiles.getSystemConfig(),
-			ConfigFiles.getSqlConnectionConfig(),
-			ConfigFiles.getLanConfig(),
-			ConfigFiles.getIpBanConfig(),
-			ConfigFiles.getLogConfig(),
-			ConfigFiles.getMessagesConfig(),
-			ConfigFiles.getLoginConfig(),
-			ConfigFiles.getClientConfig(),
-			ConfigFiles.getVipConfig(),
+			ConfigFiles.getSystemConfig().clone(),
+			ConfigFiles.getSqlConnectionConfig().clone(),
+			ConfigFiles.getLanConfig().clone(),
+			ConfigFiles.getIpBanConfig().clone(),
+			ConfigFiles.getLogConfig().clone(),
+			ConfigFiles.getMessagesConfig().clone(),
+			ConfigFiles.getLoginConfig().clone(),
+			ConfigFiles.getClientConfig().clone(),
+			ConfigFiles.getVipConfig().clone(),
 
-			ConfigSQL.getHost(),
-			ConfigSQL.getUsername(),
-			ConfigSQL.getPassword(),
-			ConfigSQL.getDatabase(),
-			ConfigSQL.getPort(),
-			ConfigSQL.getLegacyDatetime(),
+			ConfigSQL.getHost().clone(),
+			ConfigSQL.getUsername().clone(),
+			ConfigSQL.getPassword().clone(),
+			ConfigSQL.getDatabase().clone(),
+			ConfigSQL.getPort().clone(),
+			ConfigSQL.getLegacyDatetime().clone(),
 		};
 	}
 }

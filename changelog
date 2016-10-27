@@ -1,5 +1,14 @@
-25.10.2016 - 1.1.57
+27.10.2016 - 1.1.59
+- Configurações agora podem ser clonadas para facilitar o multiuso de uma configuração.
+	- Assim se pode ter vários servidores usando uma configuração com valores diversificados.
+- CharConfig, LoginConfig e MapConfig deverão usar clone para duplicar as configurações.
+- Implementação básica para leitura das configurações em CharServer e MapServer.
+
+25.10.2016 - 1.1.58
 - Redução na complexidade ciclomática de algumas operações.
+
+25.10.2016 - 1.1.57
+- Redução na complexidade ciclomática de JRagnarokUtil.dateToVersion com PACKET_VER[].
 
 25.10.2016 - 1.1.56
 - Reconhecimento e autenticação de uma conexão solicitada por um cliente (jogador).
