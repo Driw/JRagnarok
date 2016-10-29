@@ -1,3 +1,15 @@
+29.10.2016 - 1.1.63
+- Agora setInterval em Timer deve ser usado por TimerMap.addInterval.
+- Correções para TimerMap:
+	- acquireTimer deve ser um método de TimerMap.
+	- add deve adicionar o temporizador como TIMER_ONCE_AUTODEL.
+	- addInterval deve adicionar o temporizador como TIMER_INTERVAL.
+	- setTimerExpired não precisa adicionar o temporizador.
+	- delete deve remover o temporizador da lista de temporizadores.
+- Atualizando todas as classes que utilizam temporizadores conforme atualizações acima.
+- LoginCharacterService não era inicializado no LoginServer.
+- LoginClientService atualizado conforme rev62.
+
 29.10.2016 - 1.1.62
 - Por em quanto ConfigLoad não deverá mostrar que a configuração não existe.
 - Pacotes corrigidos, CharConnectRequest envia e CharConnectReceive recebe.

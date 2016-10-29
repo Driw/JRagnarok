@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.server.login.structures;
 
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
+import org.diverproject.util.ObjectDescription;
 
 public class ClientCharServer
 {
@@ -11,7 +12,7 @@ public class ClientCharServer
 	private short port;
 	private short users;
 	private CharServerType type;
-	private short newValue;
+	private short newDisplay;
 
 	public ClientCharServer(FileDescriptor fileDecriptor)
 	{
@@ -80,17 +81,25 @@ public class ClientCharServer
 
 	public short getNewValue()
 	{
-		return newValue;
+		return newDisplay;
 	}
 
-	public void setNewValue(short newValue)
+	public void setNewDisplay(short newDisplay)
 	{
-		this.newValue = newValue;
+		this.newDisplay = newDisplay;
 	}
 
 	@Override
 	public String toString()
 	{
-		return super.toString();
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("serverIP", ip);
+		description.append("serverPort", port);
+		description.append("serverName", name);
+		description.append("serverType", type);
+		description.append("newDisplay", newDisplay);
+
+		return description.toString();
 	}
 }

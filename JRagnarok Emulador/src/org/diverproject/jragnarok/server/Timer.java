@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok.server;
 
 import org.diverproject.util.BitWise;
+import org.diverproject.util.ObjectDescription;
 
 /**
  * <h1>Temporizador</h1>
@@ -140,7 +141,7 @@ public class Timer
 	 * @param interval valor em ticks que serão incrementados.
 	 */
 
-	public void setInterval(int interval)
+	void setInterval(int interval)
 	{
 		this.interval = interval;
 	}
@@ -179,5 +180,19 @@ public class Timer
 	public void setListener(TimerListener listener)
 	{
 		this.listener = listener;
+	}
+
+	@Override
+	public String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("id", id);
+		description.append("tick", tick);
+		description.append("interval", interval);
+		description.append("type", type.toStringProperties());
+		description.append("listener", listener);
+
+		return description.toString();
 	}
 }

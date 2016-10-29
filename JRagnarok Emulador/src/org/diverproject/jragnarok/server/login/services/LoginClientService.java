@@ -29,10 +29,10 @@ import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.RequestCharConnectPacket;
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.packets.AcknologeHash;
 import org.diverproject.jragnarok.packets.AlreadyOnline;
+import org.diverproject.jragnarok.packets.CharConnectReceive;
 import org.diverproject.jragnarok.packets.KeepAlivePacket;
 import org.diverproject.jragnarok.packets.ListCharServers;
 import org.diverproject.jragnarok.packets.LoginHan;
@@ -46,7 +46,7 @@ import org.diverproject.jragnarok.packets.NotifyAuth;
 import org.diverproject.jragnarok.packets.ReceivePacketIDPacket;
 import org.diverproject.jragnarok.packets.RefuseLoginBytePacket;
 import org.diverproject.jragnarok.packets.RefuseLoginIntPacket;
-import org.diverproject.jragnarok.packets.ReponseCharConnectPacket;
+import org.diverproject.jragnarok.packets.CharConnectResult;
 import org.diverproject.jragnarok.packets.UpdateClientHashPacket;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorAction;
@@ -54,6 +54,7 @@ import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.ServerState;
 import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.login.LoginCharServers;
 import org.diverproject.jragnarok.server.login.LoginServer;
@@ -621,7 +622,9 @@ public class LoginClientService extends LoginServerService
 		node.setClientType(sd.getClientType());
 
 		TimerSystem ts = TimerSystem.getInstance();
-		Timer waitingDisconnect = ts.acquireTimer();
+		TimerMap timers = ts.getTimers();
+
+		Timer waitingDisconnect = timers.acquireTimer();
 		waitingDisconnect.setTick(ts.getLastTick() + AUTH_TIMEOUT);
 		waitingDisconnect.setListener(this.login.waitingDisconnectTimer);
 
@@ -808,11 +811,11 @@ public class LoginClientService extends LoginServerService
 
 	private void requestCharConnect(FileDescriptor fd, LoginSessionData sd)
 	{
-		RequestCharConnectPacket rccPacket = new RequestCharConnectPacket();
-		rccPacket.receive(fd);
+		CharConnectReceive ccPacket = new CharConnectReceive();
+		ccPacket.receive(fd);
 
-		sd.setUsername(rccPacket.getUsername());
-		sd.setPassword(rccPacket.getPassword());
+		sd.setUsername(ccPacket.getUsername());
+		sd.setPassword(ccPacket.getPassword());
 
 		if (getConfigs().getBool("login.user_md5_password"))
 			sd.setPassword(md5Encrypt(sd.getPassword()));
@@ -820,11 +823,11 @@ public class LoginClientService extends LoginServerService
 		sd.getPassDencrypt().setValue(0);
 		sd.setVersion(getConfigs().getInt("login.version"));
 
-		String serverName = rccPacket.getServerName();
-		int serverIP = rccPacket.getServerIP();
-		short serverPort = rccPacket.getServerPort();
-		short type = rccPacket.getType();
-		short newValue = rccPacket.getNewValue();
+		String serverName = ccPacket.getServerName();
+		int serverIP = ccPacket.getServerIP();
+		short serverPort = ccPacket.getServerPort();
+		short type = ccPacket.getType();
+		short newDisplay = ccPacket.getNewDisplay();
 
 		logInfo("conexão solicitada do servidor de personagens %s@%s (account: %s, pass: %s, ip: %s)", serverName, serverIP, sd.getUsername(), sd.getPassword(), fd.getAddressString());
 
@@ -845,13 +848,13 @@ public class LoginClientService extends LoginServerService
 			server.setPort(serverPort);
 			server.setUsers((short) 0);
 			server.setType(CharServerType.parse(type));
-			server.setNewValue(newValue);
+			server.setNewDisplay(newDisplay);
 			getServer().getCharServers().add(server);
 
 			fd.setParseListener(character.parse);
 			fd.getFlag().set(FileDescriptor.FLAG_SERVER);
 
-			ReponseCharConnectPacket packet = new ReponseCharConnectPacket();
+			CharConnectResult packet = new CharConnectResult();
 			packet.setResult(AuthResult.OK);
 			packet.send(fd);
 		}
@@ -860,7 +863,7 @@ public class LoginClientService extends LoginServerService
 		{
 			logNotice("Conexão com o servidor de personagens '%s' RECUSADA.\n", serverName);
 
-			ReponseCharConnectPacket packet = new ReponseCharConnectPacket();
+			CharConnectResult packet = new CharConnectResult();
 			packet.setResult(AuthResult.REJECTED_FROM_SERVER);
 			packet.send(fd);
 		}

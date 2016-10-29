@@ -191,6 +191,7 @@ public class LoginServer extends Server implements ServerListener
 		ipBanService = new LoginIpBanService(this);
 		loginService = new LoginService(this);
 
+		charService.init();
 		clientService.init();
 
 		if (getConfigs().getBool("log.login"))
@@ -202,13 +203,12 @@ public class LoginServer extends Server implements ServerListener
 		setDefaultParser(clientService.parse);
 
 		TimerSystem ts = TimerSystem.getInstance();
-		Timer odcTimer = ts.acquireTimer();
-		odcTimer.setTick(ts.getLastTick() + minutes(10));
-		odcTimer.setInterval(minutes(10));
-		odcTimer.setListener(onlineDataCleanup);
-
 		TimerMap timers = ts.getTimers();
-		timers.update(odcTimer);
+
+		Timer odcTimer = timers.acquireTimer();
+		odcTimer.setTick(ts.getLastTick() + minutes(10));
+		odcTimer.setListener(onlineDataCleanup);
+		ts.getTimers().addInterval(odcTimer, minutes(10));
 	}
 
 	@Override

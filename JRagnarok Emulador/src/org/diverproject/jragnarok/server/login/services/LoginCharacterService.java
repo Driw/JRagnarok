@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.login.services;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
 import static org.diverproject.log.LogSystem.logInfo;
 
 import org.diverproject.jragnaork.RagnarokException;
@@ -77,37 +78,37 @@ public class LoginCharacterService extends LoginServerService
 		}
 	};
 
-//	keepAlive
-//	onDisconnect
+	// TODO keepAlive
+	// TODO onDisconnect
 
-//	serverDestroy
-//	serverInit
-//	serverReset
+	// TODO serverDestroy
+	// TODO serverInit
+	// TODO serverReset
 
-//	acknologeUserCount
-//	setAccountOffline
-//	setAccountOnline
-//	setAllOffline
+	// TODO acknologeUserCount
+	// TODO setAccountOffline
+	// TODO setAccountOnline
+	// TODO setAllOffline
 
-//	updateCharIP
-//	updateOnlineDatabase
-//	updatePincode
+	// TODO updateCharIP
+	// TODO updateOnlineDatabase
+	// TODO updatePincode
 
-//	authenticate
+	// TODO authenticate
 
-//	accountDataResquest
-//	accountDataSend
-//	accountInfo
-//	vipDataResquest
-//	vipDataSend
-//	banAccountRequest
-//	unbanAccountRequest
-//	updateAccountSate
-//	requestChangeEmail
-//	requestChangeSex
-//	pincodeAuthFail
-//	globalAccountRegResquest
-//	globalAccountRegUpdate
+	// TODO accountDataResquest
+	// TODO accountDataSend
+	// TODO accountInfo
+	// TODO vipDataResquest
+	// TODO vipDataSend
+	// TODO banAccountRequest
+	// TODO unbanAccountRequest
+	// TODO updateAccountSate
+	// TODO requestChangeEmail
+	// TODO requestChangeSex
+	// TODO pincodeAuthFail
+	// TODO globalAccountRegResquest
+	// TODO globalAccountRegUpdate
 
 	public void init()
 	{
@@ -118,11 +119,10 @@ public class LoginCharacterService extends LoginServerService
 			TimerSystem ts = TimerSystem.getInstance();
 			TimerMap timers = ts.getTimers();
 
-			Timer siaTimer = ts.acquireTimer();
+			Timer siaTimer = timers.acquireTimer();
 			siaTimer.setListener(syncronizeIpAddress);
-			siaTimer.setTick(ts.tick() + interval);
-			siaTimer.setInterval(interval);
-			timers.add(siaTimer);
+			siaTimer.setTick(ts.getLastTick() + minutes(interval));
+			ts.getTimers().addInterval(siaTimer, minutes(interval));
 		}
 	}
 

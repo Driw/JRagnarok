@@ -52,7 +52,21 @@ public class TimerMap implements Iterable<Timer>
 	}
 
 	/**
-	 * Procedimento que permite adicionar um novo temporizador para ser mapeado.
+	 * Cria um novo temporizador e o adiciona ao mapa de temporizadores.
+	 * O código de identificação dele é auto incremental no sistema.
+	 * @return aquisição do objeto temporizador para ser utilizado.
+	 */
+
+	public Timer acquireTimer()
+	{
+		Timer timer = new Timer();
+		timers.add(timer.getID(), timer);
+
+		return timer;
+	}
+
+	/**
+	 * Adiciona um novo temporizador de forma que seja executado uma só vez.
 	 * @param timer referência do temporizador que deverá ser mapeado.
 	 */
 
@@ -60,20 +74,46 @@ public class TimerMap implements Iterable<Timer>
 	{
 		if (timer != null)
 		{
-			timers.add(timer.getID(), timer);
-			indexes.add(timer.getTick(), timer);
+			if (!timers.containsKey(timer.getID()))
+				timers.add(timer.getID(), timer);
+
+			timer.setInterval(0);
+			timer.getType().set(Timer.TIMER_ONCE_AUTODEL);
+
+			update(timer);
 		}
 	}
 
 	/**
-	 * Atualiza um temporizador para que será excluído assim que expirado.
+	 * Adiciona o temporizador para ser executado em loops conforme o intervalo definido.
+	 * @param timer referência do temporizador que será atualizado.
+	 * @param interval intervalo para que o temporizador seja renovado.
+	 */
+
+	public void addInterval(Timer timer, int interval)
+	{
+		if (interval >= 0)
+		{
+			if (!timers.containsKey(timer.getID()))
+				timers.add(timer.getID(), timer);
+
+			timer.getType().set(Timer.TIMER_INTERVAL);
+			timer.setInterval(interval);
+
+			update(timer);
+		}
+
+		else
+			logError("intervalo inválido (timer: %d, listener: %s).\n", timer.getID(), timer.getListener().getName());
+	}
+
+	/**
+	 * Atualiza um temporizador para que seja excluído após ao fim do próximo segundo.
 	 * @param timer referência do temporizador que deseja alterar.
 	 */
 
 	public void setTimerExpired(Timer timer)
 	{
-		add(timer);
-
 		timer.setInterval(1000);
 		timer.getType().set(Timer.TIMER_ONCE_AUTODEL);
 
@@ -93,29 +133,6 @@ public class TimerMap implements Iterable<Timer>
 	}
 
 	/**
-	 * Atualiza um temporizador para auto reiniciar quando for expirado.
-	 * Assim sendo deverá ser removido manualmente do sistema.
-	 * @param timer referência do temporizador que será atualizado.
-	 * @param interval intervalo para que o temporizador seja renovado.
-	 */
-
-	public void addInterval(Timer timer, int interval)
-	{
-		if (interval >= 0)
-		{
-			add(timer);
-
-			timer.setInterval(interval);
-			timer.getType().set(Timer.TIMER_INTERVAL);
-
-			update(timer);
-		}
-
-		else
-			logError("intervalo inválido (timer: %d, listener: %s).\n", timer.getID(), timer.getListener().getName());
-	}
-
-	/**
 	 * Permite remover um determinado temporizador do sistema de temporizadores.
 	 * Será removido ainda o listener vinculado a essa temporizador se houver.
 	 * @param timer referência do temporizador que será removido do sistema.
@@ -125,6 +142,8 @@ public class TimerMap implements Iterable<Timer>
 	{
 		timer.setListener(null);
 		timer.getType().set(Timer.TIMER_ONCE_AUTODEL);
+
+		timers.removeKey(timer.getID());
 	}
 
 	/**

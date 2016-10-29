@@ -86,20 +86,6 @@ public class TimerSystem
 	}
 
 	/**
-	 * Cria um novo temporizador e o adiciona ao mapa de temporizadores.
-	 * O código de identificação dele é auto incremental no sistema.
-	 * @return aquisição do objeto temporizador para ser utilizado.
-	 */
-
-	public Timer acquireTimer()
-	{
-		Timer timer = new Timer();
-		timers.add(timer);
-
-		return timer;
-	}
-
-	/**
 	 * Aumenta o tempo de um temporizador em milissegundos especificados.
 	 * @param timer referência do temporizador que será atualizado.
 	 * @param milisseconds quantidade de tempo em milissegundos.
