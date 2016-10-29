@@ -821,7 +821,7 @@ public class LoginClientService extends LoginServerService
 			sd.setPassword(md5Encrypt(sd.getPassword()));
 
 		sd.getPassDencrypt().setValue(0);
-		sd.setVersion(getConfigs().getInt("login.version"));
+		sd.setVersion(getConfigs().getInt("client.version"));
 
 		String serverName = ccPacket.getServerName();
 		int serverIP = ccPacket.getServerIP();
@@ -829,15 +829,14 @@ public class LoginClientService extends LoginServerService
 		short type = ccPacket.getType();
 		short newDisplay = ccPacket.getNewDisplay();
 
-		logInfo("conexão solicitada do servidor de personagens %s@%s (account: %s, pass: %s, ip: %s)", serverName, serverIP, sd.getUsername(), sd.getPassword(), fd.getAddressString());
+		logInfo("conexão solicitada do servidor de personagens %s@%s (account: %s, pass: %s).\n", serverName, sd.getAddressString(), sd.getUsername(), sd.getPassword());
 
 		String message = format("charserver - %s@%s:%d", serverName, SocketUtil.socketIP(serverIP), serverPort);
 		log.addLoginLog(fd.getAddress(), sd, 100, message);
 
 		AuthResult result = login.authLogin(sd, true);
 
-		if (getServer().isState(ServerState.RUNNING) && result == AuthResult.OK &&
-			sd.getID() < getServer().getCharServers().size() && fd.isConnected())
+		if (getServer().isState(ServerState.RUNNING) && result == AuthResult.OK && fd.isConnected())
 		{
 			log("conexão do servidor de personagens '%s' aceita.\n", serverName);
 

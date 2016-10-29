@@ -440,4 +440,41 @@ public class JRagnarokUtil
 	{
 		return minutes(minutes) + seconds(seconds);
 	}
+
+	/**
+	 * Converte um valor inteiro passado em horas para milissegundos.
+	 * @param hours quantas horas que devem ser convertidos.
+	 * @return aquisição do tempo passado por parâmetro em milissegundos.
+	 */
+
+	public static int hours(int hours)
+	{
+		return hours * 3600000;
+	}
+
+	/**
+	 * Converte um valor inteiro passado em horas e minutos para milissegundos.
+	 * @param hours quantas horas que devem ser convertidos.
+	 * @param minutes quantos minutos que devem ser convertidos.
+	 * @param seconds quantos segundos que devem ser convertidos.
+	 * @return aquisição do tempo passado por parâmetro em milissegundos.
+	 */
+
+	public static int hours(int hours, int minutes)
+	{
+		return hours(hours) + minutes(minutes);
+	}
+
+	/**
+	 * Converte um valor inteiro passado em horas, minutos e segundos para milissegundos.
+	 * @param hours quantas horas que devem ser convertidos.
+	 * @param minutes quantos minutos que devem ser convertidos.
+	 * @param seconds quantos segundos que devem ser convertidos.
+	 * @return aquisição do tempo passado por parâmetro em milissegundos.
+	 */
+
+	public static int hours(int hours, int minutes, int seconds)
+	{
+		return hours(hours) + minutes(minutes) + seconds(seconds);
+	}
 }
