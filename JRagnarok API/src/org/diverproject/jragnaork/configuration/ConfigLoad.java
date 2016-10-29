@@ -97,7 +97,7 @@ public class ConfigLoad
 					Config<?> config = configurations.get(name);
 
 					if (config == null)
-						logWarning("configuração '%s' não encontrada.\n", name);
+						continue;//logWarning("configuração '%s' não encontrada.\n", name);
 
 					else if (!isConfigType(config, value))
 						logWarning("configuração '%s' não é %s.\n", name, config.getValue().getClass().getSimpleName());

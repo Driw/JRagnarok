@@ -1,3 +1,8 @@
+29.10.2016 - 1.1.62
+- Por em quanto ConfigLoad não deverá mostrar que a configuração não existe.
+- Pacotes corrigidos, CharConnectRequest envia e CharConnectReceive recebe.
+	- CharConnectResult deve enviar o resultado da solicitação do acesso.
+
 27.10.2016 - 1.1.61
 - Algumas documentações de classes corrigidas.
 - Removido o atributo data de Timer já que não está sendo usado no momento.

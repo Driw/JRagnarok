@@ -1,12 +1,11 @@
 package org.diverproject.jragnarok.packets;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_REQ_CHAR_CONNECT;
 
 import org.diverproject.util.ObjectDescription;
-import org.diverproject.util.stream.Input;
+import org.diverproject.util.stream.Output;
 
-public class RequestCharConnectPacket extends ReceivePacket
+public class CharConnectRequest extends ResponsePacket
 {
 	private String username;
 	private String password;
@@ -14,55 +13,55 @@ public class RequestCharConnectPacket extends ReceivePacket
 	private short serverPort;
 	private String serverName;
 	private short type;
-	private short newValue;
+	private short newDisplay;
 
 	@Override
-	protected void receiveInput(Input input)
+	protected void sendOutput(Output output)
 	{
-		username = strclr(input.getString(24));
-		password = strclr(input.getString(24));
-		input.skipe(4);
-		serverIP = input.getInt();
-		serverPort = input.getShort();
-		serverName = strclr(input.getString(20));
-		input.skipe(2);
-		type = input.getShort();
-		newValue = input.getShort();
+		output.putString(username, 24);
+		output.putString(password, 24);
+		output.skipe(4);
+		output.putInt(serverIP);
+		output.putShort(serverPort);
+		output.putString(serverName, 20);
+		output.skipe(2);
+		output.putShort(type);
+		output.putShort(newDisplay);
 	}
 
-	public String getUsername()
+	public void setUsername(String username)
 	{
-		return username;
+		this.username = username;
 	}
 
-	public String getPassword()
+	public void setPassword(String password)
 	{
-		return password;
+		this.password = password;
 	}
 
-	public int getServerIP()
+	public void setServerIP(int serverIP)
 	{
-		return serverIP;
+		this.serverIP = serverIP;
 	}
 
-	public short getServerPort()
+	public void setServerPort(short serverPort)
 	{
-		return serverPort;
+		this.serverPort = serverPort;
 	}
 
-	public String getServerName()
+	public void setServerName(String serverName)
 	{
-		return serverName;
+		this.serverName = serverName;
 	}
 
-	public short getType()
+	public void setType(short type)
 	{
-		return type;
+		this.type = type;
 	}
 
-	public short getNewValue()
+	public void setNewDisplay(short newValue)
 	{
-		return newValue;
+		this.newDisplay = newValue;
 	}
 
 	@Override
@@ -94,6 +93,6 @@ public class RequestCharConnectPacket extends ReceivePacket
 		description.append("serverPort", serverPort);
 		description.append("serverName", serverName);
 		description.append("serverType", type);
-		description.append("newValue", newValue);
+		description.append("newDisplay", newDisplay);
 	}
 }

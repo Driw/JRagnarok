@@ -6,7 +6,7 @@ import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
-public class ReponseCharConnectPacket extends ResponsePacket
+public class CharConnectResult extends ResponsePacket
 {
 	private AuthResult result;
 
