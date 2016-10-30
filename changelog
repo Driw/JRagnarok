@@ -1,3 +1,9 @@
+30.10.2016 - 1.2.70
+- Excluindo diversas configurações que não serão mais necessárias.
+- JRagnarokConfigs movido para jragnarok.configs.
+	- Agora ele deverá instanciar Configurations de todos os grupos de configurações.
+	- Adicionando constantes para o nome de todas as configurações existentes até o momento.
+
 30.10.2016 - 1.2.69
 - Atualizando Server para obter algumas informações de configs.
 - CharConfig, LoginConfig e MapConfig agora são Configurations.

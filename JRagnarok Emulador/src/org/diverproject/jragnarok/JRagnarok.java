@@ -1,25 +1,38 @@
 package org.diverproject.jragnarok;
 
-import static org.diverproject.jragnarok.JRagnarokConfigs.TYPES_CONFIGS;
-import static org.diverproject.jragnarok.JRagnarokConfigs.USE_CONSOLE;
-import static org.diverproject.jragnarok.JRagnarokConfigs.USE_LOG;
-import static org.diverproject.jragnarok.JRagnarokConfigs.CONFIG_TYPES;
-import static org.diverproject.jragnarok.JRagnarokConfigs.FILE_CONFIG_TYPES;
-import static org.diverproject.jragnarok.JRagnarokConfigs.FILE_SYSTEM;
-import static org.diverproject.jragnarok.JRagnarokConfigs.LOG_FILENAME;
-import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_FILES;
-import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_FOLDER;
-import static org.diverproject.jragnarok.JRagnarokConfigs.SYSTEM_CONFIGS;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.TYPES_CONFIGS;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newServerConfigs;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newSystemConfigs;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_USE_CONSOLE;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_USE_LOG;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.FILE_CONFIG_TYPES;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.FILE_SYSTEM;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_LOGINID;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_LOG_FILENAME;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FILES;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FOLDER;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_CONFIGS;
+import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.log.LogSystem.log;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logExeceptionSource;
+import static org.diverproject.log.LogSystem.logNotice;
+import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.MessageUtil.die;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Config;
 import org.diverproject.jragnaork.configuration.ConfigBoolean;
-import org.diverproject.jragnaork.configuration.ConfigLoad;
+import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.ConfigString;
 import org.diverproject.jragnaork.configuration.ConfigSystem;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.server.ServerControl;
 import org.diverproject.log.LogPreferences;
 import org.diverproject.log.LogSystem;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;
@@ -41,7 +54,7 @@ import org.diverproject.util.lang.StringUtil;
  *
  * @see StringSimpleMap
  * @see Configurations
- * @see ConfigLoad
+ * @see ConfigReader
  * @see Config
  * @see LogPreferences
  * @see LogSystem
@@ -76,6 +89,8 @@ public class JRagnarok
 		prepareLog();
 		prepareConsole();
 		loadSystemConfig();
+		prepareConfigTypes();
+		prepareServers();
 	}
 
 	/**
@@ -86,16 +101,8 @@ public class JRagnarok
 
 	private static void prepareSystemConfig()
 	{
-		Configurations system = new Configurations();
-		system.add(new ConfigString(CONFIG_TYPES, "ConfigTypes.conf"));
-		system.add(new ConfigString(SERVER_FILES));
-		system.add(new ConfigString(SERVER_FOLDER, "Servers"));
-		system.add(new ConfigBoolean(USE_CONSOLE, true));
-		system.add(new ConfigBoolean(USE_LOG, true));
-		system.add(new ConfigString(LOG_FILENAME, "log"));
-
 		ConfigSystem configs = ConfigSystem.getInstance();
-		configs.add(SYSTEM_CONFIGS, system);
+		configs.add(SYSTEM_CONFIGS, newSystemConfigs());
 		configs.add(TYPES_CONFIGS, new Configurations());
 	}
 
@@ -108,9 +115,9 @@ public class JRagnarok
 	{
 		ARGUMENTS.add("fs", FILE_SYSTEM);
 		ARGUMENTS.add("fct", FILE_CONFIG_TYPES);
-		ARGUMENTS.add("c", USE_CONSOLE);
-		ARGUMENTS.add("l", USE_LOG);
-		ARGUMENTS.add("lf", LOG_FILENAME);
+		ARGUMENTS.add("c", SYSTEM_USE_CONSOLE);
+		ARGUMENTS.add("l", SYSTEM_USE_LOG);
+		ARGUMENTS.add("lf", SYSTEM_LOG_FILENAME);
 
 		ARGUMENT_CONFIGS.add(new ConfigString("arg.fs"));
 		ARGUMENT_CONFIGS.add(new ConfigString("arg.fct"));
@@ -212,14 +219,127 @@ public class JRagnarok
 			ConfigSystem system = ConfigSystem.getInstance();
 			Configurations configurations = system.get(SYSTEM_CONFIGS);
 
-			ConfigLoad load = new ConfigLoad();
-			load.setConfigurations(configurations);
-			load.setFilePath(filePath);
-			load.read();
+			ConfigReader read = new ConfigReader();
+			read.setConfigurations(configurations);
+			read.setFilePath(filePath);
+			read.read();
 
 		} catch (RagnarokException e) {
 			logExeceptionSource(e);
 			die(e);
 		}
+	}
+
+	/**
+	 * Realiza a leitura do arquivo de configurações que listam os tipos de configurações.
+	 * Essa lista deverá conter apenas as configurações que não forem padrões da API.
+	 * Assim uma nova configuração poderá ser lida corretamente sem exceptions.
+	 */
+
+	private static void prepareConfigTypes()
+	{
+		String filePath = ARGUMENT_CONFIGS.getString("arg.fct");
+
+		try {
+
+			FileReader fr = new FileReader(filePath);
+			BufferedReader br = new BufferedReader(fr);
+
+			while (br.ready())
+			{
+				String className = br.readLine();
+
+				try {
+
+					Class<?> cls = Class.forName(className);
+
+					if (Config.add(cls))
+						log("classe de configuração '%s' vinculada.\n", cls.getSimpleName());
+					else
+						logWarning("classe de configuração '%s' já foi vinculada.\n", cls.getSimpleName());
+
+				} catch (ClassNotFoundException e) {
+					logError("configuração '%s' não encontrada.\n", className);
+					logExeception(e);
+				}
+			}
+
+			br.close();
+
+		} catch (IOException e) {
+			logExeceptionSource(e);
+			die(e);
+		}
+	}
+
+	/**
+	 * Prepara os servidores (micro servidores) para serem utilizados pelo sistema.
+	 * Deve considerar os arquivos de configurações definidos e configurá-los de tal modo.
+	 */
+
+	private static void prepareServers()
+	{
+		ConfigSystem system = ConfigSystem.getInstance();
+		Configurations configs = system.get(SYSTEM_CONFIGS);
+
+		String folder = configs.getString(SYSTEM_SERVER_FOLDER);
+		String files[] = configs.getString(SYSTEM_SERVER_FILES).split(",");
+
+		for (String file : files)
+		{
+			String filepath = format("config/%s%s", folder, file);
+			prepareServer(configs, filepath);
+		}
+	}
+
+	private static void prepareServer(Configurations systemConfigs, String filepath)
+	{
+		Configurations serverConfigs = newServerConfigs();
+		serverConfigs.add(systemConfigs);
+
+		ConfigReader read = new ConfigReader();
+		read.setConfigurations(serverConfigs);
+		read.setFilePath(filepath);
+
+		try {
+			logNotice("lido %d configurações de '%s'.\n", read.read(), filepath);
+		} catch (RagnarokException e) {
+			logError("falha ao ler configurações de '%s'.\n", filepath);
+			logExeception(e);
+		}
+
+		prepareMicroServers(serverConfigs);
+	}
+
+	private static void prepareMicroServers(Configurations configs)
+	{
+		ServerControl control = ServerControl.getInstance();
+
+		if (control.getLoginServer(configs.getInt(SERVER_LOGINID)) != null)
+			prepareLoginServer(configs);
+
+		if (control.getCharServer(configs.getInt(SERVER_LOGINID)) != null)
+			prepareCharServer(configs);
+
+		if (control.getMapServer(configs.getInt(SERVER_LOGINID)) != null)
+			prepareMapServer(configs);
+	}
+
+	private static void prepareLoginServer(Configurations configs)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void prepareCharServer(Configurations configs)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void prepareMapServer(Configurations configs)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

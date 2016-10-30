@@ -1,0 +1,201 @@
+package org.diverproject.jragnarok.configs;
+
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_BILLING;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_VIP;
+import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
+import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
+
+import org.diverproject.jragnaork.configuration.ConfigBoolean;
+import org.diverproject.jragnaork.configuration.ConfigInt;
+import org.diverproject.jragnaork.configuration.ConfigString;
+import org.diverproject.jragnaork.configuration.Configurations;
+
+public class JRagnarokConfigs
+{
+	public static final String FILE_SYSTEM = "conf/System.conf";
+	public static final String FILE_CONFIG_TYPES = "conf/ConfigTypes.conf";
+
+	public static final String TYPES_CONFIGS = "types";
+
+	public static final String SYSTEM_CONFIGS = "system";
+	public static final String SYSTEM_CONFIG_TYPES = SYSTEM_CONFIGS+ ".types";
+	public static final String SYSTEM_SERVER_FILES = SYSTEM_CONFIGS+ ".files";
+	public static final String SYSTEM_SERVER_FOLDER = SYSTEM_CONFIGS+ ".folder";
+	public static final String SYSTEM_USE_CONSOLE = SYSTEM_CONFIGS+ ".use_console";
+	public static final String SYSTEM_USE_LOG = SYSTEM_CONFIGS+ ".use_log";
+	public static final String SYSTEM_LOG_FILENAME = SYSTEM_CONFIGS+ ".log_filename";
+	public static final String SYSTEM_SERVER_DEFAULT_FILES = SYSTEM_CONFIGS+ ".default_files";
+	public static final String SYSTEM_SERVER_DEFAULT_FOLDER = SYSTEM_CONFIGS+ ".default_folder";
+
+	public static final String SERVER_CONFIGS = "server";
+	public static final String SERVER_NAME = SERVER_CONFIGS+ ".name";
+	public static final String SERVER_FOLDER = SERVER_CONFIGS+ ".folder";
+	public static final String SERVER_FILES = SERVER_CONFIGS+ ".files";
+	public static final String SERVER_LOGINID = SERVER_CONFIGS+ "login_server_id";
+	public static final String SERVER_CHARID = SERVER_CONFIGS+ "char_server_id";
+	public static final String SERVER_MAPID = SERVER_CONFIGS+ ".map_server_id";
+
+	public static final String FILES_CONFIGS = "file";
+	public static final String FILE_SQLCONNECTION = FILES_CONFIGS+ ".sql_connection";
+	public static final String FILE_CLIENT = FILES_CONFIGS+ ".client";
+	public static final String FILE_LAN = FILES_CONFIGS+ ".lan";
+	public static final String FILE_IPBAN = FILES_CONFIGS+ ".ipban";
+	public static final String FILE_LOG = FILES_CONFIGS+ ".lan";
+	public static final String FILE_VIP = FILES_CONFIGS+ ".vip";
+	public static final String FILE_LOGIN_SERVER = FILES_CONFIGS+ "login_server";
+	public static final String FILE_CHAR_SERVER = FILES_CONFIGS+ ".char_server";
+	public static final String FILE_MAP_SERVER = FILES_CONFIGS+ ".map_server";
+	public static final String FILE_MESSAGES = FILES_CONFIGS+ ".messages";
+
+	public static final String SQL_CONFIGS = "file";
+	public static final String SQL_HOST = SQL_CONFIGS+ ".host";
+	public static final String SQL_PORT = SQL_CONFIGS+ ".port";
+	public static final String SQL_DATABASE = SQL_CONFIGS+ ".database";
+	public static final String SQL_USERNAME = SQL_CONFIGS+ ".username";
+	public static final String SQL_PASSWORD = SQL_CONFIGS+ ".password";
+	public static final String SQL_LEGACY_DATETIME = SQL_CONFIGS+ ".legacydatetime";
+
+	public static final String LOGIN_CONFIGS = "login";
+	public static final String LOGIN_IP = LOGIN_CONFIGS+ ".ip";
+	public static final String LOGIN_PORT = LOGIN_CONFIGS+ ".port";
+	public static final String LOGIN_USERNAME = LOGIN_CONFIGS+ ".username";
+	public static final String LOGIN_PASSWORD = LOGIN_CONFIGS+ ".password";
+	public static final String LOGIN_IP_SYNC_INTERVAL = LOGIN_CONFIGS+ ".ip_sync_interval";
+	public static final String LOGIN_DATE_FORMAT = LOGIN_CONFIGS+ ".date_format";
+	public static final String LOGIN_USE_MD5_PASSWORD = LOGIN_CONFIGS+ ".use_md5_password";
+	public static final String LOGIN_GROUP_TO_CONNECT = LOGIN_CONFIGS+ ".group_to_connnect";
+	public static final String LOGIN_MIN_GROUP_TO_CONNECT = LOGIN_CONFIGS+ ".min_group_to_connect";
+	public static final String LOGIN_ALLOWED_REGS = LOGIN_CONFIGS+ ".allowed_regs";
+	public static final String LOGIN_TIME_ALLOWED = LOGIN_CONFIGS+ ".time_allowed";
+
+	public static final String LOG_CONFIGS = "log";
+	public static final String LOG_LOGIN = LOG_CONFIGS+ ".login";
+
+	public static final String IPBAN_CONFIGS = "ipban";
+	public static final String IPBAN_ENABLED = IPBAN_CONFIGS+ ".enabled";
+	public static final String IPBAN_CLEANUP_INTERVAL = IPBAN_CONFIGS+ ".cleanup_interval";
+	public static final String IPBAN_PASS_FAILURE = IPBAN_CONFIGS+ ".pass_failure";
+	public static final String IPBAN_PASS_FAILURE_INTERVAL = IPBAN_CONFIGS+ ".pass_failure_interval";
+	public static final String IPBAN_PASS_FAILURE_LIMIT = IPBAN_CONFIGS+ ".pass_failure_limit";
+	public static final String IPBAN_PASS_FAILURE_DURATION = IPBAN_CONFIGS+ ".pass_failure_duration";
+
+	public static final String CLIENT_CONFIGS = "client";
+	public static final String CLIENT_HASH_CHECK = CLIENT_CONFIGS+ ".hash_check";
+	public static final String CLIENT_HASH_NODES = CLIENT_CONFIGS+ ".hash_nodes";
+	public static final String CLIENT_CHAR_PER_ACCOUNT = CLIENT_CONFIGS+ ".char_per_account";
+	public static final String CLIENT_CHECK_VERSION = CLIENT_CONFIGS+ ".check_version";
+	public static final String CLIENT_VERSION = CLIENT_CONFIGS+ ".version";
+
+	public static final String SERVER_HOST = SERVER_CONFIGS+ ".host";
+	public static final String SERVER_PORT = SERVER_CONFIGS+ ".port";
+	public static final String SERVER_THREAD_PRIORITY = SERVER_CONFIGS+ ".thread_priority";
+
+	public static final Configurations newSystemConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigString(SYSTEM_CONFIG_TYPES, "ConfigTypes.conf"));
+		configurations.add(new ConfigString(SYSTEM_SERVER_FILES));
+		configurations.add(new ConfigString(SYSTEM_SERVER_FOLDER, "Servers"));
+		configurations.add(new ConfigString(SYSTEM_SERVER_DEFAULT_FILES, "IpBan.conf,Log.conf,Client.conf,LoginServer.conf,CharServer.conf,MapServer.conf"));
+		configurations.add(new ConfigString(SYSTEM_SERVER_DEFAULT_FOLDER, "Default"));
+		configurations.add(new ConfigBoolean(SYSTEM_USE_CONSOLE, true));
+		configurations.add(new ConfigBoolean(SYSTEM_USE_LOG, true));
+		configurations.add(new ConfigString(SYSTEM_LOG_FILENAME, "log"));
+
+		return configurations;
+	}
+
+	public static Configurations newServerConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigString(SERVER_NAME));
+		configurations.add(new ConfigString(SERVER_FOLDER));
+		configurations.add(new ConfigInt(SERVER_LOGINID));
+		configurations.add(new ConfigInt(SERVER_CHARID));
+		configurations.add(new ConfigInt(SERVER_MAPID));
+
+		return configurations;
+	}
+
+	public static Configurations newFileConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigString(FILE_SQLCONNECTION, "SqlConnection.conf"));
+		configurations.add(new ConfigString(FILE_CLIENT, "Client.conf"));
+		configurations.add(new ConfigString(FILE_LAN, "Lan.conf"));
+		configurations.add(new ConfigString(FILE_IPBAN, "IpBan.conf"));
+		configurations.add(new ConfigString(FILE_LOG, "Log.conf"));
+		configurations.add(new ConfigString(FILE_VIP, "Vip.conf"));
+		configurations.add(new ConfigString(FILE_LOGIN_SERVER, "LoginServer.conf"));
+		configurations.add(new ConfigString(FILE_CHAR_SERVER, "CharServer.conf"));
+		configurations.add(new ConfigString(FILE_MAP_SERVER, "MapServer.conf"));
+		configurations.add(new ConfigString(FILE_MESSAGES, "Messages.conf"));
+
+		return configurations;
+	}
+
+	public static Configurations newSqlConnectionConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigString(SQL_HOST, "localhost"));
+		configurations.add(new ConfigString(SQL_DATABASE, "jragnarok"));
+		configurations.add(new ConfigString(SQL_USERNAME, "jragnarok"));
+		configurations.add(new ConfigString(SQL_PASSWORD, "jragnarok"));
+		configurations.add(new ConfigInt(SQL_PORT, 3306));
+		configurations.add(new ConfigBoolean(SQL_LEGACY_DATETIME, false));
+
+		return configurations;
+	}
+
+	public static Configurations newLoginServerConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigString(LOGIN_IP, "localhost"));
+		configurations.add(new ConfigInt(LOGIN_PORT, 6900));
+		configurations.add(new ConfigString(LOGIN_USERNAME, "server"));
+		configurations.add(new ConfigString(LOGIN_PASSWORD, "passwd"));
+		configurations.add(new ConfigInt(LOGIN_IP_SYNC_INTERVAL, 10));
+		configurations.add(new ConfigString(LOGIN_DATE_FORMAT, "YY-mm-dd HH:MM:SS"));
+		configurations.add(new ConfigBoolean(LOGIN_USE_MD5_PASSWORD, false));
+		configurations.add(new ConfigInt(LOGIN_GROUP_TO_CONNECT, 0));
+		configurations.add(new ConfigInt(LOGIN_MIN_GROUP_TO_CONNECT, 0));
+		configurations.add(new ConfigInt(LOGIN_ALLOWED_REGS, 1));
+		configurations.add(new ConfigInt(LOGIN_TIME_ALLOWED, 10));
+
+		return configurations;
+	}
+
+	public static Configurations newLogConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigBoolean(LOG_LOGIN, true));
+
+		return configurations;
+	}
+
+	public static Configurations newIPBanConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigBoolean(IPBAN_ENABLED, true));
+		configurations.add(new ConfigInt(IPBAN_CLEANUP_INTERVAL, 60));
+		configurations.add(new ConfigBoolean(IPBAN_PASS_FAILURE, true));
+		configurations.add(new ConfigInt(IPBAN_PASS_FAILURE_INTERVAL, 5));
+		configurations.add(new ConfigInt(IPBAN_PASS_FAILURE_LIMIT, 7));
+		configurations.add(new ConfigInt(IPBAN_PASS_FAILURE_DURATION, 5));
+
+		return configurations;
+	}
+
+	public static Configurations newClientConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigInt(CLIENT_HASH_CHECK, 0));
+		configurations.add(new ConfigString(CLIENT_HASH_NODES, ""));
+		configurations.add(new ConfigInt(CLIENT_CHAR_PER_ACCOUNT, MAX_CHARS - MAX_CHAR_VIP - MAX_CHAR_BILLING));
+		configurations.add(new ConfigBoolean(CLIENT_CHECK_VERSION, false));
+		configurations.add(new ConfigInt(CLIENT_VERSION, dateToVersion(PACKETVER)));
+
+		return configurations;
+	}
+}
