@@ -1,3 +1,6 @@
+30.10.2016 - 1.2.72
+- Atualizando os arquivos de configurações e separando as configurações conforme esperado.
+
 30.10.2016 - 1.2.71
 - Configurations agora permite adicionar configurações de outro Configurations.
 - ConfigLoad renomeado para ConfigReader para fazer jus a sua finalidade.
