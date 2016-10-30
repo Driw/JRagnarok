@@ -1,5 +1,7 @@
 package org.diverproject.jragnaork.configuration;
 
+import org.diverproject.util.lang.IntUtil;
+
 public class ConfigInt extends Config<Integer>
 {
 	private int value;
@@ -34,8 +36,13 @@ public class ConfigInt extends Config<Integer>
 	@Override
 	public void setObject(Object object)
 	{
-		if (object != null && object instanceof Integer)
-			setValue((Integer) object);
+		if (object != null)
+		{
+			if (object instanceof Integer)
+				setValue((Integer) object);
+			else if (object instanceof Integer)
+				setValue(IntUtil.parse((String) object));
+		}
 	}
 
 	@Override

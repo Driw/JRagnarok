@@ -1,3 +1,12 @@
+29.10.2016 - 1.2.67
+- Configurações agora serão agrupadas por Configurations.
+- Config deverá especificar os tipos de configurações existentes (static).
+- JRagnarok deve considerar a leitura de argumentos passados na inicialização.
+	- Inicio do projeto para criação de micro servidores e independências.
+
+29.10.2016 - 1.1.66
+- Implementação do sistema para leitura de vários servidores.
+
 29.10.2016 - 1.1.65
 - Limpando strings que são recebidas de CharConnectReceive (strclr).
 

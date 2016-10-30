@@ -1,6 +1,14 @@
 package org.diverproject.jragnaork.configuration;
 
+import static org.diverproject.log.LogSystem.logWarning;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.collection.Map;
+import org.diverproject.util.collection.abstraction.StringSimpleMap;
 
 public abstract class Config<T>
 {
@@ -34,5 +42,67 @@ public abstract class Config<T>
 		description.append("value", getValue());
 
 		return description.toString();
+	}
+
+	private static final Map<String, Class<?>> TYPES = new StringSimpleMap<>();
+
+	static
+	{
+		add(ConfigString.class);
+		add(ConfigBoolean.class);
+		add(ConfigInt.class);
+	}
+
+	public static void add(Class<?> cls)
+	{
+		if (TYPES.add(cls.getSimpleName(), cls))
+			logWarning("'%s' já foi adicionada.\n", cls.getSimpleName());
+	}
+
+	public static Config<?> newConfig(String name, Object object)
+	{
+		if (name == null || object == null)
+			throw new IllegalArgumentException("valores nulos");
+
+		return newConfig(name, object.getClass());
+	}
+
+	public static Config<?> newConfig(String name, Class<?> cls)
+	{
+		Class<?> parent;
+
+		for (parent = cls; parent != Object.class; parent = cls, cls = cls.getSuperclass())
+		{
+			Class<?> configClass = TYPES.get(cls.getSimpleName());
+
+			if (configClass != null)
+			{
+				String classname = configClass.getSimpleName();
+
+				try {
+
+					Constructor<?> constructor = configClass.getDeclaredConstructor(String.class);
+					Object instance = constructor.newInstance(name);
+					Config<?> config = (Config<?>) instance;
+
+					return config;
+
+				} catch (NoSuchMethodException e) {
+					throw new RagnarokRuntimeException("'%s' não possui construtor adequado", classname);
+				} catch (SecurityException e) {
+					throw new RagnarokRuntimeException("'%s' construtor esperado não público", classname);
+				} catch (InstantiationException e) {
+					throw new RagnarokRuntimeException("'%s' não pôde ser instanciado", classname);
+				} catch (IllegalAccessException e) {
+					throw new RagnarokRuntimeException("'%s' não tem acesso ao construtor", classname);
+				} catch (IllegalArgumentException e) {
+					throw new RagnarokRuntimeException("'%s' não recebe uma string", classname);
+				} catch (InvocationTargetException e) {
+					throw new RagnarokRuntimeException("'%s' %s", classname, e.getMessage());
+				}
+			}
+		}
+
+		throw new RagnarokRuntimeException("configuração para '%s' não existe", cls.getSimpleName());
 	}
 }

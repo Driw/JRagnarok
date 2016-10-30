@@ -34,8 +34,13 @@ public class ConfigBoolean extends Config<Boolean>
 	@Override
 	public void setObject(Object object)
 	{
-		if (object != null && object instanceof Boolean)
-			setValue((Boolean) object);
+		if (object != null)
+		{
+			if (object instanceof Boolean)
+				setValue((Boolean) object);
+			else
+				setValue(Boolean.parseBoolean((String) object));
+		}
 	}
 
 	@Override

@@ -10,24 +10,17 @@ import java.io.IOException;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.util.ObjectDescription;
-import org.diverproject.util.collection.Map;
-import org.diverproject.util.collection.abstraction.StringSimpleMap;
 import org.diverproject.util.lang.BooleanUtil;
 import org.diverproject.util.lang.IntUtil;
 
 public class ConfigLoad
 {
 	private String filePath;
-	private Map<String, Config<?>> configurations;
+	private Configurations configurations;
 
 	public ConfigLoad()
 	{
-		configurations = new StringSimpleMap<>();
-	}
-
-	public String getFilePath()
-	{
-		return filePath;
+		clearRead();
 	}
 
 	public void setFilePath(String filePath)
@@ -35,19 +28,19 @@ public class ConfigLoad
 		this.filePath = filePath;
 	}
 
-	public Map<String, Config<?>> getConfigurations()
+	public Configurations getConfigurations()
 	{
 		return configurations;
 	}
 
-	public void setConfigurations(Map<String, Config<?>> configurations)
+	public void setConfigurations(Configurations configurations)
 	{
 		this.configurations = configurations;
 	}
 
 	public void clearRead()
 	{
-		configurations = new StringSimpleMap<>();
+		configurations = new Configurations();
 		filePath = null;
 	}
 
