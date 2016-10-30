@@ -1,12 +1,12 @@
 package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FILES;
-import static org.diverproject.jragnarok.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FOLDER;
-import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_FILES;
-import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_FOLDER;
-import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_HOST;
-import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_PORT;
-import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_THREAD_PRIORITY;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FILES;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FOLDER;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FILES;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FOLDER;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_HOST;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_PORT;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_THREAD_PRIORITY;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
@@ -30,7 +30,7 @@ import java.net.UnknownHostException;
 import java.sql.SQLException;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.ConfigRead;
+import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.util.lang.IntUtil;
 import org.diverproject.util.lang.ShortUtil;
@@ -439,7 +439,7 @@ public abstract class Server
 
 	private void readConfigFile(String filePath)
 	{
-		ConfigRead load = new ConfigRead();
+		ConfigReader load = new ConfigReader();
 		load.setConfigurations(configs);
 		load.setFilePath(filePath);
 

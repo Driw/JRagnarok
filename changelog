@@ -1,3 +1,10 @@
+30.10.2016 - 1.2.71
+- Configurations agora permite adicionar configurações de outro Configurations.
+- ConfigLoad renomeado para ConfigReader para fazer jus a sua finalidade.
+- Removendo toda estrutura que tornava CharServer, LoginServer e MapServer Singleton.
+	- ServerListener agora fica implementado como atributo para evitar acesso por fora.
+- LoginServer atualizado para a utilização de JRagnarokConfigs.
+
 30.10.2016 - 1.2.70
 - Excluindo diversas configurações que não serão mais necessárias.
 - JRagnarokConfigs movido para jragnarok.configs.

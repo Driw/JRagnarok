@@ -3,8 +3,10 @@ package org.diverproject.jragnaork.configuration;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.Map.MapItem;
+import org.diverproject.util.collection.abstraction.DynamicList;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;
 import org.diverproject.util.lang.StringUtil;
 
@@ -142,6 +144,24 @@ public class Configurations
 	}
 
 	/**
+	 * Permite obter todas as configurações existentes em um determinado grupo.
+	 * @param groupname nome do grupo de configurações desejados do conjunto.
+	 * @return aquisição de uma lista contendo todas as configurações do grupo.
+	 */
+
+	public List<Config<?>> getGroup(String groupname)
+	{
+		Map<String, Config<?>> map = configs.get(groupname);
+		List<Config<?>> configs = new DynamicList<>();
+
+		if (map != null)
+			for (Config<?> config : map)
+				configs.add(config);
+
+		return configs;
+	}
+
+	/**
 	 * Permite definir um valor em objeto para um determinada configuração.
 	 * @param name nome para localização da configuração a ser atualizada.
 	 * @param value referência do objeto contendo o novo valor da configuração.
@@ -154,6 +174,19 @@ public class Configurations
 		Config<?> config = get(name);
 
 		return set(config, value);
+	}
+
+	/**
+	 * Adiciona todas as configurações que estiverem alocadas em um conjunto de configurações.
+	 * Qualquer mudança que for feita nos valores das configurações de um será feito na outra.
+	 * @param configurations referência do conjunto de configurações a ser considerado.
+	 */
+
+	public void add(Configurations configurations)
+	{
+		for (StringSimpleMap<Config<?>> map : configurations.configs)
+			for (Config<?> config : map)
+				add(config);
 	}
 
 	/**

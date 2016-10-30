@@ -26,7 +26,7 @@ import org.diverproject.util.collection.Queue;
  * @author Andrew Mello
  */
 
-public class ConfigRead
+public class ConfigReader
 {
 	/**
 	 * Caminho referente ao arquivo que será lido.
@@ -47,7 +47,7 @@ public class ConfigRead
 	 * Cria um novo leitor de configurações inicializando o conjunto de configurações.
 	 */
 
-	public ConfigRead()
+	public ConfigReader()
 	{
 		clearRead();
 	}
