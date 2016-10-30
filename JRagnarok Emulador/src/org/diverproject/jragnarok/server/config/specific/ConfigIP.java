@@ -16,19 +16,20 @@ public class ConfigIP extends ConfigObject<InternetProtocol>
 	public void setObject(Object object)
 	{
 		if (object instanceof String)
-			setRawValue((String) object);
-		else
-			super.setObject(object);
+			setRaw((String) object);
 	}
 
-	private void setRawValue(String string)
+	@Override
+	public boolean setRaw(String rawValue)
 	{
-		if (StringUtil.countOf(string, '.') != 3)
-			throw new IllegalArgumentException();
+		if (StringUtil.countOf(rawValue, '.') != 3)
+			return false;
 
-		int ipAddress = SocketUtil.socketIPInt(string);
+		int ipAddress = SocketUtil.socketIPInt(rawValue);
 
 		getValue().set(ipAddress);
+
+		return true;
 	}
 
 	@Override

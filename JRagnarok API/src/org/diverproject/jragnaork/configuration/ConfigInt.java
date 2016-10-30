@@ -1,5 +1,6 @@
 package org.diverproject.jragnaork.configuration;
 
+import org.diverproject.util.UtilException;
 import org.diverproject.util.lang.IntUtil;
 
 public class ConfigInt extends Config<Integer>
@@ -41,8 +42,20 @@ public class ConfigInt extends Config<Integer>
 			if (object instanceof Integer)
 				setValue((Integer) object);
 			else if (object instanceof Integer)
-				setValue(IntUtil.parse((String) object));
+				setRaw((String) object);
 		}
+	}
+
+	@Override
+	public boolean setRaw(String rawValue)
+	{
+		try {
+			setValue(IntUtil.parseString(rawValue));
+		} catch (UtilException e) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override

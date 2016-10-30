@@ -31,7 +31,15 @@ public class ConfigString extends Config<String>
 	public void setObject(Object object)
 	{
 		if (object != null && object instanceof String)
-			setValue((String) object);
+			setRaw((String) object);
+	}
+
+	@Override
+	public boolean setRaw(String rawValue)
+	{
+		this.value = rawValue;
+
+		return true;
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package org.diverproject.jragnaork.configuration;
 
-import static org.diverproject.log.LogSystem.logWarning;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -30,6 +28,8 @@ public abstract class Config<T>
 
 	public abstract void setObject(Object object);
 
+	public abstract boolean setRaw(String rawValue);
+
 	@Override
 	protected abstract Object clone();
 
@@ -53,10 +53,9 @@ public abstract class Config<T>
 		add(ConfigInt.class);
 	}
 
-	public static void add(Class<?> cls)
+	public static boolean add(Class<?> cls)
 	{
-		if (TYPES.add(cls.getSimpleName(), cls))
-			logWarning("'%s' já foi adicionada.\n", cls.getSimpleName());
+		return TYPES.add(cls.getSimpleName(), cls);
 	}
 
 	public static Config<?> newConfig(String name, Object object)

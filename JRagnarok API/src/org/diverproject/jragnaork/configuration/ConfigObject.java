@@ -1,8 +1,6 @@
 package org.diverproject.jragnaork.configuration;
 
-import static org.diverproject.log.LogSystem.logExeception;
-
-public class ConfigObject<T> extends Config<T>
+public abstract class ConfigObject<T> extends Config<T>
 {
 	private T value;
 
@@ -30,23 +28,6 @@ public class ConfigObject<T> extends Config<T>
 		this.value = value;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void setObject(Object object)
-	{
-		try {	
-			this.value = (T) object;
-		} catch (Exception e) {
-			logExeception(e);
-		}
-	}
-
-	@Override
-	public ConfigObject<T> clone()
-	{
-		ConfigObject<T> config = new ConfigObject<T>(getName());
-		config.setValue(getValue());
-
-		return config;
-	}
+	public abstract ConfigObject<T> clone();
 }

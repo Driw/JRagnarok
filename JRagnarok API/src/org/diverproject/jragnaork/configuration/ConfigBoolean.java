@@ -1,5 +1,7 @@
 package org.diverproject.jragnaork.configuration;
 
+import org.diverproject.util.lang.BooleanUtil;
+
 public class ConfigBoolean extends Config<Boolean>
 {
 	private boolean value;
@@ -39,8 +41,27 @@ public class ConfigBoolean extends Config<Boolean>
 			if (object instanceof Boolean)
 				setValue((Boolean) object);
 			else
-				setValue(Boolean.parseBoolean((String) object));
+				setRaw((String) object);
 		}
+	}
+
+	@Override
+	public boolean setRaw(String rawValue)
+	{
+		int result = BooleanUtil.parseString(rawValue);
+
+		switch (result)
+		{
+			case BooleanUtil.BOOLEAN_TRUE:
+				setValue(true);
+				break;
+
+			case BooleanUtil.BOOLEAN_FALSE:
+				setValue(false);
+				break;
+		}
+
+		return result != BooleanUtil.BOOLEAN_ERROR;
 	}
 
 	@Override

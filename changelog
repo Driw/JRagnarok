@@ -1,3 +1,8 @@
+30.10.2016 - 1.2.68
+- Config agora possui setRaw para atribuir um valor por string.
+	- Cada classe deve implementar como será atribuído.
+- ConfigLoad renomeado para ConfigRead e algumas pequenas melhorias.
+
 29.10.2016 - 1.2.67
 - Configurações agora serão agrupadas por Configurations.
 - Config deverá especificar os tipos de configurações existentes (static).
