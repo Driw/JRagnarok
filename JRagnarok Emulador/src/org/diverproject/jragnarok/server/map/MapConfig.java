@@ -1,11 +1,11 @@
 package org.diverproject.jragnarok.server.map;
 
 import org.diverproject.jragnaork.configuration.Config;
-import org.diverproject.jragnarok.server.ServerConfig;
+import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.jragnarok.server.config.ConfigFiles;
 import org.diverproject.jragnarok.server.config.ConfigSQL;
 
-public class MapConfig extends ServerConfig
+public class MapConfig extends Configurations
 {
 	@Override
 	protected Config<?>[] getInitialConfigs()

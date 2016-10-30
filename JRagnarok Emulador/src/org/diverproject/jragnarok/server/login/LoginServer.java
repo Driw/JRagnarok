@@ -7,10 +7,9 @@ import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
-import static org.diverproject.util.MessageUtil.die;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.ConfigLoad;
+import org.diverproject.jragnaork.configuration.ConfigRead;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorAction;
 import org.diverproject.jragnarok.server.InternetProtocol;
@@ -37,27 +36,12 @@ import org.diverproject.util.SocketUtil;
 
 public class LoginServer extends Server implements ServerListener
 {
-	private static final LoginServer INSTANCE;
-
 	private LoginCharServers charServers;
 	private LoginLogService logService;
 	private LoginClientService clientService;
 	private LoginCharacterService charService;
 	private LoginIpBanService ipBanService;
 	private LoginService loginService;
-
-	static
-	{
-		LoginServer instance = null;
-
-		try {
-			instance = new LoginServer();
-		} catch (RagnarokException e) {
-			die(e);
-		}
-
-		INSTANCE = instance;
-	}
 
 	public LoginServer() throws RagnarokException
 	{
@@ -153,8 +137,8 @@ public class LoginServer extends Server implements ServerListener
 
 	private void readConfigFiles()
 	{
-		ConfigLoad load = new ConfigLoad();
-		load.setConfigurations(getConfigs().getMap());
+		ConfigRead load = new ConfigRead();
+		load.setConfigurations(getConfigs());
 
 		String fileKeys[] = new String[]
 		{
@@ -222,7 +206,7 @@ public class LoginServer extends Server implements ServerListener
 
 		// TODO confirmar usuário e senha
 
-		logService.addLoginLog(SocketUtil.socketIPInt(getAddress()), login, 100, "login server started");
+		logService.addLoginLog(SocketUtil.socketIPInt(getHost()), login, 100, "login server started");
 	}
 
 	@Override
@@ -248,30 +232,6 @@ public class LoginServer extends Server implements ServerListener
 	{
 		charService.shutdown();
 		FileDescriptor.execute(onDestroyed);
-	}
-
-	@Override
-	protected String getThreadName()
-	{
-		return "Servidor de Acesso";
-	}
-
-	@Override
-	protected int getThreadPriority()
-	{
-		return Thread.MIN_PRIORITY;
-	}
-
-	@Override
-	protected String getAddress()
-	{
-		return ((InternetProtocol) getConfigs().getObject("login.ip")).getString();
-	}
-
-	@Override
-	protected int getPort()
-	{
-		return getConfigs().getInt("login.port");
 	}
 
 	private final TimerListener onlineDataCleanup = new TimerListener()
@@ -319,9 +279,4 @@ public class LoginServer extends Server implements ServerListener
 			return description.toString();
 		}
 	};
-
-	public static LoginServer getInstance()
-	{
-		return INSTANCE;
-	}
 }

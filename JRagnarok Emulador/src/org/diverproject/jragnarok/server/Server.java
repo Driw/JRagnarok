@@ -1,11 +1,22 @@
 package org.diverproject.jragnarok.server;
 
+import static org.diverproject.jragnarok.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FILES;
+import static org.diverproject.jragnarok.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FOLDER;
+import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_FILES;
+import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_FOLDER;
+import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_HOST;
+import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_PORT;
+import static org.diverproject.jragnarok.JRagnarokConfigs.SERVER_THREAD_PRIORITY;
+import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
+import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.sleep;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
 import static org.diverproject.jragnarok.server.ServerState.DESTROYED;
 import static org.diverproject.jragnarok.server.ServerState.NONE;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.ServerState.STOPED;
+import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
@@ -19,8 +30,10 @@ import java.net.UnknownHostException;
 import java.sql.SQLException;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.ConfigLoad;
+import org.diverproject.jragnaork.configuration.ConfigRead;
+import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.util.lang.IntUtil;
+import org.diverproject.util.lang.ShortUtil;
 import org.diverproject.util.sql.MySQL;
 
 /**
@@ -56,6 +69,11 @@ public abstract class Server
 
 
 	/**
+	 * Código de identificação do servidor de acesso.
+	 */
+	private int id;
+
+	/**
 	 * Thread que será usada para receber as conexões sockets.
 	 */
 	private Thread thread;
@@ -78,7 +96,7 @@ public abstract class Server
 	/**
 	 * Configurações do servidor.
 	 */
-	private ServerConfig configs;
+	private Configurations configs;
 
 	/**
 	 * Listener para despachar os Arquivos Descritores.
@@ -103,28 +121,70 @@ public abstract class Server
 	}
 
 	/**
+	 * O código de identificação é individual para cada tipo de servidor.
+	 * @return aquisição do código de identificação do servidor.
+	 */
+
+	public final int getID()
+	{
+		return id;
+	}
+
+	/**
+	 * O código de identificação é individual para cada tipo de servidor.
+	 * Acesso por pacote e utilizado por ServerControl quando listado.
+	 * @param id código de identificação do servidor.
+	 * @see ServerControl
+	 */
+
+	final void setID(int id)
+	{
+		this.id = id;
+	}
+
+	/**
 	 * @return aquisição do nome que será dado a thread do servidor.
 	 */
 
-	protected abstract String getThreadName();
+	protected final String getThreadName()
+	{
+		return format("%s#%d@%s:%d", nameOf(this), id, getHost(), getPort());
+	}
 
 	/**
 	 * @return aquisição do nível de prioridade da thread (MIN_PRIORITY ou MAX_PRIORITY).
 	 */
 
-	protected abstract int getThreadPriority();
+	public int getThreadPriority()
+	{
+		int value = configs.getInt(SERVER_THREAD_PRIORITY);
+
+		return IntUtil.limit(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+	}
 
 	/**
+	 * Nome do host permite definir a interface para recebimento das conexões.
 	 * @return aquisição do host para realizar a conexão socket (ip ou domínio).
 	 */
 
-	protected abstract String getAddress();
+	public String getHost()
+	{
+		String value = configs.getString(SERVER_HOST);
+
+		return value == null || value.isEmpty() ? "localhost" : value;
+	}
 
 	/**
+	 * Através da porta é possível saber por onde as conexões são recebidas na máquina.
 	 * @return aquisição da porta em que o servidor irá receber as conexões.
 	 */
 
-	protected abstract int getPort();
+	public short getPort()
+	{
+		short port = s(configs.getInt(SERVER_PORT));
+
+		return ShortUtil.min(port, s(1001));
+	}
 
 	/**
 	 * O estado do servidor pode ser útil para realizar determinadas operações.
@@ -164,7 +224,7 @@ public abstract class Server
 	 * @param configs referência do objeto contendo as configurações do servidor.
 	 */
 
-	protected void setServerConfig(ServerConfig configs)
+	protected void setServerConfig(Configurations configs)
 	{
 		if (this.configs == null && configs != null)
 			this.configs = configs;
@@ -175,7 +235,7 @@ public abstract class Server
 	 * @return aquisição do objeto com as configurações do servidor.
 	 */
 
-	public ServerConfig getConfigs()
+	public Configurations getConfigs()
 	{
 		return configs;
 	}
@@ -351,10 +411,46 @@ public abstract class Server
 
 	protected void initConfigs() throws RagnarokException
 	{
-		ConfigLoad load = new ConfigLoad();
-		load.setConfigurations(configs.getMap());
-		load.setFilePath("config/SqlConnection.conf");
-		load.read();
+		String filenames[] = configs.getString(SERVER_FILES).split(",");
+
+		for (String filename : filenames)
+		{
+			String folder = configs.getString(SERVER_FOLDER);
+			String filePath = format("config/Servers/%s%s", folder, filename.trim());
+
+			readConfigFile(filePath);
+		}
+
+		filenames = configs.getString(SYSTEM_SERVER_DEFAULT_FILES).split(",");
+
+		for (String filename : filenames)
+		{
+			String folder = configs.getString(SYSTEM_SERVER_DEFAULT_FOLDER);
+			String filePath = format("config/Servers/%s%s", folder, filename.trim());
+
+			readConfigFile(filePath);
+		}
+	}
+
+	/**
+	 * Efetua a leitura de um arquivo de configurações atualizando as configurações do servidor.
+	 * @param filePath caminho completo ou parcial do arquivo de configurações.
+	 */
+
+	private void readConfigFile(String filePath)
+	{
+		ConfigRead load = new ConfigRead();
+		load.setConfigurations(configs);
+		load.setFilePath(filePath);
+
+		try {
+
+			logNotice("lido %d configurações de '%s'.\n", load.read(), filePath);
+
+		} catch (RagnarokException e) {
+			logError("falha ao ler '%s'.\n", filePath);
+			logExeception(e);
+		}
 	}
 
 	/**
@@ -473,7 +569,7 @@ public abstract class Server
 			if (!IntUtil.interval(port, MIN_PORT, MAX_PORT))
 				throw new RagnarokException("porta %d inválida");
 
-			InetAddress address = InetAddress.getByName(getAddress());
+			InetAddress address = InetAddress.getByName(getHost());
 			serverSocket = new ServerSocket(port, SOCKET_BACKLOG, address);
 
 			logNotice("conexão estabelecida com êxito (porta: %d).\n", port);

@@ -4,7 +4,7 @@ import org.diverproject.util.ObjectDescription;
 
 public class ClientHash
 {
-	private static final int SIZE = 16;
+	public static final int SIZE = 16;
 
 	private final byte hash[];
 	private String hashString;

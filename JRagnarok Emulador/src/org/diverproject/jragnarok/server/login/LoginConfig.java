@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server.login;
 
 import org.diverproject.jragnaork.configuration.Config;
-import org.diverproject.jragnarok.server.ServerConfig;
+import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.jragnarok.server.config.ConfigClient;
 import org.diverproject.jragnarok.server.config.ConfigFiles;
 import org.diverproject.jragnarok.server.config.ConfigIpBan;
@@ -9,7 +9,7 @@ import org.diverproject.jragnarok.server.config.ConfigLog;
 import org.diverproject.jragnarok.server.config.ConfigLogin;
 import org.diverproject.jragnarok.server.config.ConfigSQL;
 
-public class LoginConfig extends ServerConfig
+public class LoginConfig extends Configurations
 {
 	@Override
 	protected Config<?>[] getInitialConfigs()

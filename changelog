@@ -1,3 +1,9 @@
+30.10.2016 - 1.2.69
+- Atualizando Server para obter algumas informações de configs.
+- CharConfig, LoginConfig e MapConfig agora são Configurations.
+- CharServer, LoginServer e MapServer não usa mais o Singleton.
+	- Será permitido criar diversos micro servidores (Server).
+
 30.10.2016 - 1.2.68
 - Config agora possui setRaw para atribuir um valor por string.
 	- Cada classe deve implementar como será atribuído.

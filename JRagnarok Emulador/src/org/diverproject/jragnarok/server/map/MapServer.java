@@ -6,7 +6,7 @@ import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.util.MessageUtil.die;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.ConfigLoad;
+import org.diverproject.jragnaork.configuration.ConfigRead;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.config.ConfigFiles;
@@ -65,8 +65,8 @@ public class MapServer extends Server implements ServerListener
 
 	private void readConfigFiles()
 	{
-		ConfigLoad load = new ConfigLoad();
-		load.setConfigurations(getConfigs().getMap());
+		ConfigRead load = new ConfigRead();
+		load.setConfigurations(getConfigs());
 
 		String fileKeys[] = new String[]
 		{
@@ -144,7 +144,7 @@ public class MapServer extends Server implements ServerListener
 	}
 
 	@Override
-	protected String getAddress()
+	protected String getHost()
 	{
 		return HOST;
 	}

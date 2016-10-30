@@ -6,17 +6,17 @@ import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.util.MessageUtil.die;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.ConfigLoad;
+import org.diverproject.jragnaork.configuration.ConfigRead;
+import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
+import org.diverproject.jragnarok.server.config.ConfigChar;
 import org.diverproject.jragnarok.server.config.ConfigFiles;
+import org.diverproject.jragnarok.server.config.ConfigLogin;
 import org.diverproject.jragnarok.server.config.ConfigSQL;
 
 public class CharServer extends Server implements ServerListener
 {
-	private static final String HOST = "localhost";
-	private static final int PORT = 6121;
-
 	private static final CharServer INSTANCE;
 
 	static
@@ -49,9 +49,7 @@ public class CharServer extends Server implements ServerListener
 		ConfigFiles.getSystemConfig().setValue("config/System.conf");
 		ConfigFiles.getSqlConnectionConfig().setValue("config/SqlConnection.conf");
 		ConfigFiles.getLoginConfig().setValue("config/Login.conf");
-		ConfigFiles.getIpBanConfig().setValue("config/IpBan.conf");
-		ConfigFiles.getLogConfig().setValue("config/Log.conf");
-		ConfigFiles.getClientConfig().setValue("config/Client.conf");
+		ConfigFiles.getCharConfig().setValue("config/Character.conf");
 
 		ConfigSQL.getHost().setValue("localhost");
 		ConfigSQL.getUsername().setValue("jragnarok");
@@ -60,18 +58,31 @@ public class CharServer extends Server implements ServerListener
 		ConfigSQL.getPort().setValue(3306);
 		ConfigSQL.getLegacyDatetime().setValue(false);
 
+		ConfigLogin.getIp().setValue(new InternetProtocol());
+		ConfigLogin.getPort().setValue(6900);
+
+		ConfigChar.getIp().setValue(new InternetProtocol());
+		ConfigChar.getPort().setValue(6121);
+		ConfigChar.getName().setValue("JRagnarok");
+		ConfigChar.getUsername().setValue("jragnarok");
+		ConfigChar.getPassword().setValue("jragnarok");
+		ConfigChar.getMaintance().setValue(0);
+		ConfigChar.getNewDisplay().setValue(0);
+
 		setServerConfig(new CharConfig());
 	}
 
 	private void readConfigFiles()
 	{
-		ConfigLoad load = new ConfigLoad();
-		load.setConfigurations(getConfigs().getMap());
+		ConfigRead load = new ConfigRead();
+		load.setConfigurations(getConfigs());
 
 		String fileKeys[] = new String[]
 		{
 			ConfigFiles.getSystemConfig().getName(),
 			ConfigFiles.getSqlConnectionConfig().getName(),
+			ConfigFiles.getLoginConfig().getName(),
+			ConfigFiles.getCharConfig().getName(),
 		};
 
 		for (String fileKey : fileKeys)
@@ -129,30 +140,6 @@ public class CharServer extends Server implements ServerListener
 	{
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	protected String getThreadName()
-	{
-		return "Servidor de Personagens";
-	}
-
-	@Override
-	protected int getThreadPriority()
-	{
-		return Thread.MIN_PRIORITY;
-	}
-
-	@Override
-	protected String getAddress()
-	{
-		return HOST;
-	}
-
-	@Override
-	protected int getPort()
-	{
-		return PORT;
 	}
 
 	public static CharServer getInstance()
