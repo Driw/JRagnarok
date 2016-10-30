@@ -278,7 +278,7 @@ public class LoginServer extends Server
 
 			setDefaultParser(clientService.parse);
 
-			TimerSystem ts = TimerSystem.getInstance();
+			TimerSystem ts = getTimerSystem();
 			TimerMap timers = ts.getTimers();
 
 			Timer odcTimer = timers.acquireTimer();
@@ -326,7 +326,7 @@ public class LoginServer extends Server
 		public void onDestroyed() throws RagnarokException
 		{
 			charService.shutdown();
-			FileDescriptor.execute(onDestroyed);
+			getFileDescriptorSystem().execute(onDestroyed);
 		}
 	};
 

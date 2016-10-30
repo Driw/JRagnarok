@@ -2,6 +2,8 @@ package org.diverproject.jragnarok.server;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.free;
 
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.Time;
 import org.diverproject.util.TimerTick;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.lang.IntUtil;
@@ -30,12 +32,6 @@ public class TimerSystem
 	 * Tempo limite de um temporizador.
 	 */
 	public static final int MAX_TIMER_INTERVAL = 1000;
-
-
-	/**
-	 * Única instância disponível do Sistema de Temporizadores.
-	 */
-	private static final TimerSystem INSTANCE = new TimerSystem();
 
 
 	/**
@@ -68,7 +64,7 @@ public class TimerSystem
 	 * Também inicializa o cronômetro com TimerTick definindo o intervalo de 1 milissegundo.
 	 */
 
-	private TimerSystem()
+	public TimerSystem()
 	{
 		tick = new TimerTick(1);
 		timers = new TimerMap();
@@ -193,14 +189,17 @@ public class TimerSystem
 		free();
 	}
 
-	/**
-	 * O Sistema de Temporizadores utiliza o Padrão de Projetos Singleton.
-	 * Por esse motivo é necessário a existência desse método para obtê-lo.
-	 * @return aquisição da única instância do Sistema de Temporizadores.
-	 */
-
-	public static TimerSystem getInstance()
+	@Override
+	public String toString()
 	{
-		return INSTANCE;
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("started", new Time(started));
+		description.append("lastTick", lastTick);
+		description.append("lastTickCount", lastTickCount);
+		description.append("tick", tick);
+		description.append("timers", timers.size());
+
+		return description.toString();
 	}
 }

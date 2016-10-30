@@ -1,32 +1,25 @@
 package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.FD_SETSIZE;
-import static org.diverproject.jragnarok.JRagnarokUtil.indexOn;
 import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
-import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
-import static org.diverproject.log.LogSystem.logExeceptionSource;
-import static org.diverproject.log.LogSystem.logInfo;
 
 import java.io.IOException;
 import java.net.Socket;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
-import org.diverproject.util.collection.List;
-import org.diverproject.util.collection.Queue;
-import org.diverproject.util.collection.abstraction.DynamicQueue;
-import org.diverproject.util.collection.abstraction.LoopList;
 import org.diverproject.util.stream.implementation.PacketBuilder;
 
 /**
  * <h1>Descritor de Arquivo</h1>
  *
- * <p>Classe usada para trabalhar com conexões socket recebido de clientes dos servidores.
- * Através dele será especificado para onde as conexões serão repassadas para operarem.
- * Além disso nele será possível criar objetos que trabalhem com entrada e saída de dados.</p>
+ * <p>Um descritor de arquivo é criado a partir de uma conexão socket para ser usado no JRagnarok.
+ * Esse descritor irá permitir a construção de pacotes para enviar dados ou receber dados do cliente.
+ * Será possível ainda definir algumas propriedades (flag) como verificar se ainda há conexão.</p>
+ *
+ * <p>Ainda possui um atributo para funcionar como cache, permitindo transportar objetos.
+ * Para que um descritor seja chamado para ser processado deve ser definido um listener.
+ * Quando um listener estiver definido a atualização do servidor chamará esse listener.</p>
  *
  * @see Socket
  * @see InternetProtocol
@@ -62,21 +55,16 @@ public class FileDescriptor
 	 */
 	public static final int DEFAULT_TIMEOUT = 30000;
 
-	/**
-	 * Lista contendo todas as conexões sockets.
-	 */
-	private static final List<FileDescriptor> SESSIONS = new LoopList<>(FD_SETSIZE);
 
 	/**
-	 * Lista contendo todas as ações únicas a se executar.
+	 * Sistema que criou esse Descritor de Arquivo.
 	 */
-	private static final Queue<FileDescriptorAction> ACTIONS = new DynamicQueue<>();
-
+	FileDescriptorSystem system;
 
 	/**
 	 * Código de identificação do descritor no sistema.
 	 */
-	private int id;
+	int id;
 
 	/**
 	 * Flag que determina o tipo de descritor.
@@ -99,16 +87,6 @@ public class FileDescriptor
 	private InternetProtocol address;
 
 	/**
-	 * Listener para receber pacotes de dados.
-	 */
-	private FileDescriptorListener receiveListener;
-
-	/**
-	 * Listener para enviar pacotes de dados.
-	 */
-	private FileDescriptorListener sendListener;
-
-	/**
 	 * Listener para validar conexão.
 	 */
 	private FileDescriptorListener parseListener;
@@ -128,7 +106,7 @@ public class FileDescriptor
 	 * @param socket referência da conexão do cliente com o servidor.
 	 */
 
-	private FileDescriptor(Socket socket)
+	FileDescriptor(Socket socket)
 	{
 		this.socket = socket;
 		this.flag = new BitWise(FLAG_STRING);
@@ -199,46 +177,6 @@ public class FileDescriptor
 	}
 
 	/**
-	 * Listener de recebimento possui um método para receber dados do socket.
-	 * @return aquisição do listener usado para receber dados do socket.
-	 */
-
-	public FileDescriptorListener getReceiveListener()
-	{
-		return receiveListener;
-	}
-
-	/**
-	 * Listener de recebimento possui um método para receber dados do socket.
-	 * @param receiveListener listener usado para receber dados do socket.
-	 */
-
-	public void setReceiveListener(FileDescriptorListener receiveListener)
-	{
-		this.receiveListener = receiveListener;
-	}
-
-	/**
-	 * Listener de recebimento possui um método para enviar dados por socket.
-	 * @return aquisição do listener usado para receber dados por socket.
-	 */
-
-	public FileDescriptorListener getSendListener()
-	{
-		return sendListener;
-	}
-
-	/**
-	 * Listener de recebimento possui um método para enviar dados por socket.
-	 * @param sendListener listener usado para receber dados por socket.
-	 */
-
-	public void setSendListener(FileDescriptorListener sendListener)
-	{
-		this.sendListener = sendListener;
-	}
-
-	/**
 	 * Listener que possui um método para analisar o despache do socket no servidor.
 	 * @return aquisição do listener usado para despachar o socket no servidor.
 	 */
@@ -286,7 +224,7 @@ public class FileDescriptor
 
 	public PacketBuilder getPacketBuilder()
 	{
-		timeout = TimerSystem.getInstance().getLastTickCount() + DEFAULT_TIMEOUT;
+		timeout = system.getTimerSystem().getLastTickCount() + DEFAULT_TIMEOUT;
 
 		return packetBuilder;
 	}
@@ -309,8 +247,6 @@ public class FileDescriptor
 
 			socket = null;
 			cache = null;
-			sendListener = null;
-			receiveListener = null;
 			parseListener = null;
 
 			id = 0;
@@ -342,155 +278,11 @@ public class FileDescriptor
 
 		description.append("id", id);
 		description.append("address", address.getString());
-
-		description.append("receive", receiveListener);
-		description.append("send", sendListener);
 		description.append("parse", parseListener);
 
 		if (cache != null)
 			description.append("cache", nameOf(cache));
 
 		return description.toString();
-	}
-
-
-	/**
-	 * Cria um novo Arquivo Descritor a partir de uma conexão socket.
-	 * @param socket referência da conexão socket a considerar.
-	 * @return aquisição de uma novo Arquivo Descritor.
-	 */
-
-	public static FileDescriptor newFileDecriptor(Socket socket)
-	{
-		FileDescriptor fd = new FileDescriptor(socket);
-
-		if (!SESSIONS.add(fd))
-		{
-			fd.close();
-
-			return null;
-		}
-
-		fd.id = indexOn(SESSIONS, fd);
-
-		return fd;
-	}
-
-	/**
-	 * Procedimento estático usado para atualizar todos os Arquivos Descritores.
-	 * Deverá garantir que todas conexões sejam processadas igualmente.
-	 * @param next milissegundos para expirar o próximo temporizador.
-	 */
-
-	public static void update(int next)
-	{
-		TimerSystem timer = TimerSystem.getInstance();
-		int lastTick = timer.getLastTickCount();
-
-		executeActions();
-
-		for (int i = 0; i < SESSIONS.size(); i++)
-		{
-			FileDescriptor fd = SESSIONS.get(i);
-
-			if (fd.getTimeout() > 0 && (fd.getTimeout() - lastTick) < 0)
-			{
-				if (fd.getFlag().is(FLAG_SERVER) && fd.getFlag().is(FLAG_PING))
-					fd.getFlag().unset(FLAG_PING);
-
-				else
-				{
-					logInfo("sessão #%d terminada por ociosidade (ip: %s).\n", fd.getID(), fd.getAddressString());
-					setEndOfFile(fd);
-				}
-			}
-
-			executeListener(fd, lastTick);
-
-			if (!fd.isConnected())
-			{
-				logInfo("sessão encerrada (ip: %s).\n", fd.getAddressString());
-
-				fd.close();
-				SESSIONS.remove(i);
-			}
-		}
-	}
-
-	/**
-	 * Procedimento chamado quando solicitado para atualizar os temporizadores.
-	 * Deverá executar todas as ações em file que foram adicionadas no último loop.
-	 * Uma vez que a ação tenha sido executada ela terá sido removido da fila.
-	 */
-
-	private static void executeActions()
-	{
-		while (!ACTIONS.isEmpty())
-		{
-			FileDescriptorAction action = ACTIONS.poll();
-
-			for (FileDescriptor fd : SESSIONS)
-				action.execute(fd);
-		}
-	}
-
-	/**
-	 * Procedimento chamado quando solicitado para atualizar os temporizadores.
-	 * Deverá garantir que o descritor de arquivo chame o seu listener de análise.
-	 * @param fd referência do arquivo descritor que será analisado os dados recebidos.
-	 * @param lastTick tempo atual referente a última atualização (loop) do servidor.
-	 */
-
-	private static void executeListener(FileDescriptor fd, int lastTick)
-	{
-		try {
-
-			if (fd.getParseListener() != null)
-				if (!fd.getParseListener().onCall(fd))
-					fd.setTimeout(lastTick);
-
-		} catch (RagnarokException e) {
-
-			logError("processamento inválido encontrado:\n");
-			logExeceptionSource(e);
-
-			setEndOfFile(fd);
-
-		} catch (RagnarokRuntimeException e) {
-
-			logError("informação inválida encontrada:\n");
-			logExeceptionSource(e);
-
-			setEndOfFile(fd);
-
-		} catch (Exception e) {
-
-			logError("erro inesperado ocorrido:\n");
-			logExeceptionSource(e);
-
-			setEndOfFile(fd);
-
-		}
-	}
-
-	/**
-	 * Define o fim dos dados para um descritor de arquivo, assim ele será fechado forçadamente.
-	 * @param fd referência do arquivo descritor do qual será terminado.
-	 */
-
-	private static void setEndOfFile(FileDescriptor fd)
-	{
-		fd.getFlag().set(FLAG_EOF);
-	}
-
-	/**
-	 * Executa uma ação para ser processada por todos os descritores de arquivos.
-	 * A ação será executada no primeiro update que for executado pós adição.
-	 * @param action referência do objeto que contém a ação a ser executada.
-	 */
-
-	public static void execute(FileDescriptorAction action)
-	{
-		ACTIONS.offer(action);
 	}
 }

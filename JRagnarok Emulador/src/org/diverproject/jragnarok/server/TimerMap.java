@@ -200,6 +200,23 @@ public class TimerMap implements Iterable<Timer>
 	}
 
 	/**
+	 * Cria um StringBuffer internamente e vincula o nome de todos os temporizadores.
+	 * O nome de cada temporizador é obtido conforme o nome do listener do mesmo.
+	 * @return aquisição de uma string contendo o nome dos temporizadores.
+	 */
+
+	public String getTimerNames()
+	{
+		StringBuffer buffer = new StringBuffer();
+
+		for (Timer timer : this)
+			if (timer.getListener() != null)
+				buffer.append(timer.getListener().getName()+ ";");
+
+		return buffer.toString();
+	}
+
+	/**
 	 * Limpa o mapeador e indexador de temporizadores, removendo todos eles de suas coleções.
 	 * Caso os temporizadores não esteja armazenados em outros lugares serão liberados em memória.
 	 */
@@ -208,6 +225,15 @@ public class TimerMap implements Iterable<Timer>
 	{
 		timers.clear();
 		indexes.clear();
+	}
+
+	/**
+	 * @return aquisição da quantidade de temporizadores mapeados.
+	 */
+
+	public int size()
+	{
+		return timers.size();
 	}
 
 	@Override

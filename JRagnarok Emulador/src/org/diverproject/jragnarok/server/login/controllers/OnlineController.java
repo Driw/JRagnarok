@@ -1,17 +1,19 @@
 package org.diverproject.jragnarok.server.login.controllers;
 
-import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.login.entities.OnlineLogin;
+import org.diverproject.jragnarok.server.login.services.LoginServerService;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;
 
 public class OnlineController
 {
-	private static final Map<Integer, OnlineLogin> onlines;
+	private LoginServerService service;
+	private final Map<Integer, OnlineLogin> onlines;
 
-	static
+	public OnlineController(LoginServerService service)
 	{
-		onlines = new IntegerLittleMap<>();
+		this.service = service;
+		this.onlines = new IntegerLittleMap<>();
 	}
 
 	public OnlineLogin get(int id)
@@ -23,7 +25,7 @@ public class OnlineController
 	{
 		if (online.getWaitingDisconnect() != null)
 		{
-			TimerSystem.getInstance().getTimers().delete(online.getWaitingDisconnect());
+			service.getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
 			online.setWaitingDisconnect(null);
 		}
 
@@ -34,7 +36,7 @@ public class OnlineController
 	{
 		if (online.getWaitingDisconnect() != null)
 		{
-			TimerSystem.getInstance().getTimers().delete(online.getWaitingDisconnect());
+			service.getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
 			online.setWaitingDisconnect(null);
 		}
 

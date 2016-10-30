@@ -155,6 +155,7 @@ public class LoginClientService extends LoginServerService
 		ipban = getServer().getIpBanService();
 		login = getServer().getLoginService();
 		character = getServer().getCharService();
+		onlines = new OnlineController(this);
 	}
 
 	/**
@@ -334,7 +335,7 @@ public class LoginClientService extends LoginServerService
 
 	private void sendAllWithoutOurSelf(ResponsePacket packet)
 	{
-		FileDescriptor.execute(new FileDescriptorAction()
+		getFileDescriptorSystem().execute(new FileDescriptorAction()
 		{
 			@Override
 			public void execute(FileDescriptor fd)
@@ -621,7 +622,7 @@ public class LoginClientService extends LoginServerService
 		node.setVersion(sd.getVersion());
 		node.setClientType(sd.getClientType());
 
-		TimerSystem ts = TimerSystem.getInstance();
+		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
 
 		Timer waitingDisconnect = timers.acquireTimer();
@@ -790,7 +791,7 @@ public class LoginClientService extends LoginServerService
 
 		if (online.getWaitingDisconnect().getTick() == Timer.INVALID_TIMER)
 		{
-			TimerSystem ts = TimerSystem.getInstance();
+			TimerSystem ts = getTimerSystem();
 
 			Timer timer = online.getWaitingDisconnect();
 			timer.setListener(login.waitingDisconnectTimer);

@@ -3,7 +3,7 @@ package org.diverproject.jragnarok;
 public class JRagnarokConstants
 {
 	public static final int INADDR_ANY = 0x00000000;
-	public static final int FD_SETSIZE = 4096;
+	public static final int FD_SIZE = 4096;
 	public static final int MAX_SERVERS = 30;
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";

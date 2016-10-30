@@ -11,6 +11,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.sleep;
+import static org.diverproject.jragnarok.JRagnarokUtil.time;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
 import static org.diverproject.jragnarok.server.ServerState.DESTROYED;
 import static org.diverproject.jragnarok.server.ServerState.NONE;
@@ -32,6 +33,7 @@ import java.sql.SQLException;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.lang.IntUtil;
 import org.diverproject.util.lang.ShortUtil;
 import org.diverproject.util.sql.MySQL;
@@ -76,7 +78,12 @@ public abstract class Server
 	/**
 	 * Thread que será usada para receber as conexões sockets.
 	 */
-	private Thread thread;
+	private Thread threadSocket;
+
+	/**
+	 * Thread que será usada para manter o servidor rodando.
+	 */
+	private Thread threadServer;
 
 	/**
 	 * Estado do servidor para garantir ordem nas chamadas.
@@ -109,6 +116,16 @@ public abstract class Server
 	private MySQL sql;
 
 	/**
+	 * Sitema de temporização do servidor.
+	 */
+	private TimerSystem timerSystem;
+
+	/**
+	 * Sistema para criação de Descritor de Arquivos.
+	 */
+	private FileDescriptorSystem fileDescriptorSystem;
+
+	/**
 	 * Cria um novo servidor definindo o servidor no estado NONE (nenhum/inicial).
 	 * Também define as configurações do servidor por setServerConfig().
 	 * E por fim instancia o objeto para criar a conexão com o banco de dados.
@@ -116,8 +133,10 @@ public abstract class Server
 
 	public Server()
 	{
-		this.state = NONE;
-		this.sql = new MySQL();
+		state = NONE;
+		sql = new MySQL();
+		timerSystem = new TimerSystem();
+		fileDescriptorSystem = new FileDescriptorSystem(timerSystem);
 	}
 
 	/**
@@ -264,6 +283,27 @@ public abstract class Server
 	}
 
 	/**
+	 * Os servidores possui um sistema de temporização individual para calcular os ticks.
+	 * Cada tick represente um milissegundo no tempo real e influencia em chamados.
+	 * @return aquisição do sistema para controle da temporização do servidor.
+	 */
+
+	public TimerSystem getTimerSystem()
+	{
+		return timerSystem;
+	}
+
+	/**
+	 * Todo servidor precisa de um sistema que controle as sessões de conexões feitas.
+	 * @return aquisição do sistema que efetua o controle das sessões no servidor.
+	 */
+
+	public FileDescriptorSystem getFileDescriptorSystem()
+	{
+		return fileDescriptorSystem;
+	}
+
+	/**
 	 * Procedimento interno que permite alterar o estado em que o servidor se encontra.
 	 * Para que um estado seja alterado pode ser necessário encontrar-se em outro.
 	 * Por exemplo, para entrar no estado de CREATED precisa estar em CREATE.
@@ -317,7 +357,7 @@ public abstract class Server
 			initConfigs();
 			initSqlConnection();
 			initTimer();
-			initThread();
+			initThreads();
 			initSocket();
 		}
 		listener.onCreated();
@@ -337,15 +377,20 @@ public abstract class Server
 		if (!isState(CREATED))
 			throw new RagnarokException("o servidor não pode dar run em %s", state);
 
-		if (thread == null)
+		if (threadSocket == null || threadServer == null)
 			throw new RagnarokException("thread não criada");
 
 		listener.onRunning();
 		{
-			if (thread.isInterrupted())
-				thread.resume();
+			if (threadSocket.isInterrupted())
+				threadSocket.resume();
 			else
-				thread.start();
+				threadSocket.start();
+
+			if (threadServer.isInterrupted())
+				threadServer.resume();
+			else
+				threadServer.start();
 		}
 
 		setNextState();
@@ -363,12 +408,13 @@ public abstract class Server
 		if (!isState(RUNNING))
 			throw new RagnarokException("o servidor não pode dar stop em %s", state);
 
-		if (thread == null)
+		if (threadSocket == null || threadServer == null)
 			throw new RagnarokException("thread não encontrada");
 
 		listener.onStop();
 		{
-			thread.interrupt();
+			threadSocket.interrupt();
+			threadServer.interrupt();
 		}
 		setNextState();
 	}
@@ -389,14 +435,17 @@ public abstract class Server
 		try {
 
 			listener.onDestroy();
-			serverSocket.close();
+			{
+				serverSocket.close();
 
-			state = ServerState.DESTROYED;
+				setNextState();
 
+				threadSocket.interrupt();
+				threadServer.interrupt();
+				threadSocket = null;
+				threadServer = null;
+			}
 			listener.onDestroyed();
-
-			thread.interrupt();
-			thread = null;
 
 		} catch (IOException e) {
 			throw new RagnarokException(e.getMessage());
@@ -503,8 +552,7 @@ public abstract class Server
 
 	private void initTimer()
 	{
-		TimerSystem timer = TimerSystem.getInstance();
-		timer.init();
+		timerSystem.init();
 	}
 
 	/**
@@ -512,11 +560,11 @@ public abstract class Server
 	 * Instancia a thread, define o nome e prioridade tal como a interface Runnable.
 	 */
 
-	private void initThread()
+	private void initThreads()
 	{
 		Server self = this;
 
-		thread = new Thread(new Runnable()
+		threadSocket = new Thread(new Runnable()
 		{
 			@Override
 			public void run()
@@ -524,13 +572,16 @@ public abstract class Server
 				while (state != DESTROYED)
 				{
 					if (state != RUNNING)
+					{
 						sleep(1000);
+						continue;
+					}
 
 					try {
 
 						Socket socket = serverSocket.accept();
 
-						FileDescriptor fd = FileDescriptor.newFileDecriptor(socket);
+						FileDescriptor fd = fileDescriptorSystem.newFileDecriptor(socket);
 						fd.setParseListener(defaultParser);
 
 					} catch (IOException e) {
@@ -547,9 +598,31 @@ public abstract class Server
 				return self.toString();
 			}
 		});
-		thread.setName(getThreadName());
-		thread.setPriority(getThreadPriority());
-		thread.setDaemon(false);
+		threadSocket.setName(getThreadName()+ "|ServerSocket");
+		threadSocket.setPriority(Thread.MIN_PRIORITY);
+		threadSocket.setDaemon(false);
+
+		threadServer = new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				while (state != DESTROYED)
+				{
+					if (state != RUNNING)
+					{
+						sleep(1000);
+						continue;
+					}
+
+					int next = timerSystem.update(timerSystem.tick());
+					fileDescriptorSystem.update(next);
+				}
+			}
+		});
+		threadServer.setName(getThreadName()+ "|Server");
+		threadServer.setPriority(getThreadPriority());
+		threadServer.setDaemon(false);
 
 		logNotice("thread do servidor criada.\n");
 	}
@@ -579,5 +652,25 @@ public abstract class Server
 		} catch (IOException e) {
 			throw new RagnarokException(e.getMessage());
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("id", id);
+		description.append("state", state);
+		description.append("host", getHost());
+		description.append("port", getPort());
+		description.append("thread", getThreadName());
+
+		if (sql != null && sql.getConnection() != null)
+			description.append("sql", sql.getDatabase());
+
+		description.append("uptime", time(timerSystem.getUptime()));
+		description.append("clients", fileDescriptorSystem.size());
+
+		return description.toString();
 	}
 }

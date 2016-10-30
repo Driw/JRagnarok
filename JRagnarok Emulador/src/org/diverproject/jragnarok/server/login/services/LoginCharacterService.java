@@ -116,7 +116,7 @@ public class LoginCharacterService extends LoginServerService
 
 		if (interval > 0)
 		{
-			TimerSystem ts = TimerSystem.getInstance();
+			TimerSystem ts = getTimerSystem();
 			TimerMap timers = ts.getTimers();
 
 			Timer siaTimer = timers.acquireTimer();

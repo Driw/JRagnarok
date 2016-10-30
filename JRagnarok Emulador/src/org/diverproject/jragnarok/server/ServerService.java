@@ -58,6 +58,24 @@ public class ServerService
 	}
 
 	/**
+	 * @return aquisição do sistema de temporização do servidor.
+	 */
+
+	public final TimerSystem getTimerSystem()
+	{
+		return server.getTimerSystem();
+	}
+
+	/**
+	 * @return aquisição do sistema controlador de sessões do servidor.
+	 */
+
+	public final FileDescriptorSystem getFileDescriptorSystem()
+	{
+		return server.getFileDescriptorSystem();
+	}
+
+	/**
 	 * Permite obter um objeto que realiza operações no banco de dados.
 	 * @return aquisição da conexão do servidor com o banco de dados.
 	 * @throws RagnarokException servidor não definido ou conexão inválida.
