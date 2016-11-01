@@ -1,3 +1,7 @@
+01.11.2016 - 1.2.74
+- Pequenas modificações em ConfigReader para torná-lo mais dinâmico com preferências.
+- Configurations.toString deverá mostrar o nome e valor da configuração.
+
 30.10.2016 - 1.2.73
 - Modificando TimerSystem e FileDescriptor para que possam ser usados por todos os servidores.
 	- Agora não usam Singleton e são instanciados dentro de um Server.

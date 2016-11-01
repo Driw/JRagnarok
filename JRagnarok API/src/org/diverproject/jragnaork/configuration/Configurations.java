@@ -359,8 +359,8 @@ public class Configurations
 		ObjectDescription description = new ObjectDescription(getClass());
 
 		for (MapItem<String, StringSimpleMap<Config<?>>> item : configs.iterateItems())
-			for (String key : item.value.iterateKey())
-				description.append(item.key+ "." +key);
+			for (MapItem<String, Config<?>> config : item.value.iterateItems())
+				description.append(config.value.getName(), config.value.getValue());
 
 		return description.toString();
 	}

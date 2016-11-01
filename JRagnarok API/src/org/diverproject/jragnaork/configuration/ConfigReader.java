@@ -1,13 +1,19 @@
 package org.diverproject.jragnaork.configuration;
 
+import static org.diverproject.log.LogSystem.logNotice;
+import static org.diverproject.log.LogSystem.logWarning;
+import static org.diverproject.log.LogSystem.setUpSource;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Queue;
+import org.diverproject.util.collection.abstraction.DynamicQueue;
 
 /**
  * <h1>Leitor de Configurações</h1>
@@ -29,6 +35,57 @@ import org.diverproject.util.collection.Queue;
 public class ConfigReader
 {
 	/**
+	 * Armazenar as exceções quando encontradas porém não repassar.
+	 */
+	public static final int PREFERENCES_SAVE_EXCEPTIONS = 0x0001;
+
+	/**
+	 * Repassar as exceções durante a leitura (sobrescreve SAVE_EXCEPTIONS).
+	 */
+	public static final int PREFERENCES_THROWS_EXCEPTIONS = 0x0002;
+
+	/**
+	 * Criar exceções para as configurações que não forem encontradas.
+	 */
+	public static final int PREFERENCES_THROWS_NOTFOUND = 0x0004;
+
+	/**
+	 * Criar exceções para dados inesperados: formato de configuração inválido.
+	 */
+	public static final int PREFERENCES_THROWS_FORMAT = 0x0008;
+
+	/**
+	 * Criar exceções para dados inesperados: formado do valor da configuração inválida.
+	 */
+	public static final int PREFERENCES_THROWS_UNEXPECTED = 0x0010;
+
+	/**
+	 * Registar uma mensagem mostrando quantas configurações foram lidas.
+	 */
+	public static final int PREFERENCES_INTERNAL_LOG_READ = 0x0020;
+
+	/**
+	 * Registar uma mensagem mostrando quando uma configuração for lida.
+	 */
+	public static final int PREFERENCES_INTERNAL_LOG_ALL = 0x0040;
+
+	/**
+	 * Registar a mensagem de uma exceção quando for gerada (sobrescreve THROWS_*).
+	 */
+	public static final int PREFERENCES_LOG_EXCEPTIONS = 0x0080;
+
+	/**
+	 * Constante para aplicar todas as propriedades disponíveis.
+	 */
+	public static final int PREFERENCES_ALL = 0x0100 - 1;
+
+	/**
+	 * Vetor contendo o nome de todas as propriedades que podem ser aplicadas.
+	 */
+	public static final String PREFERENCES_STRINGS[] = new String[]
+	{ "SAVE_EXCEPTIONS", "THROWS_EXCEPTIONS", "NOTFOUND", "UNEXPECTED" };
+
+	/**
 	 * Caminho referente ao arquivo que será lido.
 	 */
 	private String filePath;
@@ -44,11 +101,19 @@ public class ConfigReader
 	private Queue<RagnarokException> exceptions;
 
 	/**
+	 * Preferências para reações na leitura de configurações.
+	 */
+	private BitWise preferences;
+
+	/**
 	 * Cria um novo leitor de configurações inicializando o conjunto de configurações.
 	 */
 
 	public ConfigReader()
 	{
+		exceptions = new DynamicQueue<>();
+		preferences = new BitWise(PREFERENCES_STRINGS);
+
 		clearRead();
 	}
 
@@ -109,6 +174,17 @@ public class ConfigReader
 	}
 
 	/**
+	 * Para melhorar a dinâmica e funcionamento do carregador é possível definir preferências.
+	 * Verificar todas as constantes disponíveis em ConfigRead por PREFERENCES_*.
+	 * @return aquisição do configurador de preferências do leitor.
+	 */
+
+	public BitWise getPreferences()
+	{
+		return preferences;
+	}
+
+	/**
 	 * Efetua a leitura do arquivo atualizando as configurações conforme os valores em arquivo.
 	 * Caso tenha sido definido uma pasta ao invés de um arquivo lê todos os arquivos dentro.
 	 * @return quantidade de configurações que foram atualizados durante a leitura.
@@ -164,27 +240,73 @@ public class ConfigReader
 				};
 
 				if (columns.length != 2)
-					exceptions.offer(new RagnarokException("formato inválido (linha: %d).\n", i));
+				{
+					if (!preferences.is(PREFERENCES_THROWS_FORMAT))
+						continue;
+
+					newException("formato inválido (linha: %d)", i);
+				}
+
+				String name = columns[0].trim();
+				String value = columns[1].trim();
+
+				Config<?> config = configurations.get(name);
+
+				if (config == null && preferences.is(PREFERENCES_THROWS_NOTFOUND))
+					newException("configuração '%s' não encontrada (linha: %d)", name, i);
+
+				else if (!config.setRaw(value) && preferences.is(PREFERENCES_THROWS_UNEXPECTED))
+					newException("configuração '%s' não aceitou '%s' (linha: %d)", name, value, i);
 
 				else
 				{
-					String name = columns[0].trim();
-					String value = columns[1].trim();
+					read++;
 
-					Config<?> config = configurations.get(name);
-
-					if (config != null && config.setRaw(value))
-						read++;
+					if (preferences.is(PREFERENCES_INTERNAL_LOG_ALL))
+					{
+						setUpSource(2);
+						logNotice("configuração '%s' definida em '%s'.\n", name, value);
+					}
 				}
 			}
 
 			reader.close();
+
+			if (preferences.is(PREFERENCES_INTERNAL_LOG_READ))
+			{
+				setUpSource(2);
+				logNotice("%d configurações lidas de '%s'.\n", read, filePath);
+			}
 
 			return read;
 
 		} catch (IOException e) {
 			throw new RagnarokException(e.getMessage());
 		}
+	}
+
+	/**
+	 * Cria uma nova exceção e reage conforme as preferências definidas no leitor.
+	 * @param format string contendo o formato da mensagem que será exibida.
+	 * @param args argumentos respectivos a formatação da mensagem.
+	 * @throws RagnarokException apenas se PREFERENCES_THROWS_EXCEPTIONS definido.
+	 */
+
+	private void newException(String format, Object... args) throws RagnarokException
+	{
+		RagnarokException exception = new RagnarokException(format, args);
+
+		if (preferences.is(PREFERENCES_LOG_EXCEPTIONS))
+		{
+			setUpSource(3);
+			logWarning(exception.getMessage()+ "\n");
+		}
+
+		else if (preferences.is(PREFERENCES_THROWS_EXCEPTIONS))
+			throw exception;
+
+		else if (preferences.is(PREFERENCES_SAVE_EXCEPTIONS))
+			exceptions.offer(exception);		
 	}
 
 	@Override
