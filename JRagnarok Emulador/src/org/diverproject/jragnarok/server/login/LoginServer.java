@@ -1,27 +1,19 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PASSWORD;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_USERNAME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOG_LOGIN;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FILES;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FOLDER;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FILES;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FOLDER;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newClientConfigs;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newFileConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newIPBanConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newLogConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newLoginServerConfigs;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newSqlConnectionConfigs;
 import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
-import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
-import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorAction;
@@ -37,7 +29,6 @@ import org.diverproject.jragnarok.server.login.services.LoginClientService;
 import org.diverproject.jragnarok.server.login.services.LoginIpBanService;
 import org.diverproject.jragnarok.server.login.services.LoginLogService;
 import org.diverproject.jragnarok.server.login.services.LoginService;
-import org.diverproject.util.SocketUtil;
 
 /**
  * <h1>Servidor de Acesso</h1>
@@ -163,6 +154,18 @@ public class LoginServer extends Server
 		return loginService;
 	}
 
+	@Override
+	public String getHost()
+	{
+		return getConfigs().getString(LOGIN_IP);
+	}
+
+	@Override
+	public int getPort()
+	{
+		return getConfigs().getInt(LOGIN_PORT);
+	}
+
 	/**
 	 * Listener que implementa os métodos para alteração de estado do servidor.
 	 */
@@ -173,7 +176,6 @@ public class LoginServer extends Server
 		public void onCreate() throws RagnarokException
 		{
 			setDefaultConfigs();
-			readConfigFiles();
 		}
 
 		/**
@@ -185,77 +187,20 @@ public class LoginServer extends Server
 
 		private void setDefaultConfigs()
 		{
-			Configurations files = newFileConfigs();
-			Configurations sqlConnection = newSqlConnectionConfigs();
 			Configurations log = newLogConfigs();
 			Configurations ipban = newIPBanConfigs();
 			Configurations client = newClientConfigs();
 			Configurations server = newLoginServerConfigs();
 	
-			Configurations configs = new Configurations();
-			configs.add(files);
-			configs.add(sqlConnection);
+			Configurations configs = getConfigs();
+
+			if (configs == null)
+				setConfigurations(configs = new Configurations());
+
 			configs.add(log);
 			configs.add(ipban);
 			configs.add(client);
 			configs.add(server);
-	
-			setServerConfig(configs);
-		}
-	
-		/**
-		 * Faz a leitura todos os arquivos de configurações padrões e dos arquivos individuais do servidor.
-		 * A leitura dos arquivos irá atualizar o valor das configurações que até então eram os padrões.
-		 * Configurações lidas dos arquivos individuais do servidor sobrescrevem as dos arquivos padrões.
-		 */
-
-		private void readConfigFiles()
-		{
-			Configurations configs = getConfigs();
-
-			ConfigReader reader = new ConfigReader();
-			reader.setConfigurations(configs);
-
-			String defaultFolder = configs.getString(SYSTEM_SERVER_DEFAULT_FOLDER);
-			String defaultFolderPath = String.format("config/%s", defaultFolder);
-
-			String defaultFilesConfig = configs.getString(SYSTEM_SERVER_DEFAULT_FILES);
-			String defaultFiles[] = defaultFilesConfig.split(",");
-
-			String folder = configs.getString(SERVER_FOLDER);
-			String folderPath = String.format("config/%s%s", defaultFolder, folder);
-
-			String filesConfig = configs.getString(SERVER_FILES);
-			String files[] = filesConfig.split(",");
-
-			readConfigFilesOf(reader, configs, defaultFolderPath, defaultFiles);
-			readConfigFilesOf(reader, configs, folderPath, files);
-		}
-
-		/**
-		 * Realiza a leitura de diversos arquivos em uma determinada pasta especificada.
-		 * @param reader objeto que irá efetuar a leitura das configurações necessárias.
-		 * @param configs objeto que está agrupando as configurações do servidor.
-		 * @param folderPath caminho parcial ou completo da pasta que contém os arquivos.
-		 * @param files vetor contendo o nome de todos os arquivos a serem lidos.
-		 */
-
-		private void readConfigFilesOf(ConfigReader reader, Configurations configs, String folderPath, String files[])
-		{
-			for (String file : files)
-			{
-				String filepath = String.format("%s%s", folderPath, file);
-
-				try {
-
-					reader.setFilePath(filepath);
-					reader.read();
-
-				} catch (RagnarokException e) {
-					logError("falha durante a leitura de '%s' (%s:%d).\n", filepath, nameOf(this), getID());
-					logExeception(e);
-				}
-			}
 		}
 
 		@Override
@@ -298,7 +243,7 @@ public class LoginServer extends Server
 
 			// TODO confirmar usuário e senha
 
-			logService.addLoginLog(SocketUtil.socketIPInt(getHost()), login, 100, "login server started");
+			logService.addLoginLog(getAddress(), login, 100, "login server started");
 		}
 
 		@Override

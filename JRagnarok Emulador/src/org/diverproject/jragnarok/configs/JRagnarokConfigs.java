@@ -69,6 +69,21 @@ public class JRagnarokConfigs
 	public static final String LOGIN_ALLOWED_REGS = LOGIN_CONFIGS+ ".allowed_regs";
 	public static final String LOGIN_TIME_ALLOWED = LOGIN_CONFIGS+ ".time_allowed";
 
+	public static final String CHAR_CONFIGS = "char";
+	public static final String CHAR_IP = CHAR_CONFIGS+ ".ip";
+	public static final String CHAR_PORT = CHAR_CONFIGS+ ".port";
+	public static final String CHAR_USERNAME = CHAR_CONFIGS+ ".username";
+	public static final String CHAR_PASSWORD = CHAR_CONFIGS+ ".password";
+	public static final String CHAR_SERVER_NAME = CHAR_CONFIGS+ ".name";
+	public static final String CHAR_MAINTANCE = CHAR_CONFIGS+ ".maintance";
+	public static final String CHAR_NEW_DISPLAY = CHAR_CONFIGS+ ".new_display";
+
+	public static final String MAP_CONFIGS = "map";
+	public static final String MAP_IP = MAP_CONFIGS+ ".ip";
+	public static final String MAP_PORT = MAP_CONFIGS+ ".port";
+	public static final String MAP_USERNAME = MAP_CONFIGS+ ".username";
+	public static final String MAP_PASSWORD = MAP_CONFIGS+ ".password";
+
 	public static final String LOG_CONFIGS = "log";
 	public static final String LOG_LOGIN = LOG_CONFIGS+ ".login";
 
@@ -87,8 +102,6 @@ public class JRagnarokConfigs
 	public static final String CLIENT_CHECK_VERSION = CLIENT_CONFIGS+ ".check_version";
 	public static final String CLIENT_VERSION = CLIENT_CONFIGS+ ".version";
 
-	public static final String SERVER_HOST = SERVER_CONFIGS+ ".host";
-	public static final String SERVER_PORT = SERVER_CONFIGS+ ".port";
 	public static final String SERVER_THREAD_PRIORITY = SERVER_CONFIGS+ ".thread_priority";
 
 	public static final Configurations newSystemConfigs()
@@ -163,6 +176,31 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigInt(LOGIN_MIN_GROUP_TO_CONNECT, 0));
 		configurations.add(new ConfigInt(LOGIN_ALLOWED_REGS, 1));
 		configurations.add(new ConfigInt(LOGIN_TIME_ALLOWED, 10));
+
+		return configurations;
+	}
+
+	public static Configurations newCharServerConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigString(CHAR_IP, "localhost"));
+		configurations.add(new ConfigInt(CHAR_PORT, 6900));
+		configurations.add(new ConfigString(CHAR_USERNAME, "server"));
+		configurations.add(new ConfigString(CHAR_PASSWORD, "passwd"));
+		configurations.add(new ConfigString(CHAR_SERVER_NAME, "Char Server"));
+		configurations.add(new ConfigInt(CHAR_MAINTANCE, 0));
+		configurations.add(new ConfigInt(CHAR_NEW_DISPLAY, 0));
+
+		return configurations;
+	}
+
+	public static Configurations newMapServerConfigs()
+	{
+		Configurations configurations = new Configurations();
+		configurations.add(new ConfigString(MAP_IP, "localhost"));
+		configurations.add(new ConfigInt(MAP_PORT, 6900));
+		configurations.add(new ConfigString(MAP_USERNAME, "server"));
+		configurations.add(new ConfigString(MAP_PASSWORD, "passwd"));
 
 		return configurations;
 	}

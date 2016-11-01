@@ -1,3 +1,11 @@
+01.11.2016 - 1.2.77
+- Mudanças para Server:
+	- getPort e getHost devem voltar a ser abstract, pois muda o nome da configuração entre servidores.
+	- initConfigs deverá garantir a existência das configurações porém não deve carregá-las.
+	- readConfigFiles adicionado para efetuar a leitura dos arquivos de configurações (padrões e privado).
+- LoginServer, CharServer e MapServer atualizados para funcionar com getPort e getHost.
+	- Implementação do carregamento das configurações até então existentes.
+
 01.11.2016 - 1.2.76
 - Atualizando funcionamento base de JRagnarok para criar e configurar todos os servidores encontrados.
 - Pequenas correções e atualizações em Server referentes a nomes e visibilidade de métodos.

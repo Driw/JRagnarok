@@ -1,15 +1,25 @@
 package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FILES;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FOLDER;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newFileConfigs;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newLogConfigs;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newServerConfigs;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newSqlConnectionConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FOLDER;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_HOST;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_THREAD_PRIORITY;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_DATABASE;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_HOST;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_LEGACY_DATETIME;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_PASSWORD;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_PORT;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_USERNAME;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FILES;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FOLDER;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FOLDER;
+import static org.diverproject.jragnarok.JRagnarokConstants.LOCALHOST;
+import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.sleep;
 import static org.diverproject.jragnarok.JRagnarokUtil.time;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
@@ -34,8 +44,10 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.SocketUtil;
+import org.diverproject.util.collection.Queue;
+import org.diverproject.util.lang.Bits;
 import org.diverproject.util.lang.IntUtil;
-import org.diverproject.util.lang.ShortUtil;
 import org.diverproject.util.sql.MySQL;
 
 /**
@@ -200,23 +212,25 @@ public abstract class Server
 	 * @return aquisição do host para realizar a conexão socket (ip ou domínio).
 	 */
 
-	public String getHost()
-	{
-		String value = configs.getString(SERVER_HOST);
-
-		return value == null || value.isEmpty() ? "localhost" : value;
-	}
+	public abstract String getHost();
 
 	/**
 	 * Através da porta é possível saber por onde as conexões são recebidas na máquina.
 	 * @return aquisição da porta em que o servidor irá receber as conexões.
 	 */
 
-	public short getPort()
-	{
-		short port = s(configs.getInt(SERVER_PORT));
+	public abstract int getPort();
 
-		return ShortUtil.min(port, s(1001));
+	/**
+	 * @return aquisição do endereço de IP em que o servidor está conectado.
+	 */
+
+	public int getAddress()
+	{
+		if (serverSocket == null || serverSocket.isClosed())
+			return Bits.makeInt(b(127), b(0), b(0), b(1));
+
+		return SocketUtil.socketIPInt(serverSocket.getInetAddress().getHostAddress());
 	}
 
 	/**
@@ -350,7 +364,7 @@ public abstract class Server
 				break;
 		}
 
-		logInfo("alterando estado de %s para %s.\n", old, state);
+		logNotice("alterando estado de %s para %s.\n", old, state);
 	}
 
 	/**
@@ -452,12 +466,12 @@ public abstract class Server
 			{
 				serverSocket.close();
 
-				setNextState();
-
 				threadSocket.interrupt();
 				threadServer.interrupt();
 				threadSocket = null;
 				threadServer = null;
+
+				setNextState();
 			}
 			listener.onDestroyed();
 
@@ -467,52 +481,24 @@ public abstract class Server
 	}
 
 	/**
-	 * Inicialização das configurações irá carregar todas as configurações necessárias.
-	 * Para o servidor é considerado apenas configurações do banco de dados.
+	 * A inicialização das configurações deverá carregar as configurações mínimas do servidor.
+	 * Para tal será necessário carregar configurações básicas e de conexão com o banco de dados.
 	 * @throws RagnarokException falha durante o carregamento das configurações.
 	 */
 
-	protected void initConfigs() throws RagnarokException
+	private void initConfigs() throws RagnarokException
 	{
-		String filenames[] = configs.getString(SERVER_FILES).split(",");
+		Configurations fileConfigs = newFileConfigs();
+		Configurations serverConfigs = newServerConfigs();
+		Configurations sqlConfigs = newSqlConnectionConfigs();
+		Configurations logConfigs = newLogConfigs();
 
-		for (String filename : filenames)
-		{
-			String folder = configs.getString(SERVER_FOLDER);
-			String filePath = format("config/Servers/%s/%s", folder, filename.trim());
+		configs.add(fileConfigs);
+		configs.add(serverConfigs);
+		configs.add(sqlConfigs);
+		configs.add(logConfigs);
 
-			readConfigFile(filePath);
-		}
-
-		filenames = configs.getString(SYSTEM_SERVER_DEFAULT_FILES).split(",");
-
-		for (String filename : filenames)
-		{
-			String folder = configs.getString(SYSTEM_SERVER_DEFAULT_FOLDER);
-			String filePath = format("config/Servers/%s/%s", folder, filename.trim());
-
-			readConfigFile(filePath);
-		}
-	}
-
-	/**
-	 * Efetua a leitura de um arquivo de configurações atualizando as configurações do servidor.
-	 * @param filePath caminho completo ou parcial do arquivo de configurações.
-	 */
-
-	private void readConfigFile(String filePath)
-	{
-		ConfigReader load = new ConfigReader();
-		load.getPreferences().set(CONFIG_READ_PREFERENCES);
-		load.setConfigurations(configs);
-		load.setFilePath(filePath);
-
-		try {
-			load.read();
-		} catch (RagnarokException e) {
-			logError("falha ao ler '%s'.\n", filePath);
-			logExeception(e);
-		}
+		readConfigFiles();
 	}
 
 	/**
@@ -533,12 +519,12 @@ public abstract class Server
 			logWarning("falha ao verificar existência da conexão MySQL");
 		}
 
-		String host = configs.getString("sql.host");
-		String username = configs.getString("sql.username");
-		String password = configs.getString("sql.password");
-		String database = configs.getString("sql.database");
-		int port = configs.getInt("sql.port");
-		boolean legacy = configs.getBool("sql.legacydatetime");
+		String host = configs.getString(SQL_HOST);
+		String username = configs.getString(SQL_USERNAME);
+		String password = configs.getString(SQL_PASSWORD);
+		String database = configs.getString(SQL_DATABASE);
+		int port = configs.getInt(SQL_PORT);
+		boolean legacy = configs.getBool(SQL_LEGACY_DATETIME);
 
 		sql.setHost(host);
 		sql.setUsername(username);
@@ -556,7 +542,7 @@ public abstract class Server
 			throw new RagnarokException(e.getMessage());
 		}
 
-		logNotice("conexão MySQL estabelecida (%s:%d).\n", host, port);
+		logInfo("conexão MySQL estabelecida (%s:%d).\n", host, port);
 	}
 
 	/**
@@ -637,7 +623,7 @@ public abstract class Server
 		threadServer.setPriority(getThreadPriority());
 		threadServer.setDaemon(false);
 
-		logNotice("thread do servidor criada.\n");
+		logInfo("thread do servidor criada.\n");
 	}
 
 	/**
@@ -653,18 +639,117 @@ public abstract class Server
 			int port = getPort();
 
 			if (!IntUtil.interval(port, MIN_PORT, MAX_PORT))
-				throw new RagnarokException("porta %d inválida");
+				throw new RagnarokException("porta %d inválida", port);
+
+			String host = getHost();
+
+			if (host == null || host.isEmpty())
+				host = LOCALHOST;
 
 			InetAddress address = InetAddress.getByName(getHost());
 			serverSocket = new ServerSocket(port, SOCKET_BACKLOG, address);
 
-			logNotice("conexão estabelecida com êxito (porta: %d).\n", port);
+			logInfo("conexão estabelecida com êxito (porta: %d).\n", port);
 
 		} catch (UnknownHostException e) {
 			throw new RagnarokException("host desconhecido");
 		} catch (IOException e) {
 			throw new RagnarokException(e.getMessage());
 		}
+	}
+
+	/**
+	 * Faz a leitura todos os arquivos de configurações padrões e dos arquivos individuais do servidor.
+	 * A leitura dos arquivos irá atualizar o valor das configurações que até então eram os padrões.
+	 * Configurações lidas dos arquivos individuais do servidor sobrescrevem as dos arquivos padrões.
+	 */
+
+	private void readConfigFiles()
+	{
+		Configurations configs = getConfigs();
+
+		ConfigReader reader = new ConfigReader();
+		reader.getPreferences().set(CONFIG_READ_PREFERENCES);
+		reader.setConfigurations(configs);
+
+		String serverFolder = configs.getString(SYSTEM_SERVER_FOLDER);
+
+		String filepath = format("config/%s/%s%d.conf", serverFolder, getClass().getSimpleName(), getID());
+		readConfigFileOf(reader, configs, filepath);
+
+		readDefaultConfigs(configs, reader, serverFolder);
+		readPrivateConfigs(configs, reader, serverFolder);
+	}
+
+	/**
+	 * Efetua a leitura dos arquivos de configurações padrões para os servidores.
+	 * Os arquivos padrões são carregados para qualquer servidor afim de ter um valor fixo.
+	 * @param configs conjunto de configurações do servidor que terá os valores atualizados.
+	 * @param reader leitor de configurações já configurado para carregar as informações.
+	 * @param serverFolder diretório onde se encontra os servidores dentro das configurações.
+	 */
+
+	private void readDefaultConfigs(Configurations configs, ConfigReader reader, String serverFolder)
+	{
+		String defaultFolder = configs.getString(SYSTEM_SERVER_DEFAULT_FOLDER);
+		String defaultFolderPath = format("config/%s/%s", serverFolder, defaultFolder);
+
+		String defaultFilesConfig = configs.getString(SYSTEM_SERVER_DEFAULT_FILES);
+		String defaultFiles[] = defaultFilesConfig.split(",");
+
+		for (String file : defaultFiles)
+		{
+			String filepath = format("%s/%s", defaultFolderPath, file);
+			readConfigFileOf(reader, configs, filepath);
+		}
+	}
+
+	/**
+	 * Efetua a leitura dos arquivos de configurações privados dos servidores.
+	 * Os arquivos privados são aplicados apenas a um servidor sobrescrevendo o padrão.
+	 * @param configs conjunto de configurações do servidor que terá os valores atualizados.
+	 * @param reader leitor de configurações já configurado para carregar as informações.
+	 * @param serverFolder diretório onde se encontra os servidores dentro das configurações.
+	 */
+
+	private void readPrivateConfigs(Configurations configs, ConfigReader reader, String serverFolder)
+	{
+		String folder = configs.getString(SERVER_FOLDER);
+		String folderPath = format("config/%s/%s", serverFolder, folder);
+
+		String filesConfig = configs.getString(SERVER_FILES);
+		String files[] = filesConfig.split(",");
+
+		for (String file : files)
+		{
+			String filepath = format("%s/%s", folderPath, file);
+			readConfigFileOf(reader, configs, filepath);
+		}
+	}
+
+	/**
+	 * Realiza a leitura de diversos arquivos em uma determinada pasta especificada.
+	 * @param reader objeto que irá efetuar a leitura das configurações necessárias.
+	 * @param configs objeto que está agrupando as configurações do servidor.
+	 * @param folderPath caminho parcial ou completo da pasta que contém os arquivos.
+	 * @param files vetor contendo o nome de todos os arquivos a serem lidos.
+	 */
+
+	private void readConfigFileOf(ConfigReader reader, Configurations configs, String filepath)
+	{
+		reader.setFilePath(filepath);
+
+		try {
+			reader.read();
+		} catch (RagnarokException e) {
+			logError("falha durante a leitura de '%s' (%s:%d).\n", filepath, nameOf(this), getID());
+			logExeception(e);
+		}
+
+		Queue<RagnarokException> exceptions = reader.getExceptions();
+
+		while (!exceptions.isEmpty())
+			logWarning(exceptions.poll().getMessage()+ "\n");
 	}
 
 	@Override

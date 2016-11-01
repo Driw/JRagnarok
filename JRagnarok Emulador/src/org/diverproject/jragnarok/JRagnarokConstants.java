@@ -8,6 +8,11 @@ public class JRagnarokConstants
 	public static final int PACKETVER = 20151104;
 
 	/**
+	 * Endereço de IP para conexões locais.
+	 */
+	public static final String LOCALHOST = "127.0.0.1";
+
+	/**
 	 * Quantidade limite de conexões por servidor.
 	 */
 	public static final int FD_SIZE = 4096;
