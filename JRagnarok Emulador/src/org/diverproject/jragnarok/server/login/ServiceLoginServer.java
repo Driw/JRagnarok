@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.services;
+package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.jragnarok.server.login.entities.AccountState.NONE;
@@ -16,7 +16,6 @@ import static org.diverproject.log.LogSystem.logNotice;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
-import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.login.controllers.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.Login;
@@ -38,13 +37,13 @@ import org.diverproject.util.collection.Node;
  * tempo de para expiração da conta, tempo restante de banimento, versão do cliente e client hash.
  * Para a autenticação de tempo de banimento será considerado independente de configurações</p>
  *
- * @see LoginServerService
+ * @see AbstractServiceLogin
  * @see AccountControl
  *
  * @author Andrew Mello
  */
 
-public class LoginService extends LoginServerService
+public class ServiceLoginServer extends AbstractServiceLogin
 {
 	/**
 	 * Controle para intermediar a persistência de contas e cache de contas.
@@ -57,7 +56,7 @@ public class LoginService extends LoginServerService
 	 * @throws RagnarokException caso não haja uma conexão válida estabelecida com o MySQL.
 	 */
 
-	public LoginService(LoginServer server) throws RagnarokException
+	public ServiceLoginServer(LoginServer server) throws RagnarokException
 	{
 		super(server);
 

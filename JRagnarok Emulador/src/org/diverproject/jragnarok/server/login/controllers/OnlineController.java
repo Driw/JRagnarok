@@ -1,16 +1,16 @@
 package org.diverproject.jragnarok.server.login.controllers;
 
+import org.diverproject.jragnarok.server.login.AbstractServiceLogin;
 import org.diverproject.jragnarok.server.login.entities.OnlineLogin;
-import org.diverproject.jragnarok.server.login.services.LoginServerService;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;
 
 public class OnlineController
 {
-	private LoginServerService service;
+	private AbstractServiceLogin service;
 	private final Map<Integer, OnlineLogin> onlines;
 
-	public OnlineController(LoginServerService service)
+	public OnlineController(AbstractServiceLogin service)
 	{
 		this.service = service;
 		this.onlines = new IntegerLittleMap<>();

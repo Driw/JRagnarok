@@ -1,20 +1,19 @@
-package org.diverproject.jragnarok.server.login.services;
+package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.InternetProtocol;
-import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.login.controllers.LoginLogControl;
 import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.entities.LoginLog;
 
-public class LoginLogService extends LoginServerService
+public class ServiceLoginLog extends AbstractServiceLogin
 {
 	private LoginLogControl controller;
 
-	public LoginLogService(LoginServer server) throws RagnarokException
+	public ServiceLoginLog(LoginServer server) throws RagnarokException
 	{
 		super(server);
 	}

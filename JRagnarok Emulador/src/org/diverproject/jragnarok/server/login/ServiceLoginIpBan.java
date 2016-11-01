@@ -1,10 +1,8 @@
-package org.diverproject.jragnarok.server.login.services;
+package org.diverproject.jragnarok.server.login;
 
-import org.diverproject.jragnarok.server.login.LoginServer;
-
-public class LoginIpBanService extends LoginServerService
+public class ServiceLoginIpBan extends AbstractServiceLogin
 {
-	public LoginIpBanService(LoginServer server)
+	public ServiceLoginIpBan(LoginServer server)
 	{
 		super(server);
 	}

@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.services;
+package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
 import static org.diverproject.log.LogSystem.logInfo;
@@ -12,13 +12,12 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.util.ObjectDescription;
 
-public class LoginCharacterService extends LoginServerService
+public class ServiceLoginChar extends AbstractServiceLogin
 {
-	public LoginCharacterService(LoginServer server)
+	public ServiceLoginChar(LoginServer server)
 	{
 		super(server);
 	}

@@ -24,11 +24,6 @@ import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.login.entities.Login;
-import org.diverproject.jragnarok.server.login.services.LoginCharacterService;
-import org.diverproject.jragnarok.server.login.services.LoginClientService;
-import org.diverproject.jragnarok.server.login.services.LoginIpBanService;
-import org.diverproject.jragnarok.server.login.services.LoginLogService;
-import org.diverproject.jragnarok.server.login.services.LoginService;
 
 /**
  * <h1>Servidor de Acesso</h1>
@@ -49,11 +44,11 @@ import org.diverproject.jragnarok.server.login.services.LoginService;
  * @see Server
  * @see ServerListener
  * @see LoginCharServers
- * @see LoginCharacterService
- * @see LoginClientService
- * @see LoginIpBanService
- * @see LoginLogService
- * @see LoginService
+ * @see ServiceLoginChar
+ * @see ServiceLoginClient
+ * @see ServiceLoginIpBan
+ * @see ServiceLoginLog
+ * @see ServiceLoginServer
  *
  * @author Andrew Mello
  */
@@ -68,27 +63,27 @@ public class LoginServer extends Server
 	/**
 	 * Serviço para comunicação com o servidor de personagens.
 	 */
-	private LoginCharacterService charService;
+	private ServiceLoginChar charService;
 
 	/**
 	 * Serviço para comunicação entre o servidor e o cliente.
 	 */
-	private LoginClientService clientService;
+	private ServiceLoginClient clientService;
 
 	/**
 	 * Serviço para banimento de acessos por endereço de IP.
 	 */
-	private LoginIpBanService ipBanService;
+	private ServiceLoginIpBan ipBanService;
 
 	/**
 	 * Serviço para registro de acessos.
 	 */
-	private LoginLogService logService;
+	private ServiceLoginLog logService;
 
 	/**
 	 * Serviço para para acesso de contas (serviço principal)
 	 */
-	private LoginService loginService;
+	private ServiceLoginServer loginService;
 
 	/**
 	 * Cria um novo micro servidor para receber os novos acessos de clientes.
@@ -113,7 +108,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para comunicação com o servidor de personagens.
 	 */
 
-	public LoginCharacterService getCharService()
+	public ServiceLoginChar getCharService()
 	{
 		return charService;
 	}
@@ -122,7 +117,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para comunicação do servidor com o cliente.
 	 */
 
-	public LoginClientService getClientService()
+	public ServiceLoginClient getClientService()
 	{
 		return clientService;
 	}
@@ -131,7 +126,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para banimento de acessos por endereço de IP.
 	 */
 
-	public LoginIpBanService getIpBanService()
+	public ServiceLoginIpBan getIpBanService()
 	{
 		return ipBanService;
 	}
@@ -140,7 +135,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para registro de acessos no servidor.
 	 */
 
-	public LoginLogService getLogService()
+	public ServiceLoginLog getLogService()
 	{
 		return logService;
 	}
@@ -149,7 +144,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para acesso de contas (serviço principal)
 	 */
 
-	public LoginService getLoginService()
+	public ServiceLoginServer getLoginService()
 	{
 		return loginService;
 	}
@@ -206,11 +201,11 @@ public class LoginServer extends Server
 		@Override
 		public void onCreated() throws RagnarokException
 		{
-			charService = new LoginCharacterService(LoginServer.this);
-			clientService = new LoginClientService(LoginServer.this);
-			ipBanService = new LoginIpBanService(LoginServer.this);
-			logService = new LoginLogService(LoginServer.this);
-			loginService = new LoginService(LoginServer.this);
+			charService = new ServiceLoginChar(LoginServer.this);
+			clientService = new ServiceLoginClient(LoginServer.this);
+			ipBanService = new ServiceLoginIpBan(LoginServer.this);
+			logService = new ServiceLoginLog(LoginServer.this);
+			loginService = new ServiceLoginServer(LoginServer.this);
 
 			charService.init();
 			clientService.init();

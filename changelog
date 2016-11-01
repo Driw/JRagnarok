@@ -1,3 +1,7 @@
+01.11.2016 - 1.2.78
+- Movendo todos os serviços de login.service para login.
+	- Renomeando de Login*Service para ServiceLogin* conforme ordem ortográfica.
+
 01.11.2016 - 1.2.77
 - Mudanças para Server:
 	- getPort e getHost devem voltar a ser abstract, pois muda o nome da configuração entre servidores.

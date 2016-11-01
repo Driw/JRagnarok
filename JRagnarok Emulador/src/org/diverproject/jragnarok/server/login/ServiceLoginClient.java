@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.services;
+package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
 import static org.diverproject.jragnarok.JRagnarokUtil.binToHex;
@@ -56,8 +56,6 @@ import org.diverproject.jragnarok.server.ServerState;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.login.LoginCharServers;
-import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.login.controllers.AuthController;
 import org.diverproject.jragnarok.server.login.controllers.OnlineController;
 import org.diverproject.jragnarok.server.login.entities.Account;
@@ -87,17 +85,17 @@ import org.diverproject.util.lang.IntUtil;
  * Fica sendo de sua responsabilidade garantir a autenticação de qualquer tipo de acesso.
  * Podendo ainda ser necessário comunicar-se com outro serviço para auxiliá-lo.
  *
- * @see LoginService
- * @see LoginLogService
- * @see LoginIpBanService
- * @see LoginCharacterService
+ * @see ServiceLoginServer
+ * @see ServiceLoginLog
+ * @see ServiceLoginIpBan
+ * @see ServiceLoginChar
  * @see OnlineController
  * @see AuthController
  *
  * @author Andrew Mello
  */
 
-public class LoginClientService extends LoginServerService
+public class ServiceLoginClient extends AbstractServiceLogin
 {
 	/**
 	 * Tempo para que uma autenticação entre em timeout.
@@ -107,22 +105,22 @@ public class LoginClientService extends LoginServerService
 	/**
 	 * Serviço de acesso de contas.
 	 */
-	private LoginService login;
+	private ServiceLoginServer login;
 
 	/**
 	 * Serviço para registro dos acessos.
 	 */
-	private LoginLogService log;
+	private ServiceLoginLog log;
 
 	/**
 	 * Serviço para banimento por endereço de IP.
 	 */
-	private LoginIpBanService ipban;
+	private ServiceLoginIpBan ipban;
 
 	/**
 	 * Serviço para tratar dos servidores de personagens.
 	 */
-	private LoginCharacterService character;
+	private ServiceLoginChar character;
 
 	/**
 	 * Controlador para identificar jogadores online.
@@ -140,7 +138,7 @@ public class LoginClientService extends LoginServerService
 	 * @param server referência do servidor de acesso que deseja criar o serviço.
 	 */
 
-	public LoginClientService(LoginServer server)
+	public ServiceLoginClient(LoginServer server)
 	{
 		super(server);
 	}
