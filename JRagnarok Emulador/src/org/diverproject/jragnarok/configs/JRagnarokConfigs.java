@@ -32,8 +32,8 @@ public class JRagnarokConfigs
 	public static final String SERVER_NAME = SERVER_CONFIGS+ ".name";
 	public static final String SERVER_FOLDER = SERVER_CONFIGS+ ".folder";
 	public static final String SERVER_FILES = SERVER_CONFIGS+ ".files";
-	public static final String SERVER_LOGINID = SERVER_CONFIGS+ "login_server_id";
-	public static final String SERVER_CHARID = SERVER_CONFIGS+ "char_server_id";
+	public static final String SERVER_LOGINID = SERVER_CONFIGS+ ".login_server_id";
+	public static final String SERVER_CHARID = SERVER_CONFIGS+ ".char_server_id";
 	public static final String SERVER_MAPID = SERVER_CONFIGS+ ".map_server_id";
 
 	public static final String FILES_CONFIGS = "file";
@@ -43,12 +43,12 @@ public class JRagnarokConfigs
 	public static final String FILE_IPBAN = FILES_CONFIGS+ ".ipban";
 	public static final String FILE_LOG = FILES_CONFIGS+ ".lan";
 	public static final String FILE_VIP = FILES_CONFIGS+ ".vip";
-	public static final String FILE_LOGIN_SERVER = FILES_CONFIGS+ "login_server";
+	public static final String FILE_LOGIN_SERVER = FILES_CONFIGS+ ".login_server";
 	public static final String FILE_CHAR_SERVER = FILES_CONFIGS+ ".char_server";
 	public static final String FILE_MAP_SERVER = FILES_CONFIGS+ ".map_server";
 	public static final String FILE_MESSAGES = FILES_CONFIGS+ ".messages";
 
-	public static final String SQL_CONFIGS = "file";
+	public static final String SQL_CONFIGS = "sql";
 	public static final String SQL_HOST = SQL_CONFIGS+ ".host";
 	public static final String SQL_PORT = SQL_CONFIGS+ ".port";
 	public static final String SQL_DATABASE = SQL_CONFIGS+ ".database";
@@ -109,11 +109,12 @@ public class JRagnarokConfigs
 	public static Configurations newServerConfigs()
 	{
 		Configurations configurations = new Configurations();
-		configurations.add(new ConfigString(SERVER_NAME));
-		configurations.add(new ConfigString(SERVER_FOLDER));
-		configurations.add(new ConfigInt(SERVER_LOGINID));
-		configurations.add(new ConfigInt(SERVER_CHARID));
-		configurations.add(new ConfigInt(SERVER_MAPID));
+		configurations.add(new ConfigString(SERVER_NAME, "Server"));
+		configurations.add(new ConfigString(SERVER_FOLDER, "ServerFolder"));
+		configurations.add(new ConfigString(SERVER_FILES, "SqlConnection.conf"));
+		configurations.add(new ConfigInt(SERVER_LOGINID, 1));
+		configurations.add(new ConfigInt(SERVER_CHARID, 1));
+		configurations.add(new ConfigInt(SERVER_MAPID, 1));
 
 		return configurations;
 	}
@@ -190,7 +191,7 @@ public class JRagnarokConfigs
 	public static Configurations newClientConfigs()
 	{
 		Configurations configurations = new Configurations();
-		configurations.add(new ConfigInt(CLIENT_HASH_CHECK, 0));
+		configurations.add(new ConfigBoolean(CLIENT_HASH_CHECK, false));
 		configurations.add(new ConfigString(CLIENT_HASH_NODES, ""));
 		configurations.add(new ConfigInt(CLIENT_CHAR_PER_ACCOUNT, MAX_CHARS - MAX_CHAR_VIP - MAX_CHAR_BILLING));
 		configurations.add(new ConfigBoolean(CLIENT_CHECK_VERSION, false));
