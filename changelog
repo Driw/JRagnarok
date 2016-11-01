@@ -1,3 +1,10 @@
+01.11.2016 - 1.2.76
+- Atualizando funcionamento base de JRagnarok para criar e configurar todos os servidores encontrados.
+- Pequenas correções e atualizações em Server referentes a nomes e visibilidade de métodos.
+	- Também foi incluso uma constante e uso padrão para preferências ao usar ConfigReader.
+- Documentando as constantes do sistema (JRagnarokConstants).
+	- MAX_NAME_LENGTH foi renomado para MAX_USERNAME_LENGTH.
+
 01.11.2016 - 1.2.75b
 - Pequenas correções em valores padrões, nome das constantes e configurações iniciais, JRagnarokConfigs.
 

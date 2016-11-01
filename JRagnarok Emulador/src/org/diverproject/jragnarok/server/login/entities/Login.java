@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login.entities;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.USERNAME_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.PASSWORD_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 
@@ -38,7 +38,7 @@ public class Login
 
 	public void setUsername(String username)
 	{
-		this.username = strcap(username, NAME_LENGTH);
+		this.username = strcap(username, USERNAME_LENGTH);
 	}
 
 	public String getPassword()

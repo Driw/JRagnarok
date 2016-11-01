@@ -69,6 +69,19 @@ public abstract class Server
 	 */
 	private static final int SOCKET_BACKLOG = 50;
 
+	/**
+	 * Valor das preferências para definir o leitor de configurações:
+	 * <code>INTERNAL_LOG_ALL</code>, <code>LOG_EXCEPTIONS</code>, <code>THROWS_FORMAT</code>,
+	 * <code>THROWS_EXCEPTIONS</code>, <code>THROWS_NOTFOUND</code> e <code>THROWS_UNEXPECETED</code>.
+	 */
+	public static final int CONFIG_READ_PREFERENCES =
+			ConfigReader.PREFERENCES_INTERNAL_LOG_READ +
+			ConfigReader.PREFERENCES_LOG_EXCEPTIONS +
+			ConfigReader.PREFERENCES_THROWS_FORMAT +
+			ConfigReader.PREFERENCES_THROWS_EXCEPTIONS +
+			ConfigReader.PREFERENCES_THROWS_NOTFOUND +
+			ConfigReader.PREFERENCES_THROWS_UNEXPECTED;
+
 
 	/**
 	 * Código de identificação do servidor de acesso.
@@ -153,12 +166,13 @@ public abstract class Server
 	 * O código de identificação é individual para cada tipo de servidor.
 	 * Acesso por pacote e utilizado por ServerControl quando listado.
 	 * @param id código de identificação do servidor.
-	 * @see ServerControl
+	 * @see ServerController
 	 */
 
-	final void setID(int id)
+	public final void setID(int id)
 	{
-		this.id = id;
+		if (this.id == 0)
+			this.id = id;
 	}
 
 	/**
@@ -232,21 +246,9 @@ public abstract class Server
 	 * @param listener referência do objeto que implementou a interface desse listener.
 	 */
 
-	public void setListener(ServerListener listener)
+	protected void setListener(ServerListener listener)
 	{
 		this.listener = listener;
-	}
-
-	/**
-	 * Permite definir qual será o objeto usado para armazenar as configurações do servidor.
-	 * Pode ser definido apenas uma única vez, logo se já tiver sido definido não terá efeito.
-	 * @param configs referência do objeto contendo as configurações do servidor.
-	 */
-
-	protected void setServerConfig(Configurations configs)
-	{
-		if (this.configs == null && configs != null)
-			this.configs = configs;
 	}
 
 	/**
@@ -260,12 +262,24 @@ public abstract class Server
 	}
 
 	/**
+	 * Permite definir qual será o objeto usado para armazenar as configurações do servidor.
+	 * Pode ser definido apenas uma única vez, logo se já tiver sido definido não terá efeito.
+	 * @param configs referência do objeto contendo as configurações do servidor.
+	 */
+
+	public void setConfigurations(Configurations configs)
+	{
+		if (this.configs == null && configs != null)
+			this.configs = configs;
+	}
+
+	/**
 	 * O analisador padrão é usado para determinar o despache dos novos clientes.
 	 * Toda nova conexão recebida será despachada para esse listener.
 	 * @param defaultParser referência do objeto que implementa esse listener.
 	 */
 
-	public void setDefaultParser(FileDescriptorListener defaultParser)
+	protected void setDefaultParser(FileDescriptorListener defaultParser)
 	{
 		this.defaultParser = defaultParser;
 	}
@@ -465,7 +479,7 @@ public abstract class Server
 		for (String filename : filenames)
 		{
 			String folder = configs.getString(SERVER_FOLDER);
-			String filePath = format("config/Servers/%s%s", folder, filename.trim());
+			String filePath = format("config/Servers/%s/%s", folder, filename.trim());
 
 			readConfigFile(filePath);
 		}
@@ -475,7 +489,7 @@ public abstract class Server
 		for (String filename : filenames)
 		{
 			String folder = configs.getString(SYSTEM_SERVER_DEFAULT_FOLDER);
-			String filePath = format("config/Servers/%s%s", folder, filename.trim());
+			String filePath = format("config/Servers/%s/%s", folder, filename.trim());
 
 			readConfigFile(filePath);
 		}
@@ -489,13 +503,12 @@ public abstract class Server
 	private void readConfigFile(String filePath)
 	{
 		ConfigReader load = new ConfigReader();
+		load.getPreferences().set(CONFIG_READ_PREFERENCES);
 		load.setConfigurations(configs);
 		load.setFilePath(filePath);
 
 		try {
-
-			logNotice("lido %d configurações de '%s'.\n", load.read(), filePath);
-
+			load.read();
 		} catch (RagnarokException e) {
 			logError("falha ao ler '%s'.\n", filePath);
 			logExeception(e);

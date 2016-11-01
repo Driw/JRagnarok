@@ -32,7 +32,10 @@ import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.ConfigString;
 import org.diverproject.jragnaork.configuration.ConfigSystem;
 import org.diverproject.jragnaork.configuration.Configurations;
-import org.diverproject.jragnarok.server.ServerControl;
+import org.diverproject.jragnarok.server.ServerController;
+import org.diverproject.jragnarok.server.character.CharServer;
+import org.diverproject.jragnarok.server.login.LoginServer;
+import org.diverproject.jragnarok.server.map.MapServer;
 import org.diverproject.log.LogPreferences;
 import org.diverproject.log.LogSystem;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;
@@ -75,6 +78,16 @@ public class JRagnarok
 	public static final StringSimpleMap<String> ARGUMENTS = new StringSimpleMap<>();
 
 	/**
+	 * Controlador de servidores.
+	 */
+	private static final ServerController SERVERS = ServerController.getInstance();
+
+	private JRagnarok()
+	{
+		
+	}
+
+	/**
 	 * Procedimento primário que será chamado quando a aplicação for aberta.
 	 * Através dele deverá chamar outros métodos para inicialização básica do sistema.
 	 * Por fim deverá garantir que todos os micro servidores sejam inicializados.
@@ -91,6 +104,7 @@ public class JRagnarok
 		loadSystemConfig();
 		prepareConfigTypes();
 		prepareServers();
+		runServers();
 	}
 
 	/**
@@ -260,7 +274,6 @@ public class JRagnarok
 
 				} catch (ClassNotFoundException e) {
 					logError("configuração '%s' não encontrada.\n", className);
-					logExeception(e);
 				}
 			}
 
@@ -287,10 +300,17 @@ public class JRagnarok
 
 		for (String file : files)
 		{
-			String filepath = format("config/%s%s", folder, file);
+			String filepath = format("config/%s/%s", folder, file);
 			prepareServer(configs, filepath);
 		}
 	}
+
+	/**
+	 * Prepara um novo servidor de acordo com as configurações de sistema.
+	 * Também é necessário definir o local das configurações desse servidor.
+	 * @param systemConfigs conjunto das configurações referentes ao sistema.
+	 * @param filepath local onde se encontra as configurações do servidor.
+	 */
 
 	private static void prepareServer(Configurations systemConfigs, String filepath)
 	{
@@ -311,35 +331,81 @@ public class JRagnarok
 		prepareMicroServers(serverConfigs);
 	}
 
+	/**
+	 * Prepara a criação dos servidores de acesso, personagem e mapa se necessário.
+	 * Através das configurações identifica o código de cada servidor e verifica se
+	 * os mesmos já foram criados, caso não tenham sido irá criar e configurar.
+	 * @param configs conjunto de configurações referente ao servidor.
+	 */
+
 	private static void prepareMicroServers(Configurations configs)
 	{
-		ServerControl control = ServerControl.getInstance();
+		int loginID = configs.getInt(SERVER_LOGINID);
+		int charID = configs.getInt(SERVER_LOGINID);
+		int mapID = configs.getInt(SERVER_LOGINID);
 
-		if (control.getLoginServer(configs.getInt(SERVER_LOGINID)) != null)
-			prepareLoginServer(configs);
+		if (SERVERS.getLoginServer(loginID) == null)
+			prepareLoginServer(loginID, configs);
 
-		if (control.getCharServer(configs.getInt(SERVER_LOGINID)) != null)
-			prepareCharServer(configs);
+		if (SERVERS.getCharServer(charID) == null)
+			prepareCharServer(charID, configs);
 
-		if (control.getMapServer(configs.getInt(SERVER_LOGINID)) != null)
-			prepareMapServer(configs);
+		if (SERVERS.getMapServer(mapID) == null)
+			prepareMapServer(mapID, configs);
 	}
 
-	private static void prepareLoginServer(Configurations configs)
+	/**
+	 * Prepara a criação e configuração de um novo servidor de acesso conforme:
+	 * @param id código de identificação único entre os servidores de acesso.
+	 * @param configs conjunto de configurações referentes ao micro servidor.
+	 */
+
+	private static void prepareLoginServer(int id, Configurations configs)
 	{
-		// TODO Auto-generated method stub
-		
+		LoginServer server = new LoginServer();
+		server.setID(id);
+		server.setConfigurations(configs);
+
+		SERVERS.add(server);
 	}
 
-	private static void prepareCharServer(Configurations configs)
+	/**
+	 * Prepara a criação e configuração de um novo servidor de personagem conforme:
+	 * @param id código de identificação único entre os servidores de personagem.
+	 * @param configs conjunto de configurações referentes ao micro servidor.
+	 */
+
+	private static void prepareCharServer(int id, Configurations configs)
 	{
-		// TODO Auto-generated method stub
-		
+		CharServer server = new CharServer();
+		server.setID(id);
+		server.setConfigurations(configs);
+
+		SERVERS.add(server);
 	}
 
-	private static void prepareMapServer(Configurations configs)
+	/**
+	 * Prepara a criação e configuração de um novo servidor de mapa conforme:
+	 * @param id código de identificação único entre os servidores de mapa.
+	 * @param configs conjunto de configurações referentes ao micro servidor.
+	 */
+
+	private static void prepareMapServer(int id, Configurations configs)
 	{
-		// TODO Auto-generated method stub
-		
+		MapServer server = new MapServer();
+		server.setID(id);
+		server.setConfigurations(configs);
+
+		SERVERS.add(server);		
+	}
+
+	/**
+	 * Procedimento que deverá forçar a criação e inicialização de todos os micro servidores.
+	 */
+
+	private static void runServers()
+	{
+		SERVERS.createAll(true);
+		SERVERS.runAll(true);
 	}
 }

@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login.entities;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.USERNAME_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 
 import org.diverproject.util.ObjectDescription;
@@ -40,7 +40,7 @@ public class Vip
 
 	public void setName(String name)
 	{
-		this.name = strcap(name, NAME_LENGTH);
+		this.name = strcap(name, USERNAME_LENGTH);
 	}
 
 	public byte getCharSlotCount()
