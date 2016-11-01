@@ -1,3 +1,9 @@
+01.11.2016 - 1.2.75
+- Removendo as configurações específicas padrões de ConfigTypes.
+- Barras para indicar diretórios removido das configurações.
+- A configuração server.folder será especificado nas configurações de cada micro servidor.
+- LoginServer.conf corrigido, duas configurações não definidas e removido três não usadas.
+
 01.11.2016 - 1.2.74
 - Pequenas modificações em ConfigReader para torná-lo mais dinâmico com preferências.
 - Configurations.toString deverá mostrar o nome e valor da configuração.
