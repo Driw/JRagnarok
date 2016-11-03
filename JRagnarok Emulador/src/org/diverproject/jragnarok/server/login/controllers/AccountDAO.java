@@ -33,9 +33,9 @@ public class AccountDAO extends AbstractDAO
 		String accountTable = Tables.getInstance().getAccounts();
 		String loginTable = Tables.getInstance().getLogins();
 
-		String sql = format("SELECT id, password, last_login, registered,"
-						+ " email, birth_date, login_count, unban, expiration, pincode, groupid, state, last_ip"
-						+ " FROM %s INNER JOIN %s ON %s.id = %s.login"
+		String sql = format("SELECT id, password, last_login, registered, email, birth_date,"
+						+ " login_count, unban, expiration, pincode, groupid, state, last_ip"
+						+ " FROM %s"
 						+ " WHERE username = ?",
 						accountTable, loginTable, loginTable, accountTable);
 
@@ -49,11 +49,11 @@ public class AccountDAO extends AbstractDAO
 			if (rs.next())
 			{
 				Account account = new Account();
-				account.getLogin().setID(rs.getInt("id"));
-				account.getLogin().setUsername(username);
-				account.getLogin().setPassword(rs.getString("password"));
-				account.getLogin().getRegistered().set(rs.getDate("registered").getTime());
-				account.getLogin().getLastLogin().set(rs.getDate("last_login").getTime());
+				account.setID(rs.getInt("id"));
+				account.setUsername(username);
+				account.setPassword(rs.getString("password"));
+				account.getRegistered().set(rs.getDate("registered").getTime());
+				account.getLastLogin().set(rs.getDate("last_login").getTime());
 				account.setEmail(rs.getString("email"));
 				account.setBirthDate(rs.getString("birth_date"));
 				account.setLoginCount(rs.getInt("login_count"));
@@ -297,8 +297,8 @@ public class AccountDAO extends AbstractDAO
 		try {
 
 			PreparedStatement ps = prepare(sql);
-			ps.setTimestamp(1, account.getLogin().getLastLogin().toTimestamp());
-			ps.setInt(2, account.getLogin().getID());
+			ps.setTimestamp(1, account.getLastLogin().toTimestamp());
+			ps.setInt(2, account.getID());
 
 			return ps.executeUpdate() == 1;
 
@@ -320,7 +320,7 @@ public class AccountDAO extends AbstractDAO
 			ps.setTimestamp(3, account.getExpiration().toTimestamp());
 			ps.setInt(4, account.getState().CODE);
 			ps.setInt(5, account.getLastIP().get());
-			ps.setInt(6, account.getLogin().getID());
+			ps.setInt(6, account.getID());
 
 			return ps.executeUpdate() == 1;
 

@@ -25,7 +25,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	private TimerListener syncronizeIpAddress = new TimerListener()
 	{
 		@Override
-		public void onCall(Timer timer, int tick)
+		public void onCall(Timer timer, int now, int tick)
 		{
 			logInfo("Sincronização de IP em progresso...\n");
 
@@ -120,8 +120,8 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 			Timer siaTimer = timers.acquireTimer();
 			siaTimer.setListener(syncronizeIpAddress);
-			siaTimer.setTick(ts.getLastTick() + minutes(interval));
-			ts.getTimers().addInterval(siaTimer, minutes(interval));
+			siaTimer.setTick(ts.getCurrentTime() + minutes(interval));
+			ts.getTimers().addLoop(siaTimer, minutes(interval));
 		}
 	}
 

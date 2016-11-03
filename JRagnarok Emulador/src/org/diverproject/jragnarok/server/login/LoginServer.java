@@ -222,9 +222,9 @@ public class LoginServer extends Server
 			TimerMap timers = ts.getTimers();
 
 			Timer odcTimer = timers.acquireTimer();
-			odcTimer.setTick(ts.getLastTick() + minutes(10));
+			odcTimer.setTick(ts.getCurrentTime() + minutes(10));
 			odcTimer.setListener(onlineDataCleanup);
-			ts.getTimers().addInterval(odcTimer, minutes(10));
+			ts.getTimers().addLoop(odcTimer, minutes(10));
 		}
 
 		@Override
@@ -273,7 +273,7 @@ public class LoginServer extends Server
 	private final TimerListener onlineDataCleanup = new TimerListener()
 	{
 		@Override
-		public void onCall(Timer timer, int tick)
+		public void onCall(Timer timer, int now, int tick)
 		{
 			// TODO Auto-generated method stub
 			

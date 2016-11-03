@@ -7,12 +7,11 @@ import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
 
-public class Account
+public class Account extends Login
 {
 	private static final String DEFAULT_EMAIL = "a@a.com";
 	private static final String DEFAULT_BIRTHDATE = "0000-00-00";
 
-	private Login login;
 	private String email;
 	private String birthDate;
 	private byte charSlots;
@@ -30,7 +29,6 @@ public class Account
 		email = DEFAULT_EMAIL;
 		birthDate = DEFAULT_BIRTHDATE;
 
-		login = new Login();
 		unban = new Time();
 		expiration = new Time();
 		lastIP = new InternetProtocol();
@@ -38,17 +36,6 @@ public class Account
 		group = new AccountGroup();
 
 		state = AccountState.NONE;
-	}
-
-	public Login getLogin()
-	{
-		return login;
-	}
-
-	public void setLogin(Login login)
-	{
-		if (login != null)
-			this.login = login;
 	}
 
 	public String getEmail()
@@ -148,13 +135,8 @@ public class Account
 	}
 
 	@Override
-	public String toString()
+	public void toString(ObjectDescription description)
 	{
-		ObjectDescription description = new ObjectDescription(getClass());
-
-		if (login != null)
-			login.toString(description);
-
 		description.append("email", email);
 		description.append("birthDate", birthDate);
 		description.append("charSlots", charSlots);
@@ -176,7 +158,5 @@ public class Account
 			description.append("pincode", pincode.getCode());
 			description.append("pincodChange", pincode.getChanged());
 		}
-
-		return description.toString();
 	}
 }

@@ -1,5 +1,9 @@
 package org.diverproject.jragnarok.server;
 
+import static org.diverproject.jragnarok.server.TimerType.TIMER_INTERVAL;
+import static org.diverproject.jragnarok.server.TimerType.TIMER_LOOP;
+import static org.diverproject.jragnarok.server.TimerType.TIMER_ONCE_AUTODEL;
+import static org.diverproject.jragnarok.server.TimerType.TIMER_REMOVE;
 import static org.diverproject.log.LogSystem.logError;
 
 import java.util.Iterator;
@@ -7,6 +11,7 @@ import java.util.Iterator;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.DynamicIndex;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;
+import org.diverproject.util.collection.abstraction.NodeList;
 
 /**
  * <h1>Mapeador de Temporizadores</h1>
@@ -35,9 +40,9 @@ public class TimerMap implements Iterable<Timer>
 	private Map<Integer, Timer> timers;
 
 	/**
-	 * Lista para indexar os temporizadores em ordem de execução.
+	 * Lista contendo nós dos temporizadores ordenados.
 	 */
-	private DynamicIndex<Timer> indexes;
+	private NodeList<Timer> indexes;
 
 	/**
 	 * Inicializa o mapeamento dos temporizadores e indexação dos temporizadores e
@@ -47,8 +52,7 @@ public class TimerMap implements Iterable<Timer>
 	public TimerMap()
 	{
 		timers = new IntegerLittleMap<>();
-		indexes = new DynamicIndex<>();
-		indexes.setRepet(true);
+		indexes = new NodeList<>();
 	}
 
 	/**
@@ -78,16 +82,16 @@ public class TimerMap implements Iterable<Timer>
 				timers.add(timer.getID(), timer);
 
 			timer.setInterval(0);
-			timer.getType().set(Timer.TIMER_ONCE_AUTODEL);
+			timer.setType(TIMER_ONCE_AUTODEL);
 
 			update(timer);
 		}
 	}
 
 	/**
-	 * Adiciona o temporizador para ser executado em loops conforme o intervalo definido.
+	 * Adiciona o temporizador para ser executado após o intervalo definido.
 	 * @param timer referência do temporizador que será atualizado.
-	 * @param interval intervalo para que o temporizador seja renovado.
+	 * @param interval intervalo de espera para a execução do loop.
 	 */
 
 	public void addInterval(Timer timer, int interval)
@@ -97,7 +101,7 @@ public class TimerMap implements Iterable<Timer>
 			if (!timers.containsKey(timer.getID()))
 				timers.add(timer.getID(), timer);
 
-			timer.getType().set(Timer.TIMER_INTERVAL);
+			timer.setType(TIMER_INTERVAL);
 			timer.setInterval(interval);
 
 			update(timer);
@@ -108,16 +112,26 @@ public class TimerMap implements Iterable<Timer>
 	}
 
 	/**
-	 * Atualiza um temporizador para que seja excluído após ao fim do próximo segundo.
-	 * @param timer referência do temporizador que deseja alterar.
+	 * Adiciona o temporizador para ser executado em loops conforme o intervalo definido.
+	 * @param timer referência do temporizador que será atualizado.
+	 * @param interval intervalo para que o temporizador seja renovado.
 	 */
 
-	public void setTimerExpired(Timer timer)
+	public void addLoop(Timer timer, int interval)
 	{
-		timer.setInterval(1000);
-		timer.getType().set(Timer.TIMER_ONCE_AUTODEL);
+		if (interval >= 0)
+		{
+			if (!timers.containsKey(timer.getID()))
+				timers.add(timer.getID(), timer);
 
-		update(timer);
+			timer.setType(TIMER_LOOP);
+			timer.setInterval(interval);
+
+			update(timer);
+		}
+
+		else
+			logError("intervalo inválido (timer: %d, listener: %s).\n", timer.getID(), timer.getListener().getName());
 	}
 
 	/**
@@ -129,7 +143,7 @@ public class TimerMap implements Iterable<Timer>
 	public void update(Timer timer)
 	{
 		indexes.remove(timer); // Remover por objeto já que pode ter tick duplicado
-		indexes.add(timer.getTick(), timer);
+		indexes.add(timer);
 	}
 
 	/**
@@ -141,62 +155,55 @@ public class TimerMap implements Iterable<Timer>
 	public void delete(Timer timer)
 	{
 		timer.setListener(null);
-		timer.getType().set(Timer.TIMER_ONCE_AUTODEL);
+		timer.setType(TimerType.TIMER_INVALID);
 
 		timers.removeKey(timer.getID());
+		indexes.remove(timer);
 	}
 
 	/**
 	 * Executa todos os temporizadores que tiverem o seu tempo expirado no sistema.
-	 * @param tick momento no tempo do sistema para atualizar os temporizadores.
-	 * @return tempo em milissegundos para o próximo temporizador vencer.
+	 * @param now tempo atual que ocorre a atualização em milissegundos.
+	 * @param tick milissegundos passados desde a última atualização.
 	 */
 
-	public int update(int tick)
+	public void update(int now, int tick)
 	{
-		int diff = TimerSystem.MAX_TIMER_INTERVAL;
-
 		for (Timer timer : this)
 		{
-			diff = timer.getTick() - tick;
-
-			if (diff > 0)
+			if (timer.getTick() > now)
 				break;
 
-			timer.getType().set(Timer.TIMER_REMOVE);
-
-			if (timer.getListener() != null)
+			switch (timer.getType())
 			{
-				if (diff < -TimerSystem.MAX_TIMER_INTERVAL)
-					timer.getListener().onCall(timer, tick);
-				else
-					timer.getListener().onCall(timer, timer.getTick());
-			}
+				case TIMER_ONCE_AUTODEL:
+					timer.getListener().onCall(timer, now, tick);
+					timer.setType(TIMER_REMOVE);
+					break;
 
-			if (timer.getType().is(Timer.TIMER_REMOVE))
-			{
-				timer.getType().unset(Timer.TIMER_REMOVE);
+				case TIMER_INTERVAL:
+					if (timer.getTick() + timer.getInterval() >= now)
+					{
+						timer.getListener().onCall(timer, now, tick);
+						timer.setType(TIMER_REMOVE);
+					}
+					break;
 
-				switch (timer.getType().getValue())
-				{
-					default:
-					case Timer.TIMER_ONCE_AUTODEL:
-						timer.getType().setValue(0);
-						timers.remove(timer);
-						indexes.remove(timer);
-						break;
+				case TIMER_LOOP:
+					if (timer.getTick() + timer.getInterval() >= now)
+					{
+						timer.getListener().onCall(timer, now, tick);
+						timer.setTick(now + timer.getInterval());
+						update(timer);
+					}
+					break;
 
-					case Timer.TIMER_INTERVAL:
-						if (timer.getTick() - tick < -1000)
-							timer.setTick(tick + timer.getInterval());
-						else
-							timer.setTick(timer.getTick() + timer.getInterval());
-						break;
-				}
+				case TIMER_REMOVE:
+					delete(timer);
+
+				default:
 			}
 		}
-
-		return diff;
 	}
 
 	/**

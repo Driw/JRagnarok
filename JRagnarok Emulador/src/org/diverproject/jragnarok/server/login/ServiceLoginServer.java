@@ -18,7 +18,6 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.login.controllers.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
-import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
 import org.diverproject.jragnarok.server.login.structures.ClientHashNode;
@@ -83,18 +82,17 @@ public class ServiceLoginServer extends AbstractServiceLogin
 			return result;
 
 		Account account = (Account) sd.getFileDescriptor().getCache();
-		Login login = account.getLogin();
 
-		logNotice("autenticação aceita (id: %d, username: %s, ip: %s).\n", login.getID(), login.getUsername(), sd.getAddressString());
+		logNotice("autenticação aceita (id: %d, username: %s, ip: %s).\n", account.getID(), account.getUsername(), sd.getAddressString());
 
-		sd.setID(login.getID());
-		sd.getLastLogin().set(login.getLastLogin().get());
+		sd.setID(account.getID());
+		sd.getLastLogin().set(account.getLastLogin().get());
 		sd.setGroup(account.getGroup().getCurrentGroup());
 
 		sd.getSeed().genFirst();
 		sd.getSeed().genSecond();
 
-		login.getLastLogin().set(now());
+		account.getLastLogin().set(now());
 		account.getLastIP().set(sd.getAddress());
 		account.setLoginCount(account.getLoginCount() + 1);
 
@@ -190,7 +188,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 	private AuthResult authPassword(LoginSessionData sd, Account account)
 	{
-		String password = account.getLogin().getPassword();
+		String password = account.getPassword();
 
 		if (!sd.getPassword().equals(password))
 		{
@@ -312,7 +310,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	public TimerListener waitingDisconnectTimer = new TimerListener()
 	{
 		@Override
-		public void onCall(Timer timer, int tick)
+		public void onCall(Timer timer, int now, int tick)
 		{
 			
 		}

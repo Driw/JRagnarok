@@ -106,40 +106,42 @@ public class FileDescriptorSystem
 	/**
 	 * Procedimento estático usado para atualizar todos os Arquivos Descritores.
 	 * Deverá garantir que todas conexões sejam processadas igualmente.
-	 * @param next milissegundos para expirar o próximo temporizador.
+	 * @param now tempo atual que ocorre a atualização em milissegundos.
+	 * @param tick milissegundos passados desde a última atualização.
 	 */
 
-	public void update(int next)
+	public void update(int now, int tick)
 	{
-		int lastTick = timerSystem.getLastTickCount();
-
 		executeActions();
 
 		for (int i = 0; i < sessions.size(); i++)
 		{
 			FileDescriptor fd = sessions.get(i);
 
-			if (fd.getTimeout() > 0 && (fd.getTimeout() - lastTick) < 0)
+			if (fd.getFlag().is(FLAG_EOF) || !fd.isConnected())
+			{
+				if (fd.isConnected())
+					fd.close();
+
+				logInfo("sessão encerrada (ip: %s).\n", fd.getAddressString());
+
+				sessions.remove(i);
+			}
+
+			else if (fd.getTimeout() > 0 && (fd.getTimeout() - now) <= 0)
 			{
 				if (fd.getFlag().is(FLAG_SERVER) && fd.getFlag().is(FLAG_PING))
 					fd.getFlag().unset(FLAG_PING);
 
 				else
 				{
-					logInfo("sessão #%d terminada por ociosidade (ip: %s).\n", fd.getID(), fd.getAddressString());
+					logInfo("sessão #%d encerrada por ociosidade (ip: %s).\n", fd.getID(), fd.getAddressString());
 					setEndOfFile(fd);
 				}
 			}
 
-			executeListener(fd, lastTick);
-
-			if (!fd.isConnected())
-			{
-				logInfo("sessão encerrada (ip: %s).\n", fd.getAddressString());
-
-				fd.close();
-				sessions.remove(i);
-			}
+			else
+				executeListener(fd);
 		}
 	}
 
@@ -164,10 +166,9 @@ public class FileDescriptorSystem
 	 * Procedimento chamado quando solicitado para atualizar os temporizadores.
 	 * Deverá garantir que o descritor de arquivo chame o seu listener de análise.
 	 * @param fd referência do arquivo descritor que será analisado os dados recebidos.
-	 * @param lastTick tempo atual referente a última atualização (loop) do servidor.
 	 */
 
-	private void executeListener(FileDescriptor fd, int lastTick)
+	private void executeListener(FileDescriptor fd)
 	{
 		try {
 

@@ -1,3 +1,13 @@
+03.11.2016 - 1.2.79
+- Modificando a forma como a atualização/chamado dos temporizadores será feita:
+	- Será repassado now (tempo do servidor) e tick (milissegundos passados).
+- Ajustes para a remoção de FileDescriptor ocioso ou que foi encerrado (EOF).
+- Atualizar os temporizadores agora deverá ser feito por getTimers().update.
+- Timer agora poderá ser comparado a outro Timer, para ser adicionado corretamente em NodeList.
+- ServiceLoginClient.requestCharConnect deve retornar boolean para fechar conexão se necessário.
+- Removendo tabela login do banco de dados, dados vinculados a tabela accounts.
+- Account agora será um Login, atualizando AccountDAO para que solicite os dados corretamente.
+
 01.11.2016 - 1.2.78
 - Movendo todos os serviços de login.service para login.
 	- Renomeando de Login*Service para ServiceLogin* conforme ordem ortográfica.

@@ -614,8 +614,9 @@ public abstract class Server
 						continue;
 					}
 
-					int next = timerSystem.update(timerSystem.tick());
-					fileDescriptorSystem.update(next);
+					int tick = timerSystem.tick();
+					timerSystem.getTimers().update(timerSystem.getCurrentTime(), tick);
+					fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
 				}
 			}
 		});

@@ -224,7 +224,7 @@ public class FileDescriptor
 
 	public PacketBuilder getPacketBuilder()
 	{
-		timeout = system.getTimerSystem().getLastTickCount() + DEFAULT_TIMEOUT;
+		timeout = system.getTimerSystem().getCurrentTime() + DEFAULT_TIMEOUT;
 
 		return packetBuilder;
 	}

@@ -1,12 +1,12 @@
 package org.diverproject.jragnarok.server;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.free;
+import static org.diverproject.jragnarok.JRagnarokUtil.i;
 
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
 import org.diverproject.util.TimerTick;
 import org.diverproject.util.collection.Map;
-import org.diverproject.util.lang.IntUtil;
 
 /**
  * <h1>Sistema de Temporizadores</h1>
@@ -24,17 +24,6 @@ import org.diverproject.util.lang.IntUtil;
 public class TimerSystem
 {
 	/**
-	 * Tempo mínimo de um temporizador.
-	 */
-	public static final int MIN_TIMER_INTERVAL = 20;
-
-	/**
-	 * Tempo limite de um temporizador.
-	 */
-	public static final int MAX_TIMER_INTERVAL = 1000;
-
-
-	/**
 	 * Quando o sistema foi inicializado.
 	 */
 	private long started;
@@ -42,17 +31,12 @@ public class TimerSystem
 	/**
 	 * Quando ocorreu o último tick no sistema.
 	 */
-	private int lastTick;
-
-	/**
-	 * Quantos ticks (milissegundos) já se passaram desde a inicialização.
-	 */
-	private int lastTickCount;
+	private int currentTime;
 
 	/**
 	 * Referência do objeto que faz a cronometragem do sistema.
 	 */
-	private TimerTick tick;
+	private TimerTick ticker;
 
 	/**
 	 * Mapeador de temporizadores.
@@ -66,7 +50,7 @@ public class TimerSystem
 
 	public TimerSystem()
 	{
-		tick = new TimerTick(1);
+		ticker = new TimerTick(1);
 		timers = new TimerMap();
 	}
 
@@ -82,28 +66,22 @@ public class TimerSystem
 	}
 
 	/**
-	 * Aumenta o tempo de um temporizador em milissegundos especificados.
-	 * @param timer referência do temporizador que será atualizado.
-	 * @param milisseconds quantidade de tempo em milissegundos.
+	 * O último tick representa a diferença de tempo entre o último e penúltimo tick.
+	 * @return aquisição da quantidade de milissegundos calculados no último tick.
 	 */
 
-	public void addTickTimer(Timer timer, int milisseconds)
+	public int getCurrentTime()
 	{
-		setTickTimer(timer, timer.getTick() + milisseconds);
+		return currentTime;
 	}
 
 	/**
-	 * Define o tempo de um temporizador em milissegundos especificados.
-	 * @param timer referência do temporizador que será atualizado.
-	 * @param tick tempo do servidor em milissegundos ligado.
+	 * @return aquisição do tempo em milissegundos que o sistema está ligado.
 	 */
 
-	private void setTickTimer(Timer timer, int tick)
+	public long getUptime()
 	{
-		if (tick < 0)
-			tick = 0;
-
-		timer.setTick(tick);
+		return System.currentTimeMillis() - started;
 	}
 
 	/**
@@ -115,53 +93,10 @@ public class TimerSystem
 
 	public int tick()
 	{
-		lastTick = (int) tick.getTicks();
-		lastTickCount = (int) tick.getTicksCount();
+		int tick = i(ticker.getTicks());
+		currentTime = i(ticker.getTicksCount());
 
-		return lastTickCount;
-	}
-
-	/**
-	 * O último tick representa a diferença de tempo entre o último e penúltimo tick.
-	 * @return aquisição da quantidade de milissegundos calculados no último tick.
-	 */
-
-	public int getLastTick()
-	{
-		return lastTick;
-	}
-
-	/**
-	 * A contagem de ticks é salva no sistema para que possa ser usado se necessário.
-	 * @return aquisição do tempo em milissegundos já calculados em ticks.
-	 */
-
-	public int getLastTickCount()
-	{
-		return lastTickCount;
-	}
-
-	/**
-	 * Atualiza o sistema de temporizadores afim de executá-los se necessário.
-	 * @param tick momento no tempo do sistema para atualizar os temporizadores.
-	 * @return tempo em milissegundos para o próximo temporizador vencer,
-	 * irá considerar os valores limites de MIN_TIMER_INTERVAL e MAX_TIMER_INTERVAL.
-	 */
-
-	public int update(int tick)
-	{
-		int diff = timers.update(tick);
-
-		return IntUtil.limit(diff, MIN_TIMER_INTERVAL, MAX_TIMER_INTERVAL);
-	}
-
-	/**
-	 * @return aquisição do tempo em milissegundos que o sistema está ligado.
-	 */
-
-	public long getUptime()
-	{
-		return System.currentTimeMillis() - started;
+		return tick;
 	}
 
 	/**
@@ -175,7 +110,7 @@ public class TimerSystem
 			return;
 
 		started = System.currentTimeMillis();
-		tick = new TimerTick(1, Long.MAX_VALUE);
+		ticker = new TimerTick(1, Long.MAX_VALUE);
 	}
 
 	/**
@@ -195,9 +130,8 @@ public class TimerSystem
 		ObjectDescription description = new ObjectDescription(getClass());
 
 		description.append("started", new Time(started));
-		description.append("lastTick", lastTick);
-		description.append("lastTickCount", lastTickCount);
-		description.append("tick", tick);
+		description.append("currentTime", currentTime);
+		description.append("tick", ticker);
 		description.append("timers", timers.size());
 
 		return description.toString();

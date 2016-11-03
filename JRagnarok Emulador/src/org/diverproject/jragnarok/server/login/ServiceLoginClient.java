@@ -22,6 +22,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_RE
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_REQ_HASH;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_SSO_LOGIN_REQ;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
+import static org.diverproject.jragnarok.server.TimerType.TIMER_INVALID;
 import static org.diverproject.jragnarok.server.login.structures.NotifyAuthResult.RECOGNIZES_LAST_LOGIN;
 import static org.diverproject.jragnarok.server.login.structures.NotifyAuthResult.SERVER_CLOSED;
 import static org.diverproject.log.LogSystem.log;
@@ -227,8 +228,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 				return requestAuth(fd, sd, command);
 
 			case PACKET_CA_REQ_CHAR_CONNECT:
-				requestCharConnect(fd, sd);
-				return true;
+				return requestCharConnect(fd, sd);
 
 			default:
 				String packet = HexUtil.parseInt(command, 4);
@@ -624,7 +624,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		TimerMap timers = ts.getTimers();
 
 		Timer waitingDisconnect = timers.acquireTimer();
-		waitingDisconnect.setTick(ts.getLastTick() + AUTH_TIMEOUT);
+		waitingDisconnect.setTick(ts.getCurrentTime() + AUTH_TIMEOUT);
 		waitingDisconnect.setListener(this.login.waitingDisconnectTimer);
 
 		OnlineLogin online = new OnlineLogin();
@@ -643,7 +643,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	private boolean authServerConnected(LoginSessionData sd)
 	{
 		Account account = (Account) sd.getFileDescriptor().getCache();
-		String username = account.getLogin().getUsername();
+		String username = account.getUsername();
 
 		int serverConnect = 0;
 		LoginCharServers servers = getServer().getCharServers();
@@ -705,7 +705,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	private boolean authGroupToConnect(Account account, int required)
 	{
 		int group = account.getGroup().getCurrentGroup().getID();
-		String username = account.getLogin().getUsername();
+		String username = account.getUsername();
 
 		if (required == 0 || group == required)
 			return true;
@@ -727,7 +727,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	private boolean authMinGroupToConnect(Account account, int required, int min)
 	{
 		int group = account.getGroup().getCurrentGroup().getID();
-		String username = account.getLogin().getUsername();
+		String username = account.getUsername();
 
 		if (required == -1 && min < group)
 			return true;
@@ -747,7 +747,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	private boolean authIsntOnline(LoginSessionData sd)
 	{
 		Account account = (Account) sd.getFileDescriptor().getCache();
-		OnlineLogin online = onlines.get(account.getLogin().getID());
+		OnlineLogin online = onlines.get(account.getID());
 
 		if (online != null)
 		{
@@ -780,20 +780,20 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	private void authIsOnline(FileDescriptor fd, Account account, OnlineLogin online, ClientCharServer server)
 	{
-		logNotice("usuário '%s' já está online em '%s'.\n", account.getLogin().getUsername(), server.getName());
+		logNotice("usuário '%s' já está online em '%s'.\n", account.getUsername(), server.getName());
 
 		AlreadyOnline packet = new AlreadyOnline();
-		packet.setAccountID(account.getLogin().getID());
+		packet.setAccountID(account.getID());
 
 		sendAllWithoutOurSelf(packet);
 
-		if (online.getWaitingDisconnect().getTick() == Timer.INVALID_TIMER)
+		if (online.getWaitingDisconnect().getType() == TIMER_INVALID)
 		{
 			TimerSystem ts = getTimerSystem();
 
 			Timer timer = online.getWaitingDisconnect();
 			timer.setListener(login.waitingDisconnectTimer);
-			timer.setTick(ts.tick());
+			timer.setTick(ts.getCurrentTime());
 			ts.getTimers().add(timer);
 
 			sendNotifyResult(fd, RECOGNIZES_LAST_LOGIN);
@@ -806,9 +806,10 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * Chamado quando um servidor de personagens solicita a conexão com o servidor de acesso.
 	 * @param fd referência da conexão com o cliente para enviar e receber dados.
 	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @return true se tiver sido aturoziado ou false caso contrário.
 	 */
 
-	private void requestCharConnect(FileDescriptor fd, LoginSessionData sd)
+	private boolean requestCharConnect(FileDescriptor fd, LoginSessionData sd)
 	{
 		CharConnectReceive ccPacket = new CharConnectReceive();
 		ccPacket.receive(fd);
@@ -855,6 +856,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			CharConnectResult packet = new CharConnectResult();
 			packet.setResult(AuthResult.OK);
 			packet.send(fd);
+
+			return true;
 		}
 
 		else
@@ -864,6 +867,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			CharConnectResult packet = new CharConnectResult();
 			packet.setResult(AuthResult.REJECTED_FROM_SERVER);
 			packet.send(fd);
+
+			return false;
 		}
 	}
 }

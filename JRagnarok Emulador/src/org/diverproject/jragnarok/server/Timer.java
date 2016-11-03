@@ -21,35 +21,8 @@ import org.diverproject.util.ObjectDescription;
  * @author Andrew
  */
 
-public class Timer
+public class Timer implements Comparable<Timer>
 {
-	/**
-	 * Código que define o tipo para funcionar uma vez e ser excluído.
-	 */
-	public static final int TIMER_ONCE_AUTODEL = 0x01;
-
-	/**
-	 * Código que define o tipo para funcionar como loops.
-	 */
-	public static final int TIMER_INTERVAL = 0x02;
-
-	/**
-	 * Código que define o tipo como expirado (remover).
-	 */
-	public static final int TIMER_REMOVE = 0x10;
-
-	/**
-	 * Valor para considerar temporizador inválido.
-	 */
-	public static final int INVALID_TIMER = -1;
-
-	/**
-	 * Vetor contendo o nome de todos os tipos de temporizadores.
-	 */
-	private static final String TIMER_STRINGS[] = new String[]
-	{ "ONCE_AUTODEL", "INTERVAL", "0x04", "0x08", "REMOVE" };
-
-
 	/**
 	 * Contagem auto incremental para distinguir os temporizadores.
 	 */
@@ -74,7 +47,7 @@ public class Timer
 	/**
 	 * Tipo do temporizador.
 	 */
-	private BitWise type;
+	private TimerType type;
 
 	/**
 	 * Listener contendo o método a ser executado.
@@ -89,7 +62,18 @@ public class Timer
 	Timer()
 	{
 		id = ++autoIncrement;
-		type = new BitWise(TIMER_STRINGS);
+		type = TimerType.TIMER_INVALID;
+	}
+
+	@Override
+	public int compareTo(Timer timer)
+	{
+		if (id == timer.id)
+			return 0;
+
+		int diff = tick - timer.tick;
+
+		return diff == 0 ? 1 : diff;
 	}
 
 	/**
@@ -147,17 +131,24 @@ public class Timer
 	}
 
 	/**
-	 * O tipo de temporizador irá definir como ele irá funcionar internamente no sistema.
-	 * Segue os tipos de temporizadores e seus comportamentos dentro do sistema:
-	 * TIMER_ONCE_AUTODEL irá executar uma vez e ser excluído;
-	 * TIMER_INTERVAL será executado e incrementa o tempo de expiração (loop);
-	 * TIMER_REMOVE remove automaticamente o temporizador sem executá-lo.
-	 * @return aquisição de um objeto que permite definir o tipo de temporizador.
+	 * O tipo de temporizador determina como será o seu comportamento no sistema.
+	 * @return aquisição do tipo de comportamento do temporizador.
 	 */
 
-	BitWise getType()
+	public TimerType getType()
 	{
 		return type;
+	}
+
+	/**
+	 * O tipo de temporizador determina como será o seu comportamento no sistema.
+	 * @param type novo tipo de comportamento do temporizador.
+	 */
+
+	void setType(TimerType type)
+	{
+		if (type != null)
+			this.type = type;
 	}
 
 	/**
@@ -190,7 +181,7 @@ public class Timer
 		description.append("id", id);
 		description.append("tick", tick);
 		description.append("interval", interval);
-		description.append("type", type.toStringProperties());
+		description.append("type", type);
 		description.append("listener", listener);
 
 		return description.toString();

@@ -16,11 +16,11 @@ public interface TimerListener
 	/**
 	 * Procedimento chamado internamente pelo Sistema de Temporizadores.
 	 * A chamada ocorre somente quando o tempo do temporizador timer expirado.
-	 * @param timer referência do temporizador que detêm esse listener.
-	 * @param tick momento em que essa chama está sendo feita no sistema.
+	 * @param now tempo atual que ocorre a atualização em milissegundos.
+	 * @param tick milissegundos passados desde a última atualização.
 	 */
 
-	void onCall(Timer timer, int tick);
+	void onCall(Timer timer, int now, int tick);
 
 	/**
 	 * O nome dos listeners devem ser únicos e especificar sua finalidade.
