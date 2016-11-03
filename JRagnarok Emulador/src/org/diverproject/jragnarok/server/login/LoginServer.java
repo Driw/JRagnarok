@@ -24,6 +24,7 @@ import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.login.entities.Login;
+import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 
 /**
  * <h1>Servidor de Acesso</h1>
@@ -93,6 +94,8 @@ public class LoginServer extends Server
 	public LoginServer()
 	{
 		setListener(listener);
+
+		charServers = new LoginCharServers();
 	}
 
 	/**
@@ -258,8 +261,10 @@ public class LoginServer extends Server
 		@Override
 		public void onDestroy() throws RagnarokException
 		{
-			// TODO Auto-generated method stub
-			
+			for (ClientCharServer client : charServers)
+				client.getFileDecriptor().close();
+
+			charServers.clear();
 		}
 
 		@Override

@@ -12,6 +12,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_HOST;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_LEGACY_DATETIME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_PASSWORD;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_PORT;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_TIMEZONE;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_USERNAME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FOLDER;
@@ -523,6 +524,8 @@ public abstract class Server
 		String username = configs.getString(SQL_USERNAME);
 		String password = configs.getString(SQL_PASSWORD);
 		String database = configs.getString(SQL_DATABASE);
+		String timezone = configs.getString(SQL_TIMEZONE);
+
 		int port = configs.getInt(SQL_PORT);
 		boolean legacy = configs.getBool(SQL_LEGACY_DATETIME);
 
@@ -532,7 +535,7 @@ public abstract class Server
 		sql.setDatabase(database);
 		sql.setPort(port);
 		sql.setUseLegacyDatetimeCode(legacy);
-		sql.setServerTimezone("Africa/Abidjan");
+		sql.setServerTimezone(timezone);
 
 		try {
 			sql.connect();

@@ -1,3 +1,11 @@
+03.11.2016 - 1.2.81
+- 
+
+03.11.2016 - 1.2.80
+- Conexão SQL agora permite definir o timezone desejado.
+	- Modificando a validação de expiration e unbantime em ServiceLoginServer.
+- Inicialização, limpeza e fechamento de conexão forçada para LoginCharServers em LoginServer.
+
 03.11.2016 - 1.2.79
 - Modificando a forma como a atualização/chamado dos temporizadores será feita:
 	- Será repassado now (tempo do servidor) e tick (milissegundos passados).

@@ -209,7 +209,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 	private AuthResult authExpirationTime(LoginSessionData sd, Account account)
 	{
-		if (account.getExpiration().get() < now() && account.getExpiration().get() > 0)
+		if (!account.getExpiration().isNull() && account.getExpiration().get() < now())
 		{
 			logNotice("conta expirada (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
 			return EXPIRED;
@@ -228,7 +228,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 	private AuthResult authBanTime(LoginSessionData sd, Account account)
 	{
-		if (account.getUnban().get() < now() && account.getUnban().get() > 0)
+		if (!account.getUnban().isNull() && account.getUnban().get() < now())
 		{
 			logNotice("conta banida (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
 			return BANNED_UNTIL;

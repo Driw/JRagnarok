@@ -55,6 +55,7 @@ public class JRagnarokConfigs
 	public static final String SQL_USERNAME = SQL_CONFIGS+ ".username";
 	public static final String SQL_PASSWORD = SQL_CONFIGS+ ".password";
 	public static final String SQL_LEGACY_DATETIME = SQL_CONFIGS+ ".legacydatetime";
+	public static final String SQL_TIMEZONE = SQL_CONFIGS+ ".timezone";
 
 	public static final String LOGIN_CONFIGS = "login";
 	public static final String LOGIN_IP = LOGIN_CONFIGS+ ".ip";
@@ -158,6 +159,7 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigString(SQL_PASSWORD, "jragnarok"));
 		configurations.add(new ConfigInt(SQL_PORT, 3306));
 		configurations.add(new ConfigBoolean(SQL_LEGACY_DATETIME, false));
+		configurations.add(new ConfigString(SQL_TIMEZONE, "Africa/Abidjan"));
 
 		return configurations;
 	}
