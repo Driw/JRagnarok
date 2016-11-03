@@ -31,13 +31,11 @@ public class AccountDAO extends AbstractDAO
 	public Account select(String username) throws RagnarokException
 	{
 		String accountTable = Tables.getInstance().getAccounts();
-		String loginTable = Tables.getInstance().getLogins();
 
 		String sql = format("SELECT id, password, last_login, registered, email, birth_date,"
 						+ " login_count, unban, expiration, pincode, groupid, state, last_ip"
-						+ " FROM %s"
-						+ " WHERE username = ?",
-						accountTable, loginTable, loginTable, accountTable);
+						+ " FROM %s WHERE username = ?",
+						accountTable);
 
 		try {
 
@@ -286,12 +284,12 @@ public class AccountDAO extends AbstractDAO
 
 	public boolean update(Account account) throws RagnarokException
 	{
-		return updateLogin(account) && updateAccount(account);
+		return updateLastLogin(account) && updateAccount(account);
 	}
 
-	public boolean updateLogin(Account account) throws RagnarokException
+	public boolean updateLastLogin(Account account) throws RagnarokException
 	{
-		String table = Tables.getInstance().getLogins();
+		String table = Tables.getInstance().getAccounts();
 		String sql = format("UPDATE %s SET last_login = ? WHERE id = ?", table);
 
 		try {
@@ -310,7 +308,7 @@ public class AccountDAO extends AbstractDAO
 	public boolean updateAccount(Account account) throws RagnarokException
 	{
 		String table = Tables.getInstance().getAccounts();
-		String sql = format("UPDATE %s SET login_count = ?, unban = ?, expiration = ?, state = ?, last_ip = ? WHERE login = ?", table);
+		String sql = format("UPDATE %s SET login_count = ?, unban = ?, expiration = ?, state = ?, last_ip = ? WHERE id = ?", table);
 
 		try {
 

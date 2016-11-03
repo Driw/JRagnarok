@@ -1,5 +1,6 @@
 03.11.2016 - 1.2.81
-- 
+- Pequenas correções referentes as mudanças na rev79: AccountDAO e LoginLogControl.
+- Modificando o nome de usuário para o servidor de personagem conectar-se ao servidor de acesso (rev80).
 
 03.11.2016 - 1.2.80
 - Conexão SQL agora permite definir o timezone desejado.

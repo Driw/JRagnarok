@@ -100,7 +100,7 @@ public class LoginLogControl extends AbstractDAO
 			throw new RagnarokException("registro sem acesso");
 
 		String table = Tables.getInstance().getLoginLog();
-		String sql = format("INSERT INTO %s (time, ip, login, rcode, message) VALUES (?, ?, ?, ?, ?)", table);
+		String sql = format("INSERT INTO %s (time, ip, account, rcode, message) VALUES (?, ?, ?, ?, ?)", table);
 
 		try {
 

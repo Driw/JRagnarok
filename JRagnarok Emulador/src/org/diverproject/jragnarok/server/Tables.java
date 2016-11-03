@@ -31,11 +31,6 @@ public class Tables
 
 
 	/**
-	 * Tabela contendo as contas dos jogadores.
-	 */
-	private String logins;
-
-	/**
 	 * Tabela contendo os registros do acesso de contas.
 	 */
 	private String loginLog;
@@ -92,7 +87,6 @@ public class Tables
 
 	private Tables()
 	{
-		logins = "logins";
 		loginLog = "login_log";
 
 		accounts = "accounts";
@@ -106,24 +100,6 @@ public class Tables
 		groupCommands = "group_commands";
 
 		vip = "vip";
-	}
-
-	/**
-	 * @return aquisição do nome da tabela que possui as contas dos jogadores.
-	 */
-
-	public String getLogins()
-	{
-		return logins;
-	}
-
-	/**
-	 * @param login nome da tabela que possui as contas dos jogadores.
-	 */
-
-	public void setLogins(String login)
-	{
-		this.logins = login;
 	}
 
 	/**
