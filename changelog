@@ -1,3 +1,6 @@
+07.11.2016 - 1.2.83
+- Enviando arquivos para atualização do banco de dados referente a rev79.
+
 07.11.2016 - 1.2.82
 - Separando todos os tipos de pacotes para packet.receive ou packet.response.
 	- Também foi renomeado alguns pacotes para ficarem com nomes mais diretos ou específicos.
