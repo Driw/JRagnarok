@@ -1,36 +1,44 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN_HAN;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_SSO_LOGIN_REQ;
 
+import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 
-public class LoginHan extends ReceivePacket
+public class LoginSingleSignOn extends ReceivePacket
 {
 	private int version;
+	private byte clientType;
 	private String username;
 	private String password;
-	private byte clientType;
-	private String ip;
 	private String macAddress;
-	private boolean hanGameUser;
+	private String ip;
+	private String token;
 
 	@Override
 	protected void receiveInput(Input input)
 	{
+		short tokeLength = input.getShort();
+
 		version = input.getInt();
+		clientType = input.getByte();
 		username = strclr(input.getString(24));
 		password = strclr(input.getString(24));
-		clientType = input.getByte();
-		ip = strclr(input.getString(16));
-		macAddress = strclr(input.getString(13));		
-		hanGameUser = input.getByte() == 0;
+		macAddress = strclr(input.getString(17));
+		ip = input.getString(15);
+		token = input.getString(tokeLength);
 	}
 
 	public int getVersion()
 	{
 		return version;
+	}
+
+	public byte getClientType()
+	{
+		return clientType;
 	}
 
 	public String getUsername()
@@ -43,9 +51,9 @@ public class LoginHan extends ReceivePacket
 		return password;
 	}
 
-	public byte getClientType()
+	public String getMacAddress()
 	{
-		return clientType;
+		return macAddress;
 	}
 
 	public String getIp()
@@ -53,32 +61,27 @@ public class LoginHan extends ReceivePacket
 		return ip;
 	}
 
-	public String getMacAddress()
+	public String getToken()
 	{
-		return macAddress;
-	}
-
-	public boolean isHanGameUser()
-	{
-		return hanGameUser;
+		return token;
 	}
 
 	@Override
 	public String getName()
 	{
-		return "packet_CA_LOGIN_HAN";
+		return "PACKET_CA_SSO_LOGIN_REQ";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_LOGIN_HAN;
+		return PACKET_CA_SSO_LOGIN_REQ;
 	}
 
 	@Override
 	protected int length()
 	{
-		return 83;
+		return 0;
 	}
 
 	@Override
@@ -87,11 +90,11 @@ public class LoginHan extends ReceivePacket
 		super.toString(description);
 
 		description.append("version", version);
+		description.append("clientType", clientType);
 		description.append("username", username);
 		description.append("password", password);
-		description.append("clientType", clientType);
-		description.append("ip", ip);
 		description.append("macAddress", macAddress);
-		description.append("hanGameUser", hanGameUser);
+		description.append("ip", ip);
+		description.append("token", token);
 	}
 }

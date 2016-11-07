@@ -31,24 +31,24 @@ import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.ResponsePacket;
-import org.diverproject.jragnarok.packets.AcknologeHash;
-import org.diverproject.jragnarok.packets.AlreadyOnline;
-import org.diverproject.jragnarok.packets.CharConnectReceive;
-import org.diverproject.jragnarok.packets.KeepAlivePacket;
-import org.diverproject.jragnarok.packets.ListCharServers;
-import org.diverproject.jragnarok.packets.LoginHan;
-import org.diverproject.jragnarok.packets.LoginMD5;
-import org.diverproject.jragnarok.packets.LoginMD5Info;
-import org.diverproject.jragnarok.packets.LoginMD5Mac;
-import org.diverproject.jragnarok.packets.LoginPCBang;
-import org.diverproject.jragnarok.packets.LoginPacket;
-import org.diverproject.jragnarok.packets.LoginSingleSignOn;
-import org.diverproject.jragnarok.packets.NotifyAuth;
-import org.diverproject.jragnarok.packets.ReceivePacketIDPacket;
-import org.diverproject.jragnarok.packets.RefuseLoginBytePacket;
-import org.diverproject.jragnarok.packets.RefuseLoginIntPacket;
-import org.diverproject.jragnarok.packets.CharConnectResult;
-import org.diverproject.jragnarok.packets.UpdateClientHashPacket;
+import org.diverproject.jragnarok.packets.receive.CharConnectReceive;
+import org.diverproject.jragnarok.packets.receive.KeepAlive;
+import org.diverproject.jragnarok.packets.receive.LoginHan;
+import org.diverproject.jragnarok.packets.receive.LoginMD5;
+import org.diverproject.jragnarok.packets.receive.LoginMD5Info;
+import org.diverproject.jragnarok.packets.receive.LoginMD5Mac;
+import org.diverproject.jragnarok.packets.receive.LoginPCBang;
+import org.diverproject.jragnarok.packets.receive.LoginDefault;
+import org.diverproject.jragnarok.packets.receive.LoginSingleSignOn;
+import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
+import org.diverproject.jragnarok.packets.receive.UpdateClientHash;
+import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
+import org.diverproject.jragnarok.packets.response.AlreadyOnline;
+import org.diverproject.jragnarok.packets.response.CharConnectResponse;
+import org.diverproject.jragnarok.packets.response.ListCharServers;
+import org.diverproject.jragnarok.packets.response.NotifyAuth;
+import org.diverproject.jragnarok.packets.response.RefuseLoginByte;
+import org.diverproject.jragnarok.packets.response.RefuseLoginInt;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorAction;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
@@ -181,8 +181,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 			LoginSessionData sd = new LoginSessionData(fd);
 
-			ReceivePacketIDPacket packetReceivePacketID = new ReceivePacketIDPacket();
-			packetReceivePacketID.receive(fd);
+			AcknowledgePacket packetReceivePacketID = new AcknowledgePacket();
+			packetReceivePacketID.receive(fd, false);
 
 			short command = packetReceivePacketID.getPacketID();
 
@@ -257,7 +257,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			log.addLoginLog(fd.getAddress(), null, -3, "ip banned");
 			skip(fd, false, 23);
 
-			RefuseLoginBytePacket refuseLoginPacket = new RefuseLoginBytePacket();
+			RefuseLoginByte refuseLoginPacket = new RefuseLoginByte();
 			refuseLoginPacket.setResult(AuthResult.REJECTED_FROM_SERVER);
 			refuseLoginPacket.setBlockDate("");
 			refuseLoginPacket.send(fd);
@@ -279,8 +279,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	private void keepAlive(FileDescriptor fd)
 	{
-		KeepAlivePacket keepAlivePacket = new KeepAlivePacket();
-		keepAlivePacket.receive(fd);
+		KeepAlive keepAlivePacket = new KeepAlive();
+		keepAlivePacket.receive(fd, false);
 	}
 
 	/**
@@ -291,8 +291,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	private void updateClientHash(FileDescriptor fd, LoginSessionData sd)
 	{
-		UpdateClientHashPacket updateClientHashPacket = new UpdateClientHashPacket();
-		updateClientHashPacket.receive(fd);
+		UpdateClientHash updateClientHashPacket = new UpdateClientHash();
+		updateClientHashPacket.receive(fd, false);
 
 		sd.setClientHash(new ClientHash());
 		sd.getClientHash().set(updateClientHashPacket.getHashValue());
@@ -306,7 +306,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	private void sendAuthResult(FileDescriptor fd, AuthResult result)
 	{
-		RefuseLoginBytePacket refuseLoginPacket = new RefuseLoginBytePacket();
+		RefuseLoginByte refuseLoginPacket = new RefuseLoginByte();
 		refuseLoginPacket.setResult(result);
 		refuseLoginPacket.send(fd);
 	}
@@ -358,7 +358,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		sd.setMd5Key(md5Key);
 		sd.setMd5KeyLenght(md5KeyLength);
 
-		AcknologeHash packet = new AcknologeHash();
+		AcknowledgeHash packet = new AcknowledgeHash();
 		packet.setMD5KeyLength(md5KeyLength);
 		packet.setMD5Key(md5Key);
 		packet.send(fd);
@@ -395,8 +395,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		switch (command)
 		{
 			case PACKET_CA_LOGIN:
-				LoginPacket loginPacket = new LoginPacket();
-				loginPacket.receive(fd);
+				LoginDefault loginPacket = new LoginDefault();
+				loginPacket.receive(fd, false);
 				sd.setVersion(loginPacket.getVersion());
 				sd.setClientType(ClientType.parse(loginPacket.getClientType()));
 				sd.setUsername(loginPacket.getUsername());
@@ -405,7 +405,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN_PCBANG:
 				LoginPCBang loginPCBang = new LoginPCBang();
-				loginPCBang.receive(fd);
+				loginPCBang.receive(fd, false);
 				sd.setVersion(loginPCBang.getVersion());
 				sd.setClientType(ClientType.parse(loginPCBang.getClientType()));
 				sd.setUsername(loginPCBang.getUsername());
@@ -414,7 +414,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN_HAN:
 				LoginHan loginHan = new LoginHan();
-				loginHan.receive(fd);
+				loginHan.receive(fd, false);
 				sd.setVersion(loginHan.getVersion());
 				sd.setClientType(ClientType.parse(loginHan.getClientType()));
 				sd.setUsername(loginHan.getUsername());
@@ -423,7 +423,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 			case PACKET_CA_SSO_LOGIN_REQ:
 				LoginSingleSignOn loginSingleSignOn = new LoginSingleSignOn();
-				loginSingleSignOn.receive(fd);
+				loginSingleSignOn.receive(fd, false);
 				sd.setVersion(loginSingleSignOn.getVersion());
 				sd.setClientType(ClientType.parse(loginSingleSignOn.getClientType()));
 				sd.setUsername(loginSingleSignOn.getUsername());
@@ -432,7 +432,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN2:
 				LoginMD5 loginMD5 = new LoginMD5();
-				loginMD5.receive(fd);
+				loginMD5.receive(fd, false);
 				sd.setVersion(loginMD5.getVersion());
 				sd.setUsername(loginMD5.getUsername());
 				sd.setPassword(loginMD5.getPassword());
@@ -442,7 +442,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN3:
 				LoginMD5Info loginMD5Info = new LoginMD5Info();
-				loginMD5Info.receive(fd);
+				loginMD5Info.receive(fd, false);
 				sd.setVersion(loginMD5Info.getVersion());
 				sd.setUsername(loginMD5Info.getUsername());
 				sd.setPassword(loginMD5Info.getPassword());
@@ -452,7 +452,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN4:
 				LoginMD5Mac loginMD5Mac = new LoginMD5Mac();
-				loginMD5Mac.receive(fd);
+				loginMD5Mac.receive(fd, false);
 				sd.setVersion(loginMD5Mac.getVersion());
 				sd.setUsername(loginMD5Mac.getUsername());
 				sd.setPassword(loginMD5Mac.getPassword());
@@ -573,7 +573,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		if (sd.getVersion() >= dateToVersion(20120000))
 		{
-			RefuseLoginIntPacket packet = new RefuseLoginIntPacket();
+			RefuseLoginInt packet = new RefuseLoginInt();
 			packet.setBlockDate(blockDate);
 			packet.setCode(result);
 			packet.send(sd.getFileDescriptor());
@@ -581,7 +581,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		else
 		{
-			RefuseLoginBytePacket packet = new RefuseLoginBytePacket();
+			RefuseLoginByte packet = new RefuseLoginByte();
 			packet.setBlockDate(blockDate);
 			packet.setResult(result);
 			packet.send(sd.getFileDescriptor());
@@ -806,13 +806,13 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * Chamado quando um servidor de personagens solicita a conexão com o servidor de acesso.
 	 * @param fd referência da conexão com o cliente para enviar e receber dados.
 	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
-	 * @return true se tiver sido aturoziado ou false caso contrário.
+	 * @return true se tiver sido autorizado ou false caso contrário.
 	 */
 
 	private boolean requestCharConnect(FileDescriptor fd, LoginSessionData sd)
 	{
 		CharConnectReceive ccPacket = new CharConnectReceive();
-		ccPacket.receive(fd);
+		ccPacket.receive(fd, false);
 
 		sd.setUsername(ccPacket.getUsername());
 		sd.setPassword(ccPacket.getPassword());
@@ -853,7 +853,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			fd.setParseListener(character.parse);
 			fd.getFlag().set(FileDescriptor.FLAG_SERVER);
 
-			CharConnectResult packet = new CharConnectResult();
+			CharConnectResponse packet = new CharConnectResponse();
 			packet.setResult(AuthResult.OK);
 			packet.send(fd);
 
@@ -864,7 +864,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		{
 			logNotice("Conexão com o servidor de personagens '%s' RECUSADA.\n", serverName);
 
-			CharConnectResult packet = new CharConnectResult();
+			CharConnectResponse packet = new CharConnectResponse();
 			packet.setResult(AuthResult.REJECTED_FROM_SERVER);
 			packet.send(fd);
 

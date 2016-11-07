@@ -1,12 +1,13 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.response;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_RES_CHAR_CONNECT;
 
+import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
-public class CharConnectResult extends ResponsePacket
+public class CharConnectResponse extends ResponsePacket
 {
 	private AuthResult result;
 

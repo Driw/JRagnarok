@@ -1,13 +1,14 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.response;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_REFUSE_LOGIN_R2;
 
+import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
-public class RefuseLoginIntPacket extends ResponsePacket
+public class RefuseLoginInt extends ResponsePacket
 {
 	public static final byte REJECTED_FROM_SERVER = 3;
 	public static final String CODE_STRINGS[] = new String[]
@@ -18,7 +19,7 @@ public class RefuseLoginIntPacket extends ResponsePacket
 	private int code;
 	private String blockDate;
 
-	public RefuseLoginIntPacket()
+	public RefuseLoginInt()
 	{
 		blockDate = "";
 	}

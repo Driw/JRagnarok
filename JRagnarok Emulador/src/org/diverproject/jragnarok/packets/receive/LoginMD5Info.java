@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN2;
@@ -7,13 +7,13 @@ import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 
-public class LoginMD5Mac extends ReceivePacket
+public class LoginMD5Info extends ReceivePacket
 {
 	private int version;
 	private String username;
 	private String password;
 	private byte clientType;
-	private String macData;
+	private byte clientInfo;
 
 	@Override
 	protected void receiveInput(Input input)
@@ -22,7 +22,7 @@ public class LoginMD5Mac extends ReceivePacket
 		username = strclr(input.getString(24));
 		password = strclr(input.getString(16));
 		clientType = input.getByte();
-		macData = input.getString(13);
+		clientInfo = input.getByte();
 	}
 
 	public int getVersion()
@@ -45,9 +45,9 @@ public class LoginMD5Mac extends ReceivePacket
 		return clientType;
 	}
 
-	public String getMacData()
+	public byte getClientInfo()
 	{
-		return macData;
+		return clientInfo;
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class LoginMD5Mac extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 58;
+		return 46;
 	}
 
 	@Override
@@ -77,6 +77,6 @@ public class LoginMD5Mac extends ReceivePacket
 		description.append("username", username);
 		description.append("password", password);
 		description.append("clientType", clientType);
-		description.append("macData", macData);
+		description.append("clientInfo", clientInfo);
 	}
 }

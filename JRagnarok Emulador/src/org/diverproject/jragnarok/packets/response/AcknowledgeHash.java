@@ -1,11 +1,12 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.response;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_ACK_HASH;
 
+import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
-public class AcknologeHash extends ResponsePacket
+public class AcknowledgeHash extends ResponsePacket
 {
 	private short md5KeyLength;
 	private String md5Key;

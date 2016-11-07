@@ -1,29 +1,28 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN_PCBANG;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN2;
 
+import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 
-public class LoginPCBang extends ReceivePacket
+public class LoginMD5Mac extends ReceivePacket
 {
 	private int version;
 	private String username;
 	private String password;
 	private byte clientType;
-	private String ip;
-	private String macAddress;
+	private String macData;
 
 	@Override
 	protected void receiveInput(Input input)
 	{
 		version = input.getInt();
 		username = strclr(input.getString(24));
-		password = strclr(input.getString(24));
+		password = strclr(input.getString(16));
 		clientType = input.getByte();
-		ip = input.getString(16);
-		macAddress = input.getString(13);
+		macData = input.getString(13);
 	}
 
 	public int getVersion()
@@ -46,32 +45,27 @@ public class LoginPCBang extends ReceivePacket
 		return clientType;
 	}
 
-	public String getIp()
+	public String getMacData()
 	{
-		return ip;
-	}
-
-	public String getMacAddress()
-	{
-		return macAddress;
+		return macData;
 	}
 
 	@Override
 	public String getName()
 	{
-		return "PACKET_CA_LOGIN_PCBANG";
+		return "PACKET_CA_LOGIN2";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_LOGIN_PCBANG;
+		return PACKET_CA_LOGIN2;
 	}
 
 	@Override
 	protected int length()
 	{
-		return 82;
+		return 58;
 	}
 
 	@Override
@@ -83,7 +77,6 @@ public class LoginPCBang extends ReceivePacket
 		description.append("username", username);
 		description.append("password", password);
 		description.append("clientType", clientType);
-		description.append("ip", ip);
-		description.append("macAddress", macAddress);
+		description.append("macData", macData);
 	}
 }

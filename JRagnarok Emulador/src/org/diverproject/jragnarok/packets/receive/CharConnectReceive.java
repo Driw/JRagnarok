@@ -1,8 +1,9 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_REQ_CHAR_CONNECT;
 
+import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 

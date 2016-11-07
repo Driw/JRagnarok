@@ -1,19 +1,21 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.receive;
 
+import org.diverproject.jragnarok.packets.ReceivePacket;
+import org.diverproject.jragnarok.packets.UnknowPacketException;
 import org.diverproject.util.lang.HexUtil;
 import org.diverproject.util.stream.Input;
 
-public class ReceivePacketIDPacket extends ReceivePacket
+public class AcknowledgePacket extends ReceivePacket
 {
 	private short expectedPacket;
 	private short packetID;
 
-	public ReceivePacketIDPacket()
+	public AcknowledgePacket()
 	{
 		this(0);
 	}
 
-	public ReceivePacketIDPacket(int expectedPacket)
+	public AcknowledgePacket(int expectedPacket)
 	{
 		if (this.expectedPacket > Short.MAX_VALUE * 2)
 			throw new UnknowPacketException("pacote %s inválido", HexUtil.parseInt(expectedPacket, 4));

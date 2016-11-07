@@ -1,15 +1,16 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_EXE_HASHCHECK;
 
+import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 
-public class UpdateClientHashPacket extends ReceivePacket
+public class UpdateClientHash extends ReceivePacket
 {
 	private byte hashValue[];
 
-	public UpdateClientHashPacket()
+	public UpdateClientHash()
 	{
 		hashValue = new byte[16];
 	}

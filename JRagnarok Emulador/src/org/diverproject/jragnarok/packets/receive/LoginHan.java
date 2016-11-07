@@ -1,28 +1,32 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN2;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN_HAN;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 
-public class LoginMD5Info extends ReceivePacket
+public class LoginHan extends ReceivePacket
 {
 	private int version;
 	private String username;
 	private String password;
 	private byte clientType;
-	private byte clientInfo;
+	private String ip;
+	private String macAddress;
+	private boolean hanGameUser;
 
 	@Override
 	protected void receiveInput(Input input)
 	{
 		version = input.getInt();
 		username = strclr(input.getString(24));
-		password = strclr(input.getString(16));
+		password = strclr(input.getString(24));
 		clientType = input.getByte();
-		clientInfo = input.getByte();
+		ip = strclr(input.getString(16));
+		macAddress = strclr(input.getString(13));		
+		hanGameUser = input.getByte() == 0;
 	}
 
 	public int getVersion()
@@ -45,27 +49,37 @@ public class LoginMD5Info extends ReceivePacket
 		return clientType;
 	}
 
-	public byte getClientInfo()
+	public String getIp()
 	{
-		return clientInfo;
+		return ip;
+	}
+
+	public String getMacAddress()
+	{
+		return macAddress;
+	}
+
+	public boolean isHanGameUser()
+	{
+		return hanGameUser;
 	}
 
 	@Override
 	public String getName()
 	{
-		return "PACKET_CA_LOGIN2";
+		return "packet_CA_LOGIN_HAN";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_LOGIN2;
+		return PACKET_CA_LOGIN_HAN;
 	}
 
 	@Override
 	protected int length()
 	{
-		return 46;
+		return 83;
 	}
 
 	@Override
@@ -77,6 +91,8 @@ public class LoginMD5Info extends ReceivePacket
 		description.append("username", username);
 		description.append("password", password);
 		description.append("clientType", clientType);
-		description.append("clientInfo", clientInfo);
+		description.append("ip", ip);
+		description.append("macAddress", macAddress);
+		description.append("hanGameUser", hanGameUser);
 	}
 }

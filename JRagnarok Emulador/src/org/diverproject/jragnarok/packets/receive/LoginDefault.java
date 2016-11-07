@@ -1,43 +1,31 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_SSO_LOGIN_REQ;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN;
 
+import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 
-public class LoginSingleSignOn extends ReceivePacket
+public class LoginDefault extends ReceivePacket
 {
 	private int version;
-	private byte clientType;
 	private String username;
 	private String password;
-	private String macAddress;
-	private String ip;
-	private String token;
+	private byte clientType;
 
 	@Override
 	protected void receiveInput(Input input)
 	{
-		short tokeLength = input.getShort();
-
 		version = input.getInt();
-		clientType = input.getByte();
 		username = strclr(input.getString(24));
 		password = strclr(input.getString(24));
-		macAddress = strclr(input.getString(17));
-		ip = input.getString(15);
-		token = input.getString(tokeLength);
+		clientType = input.getByte();
 	}
 
 	public int getVersion()
 	{
 		return version;
-	}
-
-	public byte getClientType()
-	{
-		return clientType;
 	}
 
 	public String getUsername()
@@ -50,37 +38,27 @@ public class LoginSingleSignOn extends ReceivePacket
 		return password;
 	}
 
-	public String getMacAddress()
+	public byte getClientType()
 	{
-		return macAddress;
-	}
-
-	public String getIp()
-	{
-		return ip;
-	}
-
-	public String getToken()
-	{
-		return token;
+		return clientType;
 	}
 
 	@Override
 	public String getName()
 	{
-		return "PACKET_CA_SSO_LOGIN_REQ";
+		return "PACKET_CA_LOGIN";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_SSO_LOGIN_REQ;
+		return PACKET_CA_LOGIN;
 	}
 
 	@Override
 	protected int length()
 	{
-		return 0;
+		return 53;
 	}
 
 	@Override
@@ -89,11 +67,8 @@ public class LoginSingleSignOn extends ReceivePacket
 		super.toString(description);
 
 		description.append("version", version);
-		description.append("clientType", clientType);
 		description.append("username", username);
 		description.append("password", password);
-		description.append("macAddress", macAddress);
-		description.append("ip", ip);
-		description.append("token", token);
+		description.append("clientType", clientType);
 	}
 }

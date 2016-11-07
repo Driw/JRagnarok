@@ -5,7 +5,7 @@ import static org.diverproject.log.LogSystem.logInfo;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.ResponsePacket;
-import org.diverproject.jragnarok.packets.SyncronizeAddressPacket;
+import org.diverproject.jragnarok.packets.response.SyncronizeAddress;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Timer;
@@ -29,7 +29,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		{
 			logInfo("Sincronização de IP em progresso...\n");
 
-			SyncronizeAddressPacket packet = new SyncronizeAddressPacket();
+			SyncronizeAddress packet = new SyncronizeAddress();
 			sendAllWithoutOurSelf(-1, packet);
 		}
 

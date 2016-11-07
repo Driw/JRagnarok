@@ -1,7 +1,8 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.response;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_ALREADY_ONLINE;
 
+import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.stream.Output;
 
 public class AlreadyOnline extends ResponsePacket

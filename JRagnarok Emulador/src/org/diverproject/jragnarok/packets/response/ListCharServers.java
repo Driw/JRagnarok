@@ -1,10 +1,11 @@
-package org.diverproject.jragnarok.packets;
+package org.diverproject.jragnarok.packets.response;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.i;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_ACCEPT_LOGIN;
 
+import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.LoginCharServers;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;

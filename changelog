@@ -1,3 +1,7 @@
+07.11.2016 - 1.2.82
+- Separando todos os tipos de pacotes para packet.receive ou packet.response.
+	- Também foi renomeado alguns pacotes para ficarem com nomes mais diretos ou específicos.
+
 03.11.2016 - 1.2.81
 - Pequenas correções referentes as mudanças na rev79: AccountDAO e LoginLogControl.
 - Modificando o nome de usuário para o servidor de personagem conectar-se ao servidor de acesso (rev80).
