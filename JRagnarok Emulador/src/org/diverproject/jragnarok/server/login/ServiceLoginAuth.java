@@ -39,7 +39,7 @@ import org.diverproject.jragnarok.server.ServerState;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.login.controllers.AuthController;
+import org.diverproject.jragnarok.server.login.controllers.AuthControl;
 import org.diverproject.jragnarok.server.login.controllers.OnlineControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AuthNode;
@@ -67,7 +67,7 @@ import org.diverproject.util.lang.IntUtil;
  * @see ServiceLoginChar
  * @see ServiceLoginClient
  * @see OnlineControl
- * @see AuthController
+ * @see AuthControl
  *
  * @author Andrew
  */
@@ -113,7 +113,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * Controlador para identificar jogadores autenticados.
 	 */
-	private AuthController controller;
+	private AuthControl controller;
 
 	/**
 	 * Cria um novo serviço para autenticação de solicitações dos acessos ao servidor.
@@ -138,8 +138,22 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		character = getServer().getCharService();
 		client = getServer().getClientService();
 
-		onlines = new OnlineControl(this);
-		controller = new AuthController();
+		onlines = new OnlineControl(getTimerSystem().getTimers());
+		controller = new AuthControl();
+	}
+
+	/**
+	 * Limpa as informações contidas de usuários online e autenticações feitas.
+	 * Após isso destrói o controlador de usuários online e autenticações feitas.
+	 */
+
+	public void destroy()
+	{
+		onlines.clear();
+		controller.clear();
+
+		onlines = null;
+		controller = null;
 	}
 
 	/**

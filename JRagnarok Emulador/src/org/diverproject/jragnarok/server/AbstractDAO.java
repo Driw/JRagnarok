@@ -22,6 +22,11 @@ import org.diverproject.util.ObjectDescription;
 public abstract class AbstractDAO
 {
 	/**
+	 * Código do erro para: chave duplicada.
+	 */
+	public static final int DUPLICATED_KEY = 1062;
+
+	/**
 	 * Referência da conexão com o banco de dados.
 	 */
 	private Connection connection;

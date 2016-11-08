@@ -1,3 +1,10 @@
+08.11.2016 - 1.2.88
+- LoginService atualizado para destruir ServiceLoginAuth e ServiceLoginIpBan.
+- Implementação do serviço para banimento de IPs (ServiceLoginIpBan) incluindo DAO e Control.
+- Movendo alguns métodos contidos em AccountDAO para GroupDAO e forma de load modificado.
+	- Será passado apenas o objeto e o ID deve ser definido antes para seguir a OO.
+- Documentação feita nos controles e DAO existentes e removido throws dos controles.
+
 08.11.2016 - 1.2.87
 - Enviando ServiceLoginAuth que não foi enviado na rev86.
 

@@ -7,10 +7,8 @@ import static org.diverproject.jragnarok.server.login.structures.AuthResult.EXE_
 import static org.diverproject.jragnarok.server.login.structures.AuthResult.EXPIRED;
 import static org.diverproject.jragnarok.server.login.structures.AuthResult.INCORRECT_PASSWORD;
 import static org.diverproject.jragnarok.server.login.structures.AuthResult.OK;
-import static org.diverproject.jragnarok.server.login.structures.AuthResult.REJECTED_FROM_SERVER;
 import static org.diverproject.jragnarok.server.login.structures.AuthResult.UNREGISTERED_ID;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokException;
@@ -96,14 +94,8 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		account.getLastIP().set(sd.getAddress());
 		account.setLoginCount(account.getLoginCount() + 1);
 
-		try {
-
-			controller.save(account);
-
-		} catch (RagnarokException e) {
+		if (!controller.save(account))
 			logError("falha ao persistir conta (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
-			logExeception(e);
-		}
 
 		return OK;
 	}
@@ -141,39 +133,32 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 	private AuthResult makeLoginAccount(LoginSessionData sd, boolean server)
 	{
-		try {
+		Account account = controller.get(sd.getUsername());
 
-			Account account = controller.get(sd.getUsername());
-
-			if (account == null)
-			{
-				logNotice("usuário não encontrado (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
-				return UNREGISTERED_ID;
-			}
-
-			AuthResult result = AuthResult.OK;
-
-			if ((result = authPassword(sd, account)) != OK)
-				return result;
-
-			if ((result = authExpirationTime(sd, account)) != OK)
-				return result;
-
-			if ((result = authBanTime(sd, account)) != OK)
-				return result;
-
-			if ((result = checkState(sd, account)) != OK)
-				return result;
-
-			if ((result = authClientHash(sd, account, server)) != OK)
-				return result;
-
-			sd.getFileDescriptor().setCache(account);
-
-		} catch (RagnarokException e) {
-			logExeception(e);
-			return REJECTED_FROM_SERVER;
+		if (account == null)
+		{
+			logNotice("usuário não encontrado (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
+			return UNREGISTERED_ID;
 		}
+
+		AuthResult result = AuthResult.OK;
+
+		if ((result = authPassword(sd, account)) != OK)
+			return result;
+
+		if ((result = authExpirationTime(sd, account)) != OK)
+			return result;
+
+		if ((result = authBanTime(sd, account)) != OK)
+			return result;
+
+		if ((result = checkState(sd, account)) != OK)
+			return result;
+
+		if ((result = authClientHash(sd, account, server)) != OK)
+			return result;
+
+		sd.getFileDescriptor().setCache(account);
 
 		return OK;
 	}

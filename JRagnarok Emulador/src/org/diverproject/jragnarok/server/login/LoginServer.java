@@ -87,6 +87,11 @@ public class LoginServer extends Server
 	private ServiceLoginServer loginService;
 
 	/**
+	 * Serviço para autenticação de acessos.
+	 */
+	private ServiceLoginAuth authService;
+
+	/**
 	 * Cria um novo micro servidor para receber os novos acessos de clientes.
 	 * Define ainda o listener para executar operações durante mudanças de estado.
 	 */
@@ -152,6 +157,15 @@ public class LoginServer extends Server
 		return loginService;
 	}
 
+	/**
+	 * @return aquisição do serviço para autenticação de acessos.
+	 */
+
+	public ServiceLoginAuth getAuthService()
+	{
+		return authService;
+	}
+
 	@Override
 	public String getHost()
 	{
@@ -209,9 +223,11 @@ public class LoginServer extends Server
 			ipBanService = new ServiceLoginIpBan(LoginServer.this);
 			logService = new ServiceLoginLog(LoginServer.this);
 			loginService = new ServiceLoginServer(LoginServer.this);
+			authService = new ServiceLoginAuth(LoginServer.this);
 
 			charService.init();
 			clientService.init();
+			authService.init();
 
 			if (getConfigs().getBool(LOG_LOGIN))
 				logService.init();
@@ -265,6 +281,10 @@ public class LoginServer extends Server
 				client.getFileDecriptor().close();
 
 			charServers.clear();
+			authService.destroy();
+
+			if (getConfigs().getBool(IPBAN_ENABLED))
+				ipBanService.destroy();
 		}
 
 		@Override

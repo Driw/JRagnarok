@@ -81,6 +81,11 @@ public class Tables
 	private String vip;
 
 	/**
+	 * Tabela contendo a lista de endereços IP banidos.
+	 */
+	private String ipBan;
+
+	/**
 	 * Construtor privado para aderir ao Padrão de Projetos: Singleton.
 	 * Define o nome padrão de todas as tabelas do banco de dados.
 	 */
@@ -100,6 +105,8 @@ public class Tables
 		groupCommands = "group_commands";
 
 		vip = "vip";
+
+		ipBan = "ipban_list";
 	}
 
 	/**
@@ -280,5 +287,23 @@ public class Tables
 	public void setVip(String vip)
 	{
 		this.vip = vip;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela contendo a lista de endereços IP banidos.
+	 */
+
+	public String getIpBan()
+	{
+		return this.ipBan;
+	}
+
+	/**
+	 * @param ipBan nome da tabela contendo a lista de endereços IP banidos.
+	 */
+
+	public void setIpBan(String ipBan)
+	{
+		this.ipBan = ipBan;
 	}
 }

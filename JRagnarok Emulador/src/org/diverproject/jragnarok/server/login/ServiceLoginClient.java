@@ -23,7 +23,7 @@ import org.diverproject.jragnarok.packets.response.RefuseLoginInt;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorAction;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
-import org.diverproject.jragnarok.server.login.controllers.AuthController;
+import org.diverproject.jragnarok.server.login.controllers.AuthControl;
 import org.diverproject.jragnarok.server.login.controllers.OnlineControl;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
@@ -46,7 +46,7 @@ import org.diverproject.jragnarok.server.login.structures.NotifyAuthResult;
  * @see ServiceLoginIpBan
  * @see ServiceLoginChar
  * @see OnlineControl
- * @see AuthController
+ * @see AuthControl
  *
  * @author Andrew Mello
  */
