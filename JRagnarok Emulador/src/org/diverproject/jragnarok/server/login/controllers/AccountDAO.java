@@ -53,6 +53,73 @@ public class AccountDAO extends AbstractDAO
 	}
 
 	/**
+	 * Procedimento interno usado para criar uma nova conta a partir de um resultado.
+	 * @param rs resultado obtido de uma consulta contendo dados de uma conta.
+	 * @return aquisição de uma nova instância de conta com os dados da consulta.
+	 * @throws SQLException apenas se houver falha na leitura dos dados.
+	 */
+
+	private Account newAccount(ResultSet rs) throws SQLException
+	{
+		Account account = new Account();
+		account.setID(rs.getInt("id"));
+		account.setUsername(rs.getString("username"));
+		account.setPassword(rs.getString("password"));
+		account.getRegistered().set(rs.getDate("registered").getTime());
+		account.getLastLogin().set(rs.getDate("last_login").getTime());
+		account.setEmail(rs.getString("email"));
+		account.setBirthDate(rs.getString("birth_date"));
+		account.setLoginCount(rs.getInt("login_count"));
+		account.getUnban().set(rs.getTimestamp("unban").getTime());
+		account.getExpiration().set(rs.getTimestamp("expiration").getTime());
+		account.setState(AccountState.parse(rs.getInt("state")));
+		account.getLastIP().set(rs.getInt("last_ip"));
+		account.getPincode().setID(rs.getInt("pincode"));
+		account.getGroup().setID(rs.getInt("groupid"));
+
+		return account;
+	}
+
+	/**
+	 * Seleciona as informações de uma determinada conta no banco de dados pelo código de identificação.
+	 * @param id código de identificação da conta desejada, cada conta possui um código único.
+	 * @return aquisição da conta contendo as informações carregadas ou null se não encontrar.
+	 * @throws RagnarokException apenas se houver falha na conexão.
+	 */
+
+	public Account select(int id) throws RagnarokException
+	{
+		String table = Tables.getInstance().getAccounts();
+		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date,"
+						+ " login_count, unban, expiration, pincode, groupid, state, last_ip"
+						+ " FROM %s WHERE id = ?",
+						table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, id);
+
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next())
+			{
+				Account account = newAccount(rs);
+
+				pincodeDAO.load(account.getPincode());
+				groupDAO.load(account.getGroup());
+
+				return account;
+			}
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e);
+		}
+
+		return null;
+	}
+
+	/**
 	 * Seleciona as informações de uma determinada conta no banco de dados pelo nome de usuário.
 	 * @param username nome de usuário da conta desejada, cada conta possui um usuário único.
 	 * @return aquisição da conta contendo as informações carregadas ou null se não encontrar.
@@ -61,12 +128,11 @@ public class AccountDAO extends AbstractDAO
 
 	public Account select(String username) throws RagnarokException
 	{
-		String accountTable = Tables.getInstance().getAccounts();
-
-		String sql = format("SELECT id, password, last_login, registered, email, birth_date,"
+		String table = Tables.getInstance().getAccounts();
+		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date,"
 						+ " login_count, unban, expiration, pincode, groupid, state, last_ip"
 						+ " FROM %s WHERE username = ?",
-						accountTable);
+						table);
 
 		try {
 
@@ -77,21 +143,7 @@ public class AccountDAO extends AbstractDAO
 
 			if (rs.next())
 			{
-				Account account = new Account();
-				account.setID(rs.getInt("id"));
-				account.setUsername(username);
-				account.setPassword(rs.getString("password"));
-				account.getRegistered().set(rs.getDate("registered").getTime());
-				account.getLastLogin().set(rs.getDate("last_login").getTime());
-				account.setEmail(rs.getString("email"));
-				account.setBirthDate(rs.getString("birth_date"));
-				account.setLoginCount(rs.getInt("login_count"));
-				account.getUnban().set(rs.getTimestamp("unban").getTime());
-				account.getExpiration().set(rs.getTimestamp("expiration").getTime());
-				account.setState(AccountState.parse(rs.getInt("state")));
-				account.getLastIP().set(rs.getInt("last_ip"));
-				account.getPincode().setID(rs.getInt("pincode"));
-				account.getGroup().setID(rs.getInt("groupid"));
+				Account account = newAccount(rs);
 
 				pincodeDAO.load(account.getPincode());
 				groupDAO.load(account.getGroup());

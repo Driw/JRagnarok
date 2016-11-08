@@ -6,7 +6,7 @@ import java.sql.Connection;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.login.entities.Account;
-import org.diverproject.util.collection.Map;
+import org.diverproject.util.collection.abstraction.IntegerLittleMap;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;
 
 /**
@@ -27,7 +27,12 @@ public class AccountControl
 	/**
 	 * Mapeamento das contas já carregadas.
 	 */
-	private Map<String, Account> cache;
+	private StringSimpleMap<Account> scache;
+
+	/**
+	 * Mapeamento das contas já carregadas.
+	 */
+	private IntegerLittleMap<Account> icache;
 
 	/**
 	 * DAO para comunicação com o banco de dados.
@@ -42,7 +47,8 @@ public class AccountControl
 	public AccountControl(Connection connection)
 	{
 		dao = new AccountDAO(connection);
-		cache = new StringSimpleMap<>();
+		scache = new StringSimpleMap<>();
+		icache = new IntegerLittleMap<>();
 	}
 
 	/**
@@ -53,7 +59,7 @@ public class AccountControl
 
 	public Account get(String username)
 	{
-		Account account = cache.get(username);
+		Account account = scache.get(username);
 
 		if (account == null)
 		{
@@ -64,7 +70,38 @@ public class AccountControl
 			}
 
 			if (account != null)
-				cache.add(username, account);
+			{
+				scache.add(username, account);
+				icache.add(account.getID(), account);
+			}
+		}
+
+		return account;
+	}
+
+	/**
+	 * Permite selecionar os dados de uma determinada conta por código de identificação.
+	 * @param accountID código de identificação da conta do qual deseja as informações.
+	 * @return aquisição da conta respectiva ao código de identificação acima.
+	 */
+
+	public Account get(int accountID)
+	{
+		Account account = icache.get(accountID);
+
+		if (account == null)
+		{
+			try {
+				account = dao.select(accountID);
+			} catch (RagnarokException e) {
+				logExeception(e);
+			}
+
+			if (account != null)
+			{
+				icache.add(accountID, account);
+				scache.add(account.getUsername(), account);
+			}
 		}
 
 		return account;
@@ -86,5 +123,14 @@ public class AccountControl
 		}
 
 		return false;
+	}
+
+	/**
+	 * Limpa todas as contas existentes em cache.
+	 */
+
+	public void clear()
+	{
+		scache.clear();
 	}
 }
