@@ -1,38 +1,29 @@
 package org.diverproject.jragnarok.packets;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
-
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.util.stream.Output;
-import org.diverproject.util.stream.StreamException;
-import org.diverproject.util.stream.StreamRuntimeException;
-import org.diverproject.util.stream.implementation.PacketBuilder;
 
-public abstract class ResponsePacket extends GenericPacket
+public abstract class ResponsePacket extends AbstractPacket implements IResponsePacket
 {
-	public final void send(FileDescriptor fd)
+	private AbstractResponsePacket response;
+
+	public ResponsePacket()
 	{
-		Output output;
-		PacketBuilder builder = fd.getPacketBuilder();
+		response = new AbstractResponsePacket(this)
+		{
+			@Override
+			protected void sendOutput(Output output)
+			{
+				ResponsePacket.this.sendOutput(output);
+			}
+		};
+	}
 
-		try {
-
-			if (length() == 0)
-				output = builder.newOutputPacket(getName());
-			else
-				output = builder.newOutputPacket(getName(), length() + 2);
-
-			output.setInvert(true);
-			output.putShort(getIdentify());
-			sendOutput(output);
-
-			output.flush();
-
-		} catch (StreamException e) {
-			throw new StreamRuntimeException("falha ao enviar %s (ip: %s)", nameOf(this), fd.getAddressString());
-		}
+	@Override
+	public void send(FileDescriptor fd)
+	{
+		response.send(fd);
 	}
 
 	protected abstract void sendOutput(Output output);
-	protected abstract int length();
 }

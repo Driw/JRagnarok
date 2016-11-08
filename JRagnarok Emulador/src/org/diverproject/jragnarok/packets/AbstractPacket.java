@@ -3,10 +3,11 @@ package org.diverproject.jragnarok.packets;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.lang.HexUtil;
 
-public abstract class GenericPacket
+public abstract class AbstractPacket
 {
 	public abstract String getName();
 	public abstract short getIdentify();
+	protected abstract int length();
 
 	public String getHexIdentify()
 	{

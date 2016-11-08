@@ -1,3 +1,8 @@
+08.11.2016 - 1.2.89
+- Renomeado GenericPacket para AbstractPacket.
+- Novo formato de funcionamento dos pacotes tento agora AbstractReceivePacket e AbstractResponsePacket.
+- ReceivePacket irá funcionar conforme AbstractReceivePacket e ResponsePacket conforme AbstractResponsePacket.
+
 08.11.2016 - 1.2.88
 - LoginService atualizado para destruir ServiceLoginAuth e ServiceLoginIpBan.
 - Implementação do serviço para banimento de IPs (ServiceLoginIpBan) incluindo DAO e Control.
