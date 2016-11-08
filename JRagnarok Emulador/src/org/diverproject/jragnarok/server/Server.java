@@ -471,12 +471,18 @@ public abstract class Server
 				threadServer.interrupt();
 				threadSocket = null;
 				threadServer = null;
+				defaultParser = null;
+
+				sql.closeConnection();
+				configs.clear();
+				timerSystem.destroy();
+				fileDescriptorSystem.destroy();
 
 				setNextState();
 			}
 			listener.onDestroyed();
 
-		} catch (IOException e) {
+		} catch (IOException | SQLException e) {
 			throw new RagnarokException(e.getMessage());
 		}
 	}

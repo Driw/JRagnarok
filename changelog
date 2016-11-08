@@ -1,3 +1,7 @@
+07.11.2016 - 1.2.84
+- Servidores quando destruídos agora devem destruir o TimerSystem e FileDescriptorSystem também.
+	- Nesse caso a destruição ocorre simplesmente limpando os dados desses sistemas.
+
 07.11.2016 - 1.2.83
 - Enviando arquivos para atualização do banco de dados referente a rev79.
 

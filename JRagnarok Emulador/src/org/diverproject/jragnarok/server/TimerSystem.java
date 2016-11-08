@@ -114,12 +114,17 @@ public class TimerSystem
 	}
 
 	/**
-	 * Termina o sistema limpando a lista e indexação dos temporizadores.
+	 * Destrói o sistema para gerenciamento dos temporizadores de um servidor.
+	 * Limpa a lista de identificação e indexação dos temporizadores.
+	 * Remove o ticker do sistema e reinicia o tempo do sistema.
 	 */
 
-	public void terminate()
+	public void destroy()
 	{
 		timers.clear();
+		ticker = null;
+		started = 0;
+		currentTime = 0;
 
 		free();
 	}

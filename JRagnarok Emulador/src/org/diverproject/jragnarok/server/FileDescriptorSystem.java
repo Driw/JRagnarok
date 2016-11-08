@@ -222,11 +222,45 @@ public class FileDescriptorSystem
 	}
 
 	/**
+	 * Permite obter uma determinada sessão estabelecida conforme sua identificação.
+	 * @param id código de identificação da sessão do qual deseja.
+	 * @return aquisição do descritor de arquivo da sessão especificada.
+	 */
+
+	public FileDescriptor get(int id)
+	{
+		return sessions.get(id);
+	}
+
+	/**
+	 * Verifica se uma determinada conexão foi estabelecida e se está conectada.
+	 * @param id código de identificação único da conexão desejada.
+	 * @return true se estiver conectado ou false caso contrário.
+	 */
+
+	public boolean isAlive(int id)
+	{
+		return sessions.get(id) != null && sessions.get(id).isConnected();
+	}
+
+	/**
 	 * @return aquisição da quantidade de sessões existentes no momento.
 	 */
 
 	public int size()
 	{
 		return sessions.size();
+	}
+
+	/**
+	 * Fecha forçadamente todas as conexões existentes com o servidor sem log.
+	 * Em seguida irá limpar a lista que que contém a conexão dessas sessões.
+	 * Também limpa a fila que contém as ações a serem executadas.
+	 */
+
+	public void destroy()
+	{
+		sessions.clear();
+		actions.clear();
 	}
 }
