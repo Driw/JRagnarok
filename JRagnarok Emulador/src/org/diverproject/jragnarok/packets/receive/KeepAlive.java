@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_CONNECT_INFO_CHANGED;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_KEEP_ALIVE;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -25,13 +25,13 @@ public class KeepAlive extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_CA_CONNECT_INFO_CHANGED";
+		return "PACKET_KEEP_ALIVE";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_CONNECT_INFO_CHANGED;
+		return PACKET_KEEP_ALIVE;
 	}
 
 	@Override

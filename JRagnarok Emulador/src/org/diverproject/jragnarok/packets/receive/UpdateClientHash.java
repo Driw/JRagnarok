@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.receive;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_EXE_HASHCHECK;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_UPDATE_CLIENT_HASH;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -29,13 +29,13 @@ public class UpdateClientHash extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_CA_EXE_HASHCHECK";
+		return "PACKET_UPDATE_CLIENT_HASH";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_EXE_HASHCHECK;
+		return PACKET_UPDATE_CLIENT_HASH;
 	}
 
 	@Override

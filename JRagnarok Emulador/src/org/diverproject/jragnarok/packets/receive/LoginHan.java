@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN_HAN;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_HAN;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -67,13 +67,13 @@ public class LoginHan extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "packet_CA_LOGIN_HAN";
+		return "PACKET_LOGIN_HAN";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_LOGIN_HAN;
+		return PACKET_LOGIN_HAN;
 	}
 
 	@Override

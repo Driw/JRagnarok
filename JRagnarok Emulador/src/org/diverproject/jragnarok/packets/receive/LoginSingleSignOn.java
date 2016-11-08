@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_SSO_LOGIN_REQ;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_SSO;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -69,13 +69,13 @@ public class LoginSingleSignOn extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_CA_SSO_LOGIN_REQ";
+		return "PACKET_LOGIN_SSO";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_SSO_LOGIN_REQ;
+		return PACKET_LOGIN_SSO;
 	}
 
 	@Override

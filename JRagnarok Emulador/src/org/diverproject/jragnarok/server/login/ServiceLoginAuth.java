@@ -6,13 +6,13 @@ import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.loginMessage;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Encrypt;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN2;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN3;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN4;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN_HAN;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN_PCBANG;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_SSO_LOGIN_REQ;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_MD5MAC;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_MD5;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_MD5INFO;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_HAN;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_PCBANG;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_SSO;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REQ_CHAR_CONNECT;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.TimerType.TIMER_INVALID;
@@ -24,7 +24,6 @@ import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 
-import org.diverproject.jragnarok.packets.receive.CharConnectReceive;
 import org.diverproject.jragnarok.packets.receive.LoginDefault;
 import org.diverproject.jragnarok.packets.receive.LoginHan;
 import org.diverproject.jragnarok.packets.receive.LoginMD5;
@@ -32,6 +31,7 @@ import org.diverproject.jragnarok.packets.receive.LoginMD5Info;
 import org.diverproject.jragnarok.packets.receive.LoginMD5Mac;
 import org.diverproject.jragnarok.packets.receive.LoginPCBang;
 import org.diverproject.jragnarok.packets.receive.LoginSingleSignOn;
+import org.diverproject.jragnarok.packets.request.CharConnectRequest;
 import org.diverproject.jragnarok.packets.response.AlreadyOnline;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
@@ -138,8 +138,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		character = getServer().getCharService();
 		client = getServer().getClientService();
 
-		onlines = new OnlineControl(getTimerSystem().getTimers());
-		controller = new AuthControl();
+		onlines = getServer().getAccountService().getOnlineControl();
+		controller = getServer().getAccountService().getControl();
 	}
 
 	/**
@@ -170,14 +170,14 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		switch (command)
 		{
 			// Solicitação de acesso com senha direta
-			case PACKET_CA_LOGIN:
-			case PACKET_CA_LOGIN_PCBANG:
-			case PACKET_CA_LOGIN_HAN:
-			case PACKET_CA_SSO_LOGIN_REQ:
+			case PACKET_LOGIN:
+			case PACKET_LOGIN_PCBANG:
+			case PACKET_LOGIN_HAN:
+			case PACKET_LOGIN_SSO:
 			// Solicitação de acesso com senha MD5
-			case PACKET_CA_LOGIN2:
-			case PACKET_CA_LOGIN3:
-			case PACKET_CA_LOGIN4:
+			case PACKET_LOGIN_MD5:
+			case PACKET_LOGIN_MD5MAC:
+			case PACKET_LOGIN_MD5INFO:
 				return requestAuth(fd, sd, command);
 
 			case PACKET_REQ_CHAR_CONNECT:
@@ -208,7 +208,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		switch (command)
 		{
-			case PACKET_CA_LOGIN:
+			case PACKET_LOGIN:
 				LoginDefault loginPacket = new LoginDefault();
 				loginPacket.receive(fd, false);
 				sd.setVersion(loginPacket.getVersion());
@@ -217,7 +217,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				sd.setPassword(loginPacket.getPassword());
 				break;
 
-			case PACKET_CA_LOGIN_PCBANG:
+			case PACKET_LOGIN_PCBANG:
 				LoginPCBang loginPCBang = new LoginPCBang();
 				loginPCBang.receive(fd, false);
 				sd.setVersion(loginPCBang.getVersion());
@@ -226,7 +226,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				sd.setPassword(loginPCBang.getPassword());
 				break;
 
-			case PACKET_CA_LOGIN_HAN:
+			case PACKET_LOGIN_HAN:
 				LoginHan loginHan = new LoginHan();
 				loginHan.receive(fd, false);
 				sd.setVersion(loginHan.getVersion());
@@ -235,7 +235,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				sd.setPassword(loginHan.getPassword());
 				break;
 
-			case PACKET_CA_SSO_LOGIN_REQ:
+			case PACKET_LOGIN_SSO:
 				LoginSingleSignOn loginSingleSignOn = new LoginSingleSignOn();
 				loginSingleSignOn.receive(fd, false);
 				sd.setVersion(loginSingleSignOn.getVersion());
@@ -244,7 +244,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				sd.setPassword(loginSingleSignOn.getToken());
 				break;
 
-			case PACKET_CA_LOGIN2:
+			case PACKET_LOGIN_MD5:
 				LoginMD5 loginMD5 = new LoginMD5();
 				loginMD5.receive(fd, false);
 				sd.setVersion(loginMD5.getVersion());
@@ -254,7 +254,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				usingRawPassword = false;
 				break;
 
-			case PACKET_CA_LOGIN3:
+			case PACKET_LOGIN_MD5INFO:
 				LoginMD5Info loginMD5Info = new LoginMD5Info();
 				loginMD5Info.receive(fd, false);
 				sd.setVersion(loginMD5Info.getVersion());
@@ -264,7 +264,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				usingRawPassword = false;
 				break;
 
-			case PACKET_CA_LOGIN4:
+			case PACKET_LOGIN_MD5MAC:
 				LoginMD5Mac loginMD5Mac = new LoginMD5Mac();
 				loginMD5Mac.receive(fd, false);
 				sd.setVersion(loginMD5Mac.getVersion());
@@ -585,7 +585,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		AlreadyOnline packet = new AlreadyOnline();
 		packet.setAccountID(account.getID());
 
-		client.sendAllWithoutOurSelf(packet);
+		client.sendAllWithoutOurSelf(fd, packet);
 
 		if (online.getWaitingDisconnect().getType() == TIMER_INVALID)
 		{
@@ -611,7 +611,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 	private boolean requestCharConnect(FileDescriptor fd, LoginSessionData sd)
 	{
-		CharConnectReceive ccPacket = new CharConnectReceive();
+		CharConnectRequest ccPacket = new CharConnectRequest();
 		ccPacket.receive(fd, false);
 
 		sd.setUsername(ccPacket.getUsername());

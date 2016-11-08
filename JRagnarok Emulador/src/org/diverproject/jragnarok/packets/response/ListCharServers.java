@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.packets.response;
 import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.i;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_ACCEPT_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LIST_SERVERS;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.CharServerList;
@@ -70,12 +70,12 @@ public class ListCharServers extends ResponsePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_AC_ACCEPT_LOGIN";
+		return "PACKET_LIST_SERVERS";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_AC_ACCEPT_LOGIN;
+		return PACKET_LIST_SERVERS;
 	}
 }

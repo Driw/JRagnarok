@@ -4,9 +4,9 @@ import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Salt;
 import static org.diverproject.jragnarok.JRagnarokUtil.random;
 import static org.diverproject.jragnarok.JRagnarokUtil.skip;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_CONNECT_INFO_CHANGED;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_EXE_HASHCHECK;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_REQ_HASH;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_UPDATE_CLIENT_HASH;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REQ_HASH;
 import static org.diverproject.log.LogSystem.log;
 
 import org.diverproject.jragnaork.RagnarokException;
@@ -15,17 +15,17 @@ import org.diverproject.jragnarok.packets.receive.KeepAlive;
 import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
 import org.diverproject.jragnarok.packets.receive.UpdateClientHash;
 import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
-import org.diverproject.jragnarok.packets.response.CharConnectResponse;
+import org.diverproject.jragnarok.packets.response.CharConnectResult;
 import org.diverproject.jragnarok.packets.response.ListCharServers;
 import org.diverproject.jragnarok.packets.response.NotifyAuth;
 import org.diverproject.jragnarok.packets.response.RefuseLoginByte;
 import org.diverproject.jragnarok.packets.response.RefuseLoginInt;
 import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.FileDescriptorAction;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.login.controllers.AuthControl;
 import org.diverproject.jragnarok.server.login.controllers.OnlineControl;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
+import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
 import org.diverproject.jragnarok.server.login.structures.NotifyAuthResult;
@@ -129,15 +129,15 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		switch (command)
 		{
-			case PACKET_CA_CONNECT_INFO_CHANGED:
+			case PACKET_KEEP_ALIVE:
 				keepAlive(fd);
 				break;
 
-			case PACKET_CA_EXE_HASHCHECK:
+			case PACKET_UPDATE_CLIENT_HASH:
 				updateClientHash(fd, sd);
 				break;
 
-			case PACKET_CA_REQ_HASH:
+			case PACKET_REQ_HASH:
 				parseRequestKey(fd, sd);
 				break;
 		}
@@ -230,21 +230,25 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	}
 
 	/**
-	 * Envia os dados de um mesmo pacote para todos os clientes conectados com o servidor.
-	 * A ação é feita por um listener (FileDecriptorAction) adicionado em FileDecriptor.
+	 * Envia o mesmo pacote para todos do servidor exceto a si mesmo.
+	 * Caso nenhum cliente seja definido será enviados a todos sem exceção.
+	 * @param fd referência da conexão com o cliente que não receberá o pacote
 	 * @param packet referência do pacote contendo os dados a serem enviados.
+	 * @return quantidade de clientes que tiverem os dados recebidos.
 	 */
 
-	public void sendAllWithoutOurSelf(ResponsePacket packet)
+	public int sendAllWithoutOurSelf(FileDescriptor fd, ResponsePacket packet)
 	{
-		getFileDescriptorSystem().execute(new FileDescriptorAction()
-		{
-			@Override
-			public void execute(FileDescriptor fd)
+		int count = 0;
+
+		for (ClientCharServer server : getServer().getCharServerList())
+			if (fd == null || server.getFileDecriptor().getID() != fd.getID())
 			{
-				packet.send(fd);
+				packet.send(server.getFileDecriptor());
+				count++;
 			}
-		});
+
+		return count;
 	}
 
 	/**
@@ -318,7 +322,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void charServerResult(FileDescriptor fd, AuthResult result)
 	{
-		CharConnectResponse packet = new CharConnectResponse();
+		CharConnectResult packet = new CharConnectResult();
 		packet.setResult(result);
 		packet.send(fd);
 	}

@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.response;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_REFUSE_LOGIN_R2;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REFUSE_LOGIN_R2;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
@@ -34,13 +34,13 @@ public class RefuseLoginInt extends ResponsePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_AC_REFUSE_LOGIN_R2";
+		return "PACKET_REFUSE_LOGIN_R2";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_AC_REFUSE_LOGIN_R2;
+		return PACKET_REFUSE_LOGIN_R2;
 	}
 
 	public void setCode(AuthResult result)

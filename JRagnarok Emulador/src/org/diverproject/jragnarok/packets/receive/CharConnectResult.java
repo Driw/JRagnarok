@@ -1,25 +1,25 @@
-package org.diverproject.jragnarok.packets.response;
+package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_RES_CHAR_CONNECT;
 
-import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.util.ObjectDescription;
-import org.diverproject.util.stream.Output;
+import org.diverproject.util.stream.Input;
 
-public class CharConnectResponse extends ResponsePacket
+public class CharConnectResult extends ReceivePacket
 {
 	private AuthResult result;
 
 	@Override
-	protected void sendOutput(Output output)
+	protected void receiveInput(Input input)
 	{
-		output.putByte(result.CODE);
+		result = AuthResult.parse(input.getByte());
 	}
 
-	public void setResult(AuthResult result)
+	public AuthResult getResult()
 	{
-		this.result = result;
+		return result;
 	}
 
 	@Override

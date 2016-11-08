@@ -1,3 +1,8 @@
+08.11.2016 - 1.2.90
+- Atualizando o nome da identificação dos pacotes conforme sua finalidade.
+- CharConnectResponse e CharConnectReceive agora ficam em CharConnectRequest.
+- Atualizando serviços de LoginServer conforme mudanças acima.
+
 08.11.2016 - 1.2.89
 - Renomeado GenericPacket para AbstractPacket.
 - Novo formato de funcionamento dos pacotes tento agora AbstractReceivePacket e AbstractResponsePacket.

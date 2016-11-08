@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN_PCBANG;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_PCBANG;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -60,13 +60,13 @@ public class LoginPCBang extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_CA_LOGIN_PCBANG";
+		return "PACKET_LOGIN_PCBANG";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_LOGIN_PCBANG;
+		return PACKET_LOGIN_PCBANG;
 	}
 
 	@Override

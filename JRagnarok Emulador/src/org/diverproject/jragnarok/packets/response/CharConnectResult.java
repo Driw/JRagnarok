@@ -1,28 +1,20 @@
 package org.diverproject.jragnarok.packets.response;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REFUSE_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_RES_CHAR_CONNECT;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
-public class RefuseLoginByte extends ResponsePacket
+public class CharConnectResult extends ResponsePacket
 {
 	private AuthResult result;
-	private String blockDate;
-
-	public RefuseLoginByte()
-	{
-		blockDate = "";
-	}
 
 	@Override
 	protected void sendOutput(Output output)
 	{
 		output.putByte(result.CODE);
-		output.putString(blockDate, 20);
 	}
 
 	public void setResult(AuthResult result)
@@ -30,28 +22,22 @@ public class RefuseLoginByte extends ResponsePacket
 		this.result = result;
 	}
 
-	public void setBlockDate(String blockDate)
-	{
-		if (blockDate != null)
-			this.blockDate = strcap(blockDate, 20);
-	}
-
 	@Override
 	public String getName()
 	{
-		return "PACKET_REFUSE_LOGIN";
+		return "PACKET_RES_CHAR_CONNECT";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_REFUSE_LOGIN;
+		return PACKET_RES_CHAR_CONNECT;
 	}
 
 	@Override
 	protected int length()
 	{
-		return 21;
+		return 1;
 	}
 
 	@Override
@@ -59,7 +45,6 @@ public class RefuseLoginByte extends ResponsePacket
 	{
 		super.toString(description);
 
-		description.append("code", result);
-		description.append("blockDate", blockDate);
+		description.append("result", result);
 	}
 }

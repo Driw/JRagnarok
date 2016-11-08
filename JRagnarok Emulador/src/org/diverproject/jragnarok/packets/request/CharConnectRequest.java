@@ -1,12 +1,14 @@
-package org.diverproject.jragnarok.packets.response;
+package org.diverproject.jragnarok.packets.request;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REQ_CHAR_CONNECT;
 
-import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
-public class CharConnectRequest extends ResponsePacket
+public class CharConnectRequest extends RequestPacket
 {
 	private String username;
 	private String password;
@@ -30,9 +32,33 @@ public class CharConnectRequest extends ResponsePacket
 		output.putShort(newDisplay);
 	}
 
+	@Override
+	protected void receiveInput(Input input)
+	{
+		username = strclr(input.getString(24));
+		password = strclr(input.getString(24));
+		input.skipe(4);
+		serverIP = input.getInt();
+		serverPort = input.getShort();
+		serverName = strclr(input.getString(20));
+		input.skipe(2);
+		type = input.getShort();
+		newDisplay = input.getShort();
+	}
+
+	public String getUsername()
+	{
+		return username;
+	}
+
 	public void setUsername(String username)
 	{
 		this.username = username;
+	}
+
+	public String getPassword()
+	{
+		return password;
 	}
 
 	public void setPassword(String password)
@@ -40,9 +66,19 @@ public class CharConnectRequest extends ResponsePacket
 		this.password = password;
 	}
 
+	public int getServerIP()
+	{
+		return serverIP;
+	}
+
 	public void setServerIP(int serverIP)
 	{
 		this.serverIP = serverIP;
+	}
+
+	public short getServerPort()
+	{
+		return serverPort;
 	}
 
 	public void setServerPort(short serverPort)
@@ -50,9 +86,19 @@ public class CharConnectRequest extends ResponsePacket
 		this.serverPort = serverPort;
 	}
 
+	public String getServerName()
+	{
+		return serverName;
+	}
+
 	public void setServerName(String serverName)
 	{
 		this.serverName = serverName;
+	}
+
+	public short getType()
+	{
+		return type;
 	}
 
 	public void setType(short type)
@@ -60,15 +106,20 @@ public class CharConnectRequest extends ResponsePacket
 		this.type = type;
 	}
 
-	public void setNewDisplay(short newValue)
+	public short getNewDisplay()
 	{
-		this.newDisplay = newValue;
+		return newDisplay;
+	}
+
+	public void setNewDisplay(short newDisplay)
+	{
+		this.newDisplay = newDisplay;
 	}
 
 	@Override
 	public String getName()
 	{
-		return "PACKET_CA_REQ_CHAR_CONNECT";
+		return "PACKET_REC_CHAR_CONNECT";
 	}
 
 	@Override

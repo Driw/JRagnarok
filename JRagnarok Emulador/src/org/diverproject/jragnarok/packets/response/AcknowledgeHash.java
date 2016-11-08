@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.response;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_ACK_HASH;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_ACKNOWLEDGE_HASH;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.ObjectDescription;
@@ -37,7 +37,7 @@ public class AcknowledgeHash extends ResponsePacket
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_AC_ACK_HASH;
+		return PACKET_ACKNOWLEDGE_HASH;
 	}
 
 	@Override

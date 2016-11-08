@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_LOGIN2;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_MD5INFO;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -53,13 +53,13 @@ public class LoginMD5Info extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_CA_LOGIN2";
+		return "PACKET_LOGIN_MD5INFO";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_LOGIN2;
+		return PACKET_LOGIN_MD5INFO;
 	}
 
 	@Override
