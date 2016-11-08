@@ -1,3 +1,6 @@
+08.11.2016 - 1.2.87
+- Enviando ServiceLoginAuth que não foi enviado na rev86.
+
 08.11.2016 - 1.2.86
 - ServiceLoginAuth adicionado para realizar algumas operações de ServiceLoginClient.
 	- ServiceLoginClient deve ser um serviço apenas para enviar pacotes ao cliente e de análise (parse).
