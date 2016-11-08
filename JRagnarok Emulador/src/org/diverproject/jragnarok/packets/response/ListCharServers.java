@@ -6,14 +6,14 @@ import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_AC_ACCEPT_LOGIN;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
-import org.diverproject.jragnarok.server.login.LoginCharServers;
+import org.diverproject.jragnarok.server.login.CharServerList;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
 import org.diverproject.util.stream.Output;
 
 public class ListCharServers extends ResponsePacket
 {
-	private LoginCharServers servers;
+	private CharServerList servers;
 	private LoginSessionData sd;
 
 	@Override
@@ -51,7 +51,7 @@ public class ListCharServers extends ResponsePacket
 		}
 	}
 
-	public void setServers(LoginCharServers servers)
+	public void setServers(CharServerList servers)
 	{
 		this.servers = servers;
 	}

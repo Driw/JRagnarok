@@ -35,6 +35,11 @@ public class JRagnarokConstants
 
 
 	/**
+	 * Limite de caracteres permitido por nome.
+	 */
+	public static final int NAME_LENGTH = 24;
+
+	/**
 	 * Limite de caracteres permitido por nome de usuário.
 	 */
 	public static final int USERNAME_LENGTH = 24;

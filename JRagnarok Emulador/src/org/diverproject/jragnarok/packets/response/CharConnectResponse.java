@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.response;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_RES_CHAR_CONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_RES_CHAR_CONNECT;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
@@ -31,7 +31,7 @@ public class CharConnectResponse extends ResponsePacket
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_RES_CHAR_CONNECT;
+		return PACKET_RES_CHAR_CONNECT;
 	}
 
 	@Override

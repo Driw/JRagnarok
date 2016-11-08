@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_CA_REQ_CHAR_CONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REQ_CHAR_CONNECT;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -75,7 +75,7 @@ public class CharConnectReceive extends ReceivePacket
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_CA_REQ_CHAR_CONNECT;
+		return PACKET_REQ_CHAR_CONNECT;
 	}
 
 	@Override

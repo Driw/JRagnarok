@@ -44,7 +44,7 @@ import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
  *
  * @see Server
  * @see ServerListener
- * @see LoginCharServers
+ * @see CharServerList
  * @see ServiceLoginChar
  * @see ServiceLoginClient
  * @see ServiceLoginIpBan
@@ -59,7 +59,7 @@ public class LoginServer extends Server
 	/**
 	 * Lista dos Servidores de Personagens disponíveis.
 	 */
-	private LoginCharServers charServers;
+	private CharServerList charServers;
 
 	/**
 	 * Serviço para comunicação com o servidor de personagens.
@@ -82,7 +82,7 @@ public class LoginServer extends Server
 	private ServiceLoginLog logService;
 
 	/**
-	 * Serviço para para acesso de contas (serviço principal)
+	 * Serviço para acesso de contas (serviço principal)
 	 */
 	private ServiceLoginServer loginService;
 
@@ -95,14 +95,14 @@ public class LoginServer extends Server
 	{
 		setListener(listener);
 
-		charServers = new LoginCharServers();
+		charServers = new CharServerList();
 	}
 
 	/**
 	 * @return aquisição dos servidores de personagens disponíveis para acesso.
 	 */
 
-	public LoginCharServers getCharServers()
+	public CharServerList getCharServerList()
 	{
 		return charServers;
 	}
@@ -241,7 +241,7 @@ public class LoginServer extends Server
 
 			// TODO confirmar usuário e senha
 
-			logService.addLoginLog(getAddress(), login, 100, "login server started");
+			logService.add(getAddress(), login, 100, "login server started");
 		}
 
 		@Override

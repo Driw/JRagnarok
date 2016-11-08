@@ -24,7 +24,7 @@ import org.diverproject.util.collection.abstraction.LoopList;
  *
  */
 
-public class LoginCharServers implements Iterable<ClientCharServer>
+public class CharServerList implements Iterable<ClientCharServer>
 {
 	/**
 	 * Lista que irá conter os servidores de personagens como clientes.
@@ -36,7 +36,7 @@ public class LoginCharServers implements Iterable<ClientCharServer>
 	 * Inicializa a lista através da estrutura de loop, evitando espaço em branco.
 	 */
 
-	public LoginCharServers()
+	public CharServerList()
 	{
 		servers = new LoopList<>(MAX_SERVERS);
 	}
