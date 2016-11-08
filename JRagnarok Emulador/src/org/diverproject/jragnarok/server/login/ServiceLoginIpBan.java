@@ -12,7 +12,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 		return false;
 	}
 
-	public void addBanLog(String ip)
+	public void add(String ip)
 	{
 		
 	}

@@ -54,7 +54,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	{
 		int count = 0;
 
-		for (ClientCharServer server : getServer().getCharServers())
+		for (ClientCharServer server : getServer().getCharServerList())
 		{
 			if (server.getFileDecriptor().getID() != ignoreFileDecriptID)
 			{
@@ -66,12 +66,15 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		return count;
 	}
 
-	public FileDescriptorListener parse = new FileDescriptorListener()
+	public final FileDescriptorListener parse = new FileDescriptorListener()
 	{
 		@Override
 		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
-			// TODO Auto-generated method stub
+			if (!fd.isConnected())
+				return false;
+
+			
 
 			return true;
 		}

@@ -1,3 +1,11 @@
+08.11.2016 - 1.2.86
+- ServiceLoginAuth adicionado para realizar algumas operações de ServiceLoginClient.
+	- ServiceLoginClient deve ser um serviço apenas para enviar pacotes ao cliente e de análise (parse).
+		- dispatch ficará como acknowledgePacket e não irá tratar apenas de alguns pacotes.
+		- Alguns métodos passam a se tornar públicos como keepAlive e updateClientHash.
+		- Deverá realizar refuseLogin e charServerResult.
+- ServiceLoginLog documentado e OnlineController renomeado para OnlineControl.
+
 08.11.2016 - 1.2.85
 - LoginCharServers renomado para CharServerList.
 - Nome de identificação de alguns pacotes renomeados (removido algumas siglas).

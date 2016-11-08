@@ -5,12 +5,12 @@ import org.diverproject.jragnarok.server.login.entities.OnlineLogin;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;
 
-public class OnlineController
+public class OnlineControl
 {
 	private AbstractServiceLogin service;
 	private final Map<Integer, OnlineLogin> onlines;
 
-	public OnlineController(AbstractServiceLogin service)
+	public OnlineControl(AbstractServiceLogin service)
 	{
 		this.service = service;
 		this.onlines = new IntegerLittleMap<>();

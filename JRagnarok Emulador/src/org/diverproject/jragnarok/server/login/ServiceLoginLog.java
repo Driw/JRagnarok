@@ -9,31 +9,72 @@ import org.diverproject.jragnarok.server.login.controllers.LoginLogControl;
 import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.entities.LoginLog;
 
+/**
+ * <h1>Serviço para Registro de Acessos</h1>
+ *
+ * <p>Serviço designado para realizar a adição de novos registros de acessos e contagens do mesmo.
+ * A realização desses registros devem ser feitas apenas durante ou pós autenticação de uma conta.
+ * Quanto a contagem será necessário especificar um intervalo de tempo para que possa ser realizada.</p>
+ *
+ * @see LoginLogControl
+ * @see Login
+ *
+ * @author Andrew
+ */
+
 public class ServiceLoginLog extends AbstractServiceLogin
 {
-	private LoginLogControl controller;
+	/**
+	 * Controle para registrar acesso ao banco de dados.
+	 */
+	private LoginLogControl control;
 
-	public ServiceLoginLog(LoginServer server) throws RagnarokException
+	/**
+	 * Cria um novo serviço para registro de acessos no banco de dados.
+	 * @param server servidor de acesso que irá utilizar o serviço.
+	 */
+
+	public ServiceLoginLog(LoginServer server)
 	{
 		super(server);
 	}
 
+	/**
+	 * Realiza a inicialização do serviço criando o controle para registro de acessos.
+	 */
+
 	public void init()
 	{
 		try {
-			controller = new LoginLogControl(getConnection());
+			control = new LoginLogControl(getConnection());
 		} catch (RagnarokException e) {
 			logWarning("inicie ou reinicie o servidor, sem conexão MySQL.\n");
 			logExeception(e);
 		}
 	}
 
-	public void addLoginLog(int ip, Login login, int code, String message)
+	/**
+	 * Adiciona um novo registro de acesso identificando o resultado do mesmo.
+	 * @param ip endereço de IP do cliente que realizou o acesso com o servidor.
+	 * @param login objeto contendo as informações de acesso do cliente.
+	 * @param code código resultante da solicitação do acesso com o servidor.
+	 * @param message mensagem que será vinculada ao registro referente ao resultado.
+	 */
+
+	public void add(int ip, Login login, int code, String message)
 	{
-		addLoginLog(new InternetProtocol(ip), login, code, message);
+		add(new InternetProtocol(ip), login, code, message);
 	}
 
-	public void addLoginLog(InternetProtocol ip, Login login, int code, String message)
+	/**
+	 * Adiciona um novo registro de acesso identificando o resultado do mesmo.
+	 * @param ip endereço de IP do cliente que realizou o acesso com o servidor.
+	 * @param login objeto contendo as informações de acesso do cliente.
+	 * @param code código resultante da solicitação do acesso com o servidor.
+	 * @param message mensagem que será vinculada ao registro referente ao resultado.
+	 */
+
+	public void add(InternetProtocol ip, Login login, int code, String message)
 	{
 		try {
 
@@ -44,7 +85,7 @@ public class ServiceLoginLog extends AbstractServiceLogin
 			log.setRCode(code);
 			log.setMessage(message);
 
-			if (!controller.insert(log))
+			if (!control.insert(log))
 				logWarning("falha ao registrar log (ip: %s, username: %s)", ip, login.getUsername());
 
 		} catch (RagnarokException e) {
@@ -52,12 +93,20 @@ public class ServiceLoginLog extends AbstractServiceLogin
 		}
 	}
 
+	/**
+	 * Através de acessos já realizados faz a contagem de quantos acessos ocorreram.
+	 * A contagem é feita considerando os registros dos acesso que falharam.
+	 * @param ip endereço de IP do qual deseja contar as tentativas falhas.
+	 * @param minutes no intervalo de quantos minutos será considerado.
+	 * @return aquisição da quantidade de tentativas falhas nos últimos minutos.
+	 */
+
 	public int getFailedAttempts(String ip, int minutes)
 	{
 		int failures = 0;
 
 		try {
-			failures = controller.getFailedAttempts(ip, minutes);
+			failures = control.getFailedAttempts(ip, minutes);
 		} catch (RagnarokException e) {
 			logExeception(e);
 		}
