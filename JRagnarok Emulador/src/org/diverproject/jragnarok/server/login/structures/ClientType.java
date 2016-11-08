@@ -1,16 +1,19 @@
 package org.diverproject.jragnarok.server.login.structures;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.b;
+
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 
 public enum ClientType
 {
+	CT_NONE(0),
 	CT_DEFAULT(22);
 
-	public final int CODE;
+	public final byte CODE;
 
 	ClientType(int code)
 	{
-		CODE = code;
+		CODE = b(code);
 	}
 
 	public static ClientType parse(byte b)

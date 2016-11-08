@@ -18,6 +18,7 @@ import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
 import org.diverproject.jragnarok.packets.response.CharConnectResult;
 import org.diverproject.jragnarok.packets.response.ListCharServers;
 import org.diverproject.jragnarok.packets.response.NotifyAuth;
+import org.diverproject.jragnarok.packets.response.PingResponse;
 import org.diverproject.jragnarok.packets.response.RefuseLoginByte;
 import org.diverproject.jragnarok.packets.response.RefuseLoginInt;
 import org.diverproject.jragnarok.server.FileDescriptor;
@@ -324,6 +325,18 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		CharConnectResult packet = new CharConnectResult();
 		packet.setResult(result);
+		packet.send(fd);
+	}
+
+	/**
+	 * Envia um pacote para uma conexão afim de mantê-la viva no sistema.
+	 * Esse pacote é enviado a um servidor de personagem quando este solicita um ping.
+	 * @param fd conexão do servidor de personagem com este servidor de acesso.
+	 */
+
+	public void pingCharRequest(FileDescriptor fd)
+	{
+		PingResponse packet = new PingResponse();
 		packet.send(fd);
 	}
 }

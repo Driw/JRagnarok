@@ -1,3 +1,9 @@
+08.11.2016 - 1.2.91
+- Inicialização dos serviços de CharServer, solicitação de acesso com LoginServer.
+- LoginSeed corrigido, first e second devem ser do tipo int ao invés de long.
+- CT_NONE adicionado para ClientType não definido (será usado mais a frente).
+- Envio de pacote "ping" para com CharServer, ServiceLoginClient.pingCharRequest.
+
 08.11.2016 - 1.2.90
 - Atualizando o nome da identificação dos pacotes conforme sua finalidade.
 - CharConnectResponse e CharConnectReceive agora ficam em CharConnectRequest.

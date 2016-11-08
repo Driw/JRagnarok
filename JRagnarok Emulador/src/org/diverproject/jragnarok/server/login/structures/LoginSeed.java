@@ -6,10 +6,10 @@ import org.diverproject.util.ObjectDescription;
 
 public class LoginSeed
 {
-	private long first;
-	private long second;
+	private int first;
+	private int second;
 
-	public long getFirst()
+	public int getFirst()
 	{
 		return first;
 	}
@@ -19,7 +19,7 @@ public class LoginSeed
 		first = random() + 1;
 	}
 
-	public long getSecond()
+	public int getSecond()
 	{
 		return second;
 	}
