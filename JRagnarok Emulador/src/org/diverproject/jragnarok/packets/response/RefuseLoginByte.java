@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.response;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REFUSE_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REFUSE_LOGIN;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
@@ -39,7 +39,7 @@ public class RefuseLoginByte extends ResponsePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_REFUSE_LOGIN";
+		return "REFUSE_LOGIN";
 	}
 
 	@Override

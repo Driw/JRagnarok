@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.response;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_ALREADY_ONLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ALREADY_ONLINE;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.stream.Output;
@@ -29,7 +29,7 @@ public class AlreadyOnline extends ResponsePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_ALREADY_ONLINE";
+		return "ALREADY_ONLINE";
 	}
 
 	@Override

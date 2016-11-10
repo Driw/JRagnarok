@@ -15,6 +15,8 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.login.controllers.AccountControl;
+import org.diverproject.jragnarok.server.login.controllers.AuthControl;
+import org.diverproject.jragnarok.server.login.controllers.OnlineControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
@@ -45,7 +47,17 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	/**
 	 * Controle para intermediar a persistência de contas e cache de contas.
 	 */
-	private AccountControl controller;
+	private AccountControl accountControl;
+
+	/**
+	 * Controlador para identificar jogadores online.
+	 */
+	private OnlineControl onlineControl;
+
+	/**
+	 * Controlador para identificar jogadores autenticados.
+	 */
+	private AuthControl authControl;
 
 	/**
 	 * Constrói um novo serviço para realizar a autenticação e obtenção de contas.
@@ -57,7 +69,62 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	{
 		super(server);
 
-		controller = new AccountControl(getConnection());
+		accountControl = new AccountControl(getConnection());
+	}
+
+	/**
+	 * @return aquisição do controle para gerenciar as contas dos jogadores.
+	 */
+
+	AccountControl getAccountControl()
+	{
+		return accountControl;
+	}
+
+	/**
+	 * @return aquisição do controle para identificar jogadores online.
+	 */
+
+	OnlineControl getOnlineControl()
+	{
+		return onlineControl;
+	}
+
+	/**
+	 * @return aquisição do controle para autenticação dos jogadores.
+	 */
+
+	AuthControl getAuthControl()
+	{
+		return authControl;
+	}
+
+	/**
+	 * Inicializa o serviço para recebimento de novos clientes no servidor.
+	 * @throws RagnarokException apenas se houver falha de conexão.
+	 */
+
+	public void init() throws RagnarokException
+	{
+		accountControl = new AccountControl(getConnection());
+		onlineControl = new OnlineControl(getTimerSystem().getTimers());
+		authControl = new AuthControl();
+	}
+
+	/**
+	 * Limpa as informações contidas de usuários online e autenticações feitas.
+	 * Após isso destrói o controlador de usuários online e autenticações feitas.
+	 */
+
+	public void destroy()
+	{
+		accountControl.clear();
+		onlineControl.clear();
+		authControl.clear();
+
+		accountControl = null;
+		onlineControl = null;
+		authControl = null;
 	}
 
 	/**
@@ -94,7 +161,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		account.getLastIP().set(sd.getAddress());
 		account.setLoginCount(account.getLoginCount() + 1);
 
-		if (!controller.save(account))
+		if (!accountControl.save(account))
 			logError("falha ao persistir conta (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
 
 		return OK;
@@ -133,7 +200,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 	private AuthResult makeLoginAccount(LoginSessionData sd, boolean server)
 	{
-		Account account = controller.get(sd.getUsername());
+		Account account = accountControl.get(sd.getUsername());
 
 		if (account == null)
 		{
@@ -287,6 +354,10 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 		return OK;
 	}
+
+	// lan_subnetcheck(uint32 ip)
+	// login_check_encrypted(const char* str1, const char* str2, const char* passwd)
+	// login_mmo_auth_new(const char* userid, const char* pass, const char sex, const char* last_ip)
 
 	/**
 	 * TODO ???

@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_MD5INFO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5INFO;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -53,7 +53,7 @@ public class LoginMD5Info extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_LOGIN_MD5INFO";
+		return "LOGIN_MD5INFO";
 	}
 
 	@Override

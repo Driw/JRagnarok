@@ -11,6 +11,7 @@ public class Vip
 	private Group group;
 	private String name;
 	private byte charSlotCount;
+	private byte charBilling;
 	private short maxStorage;
 
 	public int getID()
@@ -52,6 +53,16 @@ public class Vip
 	{
 		if (charSlotCount > 0)
 			this.charSlotCount = charSlotCount;
+	}
+
+	public byte getCharBilling()
+	{
+		return charBilling;
+	}
+
+	public void setCharBilling(byte charBilling)
+	{
+		this.charBilling = charBilling;
 	}
 
 	public short getMaxStorage()

@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.response;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REFUSE_LOGIN_R2;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REFUSE_LOGIN_R2;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
@@ -10,13 +10,7 @@ import org.diverproject.util.stream.Output;
 
 public class RefuseLoginInt extends ResponsePacket
 {
-	public static final byte REJECTED_FROM_SERVER = 3;
-	public static final String CODE_STRINGS[] = new String[]
-	{
-		"", "", "REJECTED_FROM_SERVER"
-	};
-
-	private int code;
+	private AuthResult result;
 	private String blockDate;
 
 	public RefuseLoginInt()
@@ -27,14 +21,14 @@ public class RefuseLoginInt extends ResponsePacket
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putInt(code);
+		output.putInt(result.CODE);
 		output.putString(blockDate, 20);
 	}
 
 	@Override
 	public String getName()
 	{
-		return "PACKET_REFUSE_LOGIN_R2";
+		return "REFUSE_LOGIN_R2";
 	}
 
 	@Override
@@ -43,9 +37,9 @@ public class RefuseLoginInt extends ResponsePacket
 		return PACKET_REFUSE_LOGIN_R2;
 	}
 
-	public void setCode(AuthResult result)
+	public void setResult(AuthResult result)
 	{
-		this.code = result.CODE;
+		this.result = result;
 	}
 
 	public String getBlockDate()
@@ -70,7 +64,7 @@ public class RefuseLoginInt extends ResponsePacket
 	{
 		super.toString(description);
 
-		description.append(CODE_STRINGS[code]);
+		description.append(result);
 		description.append(blockDate);
 	}
 }

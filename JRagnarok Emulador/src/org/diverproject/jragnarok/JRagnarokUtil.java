@@ -1,10 +1,12 @@
 package org.diverproject.jragnarok;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.log.LogSystem.setUpSource;
+import static org.diverproject.util.lang.IntUtil.interval;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -17,6 +19,7 @@ import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.util.SizeUtil;
 import org.diverproject.util.SystemUtil;
 import org.diverproject.util.collection.List;
+import org.diverproject.util.lang.StringUtil;
 import org.diverproject.util.stream.StreamException;
 import org.diverproject.util.stream.StreamRuntimeException;
 
@@ -239,6 +242,26 @@ public class JRagnarokUtil
 		}
 
 		return output;
+	}
+
+	/**
+	 * Verifica se um determinado endereço de e-mail passado possui um formato válido.
+	 * @param email endereço de e-mail do qual deseja verificar a validez do formato.
+	 * @return true se estiver com um formato válido ou false caso contrário.
+	 */
+
+	public static boolean emailCheck(String email)
+	{
+		if (email == null || !interval(email.length(), 3, EMAIL_LENGTH))
+			return false;
+
+		if (StringUtil.countOf(email, "@") != 1 || email.endsWith("@") || email.startsWith("@"))
+			return false;
+
+		if (!email.contains(".") || email.endsWith(".") || email.startsWith("."))
+			return false;
+
+		return !email.contains("@.");
 	}
 
 	/**

@@ -1,11 +1,12 @@
 package org.diverproject.jragnarok.packets.response;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_PING_RESPONSE;
+
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_KEEP_ALIVE;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.stream.Output;
 
-public class PingResponse extends ResponsePacket
+public class KeepAliveResult extends ResponsePacket
 {
 	@Override
 	protected void sendOutput(Output output)
@@ -22,12 +23,12 @@ public class PingResponse extends ResponsePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_PING_RESPONSE";
+		return "RES_KEEP_ALIVE";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_PING_RESPONSE;
+		return PACKET_RES_KEEP_ALIVE;
 	} 
 }

@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
 
 import java.util.Iterator;
 
+import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.LoopList;
@@ -71,6 +72,21 @@ public class CharServerList implements Iterable<ClientCharServer>
 	public ClientCharServer get(int id)
 	{
 		return servers.get(id);
+	}
+
+	/**
+	 * Obtém um determinado servidor da lista de servidores acessados.
+	 * @param fd sessão da conexão do cliente esperado como servidor de personagem.
+	 * @return objeto contendo os dados do servidor ou null se a sessão for inválida.
+	 */
+
+	public ClientCharServer get(FileDescriptor fd)
+	{
+		for (ClientCharServer server : servers)
+			if (server.getFileDecriptor().equals(fd))
+				return server;
+
+		return null;
 	}
 
 	/**

@@ -1,10 +1,15 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
+import static org.diverproject.jragnarok.JRagnarokUtil.s;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP_SYNC_INTERVAL;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_USER_COUNT;
 import static org.diverproject.log.LogSystem.logInfo;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
+import org.diverproject.jragnarok.packets.request.UpdateUserCount;
 import org.diverproject.jragnarok.packets.response.SyncronizeAddress;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
@@ -13,108 +18,21 @@ import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
-import org.diverproject.util.ObjectDescription;
 
 public class ServiceLoginChar extends AbstractServiceLogin
 {
+	private ServiceLoginClient client;
+
 	public ServiceLoginChar(LoginServer server)
 	{
 		super(server);
 	}
 
-	private TimerListener syncronizeIpAddress = new TimerListener()
-	{
-		@Override
-		public void onCall(Timer timer, int now, int tick)
-		{
-			logInfo("Sincronização de IP em progresso...\n");
-
-			SyncronizeAddress packet = new SyncronizeAddress();
-			sendAllWithoutOurSelf(-1, packet);
-		}
-
-		@Override
-		public String getName()
-		{
-			return "syncronizeIpAddress";
-		}
-
-		@Override
-		public String toString()
-		{
-			ObjectDescription description = new ObjectDescription(getClass());
-
-			description.append(getName());
-
-			return description.toString();
-		}
-	};
-
-	private int sendAllWithoutOurSelf(int ignoreFileDecriptID, ResponsePacket packet)
-	{
-		int count = 0;
-
-		for (ClientCharServer server : getServer().getCharServerList())
-		{
-			if (server.getFileDecriptor().getID() != ignoreFileDecriptID)
-			{
-				packet.send(server.getFileDecriptor());
-				count++;
-			}
-		}
-
-		return count;
-	}
-
-	public final FileDescriptorListener parse = new FileDescriptorListener()
-	{
-		@Override
-		public boolean onCall(FileDescriptor fd) throws RagnarokException
-		{
-			if (!fd.isConnected())
-				return false;
-
-			
-
-			return true;
-		}
-	};
-
-	// TODO keepAlive
-	// TODO onDisconnect
-
-	// TODO serverDestroy
-	// TODO serverInit
-	// TODO serverReset
-
-	// TODO acknologeUserCount
-	// TODO setAccountOffline
-	// TODO setAccountOnline
-	// TODO setAllOffline
-
-	// TODO updateCharIP
-	// TODO updateOnlineDatabase
-	// TODO updatePincode
-
-	// TODO authenticate
-
-	// TODO accountDataResquest
-	// TODO accountDataSend
-	// TODO accountInfo
-	// TODO vipDataResquest
-	// TODO vipDataSend
-	// TODO banAccountRequest
-	// TODO unbanAccountRequest
-	// TODO updateAccountSate
-	// TODO requestChangeEmail
-	// TODO requestChangeSex
-	// TODO pincodeAuthFail
-	// TODO globalAccountRegResquest
-	// TODO globalAccountRegUpdate
-
 	public void init()
 	{
-		int interval = getConfigs().getInt("login.ip_sync_interval");
+		client = getServer().getClientService();
+
+		int interval = getConfigs().getInt(LOGIN_IP_SYNC_INTERVAL);
 
 		if (interval > 0)
 		{
@@ -128,9 +46,86 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		}
 	}
 
-	public void shutdown()
+	public void destroy()
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	private TimerListener syncronizeIpAddress = new TimerListener()
+	{
+		@Override
+		public void onCall(Timer timer, int now, int tick)
+		{
+			logInfo("Sincronização de IP em progresso...\n");
+
+			SyncronizeAddress packet = new SyncronizeAddress();
+			client.sendAllWithoutOurSelf(null, packet);
+		}
+
+		@Override
+		public String getName()
+		{
+			return "syncronizeIpAddress";
+		}
+
+		@Override
+		public String toString()
+		{
+			return getName();
+		}
+	};
+
+	public final FileDescriptorListener parse = new FileDescriptorListener()
+	{
+		@Override
+		public boolean onCall(FileDescriptor fd) throws RagnarokException
+		{
+			if (!fd.isConnected())
+				return false;
+
+			return acknowledgePacket(fd);
+		}
+	};
+
+	private boolean acknowledgePacket(FileDescriptor fd)
+	{
+		AcknowledgePacket packet = new AcknowledgePacket();
+		packet.receive(fd, false);
+
+		short command = packet.getPacketID();
+
+		switch (command)
+		{
+			case PACKET_RES_KEEP_ALIVE:
+				client.pingCharRequest(fd);
+				return true;
+
+			case PACKET_UPDATE_USER_COUNT:
+				updateUserCount(fd);
+				return true;
+
+			default:
+				return false; // account.dispatch(command, fd);
+		}
+	}
+
+	/**
+	 * Um servidor de personagem envia a quantidade de jogadores online.
+	 * Deve procurar o cliente desse servidor e atualizar a informação.
+	 * @param fd conexão do servidor de personagem que está enviando.
+	 */
+
+	private void updateUserCount(FileDescriptor fd)
+	{
+		UpdateUserCount packet = new UpdateUserCount();
+		packet.receive(fd);
+
+		for (ClientCharServer server : getServer().getCharServerList())
+			if (server.getFileDecriptor().equals(fd) && server.getUsers() != packet.getCount())
+			{
+				server.setUsers(s(packet.getCount()));
+				logInfo("%d jogadores online em '%s'.\n", server.getUsers(), server.getName());
+			}
 	}
 }

@@ -11,9 +11,28 @@ import org.diverproject.jragnarok.server.ServerListener;
 
 public class CharServer extends Server
 {
+	private ServiceCharClient charClient;
+	private ServiceCharServer charServer;
+	private ServiceCharLogin charLogin;
+
 	public CharServer()
 	{
 		setListener(listener);
+	}
+
+	public ServiceCharClient getCharClient()
+	{
+		return charClient;
+	}
+
+	public ServiceCharServer getCharServer()
+	{
+		return charServer;
+	}
+
+	public ServiceCharLogin getCharLogin()
+	{
+		return charLogin;
 	}
 
 	@Override
@@ -58,7 +77,11 @@ public class CharServer extends Server
 		@Override
 		public void onCreated() throws RagnarokException
 		{
-			
+			charClient = new ServiceCharClient(CharServer.this);
+			charServer = new ServiceCharServer(CharServer.this);
+			charLogin = new ServiceCharLogin(CharServer.this);
+
+			charLogin.init();
 		};
 
 		@Override

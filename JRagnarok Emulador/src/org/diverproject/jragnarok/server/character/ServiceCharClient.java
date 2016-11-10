@@ -3,7 +3,6 @@ package org.diverproject.jragnarok.server.character;
 import org.diverproject.jragnarok.packets.response.RefuseEnter;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.character.structures.CharSessionData;
-import org.diverproject.jragnarok.server.login.structures.AuthResult;
 
 public class ServiceCharClient extends AbstractCharService
 {
@@ -12,7 +11,7 @@ public class ServiceCharClient extends AbstractCharService
 		super(server);
 	}
 
-	public void refuseEnter(FileDescriptor fd, AuthResult result)
+	public void refuseEnter(FileDescriptor fd, byte result)
 	{
 		RefuseEnter packet = new RefuseEnter();
 		packet.setResult(result);

@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.response;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_NOTIFY_BAN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_NOTIFY_AUTH;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.structures.NotifyAuthResult;
@@ -36,6 +36,6 @@ public class NotifyAuth extends ResponsePacket
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_NOTIFY_BAN;
+		return PACKET_NOTIFY_AUTH;
 	}
 }

@@ -4,21 +4,22 @@ import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Salt;
 import static org.diverproject.jragnarok.JRagnarokUtil.random;
 import static org.diverproject.jragnarok.JRagnarokUtil.skip;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_UPDATE_CLIENT_HASH;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REQ_HASH;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_CLIENT_HASH;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_HASH;
 import static org.diverproject.log.LogSystem.log;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.receive.KeepAlive;
 import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
 import org.diverproject.jragnarok.packets.receive.UpdateClientHash;
+import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
 import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
-import org.diverproject.jragnarok.packets.response.CharConnectResult;
 import org.diverproject.jragnarok.packets.response.ListCharServers;
 import org.diverproject.jragnarok.packets.response.NotifyAuth;
-import org.diverproject.jragnarok.packets.response.PingResponse;
+import org.diverproject.jragnarok.packets.response.KeepAliveResult;
+import org.diverproject.jragnarok.packets.response.RefuseEnter;
 import org.diverproject.jragnarok.packets.response.RefuseLoginByte;
 import org.diverproject.jragnarok.packets.response.RefuseLoginInt;
 import org.diverproject.jragnarok.server.FileDescriptor;
@@ -238,7 +239,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @return quantidade de clientes que tiverem os dados recebidos.
 	 */
 
-	public int sendAllWithoutOurSelf(FileDescriptor fd, ResponsePacket packet)
+	public int sendAllWithoutOurSelf(FileDescriptor fd, IResponsePacket packet)
 	{
 		int count = 0;
 
@@ -302,7 +303,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		{
 			RefuseLoginInt packet = new RefuseLoginInt();
 			packet.setBlockDate(blockDate);
-			packet.setCode(result);
+			packet.setResult(result);
 			packet.send(sd.getFileDescriptor());
 		}
 
@@ -316,6 +317,19 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	}
 
 	/**
+	 * Recusa a entrada de uma determinada sessão no servidor de acesso.
+	 * @param fd conexão do servidor de personagem com este servidor de acesso.
+	 * @param result resultado que será mostrado ao cliente.
+	 */
+
+	public void refuseEnter(FileDescriptor fd, byte result)
+	{
+		RefuseEnter packet = new RefuseEnter();
+		packet.setResult(result);
+		packet.send(fd);
+	}
+
+	/**
 	 * Notifica um conexão com um servidor de personagem o resultado do seu acesso.
 	 * @param fd conexão do servidor de personagem com este servidor de acesso.
 	 * @param result resultado da solicitação de acesso da conexão acima.
@@ -323,7 +337,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void charServerResult(FileDescriptor fd, AuthResult result)
 	{
-		CharConnectResult packet = new CharConnectResult();
+		CharServerConnectResult packet = new CharServerConnectResult();
 		packet.setResult(result);
 		packet.send(fd);
 	}
@@ -336,7 +350,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void pingCharRequest(FileDescriptor fd)
 	{
-		PingResponse packet = new PingResponse();
+		KeepAliveResult packet = new KeepAliveResult();
 		packet.send(fd);
 	}
 }

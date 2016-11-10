@@ -6,14 +6,14 @@ import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.loginMessage;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Encrypt;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_MD5MAC;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_MD5;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_MD5INFO;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_HAN;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_PCBANG;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN_SSO;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REQ_CHAR_CONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5MAC;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5INFO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_HAN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_PCBANG;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_SSO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHAR_SERVER_CONNECT;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.TimerType.TIMER_INVALID;
 import static org.diverproject.jragnarok.server.login.structures.AuthResult.OK;
@@ -31,7 +31,7 @@ import org.diverproject.jragnarok.packets.receive.LoginMD5Info;
 import org.diverproject.jragnarok.packets.receive.LoginMD5Mac;
 import org.diverproject.jragnarok.packets.receive.LoginPCBang;
 import org.diverproject.jragnarok.packets.receive.LoginSingleSignOn;
-import org.diverproject.jragnarok.packets.request.CharConnectRequest;
+import org.diverproject.jragnarok.packets.request.CharServerConnectRequest;
 import org.diverproject.jragnarok.packets.response.AlreadyOnline;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
@@ -113,7 +113,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * Controlador para identificar jogadores autenticados.
 	 */
-	private AuthControl controller;
+	private AuthControl control;
 
 	/**
 	 * Cria um novo serviço para autenticação de solicitações dos acessos ao servidor.
@@ -138,22 +138,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		character = getServer().getCharService();
 		client = getServer().getClientService();
 
-		onlines = getServer().getAccountService().getOnlineControl();
-		controller = getServer().getAccountService().getControl();
-	}
-
-	/**
-	 * Limpa as informações contidas de usuários online e autenticações feitas.
-	 * Após isso destrói o controlador de usuários online e autenticações feitas.
-	 */
-
-	public void destroy()
-	{
-		onlines.clear();
-		controller.clear();
-
-		onlines = null;
-		controller = null;
+		onlines = getServer().getLoginService().getOnlineControl();
+		control = getServer().getLoginService().getAuthControl();
 	}
 
 	/**
@@ -180,7 +166,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			case PACKET_LOGIN_MD5INFO:
 				return requestAuth(fd, sd, command);
 
-			case PACKET_REQ_CHAR_CONNECT:
+			case PACKET_REQ_CHAR_SERVER_CONNECT:
 				return requestCharConnect(fd, sd);
 
 			default:
@@ -562,7 +548,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				return true;
 			}
 
-			controller.remove(sd.getID());
+			control.remove(sd.getID());
 			onlines.remove(online);
 		}
 
@@ -611,7 +597,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 	private boolean requestCharConnect(FileDescriptor fd, LoginSessionData sd)
 	{
-		CharConnectRequest ccPacket = new CharConnectRequest();
+		CharServerConnectRequest ccPacket = new CharServerConnectRequest();
 		ccPacket.receive(fd, false);
 
 		sd.setUsername(ccPacket.getUsername());

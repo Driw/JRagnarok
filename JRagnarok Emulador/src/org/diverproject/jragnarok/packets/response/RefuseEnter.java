@@ -1,15 +1,20 @@
 package org.diverproject.jragnarok.packets.response;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_REFUSE_ENTER;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REFUSE_ENTER;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
-import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
 public class RefuseEnter extends ResponsePacket
 {
-	private AuthResult result;
+	public static final byte REJECTED_FROM_SERVER = 0;
+	public static final String CODE_STRINGS[] = new String[]
+	{
+		"REJECTED_FROM_SERVER"
+	};
+
+	private byte result;
 
 	public RefuseEnter()
 	{
@@ -18,10 +23,10 @@ public class RefuseEnter extends ResponsePacket
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putByte(result.CODE);
+		output.putByte(result);
 	}
 
-	public void setResult(AuthResult result)
+	public void setResult(byte result)
 	{
 		this.result = result;
 	}
@@ -29,7 +34,7 @@ public class RefuseEnter extends ResponsePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_REFUSE_ENTER";
+		return "REFUSE_ENTER";
 	}
 
 	@Override

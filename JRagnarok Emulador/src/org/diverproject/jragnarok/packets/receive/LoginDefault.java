@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -46,7 +46,7 @@ public class LoginDefault extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_LOGIN";
+		return "LOGIN";
 	}
 
 	@Override

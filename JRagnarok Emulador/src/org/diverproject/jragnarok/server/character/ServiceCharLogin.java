@@ -14,19 +14,17 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_SERVER_NA
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_USERNAME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_ACCOUNT_BAN_NOTIFICATION;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_RES_ACCOUNT_DATA;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_ACK_ACCOUNT_INFO;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_ACK_CHANGE_SEX;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_RES_AUTH_ACCOUNT;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_ACK_GLOBAL_ACCREG;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_ALREADY_ONLINE;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_PING_RESPONSE;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_PING_REQUEST;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_RES_CHAR_CONNECT;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_SYNCRONIZE_IPADDRESS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACCOUNT_STATE_NOTIFY;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_INFO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_ACCOUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_GLOBAL_ACCREG;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ALREADY_ONLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_CHAR_SERVER_CONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.jragnarok.server.login.structures.AuthResult.OK;
-import static org.diverproject.jragnarok.server.login.structures.AuthResult.REJECTED_FROM_SERVER;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.lang.IntUtil.diff;
@@ -35,11 +33,12 @@ import java.io.IOException;
 import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.receive.AuthAccountReceive;
+import org.diverproject.jragnarok.packets.receive.AuthAccountResponse;
 import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
-import org.diverproject.jragnarok.packets.receive.CharConnectResult;
-import org.diverproject.jragnarok.packets.request.CharConnectRequest;
-import org.diverproject.jragnarok.packets.response.PingRequest;
+import org.diverproject.jragnarok.packets.request.CharServerConnectRequest;
+import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
+import org.diverproject.jragnarok.packets.response.KeepAliveRequest;
+import org.diverproject.jragnarok.packets.response.RefuseEnter;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Timer;
@@ -150,7 +149,7 @@ public class ServiceCharLogin extends ServiceCharServer
 				short type = s(getConfigs().getInt(CHAR_MAINTANCE));
 				short newDisplay = s(getConfigs().getInt(CHAR_NEW_DISPLAY));
 
-				CharConnectRequest packet = new CharConnectRequest();
+				CharServerConnectRequest packet = new CharServerConnectRequest();
 				packet.setUsername(username);
 				packet.setPassword(password);
 				packet.setServerIP(serverIP);
@@ -236,7 +235,7 @@ public class ServiceCharLogin extends ServiceCharServer
 
 			else if (!fd.getFlag().is(FileDescriptor.FLAG_PING_SENT))
 			{
-				PingRequest packet = new PingRequest();
+				KeepAliveRequest packet = new KeepAliveRequest();
 				packet.send(fd);
 
 				fd.getFlag().set(FileDescriptor.FLAG_PING_SENT);
@@ -256,16 +255,15 @@ public class ServiceCharLogin extends ServiceCharServer
 
 		switch (command)
 		{
-			case PACKET_RES_CHAR_CONNECT: return parseLoginResult(fd);
+			case PACKET_RES_CHAR_SERVER_CONNECT: return parseLoginResult(fd);
 			case PACKET_RES_AUTH_ACCOUNT: return acknowledgeAccount(fd, sd);
 
-			case PACKET_RES_ACCOUNT_DATA:
-			case PACKET_PING_RESPONSE:
-			case PACKET_PING_REQUEST:
-			case PACKET_ACK_ACCOUNT_INFO:
-			case PACKET_ACK_CHANGE_SEX:
-			case PACKET_ACK_GLOBAL_ACCREG:
-			case PACKET_ACCOUNT_BAN_NOTIFICATION:
+			case PACKET_REQ_ACCOUNT_DATA:
+			case PACKET_REQ_KEEP_ALIVE:
+			case PACKET_RES_KEEP_ALIVE:
+			case PACKET_REQ_ACCOUNT_INFO:
+			case PACKET_REQ_GLOBAL_ACCREG:
+			case PACKET_ACCOUNT_STATE_NOTIFY:
 			case PACKET_ALREADY_ONLINE:
 			case PACKET_SYNCRONIZE_IPADDRESS:
 		}
@@ -275,7 +273,7 @@ public class ServiceCharLogin extends ServiceCharServer
 
 	private boolean parseLoginResult(FileDescriptor fd)
 	{
-		CharConnectResult packet = new CharConnectResult();
+		CharServerConnectResult packet = new CharServerConnectResult();
 		packet.receive(fd, false);
 
 		return packet.getResult() == OK;
@@ -283,7 +281,7 @@ public class ServiceCharLogin extends ServiceCharServer
 
 	private boolean acknowledgeAccount(FileDescriptor fd, CharSessionData sd)
 	{
-		AuthAccountReceive packet = new AuthAccountReceive();
+		AuthAccountResponse packet = new AuthAccountResponse();
 		packet.receive(fd, false);
 
 		if ((sd = (fd.getCache() == null) ? null : (CharSessionData) fd.getCache()) != null &&
@@ -304,11 +302,11 @@ public class ServiceCharLogin extends ServiceCharServer
 
 			switch (packet.getResult())
 			{
-				case AuthAccountReceive.OK:
+				case AuthAccountResponse.OK:
 					return charClient.charAuthOk(fd, sd);
 
-				case AuthAccountReceive.FAILED:
-					charClient.refuseEnter(fd, REJECTED_FROM_SERVER);
+				case AuthAccountResponse.FAILED:
+					charClient.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
 					return true;
 			}
 		}

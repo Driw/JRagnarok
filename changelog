@@ -1,9 +1,13 @@
+10.11.2016 - 1.2.93b
+- Formatação no nome dos identificadores dos pacotes.
+- Novo flag para ser incorporado por FileDescriptor, FLAG_PING_SENT.
+- CharServer deverá instanciar e iniciar os serviços que lhe faz parte.
+- ServiceLoginServer deverá ser responsável pelos controles de LoginServer.
+- Serviços de CharServer e LoginServer atualizados conforme as mudanças nos pacotes.
+- Vip não estava implementando o atributo referente e char billing.
+
 08.11.2016 - 1.2.93
 - Contas agora podem ser obtidas do banco de dados através do seu ID.
-
-08.11.2016 - 1.2.92
-- Complementação de algumas outras funcionalidades do serviço de acesso.
-	- Todas essas funcionalidades serão usadas entre LoginServer e CharServer.
 
 08.11.2016 - 1.2.91
 - Inicialização dos serviços de CharServer, solicitação de acesso com LoginServer.

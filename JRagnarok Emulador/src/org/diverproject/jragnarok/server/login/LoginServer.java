@@ -92,6 +92,11 @@ public class LoginServer extends Server
 	private ServiceLoginAuth authService;
 
 	/**
+	 * Serviço para trabalhar com as contas dos jogadores.
+	 */
+	private ServiceLoginAccount accountService;
+
+	/**
 	 * Cria um novo micro servidor para receber os novos acessos de clientes.
 	 * Define ainda o listener para executar operações durante mudanças de estado.
 	 */
@@ -166,6 +171,15 @@ public class LoginServer extends Server
 		return authService;
 	}
 
+	/**
+	 * @return aquisição do serviço para trabalhar com as contas dos jogadores.
+	 */
+
+	public ServiceLoginAccount getAccountService()
+	{
+		return accountService;
+	}
+
 	@Override
 	public String getHost()
 	{
@@ -218,15 +232,18 @@ public class LoginServer extends Server
 		@Override
 		public void onCreated() throws RagnarokException
 		{
+			accountService = new ServiceLoginAccount(LoginServer.this);
+			authService = new ServiceLoginAuth(LoginServer.this);
 			charService = new ServiceLoginChar(LoginServer.this);
 			clientService = new ServiceLoginClient(LoginServer.this);
 			ipBanService = new ServiceLoginIpBan(LoginServer.this);
 			logService = new ServiceLoginLog(LoginServer.this);
 			loginService = new ServiceLoginServer(LoginServer.this);
-			authService = new ServiceLoginAuth(LoginServer.this);
 
+			loginService.init();
 			charService.init();
 			clientService.init();
+			accountService.init();
 			authService.init();
 
 			if (getConfigs().getBool(LOG_LOGIN))
@@ -280,8 +297,11 @@ public class LoginServer extends Server
 			for (ClientCharServer client : charServers)
 				client.getFileDecriptor().close();
 
+			getFileDescriptorSystem().execute(onDestroyed);
+
 			charServers.clear();
-			authService.destroy();
+			charService.destroy();
+			loginService.destroy();
 
 			if (getConfigs().getBool(IPBAN_ENABLED))
 				ipBanService.destroy();
@@ -290,8 +310,6 @@ public class LoginServer extends Server
 		@Override
 		public void onDestroyed() throws RagnarokException
 		{
-			charService.shutdown();
-			getFileDescriptorSystem().execute(onDestroyed);
 		}
 	};
 

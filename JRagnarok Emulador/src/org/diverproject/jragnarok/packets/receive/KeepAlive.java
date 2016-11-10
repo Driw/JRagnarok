@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.receive;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacketList.PACKET_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_KEEP_ALIVE;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.ObjectDescription;
@@ -25,7 +25,7 @@ public class KeepAlive extends ReceivePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_KEEP_ALIVE";
+		return "KEEP_ALIVE";
 	}
 
 	@Override
