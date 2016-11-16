@@ -22,6 +22,7 @@ import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 public class ServiceLoginChar extends AbstractServiceLogin
 {
 	private ServiceLoginClient client;
+	private ServiceLoginAccount account;
 
 	public ServiceLoginChar(LoginServer server)
 	{
@@ -31,6 +32,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	public void init()
 	{
 		client = getServer().getClientService();
+		account = getServer().getAccountService();
 
 		int interval = getConfigs().getInt(LOGIN_IP_SYNC_INTERVAL);
 
@@ -106,7 +108,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 				return true;
 
 			default:
-				return false; // account.dispatch(command, fd);
+				return account.dispatch(command, fd);
 		}
 	}
 

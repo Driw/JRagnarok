@@ -1,3 +1,9 @@
+10.11.2016 - 1.2.94
+- Ao atualizar um cliente (FD) ficava preso em acknowledge por não receber pacote.
+	- Para isso FileDescriptor recebe hasData para verificar se há pacote à receber.
+- ServiceLoginClient.acknowledgePacket atualizado para retornar true em alguns pacotes.
+
+
 10.11.2016 - 1.2.93b
 - Formatação no nome dos identificadores dos pacotes.
 - Novo flag para ser incorporado por FileDescriptor, FLAG_PING_SENT.

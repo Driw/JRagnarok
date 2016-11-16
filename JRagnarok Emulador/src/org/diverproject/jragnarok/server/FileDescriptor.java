@@ -276,6 +276,20 @@ public class FileDescriptor
 		return connected;
 	}
 
+	/**
+	 * Verifica se existem dados para serem lidos através da conexão socket estabelecida.
+	 * @return true se houver dados para ler ou false caso contrário.
+	 */
+
+	public boolean hasData()
+	{
+		try {
+			return socket != null && socket.getInputStream().available() > 0;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
 	@Override
 	public String toString()
 	{

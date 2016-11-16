@@ -128,7 +128,7 @@ public class ServiceCharLogin extends ServiceCharServer
 			if (isConnected())
 				return;
 
-			logInfo("tentando se conectar com o servidor de personagens...\n");
+			logInfo("tentando se conectar com o servidor de acesso...\n");
 
 			String host = getConfigs().getString(LOGIN_IP);
 			short port = s(getConfigs().getInt(LOGIN_PORT));

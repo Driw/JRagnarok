@@ -133,15 +133,15 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		{
 			case PACKET_KEEP_ALIVE:
 				keepAlive(fd);
-				break;
+				return true;
 
 			case PACKET_UPDATE_CLIENT_HASH:
 				updateClientHash(fd, sd);
-				break;
+				return true;
 
 			case PACKET_REQ_HASH:
 				parseRequestKey(fd, sd);
-				break;
+				return true;
 		}
 
 		return auth.dispatch(command, fd, sd);

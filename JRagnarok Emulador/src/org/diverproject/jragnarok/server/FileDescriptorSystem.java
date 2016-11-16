@@ -123,7 +123,7 @@ public class FileDescriptorSystem
 				if (fd.isConnected())
 					fd.close();
 
-				logInfo("sessão encerrada (ip: %s).\n", fd.getAddressString());
+				logInfo("sessão #%d fechada e removida (ip: %s).\n", fd.getID(), fd.getAddressString());
 
 				sessions.remove(i);
 			}
@@ -173,7 +173,7 @@ public class FileDescriptorSystem
 		try {
 
 			if (fd.getParseListener() != null)
-				if (!fd.getParseListener().onCall(fd))
+				if (fd.hasData() && !fd.getParseListener().onCall(fd))
 					setEndOfFile(fd);
 
 		} catch (RagnarokException e) {
