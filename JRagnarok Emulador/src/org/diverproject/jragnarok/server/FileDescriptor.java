@@ -254,8 +254,6 @@ public class FileDescriptor
 			cache = null;
 			parseListener = null;
 
-			id = 0;
-
 		} catch (IOException e) {
 			logExeception(e);
 		}

@@ -1,3 +1,4 @@
+
 package org.diverproject.jragnarok.server;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.FD_SIZE;
@@ -55,9 +56,8 @@ public class FileDescriptorSystem
 	private TimerSystem timerSystem;
 
 	/**
-	 * Cria um novo sistema para criação de Descritores de Arquivos a partir de sockets.
-	 * Deve ser definido um sistema de temporização para que ele possa ser atualizado.
-	 * @param timerSystem referência do sistema de temporização que será usado.
+	 * Cria um novo sistema para criação de Descritores de Arquivos a partir de sockets. Deve ser definido um sistema de temporização para que ele possa ser atualizado.
+	 * @param timerSystem  referência do sistema de temporização que será usado.
 	 */
 
 	public FileDescriptorSystem(TimerSystem timerSystem)
@@ -71,14 +71,16 @@ public class FileDescriptorSystem
 	/**
 	 * Cria um novo Descritor de Arquivo que irá permitir trabalhar com uma conexão socket.
 	 * @param socket referência da conexão socket que foi estabelecida com o cliente.
+	 * @param listener quem deverá fazer a análise da conexão estabelecida com o servidor.
 	 * @return aquisição de uma novo Descritor de Arquivo a partir do socket definido.
 	 */
 
-	public FileDescriptor newFileDecriptor(Socket socket)
+	public FileDescriptor newFileDecriptor(Socket socket, FileDescriptorListener listener)
 	{
 		synchronized (sessions)
 		{
 			FileDescriptor fd = new FileDescriptor(socket);
+			fd.setParseListener(listener);
 
 			if (!sessions.add(fd))
 			{
@@ -87,8 +89,11 @@ public class FileDescriptorSystem
 				return null;
 			}
 
-			fd.id = indexOn(sessions, fd);
+			fd.id = indexOn(sessions, fd) + 1;
 			fd.system = this;
+
+			if (fd.id < 1)
+				return null;
 
 			return fd;
 		}
@@ -104,8 +109,7 @@ public class FileDescriptorSystem
 	}
 
 	/**
-	 * Procedimento estático usado para atualizar todos os Arquivos Descritores.
-	 * Deverá garantir que todas conexões sejam processadas igualmente.
+	 * Procedimento estático usado para atualizar todos os Arquivos Descritores. Deverá garantir que todas conexões sejam processadas igualmente.
 	 * @param now tempo atual que ocorre a atualização em milissegundos.
 	 * @param tick milissegundos passados desde a última atualização.
 	 */
@@ -133,7 +137,7 @@ public class FileDescriptorSystem
 				if (fd.getFlag().is(FLAG_SERVER) && fd.getFlag().is(FLAG_PING))
 					fd.getFlag().unset(FLAG_PING);
 
-				else
+				else if (!fd.getFlag().is(FLAG_SERVER))
 				{
 					logInfo("sessão #%d encerrada por ociosidade (ip: %s).\n", fd.getID(), fd.getAddressString());
 					setEndOfFile(fd);
@@ -146,9 +150,7 @@ public class FileDescriptorSystem
 	}
 
 	/**
-	 * Procedimento chamado quando solicitado para atualizar os temporizadores.
-	 * Deverá executar todas as ações em file que foram adicionadas no último loop.
-	 * Uma vez que a ação tenha sido executada ela terá sido removido da fila.
+	 * Procedimento chamado quando solicitado para atualizar os temporizadores. Deverá executar todas as ações em file que foram adicionadas no último loop. Uma vez que a ação tenha sido executada ela terá sido removido da fila.
 	 */
 
 	private void executeActions()
@@ -163,41 +165,34 @@ public class FileDescriptorSystem
 	}
 
 	/**
-	 * Procedimento chamado quando solicitado para atualizar os temporizadores.
-	 * Deverá garantir que o descritor de arquivo chame o seu listener de análise.
+	 * Procedimento chamado quando solicitado para atualizar os temporizadores. Deverá garantir que o descritor de arquivo chame o seu listener de análise.
 	 * @param fd referência do arquivo descritor que será analisado os dados recebidos.
 	 */
 
 	private void executeListener(FileDescriptor fd)
 	{
-		try {
+		try
+		{
 
 			if (fd.getParseListener() != null)
 				if (fd.hasData() && !fd.getParseListener().onCall(fd))
 					setEndOfFile(fd);
 
 		} catch (RagnarokException e) {
-
-			logError("processamento inválido encontrado:\n");
-			logExeceptionSource(e);
-
-			setEndOfFile(fd);
-
+			setExceptionsEOF(fd, e, "processamento inválido encontrado");
 		} catch (RagnarokRuntimeException e) {
-
-			logError("informação inválida encontrada:\n");
-			logExeceptionSource(e);
-
-			setEndOfFile(fd);
-
+			setExceptionsEOF(fd, e, "informação inválida encontrada");
 		} catch (Exception e) {
-
-			logError("erro inesperado ocorrido:\n");
-			logExeceptionSource(e);
-
-			setEndOfFile(fd);
-
+			setExceptionsEOF(fd, e, "erro inesperado ocorrido");
 		}
+	}
+
+	private void setExceptionsEOF(FileDescriptor fd, Exception e, String message)
+	{
+		logError(message+ ":\n");
+		logExeceptionSource(e);
+
+		setEndOfFile(fd);
 	}
 
 	/**
@@ -211,8 +206,7 @@ public class FileDescriptorSystem
 	}
 
 	/**
-	 * Executa uma ação para ser processada por todos os descritores de arquivos.
-	 * A ação será executada no primeiro update que for executado pós adição.
+	 * Executa uma ação para ser processada por todos os descritores de arquivos. A ação será executada no primeiro update que for executado pós adição.
 	 * @param action referência do objeto que contém a ação a ser executada.
 	 */
 
@@ -253,9 +247,7 @@ public class FileDescriptorSystem
 	}
 
 	/**
-	 * Fecha forçadamente todas as conexões existentes com o servidor sem log.
-	 * Em seguida irá limpar a lista que que contém a conexão dessas sessões.
-	 * Também limpa a fila que contém as ações a serem executadas.
+	 * Fecha forçadamente todas as conexões existentes com o servidor sem log. Em seguida irá limpar a lista que que contém a conexão dessas sessões. Também limpa a fila que contém as ações a serem executadas.
 	 */
 
 	public void destroy()

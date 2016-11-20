@@ -28,6 +28,7 @@ import static org.diverproject.jragnarok.server.ServerState.DESTROYED;
 import static org.diverproject.jragnarok.server.ServerState.NONE;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.ServerState.STOPED;
+import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
@@ -589,8 +590,10 @@ public abstract class Server
 
 						Socket socket = serverSocket.accept();
 
-						FileDescriptor fd = fileDescriptorSystem.newFileDecriptor(socket);
-						fd.setParseListener(defaultParser);
+						FileDescriptor fd = fileDescriptorSystem.newFileDecriptor(socket, defaultParser);
+
+						if (fd == null)
+							log("servidor está cheio, %s recusado.\n", SocketUtil.socketIP(socket));
 
 					} catch (IOException e) {
 						logExeception(e);

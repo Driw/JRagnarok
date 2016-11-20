@@ -1,4 +1,9 @@
-10.11.2016 - 1.2.94
+20.11.2016 - 1.2.95
+- Server agora registra no console caso uma nova conexão seja solicitada com servidor cheio.
+- Atualizando newFileDecriptor para definir o listener antes que update possa chamar o FD.
+- Ao fechar FileDescriptor não deverá ou será necessário mudar o ID do mesmo para 0.
+
+16.11.2016 - 1.2.94
 - Ao atualizar um cliente (FD) ficava preso em acknowledge por não receber pacote.
 	- Para isso FileDescriptor recebe hasData para verificar se há pacote à receber.
 - ServiceLoginClient.acknowledgePacket atualizado para retornar true em alguns pacotes.
