@@ -137,8 +137,7 @@ public class ServiceCharLogin extends ServiceCharServer
 
 				Socket socket = new Socket(host, port);
 
-				fd = getFileDescriptorSystem().newFileDecriptor(socket);
-				fd.setParseListener(parse);
+				fd = getFileDescriptorSystem().newFileDecriptor(socket, parse);
 				fd.getFlag().set(FileDescriptor.FLAG_SERVER);
 
 				String username = getConfigs().getString(CHAR_USERNAME);

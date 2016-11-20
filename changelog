@@ -1,3 +1,6 @@
+20.11.2016 - 1.2.96
+- ServiceCharLogin atualizado conforme as mudanças da rev95.
+
 20.11.2016 - 1.2.95
 - Server agora registra no console caso uma nova conexão seja solicitada com servidor cheio.
 - Atualizando newFileDecriptor para definir o listener antes que update possa chamar o FD.
