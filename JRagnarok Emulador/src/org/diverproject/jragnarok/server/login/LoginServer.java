@@ -245,6 +245,7 @@ public class LoginServer extends Server
 			clientService.init();
 			accountService.init();
 			authService.init();
+			ipBanService.init();
 
 			if (getConfigs().getBool(LOG_LOGIN))
 				logService.init();

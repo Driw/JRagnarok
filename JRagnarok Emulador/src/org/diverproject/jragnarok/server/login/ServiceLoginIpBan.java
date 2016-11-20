@@ -24,7 +24,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 
 	public void init() throws RagnarokException
 	{
-		log = new ServiceLoginLog(getServer());
+		log = getServer().getLogService();
 		control = new IpBanControl(getConnection());
 
 		int interval = getConfigs().getInt(IPBAN_CLEANUP_INTERVAL);

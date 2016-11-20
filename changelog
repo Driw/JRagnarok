@@ -1,3 +1,7 @@
+20.11.2016 - 1.2.97
+- ServiceLoginIpBan deve considerar o ServiceLoginLog do LoginServer.
+- ServiceLoginIpBan também não estava sendo inicializado por LoginServer.
+
 20.11.2016 - 1.2.96
 - ServiceCharLogin atualizado conforme as mudanças da rev95.
 
