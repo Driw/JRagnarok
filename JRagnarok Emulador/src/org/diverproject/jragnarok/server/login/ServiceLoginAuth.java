@@ -410,6 +410,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		TimerMap timers = ts.getTimers();
 
 		Timer waitingDisconnect = timers.acquireTimer();
+		waitingDisconnect.setObjectID(sd.getID());
 		waitingDisconnect.setTick(ts.getCurrentTime() + AUTH_TIMEOUT);
 		waitingDisconnect.setListener(this.login.waitingDisconnectTimer);
 
@@ -578,6 +579,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			TimerSystem ts = getTimerSystem();
 
 			Timer timer = online.getWaitingDisconnect();
+			timer.setObjectID(fd.getID());
 			timer.setListener(login.waitingDisconnectTimer);
 			timer.setTick(ts.getCurrentTime());
 			ts.getTimers().add(timer);

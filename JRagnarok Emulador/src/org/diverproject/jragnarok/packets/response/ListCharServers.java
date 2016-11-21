@@ -1,7 +1,5 @@
 package org.diverproject.jragnarok.packets.response;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
-import static org.diverproject.jragnarok.JRagnarokUtil.i;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LIST_SERVERS;
 
@@ -22,25 +20,25 @@ public class ListCharServers extends ResponsePacket
 		int length = 47 + (32 * servers.size());
 
 		output.putShort(s(length));
-		output.putInt(i(sd.getSeed().getFirst()));
+		output.putInt(sd.getSeed().getFirst());
 		output.putInt(sd.getID());
-		output.putInt(i(sd.getSeed().getSecond()));
+		output.putInt(sd.getSeed().getSecond());
 
 		/* Era usado em versões antigas
 		 * output.putInt(sd.getAddress());
-		 * output.putInt(i(sd.getLastLogin().get()));
+		 * output.putInt(sd.getLastLogin().get());
 		 */
 
-		output.skipe(8);
-		output.putShort(s(0)); // Desconhecido
-		output.putByte(b(0)); // Sexo da conta
+		output.skipe(4);
+		output.skipe(24);
+		output.skipe(3);
 
 		for (ClientCharServer server : servers)
 		{
 			if (!server.getFileDecriptor().isConnected())
 				continue;
 
-			// IP de LAN ou WAN : loginclif.c:128
+			// TODO IP de LAN ou WAN : loginclif.c:128
 
 			output.putInt(server.getIP().get());
 			output.putShort(s(server.getPort()));

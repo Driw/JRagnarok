@@ -16,13 +16,14 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.login.controllers.AccountControl;
 import org.diverproject.jragnarok.server.login.controllers.AuthControl;
+import org.diverproject.jragnarok.server.login.controllers.GroupControl;
 import org.diverproject.jragnarok.server.login.controllers.OnlineControl;
+import org.diverproject.jragnarok.server.login.controllers.PincodeControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
 import org.diverproject.jragnarok.server.login.structures.ClientHashNode;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
-import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Node;
 
 /**
@@ -45,9 +46,19 @@ import org.diverproject.util.collection.Node;
 public class ServiceLoginServer extends AbstractServiceLogin
 {
 	/**
-	 * Controle para intermediar a persistência de contas e cache de contas.
+	 * Controle para persistência das contas de jogadores.
 	 */
 	private AccountControl accountControl;
+
+	/**
+	 * Controle para persistência e cache dos grupos de jogadores.
+	 */
+	private GroupControl groupControl;
+
+	/**
+	 * Controle para persistência dos código PIN das contas de jogadores.
+	 */
+	private PincodeControl pincodeControl;
 
 	/**
 	 * Controlador para identificar jogadores online.
@@ -68,8 +79,6 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	public ServiceLoginServer(LoginServer server) throws RagnarokException
 	{
 		super(server);
-
-		accountControl = new AccountControl(getConnection());
 	}
 
 	/**
@@ -79,6 +88,24 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	AccountControl getAccountControl()
 	{
 		return accountControl;
+	}
+
+	/**
+	 * @return aquisição do controle para gerenciar os grupos de jogadores.
+	 */
+
+	GroupControl getGroupControl()
+	{
+		return groupControl;
+	}
+
+	/**
+	 * @return aquisição do controle para gerenciar os códigos PIN de contas.
+	 */
+
+	PincodeControl getPincodeControl()
+	{
+		return pincodeControl;
 	}
 
 	/**
@@ -107,6 +134,12 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	public void init() throws RagnarokException
 	{
 		accountControl = new AccountControl(getConnection());
+		groupControl = new GroupControl(getConnection());
+		pincodeControl = new PincodeControl(getConnection());
+
+		accountControl.setGroupControl(groupControl);
+		accountControl.setPincodeControl(pincodeControl);
+
 		onlineControl = new OnlineControl(getTimerSystem().getTimers());
 		authControl = new AuthControl();
 	}
@@ -118,7 +151,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 	public void destroy()
 	{
-		accountControl.clear();
+		groupControl.clear();
 		onlineControl.clear();
 		authControl.clear();
 
@@ -161,7 +194,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		account.getLastIP().set(sd.getAddress());
 		account.setLoginCount(account.getLoginCount() + 1);
 
-		if (!accountControl.save(account))
+		if (!accountControl.set(account))
 			logError("falha ao persistir conta (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
 
 		return OK;
@@ -360,7 +393,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	// login_mmo_auth_new(const char* userid, const char* pass, const char sex, const char* last_ip)
 
 	/**
-	 * TODO ???
+	 * Função para temporizadores executarem a remoção de uma conta como acesso online.
 	 */
 
 	public TimerListener waitingDisconnectTimer = new TimerListener()
@@ -368,7 +401,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		@Override
 		public void onCall(Timer timer, int now, int tick)
 		{
-			
+			onlineControl.remove(timer.getObjectID());
 		}
 
 		@Override
@@ -380,11 +413,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		@Override
 		public String toString()
 		{
-			ObjectDescription description = new ObjectDescription(getClass());
-
-			description.append(getName());
-
-			return description.toString();
+			return getName();
 		}
 	};
 }

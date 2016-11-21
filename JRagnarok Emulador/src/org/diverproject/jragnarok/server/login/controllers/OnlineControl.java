@@ -1,5 +1,7 @@
 package org.diverproject.jragnarok.server.login.controllers;
 
+import static org.diverproject.log.LogSystem.logDebug;
+
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.login.entities.OnlineLogin;
 import org.diverproject.util.ObjectDescription;
@@ -69,6 +71,8 @@ public class OnlineControl
 		}
 
 		cache.add(online.getAccountID(), online);
+
+		logDebug("account#%d está online.\n", online.getAccountID());
 	}
 
 	/**
@@ -85,6 +89,18 @@ public class OnlineControl
 		}
 
 		cache.remove(online);
+
+		logDebug("account#%d não está mais online.\n", online.getAccountID());
+	}
+
+	/**
+	 * Remove um jogador online do sistema conforme informações abaixo:
+	 * @param accountID código de identificação da conta online.
+	 */
+
+	public void remove(int accountID)
+	{
+		remove(cache.get(accountID));
 	}
 
 	/**

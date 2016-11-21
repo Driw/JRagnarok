@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.server.AbstractDAO;
+import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.List;
@@ -23,13 +23,13 @@ import org.diverproject.util.lang.IntUtil;
  * Permite realizar inserção de novas informações como selecionar e verificar.
  * Também permite realizar uma limpeza removendo banimentos que já expiraram.</p>
  *
- * @see AbstractDAO
+ * @see AbstractControl
  * @see IpBanList
  *
  * @author Andrew
  */
 
-public class IpBanDAO extends AbstractDAO
+public class IpBanDAO extends AbstractControl
 {
 	/**
 	 * Cria um nova DAO para realizar consultas sobre banimento de endereços IP.

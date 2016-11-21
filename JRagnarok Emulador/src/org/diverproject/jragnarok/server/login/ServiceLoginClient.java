@@ -1,21 +1,30 @@
 package org.diverproject.jragnarok.server.login;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
+import static org.diverproject.jragnarok.JRagnarokUtil.i;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Salt;
+import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
 import static org.diverproject.jragnarok.JRagnarokUtil.random;
 import static org.diverproject.jragnarok.JRagnarokUtil.skip;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_KEEP_ALIVE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_CLIENT_HASH;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_HASH;
 import static org.diverproject.log.LogSystem.log;
+import static org.diverproject.log.LogSystem.logDebug;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.receive.KeepAlive;
 import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
 import org.diverproject.jragnarok.packets.receive.UpdateClientHash;
+import org.diverproject.jragnarok.packets.request.AccountDataResult;
+import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
+import org.diverproject.jragnarok.packets.request.AccountInfoResult;
+import org.diverproject.jragnarok.packets.request.AccountStateNotify;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
 import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
+import org.diverproject.jragnarok.packets.response.AuthAccountResponse;
 import org.diverproject.jragnarok.packets.response.ListCharServers;
 import org.diverproject.jragnarok.packets.response.NotifyAuth;
 import org.diverproject.jragnarok.packets.response.KeepAliveResult;
@@ -26,9 +35,13 @@ import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.login.controllers.AuthControl;
 import org.diverproject.jragnarok.server.login.controllers.OnlineControl;
+import org.diverproject.jragnarok.server.login.entities.Account;
+import org.diverproject.jragnarok.server.login.entities.AuthNode;
+import org.diverproject.jragnarok.server.login.entities.Vip;
 import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
+import org.diverproject.jragnarok.server.login.structures.ClientType;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
 import org.diverproject.jragnarok.server.login.structures.NotifyAuthResult;
 
@@ -103,6 +116,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		@Override
 		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
+			logDebug("parsing fd#%d.\n", fd.getID());
+
 			if (!fd.isConnected())
 				return false;
 
@@ -187,6 +202,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		KeepAlive keepAlivePacket = new KeepAlive();
 		keepAlivePacket.receive(fd, false);
+
+		logDebug("keep alive received fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -202,6 +219,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		sd.setClientHash(new ClientHash());
 		sd.getClientHash().set(updateClientHashPacket.getHashValue());
+
+		logDebug("update client hash received fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -215,6 +234,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		RefuseLoginByte refuseLoginPacket = new RefuseLoginByte();
 		refuseLoginPacket.setResult(result);
 		refuseLoginPacket.send(fd);
+
+		logDebug("refuse login byte sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -229,6 +250,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		NotifyAuth packet = new NotifyAuth();
 		packet.setResult(result);
 		packet.send(fd);
+
+		logDebug("notify result sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -249,6 +272,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 				packet.send(server.getFileDecriptor());
 				count++;
 			}
+
+		logDebug("%d sessions receive %s.\n", count, nameOf(packet));
 
 		return count;
 	}
@@ -272,6 +297,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setMD5KeyLength(md5KeyLength);
 		packet.setMD5Key(md5Key);
 		packet.send(fd);
+
+		logDebug("md5 key sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -287,6 +314,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setServers(servers);
 		packet.setSessionData(sd);
 		packet.send(sd.getFileDescriptor());
+
+		logDebug("char-server list sent fd#%d.\n", sd.getFileDescriptor().getID());
 	}
 
 	/**
@@ -305,6 +334,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			packet.setBlockDate(blockDate);
 			packet.setResult(result);
 			packet.send(sd.getFileDescriptor());
+
+			logDebug("refuse login int sent fd#%d.\n", sd.getFileDescriptor().getID());
 		}
 
 		else
@@ -313,6 +344,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			packet.setBlockDate(blockDate);
 			packet.setResult(result);
 			packet.send(sd.getFileDescriptor());
+
+			logDebug("refuse login byte sent fd#%d.\n", sd.getFileDescriptor().getID());
 		}
 	}
 
@@ -327,6 +360,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		RefuseEnter packet = new RefuseEnter();
 		packet.setResult(result);
 		packet.send(fd);
+
+		logDebug("refuse enter sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -340,6 +375,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		CharServerConnectResult packet = new CharServerConnectResult();
 		packet.setResult(result);
 		packet.send(fd);
+
+		logDebug("char-server connect result sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -352,5 +389,137 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		KeepAliveResult packet = new KeepAliveResult();
 		packet.send(fd);
+
+		logDebug("keep alive char-server sent fd#%d.\n", fd.getID());
+	}
+
+	/**
+	 * Responde ao servidor de personagem que a conta possui os dados autenticados.
+	 * @param fd conexão do servidor de personagem com este servidor de acesso.
+	 * @param node nó contendo as informações do acesso autenticado.
+	 * @param fdID código de identificação da sessão do servidor de personagens.
+	 * @param ok true se tiver sido autenticado ou false caso contrário.
+	 */
+
+	public void authAccount(FileDescriptor fd, AuthNode node, int fdID, boolean ok)
+	{
+		AuthAccountResponse response = new AuthAccountResponse();
+		response.setAccountID(node.getAccountID());
+		response.setFirstSeed(node.getSeed().getFirst());
+		response.setSecondSeed(node.getSeed().getSecond());
+		response.setRequestID(fdID);
+
+		if (ok)
+		{
+			response.setResult(AuthAccountResponse.OK);
+			response.setVersion(node.getVersion());
+			response.setClientType(node.getClientType());
+		}
+
+		else
+		{
+			response.setResult(AuthAccountResponse.FAILED);
+			response.setVersion(0);
+			response.setClientType(ClientType.CT_NONE);
+		}
+
+		logDebug("auth account sent fd#%d.\n", fd.getID());
+	}
+
+	/**
+	 * Envia os dados de uma conta solicitada por um determinado servidor de personagem.
+	 * @param fd referência da conexão com o servidor para enviar e receber dados.
+	 * @param account conta do qual terá os dados enviados ao servidor acima.
+	 */
+
+	public void sendAccountData(FileDescriptor fd, Account account)
+	{
+		AccountDataResult packet = new AccountDataResult();
+		packet.setAccountID(account.getID());
+		packet.setEmail(account.getEmail());
+		packet.setExpirationTime(i(account.getExpiration().get()));
+		packet.setGroupID(b(account.getGroup().getID()));
+		packet.setCharSlots(account.getCharSlots());
+		packet.setBirthdate(account.getBirthDate());
+
+		if (account.getPincode() != null)
+		{
+			packet.setPincode(account.getPincode().getCode());
+			packet.setPincodeChage(i(account.getPincode().getChanged().get()));
+		}
+
+		else
+		{
+			packet.setPincode("0000");
+			packet.setPincodeChage(0);
+		}
+
+		Vip vip = account.getGroup().getVip();
+
+		if (vip != null)
+		{
+			packet.setVip(true);
+			packet.setCharVip(vip.getCharSlotCount());
+			packet.setCharBilling(vip.getCharSlotCount());
+		}
+
+		else
+		{
+			packet.setVip(false);
+			packet.setCharVip(b(0));
+			packet.setCharBilling(b(0));
+		}
+
+		packet.send(fd);
+
+		logDebug("account data sent fd#%d.\n", fd.getID());
+	}
+
+	public void sendAccountInfo(FileDescriptor fd, AccountInfoRequest ack, Account account)
+	{
+		AccountInfoResult packet = new AccountInfoResult();
+		packet.setMapFD(ack.getMapFD());
+		packet.setUFD(packet.getUFD());
+		packet.setAID(packet.getAID());
+		packet.setAccountID(account.getID());
+		packet.setData(account != null);
+
+		if (account != null)
+		{
+			packet.setGroupID(account.getGroup().getID());
+			packet.setLoginCount(account.getLoginCount());
+			packet.setState(account.getState().CODE);
+			packet.setEmail(account.getEmail());
+			packet.setLastIP(account.getLastIP().get());
+			packet.setLastLogin(i(account.getLastLogin().get()));
+			packet.setBirthdate(account.getBirthDate());
+
+			if (ack.getGroupID() >= account.getGroup().getID())
+			{
+				packet.setPassword(account.getPassword());
+				packet.setPincode(account.getPincode().getCode());
+			}
+
+			packet.setUsername(account.getUsername());
+		}
+
+		logDebug("account info sent fd#%d.\n", fd.getID());
+	}
+
+	/**
+	 * Envia a todas as conexões estabelecidas que uma conta teve seu estado alterado.
+	 * @param fd referência da conexão com o servidor para enviar e receber dados.
+	 * @param account referência da conta do qual está sendo alterada no sistema.
+	 * @param banned true se tiver sendo banida ou false se for outro estado.
+	 */
+
+	public void sendNotifyAccountState(FileDescriptor fd, Account account, boolean banned)
+	{
+		AccountStateNotify notify = new AccountStateNotify();
+		notify.setAccountID(account.getID());
+		notify.setValue(banned ? i(account.getUnban().get()) : account.getState().CODE);
+		notify.setType(banned ? AccountStateNotify.BAN : AccountStateNotify.CHANGE_STATE);
+
+		sendAllWithoutOurSelf(null, notify);		
 	}
 }

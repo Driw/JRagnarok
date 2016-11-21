@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.server.AbstractDAO;
+import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
 import org.diverproject.jragnarok.server.login.entities.LoginLog;
 import org.diverproject.util.ObjectDescription;
@@ -21,13 +21,13 @@ import org.diverproject.util.SocketUtil;
  * Por ser registros no lado do servidor será interessante a quantidade e inserção.
  * Para que esse seja criado é necessário definir uma conexão através do construtor.</p>
  *
- * @see AbstractDAO
+ * @see AbstractControl
  * @see LoginLog
  *
  * @author Andrew
  */
 
-public class LoginLogControl extends AbstractDAO
+public class LoginLogControl extends AbstractControl
 {
 	/**
 	 * Cria um novo controlador para trabalhar com os registros de acesso no servidor.

@@ -1,3 +1,12 @@
+21.11.2016 - 1.2.101
+- Pequenos ajustes de cast que não são mais necessários e bytes skipped, ListCharServers.
+- Adicionando alguns log para melhorar a visualização do andamento nos servidores.
+- Implementação da funcionalidade de waitingDisconnectTimer.
+- Timer agora possui uma vinculação com algum objeto através de um ID.
+	- Agora o tick e interval só serão alterados se forem maior que zero.
+- ServiceLoginServer atualizado conforme mudanças recentes nos controles.
+- Novos procedimentos que serão usado em funcionalidades futuras, ServiceLoginClient.
+
 20.11.2016 - 1.2.99
 - Renomeando AbstractDAO para AbstractControl, não será mais utilizado Control e DAO.
 	- A separação era feita apenas para considerar um cache porém nem tudo usa cache ou precisa.

@@ -35,6 +35,11 @@ public class Timer implements Comparable<Timer>
 	private int id;
 
 	/**
+	 * Código de identificação de um objeto vinculado.
+	 */
+	private int objectID;
+
+	/**
 	 * Quando o temporizador irá expirar.
 	 */
 	private int tick;
@@ -87,6 +92,29 @@ public class Timer implements Comparable<Timer>
 	}
 
 	/**
+	 * Afim de permitir que o temporizador trabalha relativamente com um objeto específico,
+	 * deve ser definido um código para a identificação desse objeto em questão.
+	 * @return aquisição do código de identificação do objeto que será trabalhado.
+	 */
+
+	public int getObjectID()
+	{
+		return objectID;
+	}
+
+	/**
+	 * Afim de permitir que o temporizador trabalha relativamente com um objeto específico,
+	 * deve ser definido um código para a identificação desse objeto em questão.
+	 * @param objectID código de identificação do objeto que será trabalhado.
+	 */
+
+	public void setObjectID(int objectID)
+	{
+		if (objectID > 0)
+			this.objectID = objectID;
+	}
+
+	/**
 	 * Tick é um valor em intervalo de tempo usado como cronômetro.
 	 * Para o temporizador irá indicar quando ele deve expirar.
 	 * @return aquisição do tempo de expiração do temporizador.
@@ -105,7 +133,8 @@ public class Timer implements Comparable<Timer>
 
 	public void setTick(int tick)
 	{
-		this.tick = tick;
+		if (tick > 0)
+			this.tick = tick;
 	}
 
 	/**
@@ -127,7 +156,8 @@ public class Timer implements Comparable<Timer>
 
 	void setInterval(int interval)
 	{
-		this.interval = interval;
+		if (interval > 0)
+			this.interval = interval;
 	}
 
 	/**
