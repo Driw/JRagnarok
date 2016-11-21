@@ -1,3 +1,9 @@
+20.11.2016 - 1.2.99
+- Renomeando AbstractDAO para AbstractControl, não será mais utilizado Control e DAO.
+	- A separação era feita apenas para considerar um cache porém nem tudo usa cache ou precisa.
+	- Nem todos os controles foram atualizados com essa modificação.
+- As operações realizadas em AccountDAO agora estão alocadas em AccountControl.
+
 20.11.2016 - 1.2.98
 - Conexões estavam sendo fechadas antes do necessário, removido condição temporariamente.
 	- Agora serão removidos por ociosidade, pois o socket terá sido fechado.

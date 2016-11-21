@@ -8,9 +8,9 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.util.ObjectDescription;
 
 /**
- * <h1>Controlador Abstrato</h1>
+ * <h1>Controle Abstrato</h1>
  *
- * <p>Todos os controladores existentes no emulador deverão ser herdados desta classe.
+ * <p>Todos os controles existentes no emulador deverão ser herdados desta classe.
  * Irá definir como requisito básico a existência de uma conexão com o banco de dados.
  * Deverá implementar métodos internamente para executar comandos no banco de dados.</p>
  *
@@ -19,7 +19,7 @@ import org.diverproject.util.ObjectDescription;
  * @author Andrew
  */
 
-public abstract class AbstractDAO
+public abstract class AbstractControl
 {
 	/**
 	 * Código do erro para: chave duplicada.
@@ -32,11 +32,11 @@ public abstract class AbstractDAO
 	private Connection connection;
 
 	/**
-	 * Cria um novo controlador sendo necessário especificar a conexão.
-	 * @param connection referência da conexão com o banco de dados.
+	 * Cria um novo controle sendo necessário especificar a conexão para persistência.
+	 * @param connection conexão com o banco de dados referente a persistência.
 	 */
 
-	public AbstractDAO(Connection connection)
+	public AbstractControl(Connection connection)
 	{
 		this.connection = connection;
 	}
