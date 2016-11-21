@@ -1,3 +1,6 @@
+21.11.2016 - 1.2.101b
+- Subindo ServiceLoginAccount que deveria ter sido enviado em revisões passadas.
+
 21.11.2016 - 1.2.101
 - Pequenos ajustes de cast que não são mais necessários e bytes skipped, ListCharServers.
 - Adicionando alguns log para melhorar a visualização do andamento nos servidores.

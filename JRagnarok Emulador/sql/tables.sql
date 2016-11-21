@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS accounts
 	UNIQUE (email),
 	PRIMARY KEY (id),
 	FOREIGN KEY (pincode) REFERENCES pincodes (id),
-	FOREIGN KEY (groupid) REFERENCES groups (id)
+	FOREIGN KEY (groupid) REFERENCES accounts_groups (id)
 
 ) ENGINE=MyISAM AUTO_INCREMENT=1000000;
 
@@ -116,10 +116,21 @@ CREATE TABLE login_log
 (
 	time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	ip INT NOT NULL DEFAULT 2130706433,
-	login INT NOT NULL,
+	account INT NOT NULL,
 	rcode TINYINT NOT NULL,
 	message VARCHAR(255),
 
-	FOREIGN KEY (login) REFERENCES logins (id)
+	FOREIGN KEY (account) REFERENCES accounts (id)
+
+) ENGINE=MyISAM;
+
+CREATE TABLE ipban_list
+(
+	address_list VARCHAR(15) NOT NULL,
+	ban_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	resume_time DATETIME NOT NULL,
+	reason VARCHAR(255),
+
+	PRIMARY KEY (address_list)
 
 ) ENGINE=MyISAM;
