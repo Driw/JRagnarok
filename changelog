@@ -1,3 +1,7 @@
+20.11.2016 - 1.2.98
+- Conexões estavam sendo fechadas antes do necessário, removido condição temporariamente.
+	- Agora serão removidos por ociosidade, pois o socket terá sido fechado.
+
 20.11.2016 - 1.2.97
 - ServiceLoginIpBan deve considerar o ServiceLoginLog do LoginServer.
 - ServiceLoginIpBan também não estava sendo inicializado por LoginServer.

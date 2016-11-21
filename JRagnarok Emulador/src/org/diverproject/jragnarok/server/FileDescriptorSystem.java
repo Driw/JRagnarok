@@ -122,9 +122,9 @@ public class FileDescriptorSystem
 		{
 			FileDescriptor fd = sessions.get(i);
 
-			if (fd.getFlag().is(FLAG_EOF) || !fd.isConnected())
+			if (fd.getFlag().is(FLAG_EOF))
 			{
-				if (fd.isConnected())
+				if (!fd.isConnected())
 					fd.close();
 
 				logInfo("sessão #%d fechada e removida (ip: %s).\n", fd.getID(), fd.getAddressString());

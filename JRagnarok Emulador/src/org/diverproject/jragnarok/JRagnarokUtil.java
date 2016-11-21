@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 import java.util.Random;
 
+import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnaork.messages.Messages;
 import org.diverproject.jragnarok.server.FileDescriptor;
@@ -277,9 +278,9 @@ public class JRagnarokUtil
 	{
 		for (int i = 0; i < list.size(); i++)
 			if (list.get(i).equals(target))
-				return i + 1;
+				return i;
 
-		return 0;
+		return -1;
 	}
 
 	/**
@@ -364,7 +365,10 @@ public class JRagnarokUtil
 		String message = Messages.getInstance().getLoginMessages().get(number);
 
 		if (message == null)
-			logWarning("mensagem '%d' não existe no LoginServer\n", number);
+		{
+			setUpSource(1);
+			logExeception(new RagnarokException("mensagem '%d' não existe no LoginServer", number));
+		}
 
 		return message == null ? "null" : message;
 	}
