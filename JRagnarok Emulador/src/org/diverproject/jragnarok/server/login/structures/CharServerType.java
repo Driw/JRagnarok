@@ -8,9 +8,9 @@ public enum CharServerType
 {
 	NORMAL(0),
 	MAINTANCE(1),
-	OVER(2),
-	PLAYING(3),
-	P2P(4);
+	OVER_AGE(2),
+	PAY_TO_PLAY(3),
+	PREE_TO_PLAY(4);
 
 	public final short CODE;
 
@@ -25,9 +25,9 @@ public enum CharServerType
 		{
 			case 0: return NORMAL;
 			case 1: return MAINTANCE;
-			case 2: return OVER;
-			case 3: return PLAYING;
-			case 4: return P2P;
+			case 2: return OVER_AGE;
+			case 3: return PAY_TO_PLAY;
+			case 4: return PREE_TO_PLAY;
 		}
 
 		throw new RagnarokRuntimeException("code não é CharServerType");

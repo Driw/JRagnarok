@@ -1,3 +1,6 @@
+25.11.2016 - 1.2.106
+- Constantes de CharServerType renomeadas para uma melhor definição do mesmo.
+
 25.11.2016 - 1.2.103
 - Renomeando o pacote dos controles de login-server para control ao invés de controller.
 
