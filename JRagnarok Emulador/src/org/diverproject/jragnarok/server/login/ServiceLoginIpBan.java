@@ -10,7 +10,7 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
-import org.diverproject.jragnarok.server.login.controllers.IpBanControl;
+import org.diverproject.jragnarok.server.login.control.IpBanControl;
 
 public class ServiceLoginIpBan extends AbstractServiceLogin
 {

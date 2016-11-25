@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.controllers;
+package org.diverproject.jragnarok.server.login.control;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.log.LogSystem.logExeception;

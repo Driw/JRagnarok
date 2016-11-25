@@ -1,3 +1,6 @@
+25.11.2016 - 1.2.103
+- Renomeando o pacote dos controles de login-server para control ao invés de controller.
+
 21.11.2016 - 1.2.102
 - Enviando arquivo SQL referente a tabela para banimento dos endereços de IP.
 

@@ -5,7 +5,7 @@ import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.InternetProtocol;
-import org.diverproject.jragnarok.server.login.controllers.LoginLogControl;
+import org.diverproject.jragnarok.server.login.control.LoginLogControl;
 import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.entities.LoginLog;
 
