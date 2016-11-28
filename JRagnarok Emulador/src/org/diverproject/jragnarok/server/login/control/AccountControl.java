@@ -13,7 +13,6 @@ import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
-import org.diverproject.util.ObjectDescription;
 
 /**
  * <h1>Controle de Contas</h1>
@@ -239,13 +238,5 @@ public class AccountControl extends AbstractControl
 		}
 
 		return false;
-	}
-
-	@Override
-	public String toString()
-	{
-		ObjectDescription description = new ObjectDescription(getClass());
-
-		return description.toString();
 	}
 }

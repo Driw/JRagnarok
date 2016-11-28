@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.server;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.util.ObjectDescription;
@@ -79,16 +80,49 @@ public abstract class AbstractControl
 		return getConnection().prepareStatement(sql);
 	}
 
+	/**
+	 * Permite definir um valor numérico inteiro em uma declaração preparada em SQL.
+	 * Define o valor numérico passado ou null caso seja necessário conforme:
+	 * @param ps declaração preparada que terá o valor numérico definido.
+	 * @param index número do índice da variável que será definida.
+	 * @param value valor numérico inteiro para ser definido na declaração.
+	 * @param nullValue valor numérico inteiro que será dado como nulo.
+	 * @throws SQLException falha de conexão.
+	 */
+
+	protected void set(PreparedStatement ps, int index, int value, int nullValue) throws SQLException
+	{
+		if (value == nullValue)
+			ps.setNull(index, Types.INTEGER);
+		else
+			ps.setInt(index, value);
+	}
+
+	/**
+	 * Procedimento interno usado para descrever as informações do objeto.
+	 * @param description descrição do objeto que será usado.
+	 */
+
+	protected void toString(ObjectDescription description)
+	{
+		try {
+
+			if (connection.isClosed())
+				description.append("closed");
+			else
+				description.append("connected");
+
+		} catch (SQLException e) {
+			description.append("closed", e.getMessage());
+		}		
+	}
+
 	@Override
-	public String toString()
+	public final String toString()
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		try {
-			description.append("closed", connection.isClosed());
-		} catch (SQLException e) {
-			description.append("closed", e.getMessage());
-		}
+		toString(description);
 
 		return description.toString();
 	}

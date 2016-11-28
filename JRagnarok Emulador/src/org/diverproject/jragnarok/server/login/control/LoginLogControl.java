@@ -11,7 +11,6 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
 import org.diverproject.jragnarok.server.login.entities.LoginLog;
-import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.SocketUtil;
 
 /**
@@ -117,13 +116,5 @@ public class LoginLogControl extends AbstractControl
 		} catch (SQLException e) {
 			throw new RagnarokException(e.getMessage());
 		}
-	}
-
-	@Override
-	public String toString()
-	{
-		ObjectDescription description = new ObjectDescription(getClass());
-
-		return description.toString();
 	}
 }

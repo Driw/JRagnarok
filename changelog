@@ -1,4 +1,7 @@
-25.11.2016 - 1.2.106
+28.11.2016 - 1.2.105
+- Atualizando a forma como AbstractControl será descrito por toString().
+
+25.11.2016 - 1.2.104
 - Constantes de CharServerType renomeadas para uma melhor definição do mesmo.
 
 25.11.2016 - 1.2.103
