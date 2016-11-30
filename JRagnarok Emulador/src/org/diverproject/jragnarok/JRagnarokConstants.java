@@ -35,9 +35,19 @@ public class JRagnarokConstants
 
 
 	/**
-	 * Limite de caracteres permitido por nome.
+	 * Quantidade de caracteres que compõe um nome.
 	 */
 	public static final int NAME_LENGTH = 24;
+
+	/**
+	 * Limite mínimo de caracteres permitido por nome.
+	 */
+	public static final int MIN_NAME_LENGTH = 4;
+
+	/**
+	 * Limite máximo de caracteres permitido por nome.
+	 */
+	public static final int MAX_NAME_LENGTH = NAME_LENGTH;
 
 	/**
 	 * Limite de caracteres permitido por nome de usuário.
@@ -74,6 +84,11 @@ public class JRagnarokConstants
 	 * TODO what is that?
 	 */
 	public static final int MAX_CHAR_BILLING = 0;
+
+	/**
+	 * Limite de pontos salvos por personagem.
+	 */
+	public static final int MAX_MEMOPOINTS = 3;
 
 	private JRagnarokConstants()
 	{

@@ -1,3 +1,10 @@
+30.11.2016 - 1.2.106
+- Enviando controles e entidades referentes aos dados iniciais de um personagem.
+- CharServer atualizado para instanciar todos os controles que foram adicionado.
+	- Também foi completamente documentado.
+	- Analisador de novos clientes foi definido, ServiceCharClient.parse.
+- Pequena inicialização das funcionalidades de ServiceCharClient.
+
 28.11.2016 - 1.2.105
 - Atualizando a forma como AbstractControl será descrito por toString().
 

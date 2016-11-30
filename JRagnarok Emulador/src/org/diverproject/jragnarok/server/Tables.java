@@ -86,6 +86,31 @@ public class Tables
 	private String ipBan;
 
 	/**
+	 * Tabela contendo todos os dados básicos dos personagens.
+	 */
+	private String characters;
+
+	/**
+	 * Tabela contendo todas as experiências obtidas pelos personagens.
+	 */
+	private String charExperiences;
+
+	/**
+	 * Tabela contendo dados de família dos personagens.
+	 */
+	private String charFamily;
+
+	/**
+	 * Tabela contendo dados das localizações salvas dos personagens.
+	 */
+	private String charLocations;
+
+	/**
+	 * Tabela contendo dados de classificação de assistentes dos personagens.
+	 */
+	private String charMercenaryRank;
+
+	/**
 	 * Construtor privado para aderir ao Padrão de Projetos: Singleton.
 	 * Define o nome padrão de todas as tabelas do banco de dados.
 	 */
@@ -107,6 +132,12 @@ public class Tables
 		vip = "vip";
 
 		ipBan = "ipban_list";
+
+		characters = "characters";
+		charExperiences = "characters_exp";
+		charFamily = "characters_family";
+		charLocations = "characters_locations";
+		charMercenaryRank = "characters_mercenary_rank";
 	}
 
 	/**
@@ -305,5 +336,95 @@ public class Tables
 	public void setIpBan(String ipBan)
 	{
 		this.ipBan = ipBan;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela contendo os dados básicos dos personagens.
+	 */
+
+	public String getCharacters()
+	{
+		return characters;
+	}
+
+	/**
+	 * @param ipBan nome da tabela contendo os dados básicos dos personagens.
+	 */
+
+	public void setCharacters(String characters)
+	{
+		this.characters = characters;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela contendo a experiências obtidas pelos personagens.
+	 */
+
+	public String getCharExperiences()
+	{
+		return charExperiences;
+	}
+
+	/**
+	 * @param experiences nome da tabela contendo a experiências obtidas pelos personagens.
+	 */
+
+	public void setCharExperiences(String experiences)
+	{
+		this.charExperiences = experiences;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela contendo dados de família dos personagens.
+	 */
+
+	public String getCharFamily()
+	{
+		return charFamily;
+	}
+
+	/**
+	 * @param charFamily nome da tabela contendo dados de família dos personagens.
+	 */
+
+	public void setCharFamily(String charFamily)
+	{
+		this.charFamily = charFamily;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela contendo dados das localizações salvas personagens.
+	 */
+
+	public String getCharLocations()
+	{
+		return charLocations;
+	}
+
+	/**
+	 * @param charLocations nome da tabela contendo dados das localizações salvas personagens.
+	 */
+
+	public void setCharLocations(String charLocations)
+	{
+		this.charLocations = charLocations;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela contendo dados de classificação de assistentes dos personagens.
+	 */
+
+	public String getCharMercenaryRank()
+	{
+		return charMercenaryRank;
+	}
+
+	/**
+	 * @param charMercenaryRank nome da tabela contendo dados de classificação de assistentes dos personagens.
+	 */
+
+	public void setCharMercenaryRank(String charMercenaryRank)
+	{
+		this.charMercenaryRank = charMercenaryRank;
 	}
 }
