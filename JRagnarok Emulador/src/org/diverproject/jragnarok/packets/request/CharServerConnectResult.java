@@ -4,7 +4,7 @@ package org.diverproject.jragnarok.packets.request;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_CHAR_SERVER_CONNECT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
-import org.diverproject.jragnarok.server.login.structures.AuthResult;
+import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;

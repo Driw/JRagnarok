@@ -4,7 +4,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REFUSE_LOGIN;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
-import org.diverproject.jragnarok.server.login.structures.AuthResult;
+import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 

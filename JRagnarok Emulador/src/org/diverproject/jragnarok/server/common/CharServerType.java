@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.structures;
+package org.diverproject.jragnarok.server.common;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 

@@ -1,27 +1,22 @@
 package org.diverproject.jragnarok.server.login.entities;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.format;
+
 import org.diverproject.jragnarok.server.InternetProtocol;
-import org.diverproject.jragnarok.server.login.structures.ClientType;
-import org.diverproject.jragnarok.server.login.structures.LoginSeed;
-import org.diverproject.util.Time;
+import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.jragnarok.server.common.LoginSeed;
+import org.diverproject.util.ObjectDescription;
 
 public class AuthNode
 {
 	private int accountID;
-	private int charID;
 	private LoginSeed seed;
 	private InternetProtocol ip;
-	private Time expiration;
-	private Group group;
-	private int changingMapServers;
 	private int version;
 	private ClientType clientType;
 
 	public AuthNode()
 	{
-		changingMapServers = 1;
-
-		expiration = new Time();
 		ip = new InternetProtocol();
 	}
 
@@ -33,16 +28,6 @@ public class AuthNode
 	public void setAccountID(int accountID)
 	{
 		this.accountID = accountID;
-	}
-
-	public int getCharID()
-	{
-		return charID;
-	}
-
-	public void setCharID(int charID)
-	{
-		this.charID = charID;
 	}
 
 	public LoginSeed getSeed()
@@ -58,31 +43,6 @@ public class AuthNode
 	public InternetProtocol getIP()
 	{
 		return ip;
-	}
-
-	public Time getExpiration()
-	{
-		return expiration;
-	}
-
-	public Group getGroup()
-	{
-		return group;
-	}
-
-	public void setGroup(Group group)
-	{
-		this.group = group;
-	}
-
-	public int getChangingMapServers()
-	{
-		return changingMapServers;
-	}
-
-	public void setChangingMapServers(int changingMapServers)
-	{
-		this.changingMapServers = changingMapServers;
 	}
 
 	public int getVersion()
@@ -103,5 +63,19 @@ public class AuthNode
 	public void setClientType(ClientType clientType)
 	{
 		this.clientType = clientType;
+	}
+
+	@Override
+	public String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("accountID", accountID);
+		description.append("seed", format("%d|%d", seed.getFirst(), seed.getSecond()));
+		description.append("ip", ip != null ? ip.getString() : null);
+		description.append("version", version);
+		description.append("clientType", clientType);
+
+		return description.toString();
 	}
 }

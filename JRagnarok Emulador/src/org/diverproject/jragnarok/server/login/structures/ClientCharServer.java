@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.server.login.structures;
 
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
+import org.diverproject.jragnarok.server.common.CharServerType;
 import org.diverproject.util.ObjectDescription;
 
 public class ClientCharServer

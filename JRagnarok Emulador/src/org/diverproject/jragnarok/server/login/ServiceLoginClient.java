@@ -33,17 +33,17 @@ import org.diverproject.jragnarok.packets.response.RefuseLoginByte;
 import org.diverproject.jragnarok.packets.response.RefuseLoginInt;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
+import org.diverproject.jragnarok.server.common.AuthResult;
+import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.jragnarok.server.login.control.AuthControl;
 import org.diverproject.jragnarok.server.login.control.OnlineControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AuthNode;
 import org.diverproject.jragnarok.server.login.entities.Vip;
-import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
-import org.diverproject.jragnarok.server.login.structures.ClientType;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
-import org.diverproject.jragnarok.server.login.structures.NotifyAuthResult;
 
 /**
  * Serviço para Acesso dos Clientes

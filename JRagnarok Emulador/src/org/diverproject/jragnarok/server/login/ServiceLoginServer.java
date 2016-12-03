@@ -1,26 +1,26 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.now;
+import static org.diverproject.jragnarok.server.common.AuthResult.BANNED_UNTIL;
+import static org.diverproject.jragnarok.server.common.AuthResult.EXE_LASTED_VERSION;
+import static org.diverproject.jragnarok.server.common.AuthResult.EXPIRED;
+import static org.diverproject.jragnarok.server.common.AuthResult.INCORRECT_PASSWORD;
+import static org.diverproject.jragnarok.server.common.AuthResult.OK;
+import static org.diverproject.jragnarok.server.common.AuthResult.UNREGISTERED_ID;
 import static org.diverproject.jragnarok.server.login.entities.AccountState.NONE;
-import static org.diverproject.jragnarok.server.login.structures.AuthResult.BANNED_UNTIL;
-import static org.diverproject.jragnarok.server.login.structures.AuthResult.EXE_LASTED_VERSION;
-import static org.diverproject.jragnarok.server.login.structures.AuthResult.EXPIRED;
-import static org.diverproject.jragnarok.server.login.structures.AuthResult.INCORRECT_PASSWORD;
-import static org.diverproject.jragnarok.server.login.structures.AuthResult.OK;
-import static org.diverproject.jragnarok.server.login.structures.AuthResult.UNREGISTERED_ID;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
+import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.control.AuthControl;
 import org.diverproject.jragnarok.server.login.control.GroupControl;
 import org.diverproject.jragnarok.server.login.control.OnlineControl;
 import org.diverproject.jragnarok.server.login.control.PincodeControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
-import org.diverproject.jragnarok.server.login.structures.AuthResult;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
 import org.diverproject.jragnarok.server.login.structures.ClientHashNode;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;

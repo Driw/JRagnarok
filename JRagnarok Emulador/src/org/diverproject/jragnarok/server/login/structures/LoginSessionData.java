@@ -4,6 +4,8 @@ import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 
 import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.jragnarok.server.common.LoginSeed;
 import org.diverproject.jragnarok.server.login.entities.Group;
 import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.util.BitWise;

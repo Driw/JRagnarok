@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets;
 public class RagnarokPacket
 {
 	public static final short PACKET_LOGIN = 0x0064;
+	public static final short PACKET_CHAR_SERVER_SELECTED = 0x0065;
 	public static final short PACKET_REFUSE_LOGIN = 0x006A;
 	public static final short PACKET_LIST_SERVERS = 0x0069;
 	public static final short PACKET_REFUSE_ENTER = 0x006C;

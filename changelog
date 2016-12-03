@@ -1,3 +1,8 @@
+03.12.2016 - 1.2.109
+- Movendo algumas estruturas para server.common pois podem ser utilizadas por todos os servidores.
+	- Junto destas foram movidos enumerações referentes aos pacotes.
+- Removendo atributos desnecessários de AuthNode do servidor de acesso, foi confundido com outro.
+
 03.12.2016 - 1.2.108
 - CharServer estava enviando endereço de IP nulo para LoginServer em checkLoginConnection.
 - Inicialização do desenvolvimento para análise de pacotes recebidos de clientes em ServiceCharClient.
