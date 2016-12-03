@@ -44,7 +44,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 		if (!isEnabled())
 			return false;
 
-		return ipbanControl.addressBanned(ip);
+		return ipbans.addressBanned(ip);
 	}
 
 	public void addBanLog(String ip)
@@ -62,7 +62,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 		@Override
 		public void onCall(Timer timer, int now, int tick)
 		{
-			ipbanControl.cleanup();
+			ipbans.cleanup();
 		}
 		
 		@Override

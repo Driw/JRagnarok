@@ -86,7 +86,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		account.getLastIP().set(sd.getAddress());
 		account.setLoginCount(account.getLoginCount() + 1);
 
-		if (!accountControl.set(account))
+		if (!accounts.set(account))
 			logError("falha ao persistir conta (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
 
 		return OK;
@@ -125,7 +125,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 	private AuthResult makeLoginAccount(LoginSessionData sd, boolean server)
 	{
-		Account account = accountControl.get(sd.getUsername());
+		Account account = accounts.get(sd.getUsername());
 
 		if (account == null)
 		{
@@ -293,7 +293,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		@Override
 		public void onCall(Timer timer, int now, int tick)
 		{
-			onlineControl.remove(timer.getObjectID());
+			onlines.remove(timer.getObjectID());
 		}
 
 		@Override

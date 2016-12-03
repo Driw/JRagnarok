@@ -366,7 +366,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		online.setAccountID(sd.getID());
 		online.setWaitingDisconnect(waitingDisconnect);
 		online.setCharServer(OnlineLogin.NONE);
-		onlineControl.add(online);
+		onlines.add(online);
 	}
 
 	/**
@@ -482,7 +482,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	private boolean authIsntOnline(LoginSessionData sd)
 	{
 		Account account = (Account) sd.getFileDescriptor().getCache();
-		OnlineLogin online = onlineControl.get(account.getID());
+		OnlineLogin online = onlines.get(account.getID());
 
 		if (online != null)
 		{
@@ -497,8 +497,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				return true;
 			}
 
-			authControl.remove(sd.getID());
-			onlineControl.remove(online);
+			auths.remove(sd.getID());
+			onlines.remove(online);
 		}
 
 		return true;

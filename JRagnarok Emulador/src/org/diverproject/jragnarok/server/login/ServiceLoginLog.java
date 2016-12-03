@@ -66,7 +66,7 @@ public class ServiceLoginLog extends AbstractServiceLogin
 			log.setRCode(code);
 			log.setMessage(message);
 
-			if (!logControl.insert(log))
+			if (!logs.insert(log))
 				logWarning("falha ao registrar log (ip: %s, username: %s)", ip, login.getUsername());
 
 		} catch (RagnarokException e) {
@@ -87,7 +87,7 @@ public class ServiceLoginLog extends AbstractServiceLogin
 		int failures = 0;
 
 		try {
-			failures = logControl.getFailedAttempts(ip, minutes);
+			failures = logs.getFailedAttempts(ip, minutes);
 		} catch (RagnarokException e) {
 			logExeception(e);
 		}

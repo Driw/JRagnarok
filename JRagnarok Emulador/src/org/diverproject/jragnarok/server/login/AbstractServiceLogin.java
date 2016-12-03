@@ -8,11 +8,29 @@ import org.diverproject.jragnarok.server.login.control.IpBanControl;
 import org.diverproject.jragnarok.server.login.control.LoginLogControl;
 import org.diverproject.jragnarok.server.login.control.OnlineControl;
 import org.diverproject.jragnarok.server.login.control.PincodeControl;
+import org.diverproject.util.ObjectDescription;
 
 /**
- * Serviço Abstrato para Servidor de Acesso
+ * <h1>Serviço Abstrato para Servidor de Acesso</h1>
  *
- * Este serviço irá 
+ * <p>O servidor abstrato tem apenas como objetivo facilitar a codificação dos serviços.
+ * Conhece todas as referências de serviços e controles referentes ao servidor de acesso.
+ * Para tal, é necessário que todos os serviços sejam inicializados e destruídos.</p>
+ *
+ * @see ServiceLoginAccount
+ * @see ServiceLoginAuth
+ * @see ServiceLoginChar
+ * @see ServiceLoginClient
+ * @see ServiceLoginIpBan
+ * @see ServiceLoginLog
+ * @see ServiceLoginServer
+ * @see AccountControl
+ * @see AuthControl
+ * @see GroupControl
+ * @see IpBanControl
+ * @see LoginLogControl
+ * @see OnlineControl
+ * @see PincodeControl
  *
  * @author Andrew
  */
@@ -57,37 +75,37 @@ public class AbstractServiceLogin extends ServerService
 	/**
 	 * Controle para persistência das contas de jogadores.
 	 */
-	protected AccountControl accountControl;
+	protected AccountControl accounts;
 
 	/**
 	 * Controle para persistência e cache dos grupos de jogadores.
 	 */
-	protected GroupControl groupControl;
+	protected GroupControl groups;
 
 	/**
 	 * Controle para persistência dos código PIN das contas de jogadores.
 	 */
-	protected PincodeControl pincodeControl;
+	protected PincodeControl pincodes;
 
 	/**
 	 * Controle para registrar acesso ao banco de dados.
 	 */
-	protected LoginLogControl logControl;
+	protected LoginLogControl logs;
 
 	/**
 	 * Controle para banimento de endereços de IP.
 	 */
-	protected IpBanControl ipbanControl;
+	protected IpBanControl ipbans;
 
 	/**
 	 * Controlador para identificar jogadores online.
 	 */
-	protected OnlineControl onlineControl;
+	protected OnlineControl onlines;
 
 	/**
 	 * Controlador para identificar jogadores autenticados.
 	 */
-	protected AuthControl authControl;
+	protected AuthControl auths;
 
 	/**
 	 * Instancia um novo serviço abstrato que permite irá permitir a comunicação entre serviços.
@@ -115,13 +133,13 @@ public class AbstractServiceLogin extends ServerService
 		auth = getServer().getAuthService();
 		account = getServer().getAccountService();
 
-		accountControl = getServer().getAccountControl();
-		groupControl = getServer().getGroupControl();
-		pincodeControl = getServer().getPincodeControl();
-		logControl = getServer().getLoginLogControl();
-		ipbanControl = getServer().getIpBanControl();
-		onlineControl = getServer().getOnlineControl();
-		authControl = getServer().getAuthControl();
+		accounts = getServer().getAccountControl();
+		groups = getServer().getGroupControl();
+		pincodes = getServer().getPincodeControl();
+		logs = getServer().getLoginLogControl();
+		ipbans = getServer().getIpBanControl();
+		onlines = getServer().getOnlineControl();
+		auths = getServer().getAuthControl();
 	}
 
 	/**
@@ -139,18 +157,28 @@ public class AbstractServiceLogin extends ServerService
 		auth = null;
 		account = null;
 
-		accountControl = null;
-		groupControl = null;
-		pincodeControl = null;
-		logControl = null;
-		ipbanControl = null;
-		onlineControl = null;
-		authControl = null;
+		accounts = null;
+		groups = null;
+		pincodes = null;
+		logs = null;
+		ipbans = null;
+		onlines = null;
+		auths = null;
 	}
 
 	@Override
 	protected LoginServer getServer()
 	{
 		return (LoginServer) super.getServer();
+	}
+
+	@Override
+	public String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("state", getServer().getState());
+
+		return description.toString();
 	}
 }

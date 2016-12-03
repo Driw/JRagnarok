@@ -1,3 +1,6 @@
+03.12.2016 - 1.3.114
+- Renomeando as variáveis de controle em AbstractLoginService para deixar em um tamanho menor.
+
 03.12.2016 - 1.3.113
 - Todos os serviços e controle agora ficam alocados em AbstractLoginService.
 	- Isto facilita a codificação já que os serviços comunicam entre si e usam diversos controles.
