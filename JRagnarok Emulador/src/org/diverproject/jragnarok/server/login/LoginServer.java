@@ -23,6 +23,13 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
+import org.diverproject.jragnarok.server.login.control.AccountControl;
+import org.diverproject.jragnarok.server.login.control.AuthControl;
+import org.diverproject.jragnarok.server.login.control.GroupControl;
+import org.diverproject.jragnarok.server.login.control.IpBanControl;
+import org.diverproject.jragnarok.server.login.control.LoginLogControl;
+import org.diverproject.jragnarok.server.login.control.OnlineControl;
+import org.diverproject.jragnarok.server.login.control.PincodeControl;
 import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 
@@ -96,6 +103,42 @@ public class LoginServer extends Server
 	 */
 	private ServiceLoginAccount accountService;
 
+
+	/**
+	 * Controle para persistência das contas de jogadores.
+	 */
+	private AccountControl accountControl;
+
+	/**
+	 * Controle para persistência e cache dos grupos de jogadores.
+	 */
+	private GroupControl groupControl;
+
+	/**
+	 * Controle para persistência dos código PIN das contas de jogadores.
+	 */
+	private PincodeControl pincodeControl;
+
+	/**
+	 * Controle para registrar acesso ao banco de dados.
+	 */
+	private LoginLogControl logControl;
+
+	/**
+	 * Controle para banimento de endereços de IP.
+	 */
+	private IpBanControl ipbanControl;
+
+	/**
+	 * Controlador para identificar jogadores online.
+	 */
+	private OnlineControl onlineControl;
+
+	/**
+	 * Controlador para identificar jogadores autenticados.
+	 */
+	private AuthControl authControl;
+
 	/**
 	 * Cria um novo micro servidor para receber os novos acessos de clientes.
 	 * Define ainda o listener para executar operações durante mudanças de estado.
@@ -112,7 +155,7 @@ public class LoginServer extends Server
 	 * @return aquisição dos servidores de personagens disponíveis para acesso.
 	 */
 
-	public CharServerList getCharServerList()
+	CharServerList getCharServerList()
 	{
 		return charServers;
 	}
@@ -121,7 +164,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para comunicação com o servidor de personagens.
 	 */
 
-	public ServiceLoginChar getCharService()
+	ServiceLoginChar getCharService()
 	{
 		return charService;
 	}
@@ -130,7 +173,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para comunicação do servidor com o cliente.
 	 */
 
-	public ServiceLoginClient getClientService()
+	ServiceLoginClient getClientService()
 	{
 		return clientService;
 	}
@@ -139,7 +182,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para banimento de acessos por endereço de IP.
 	 */
 
-	public ServiceLoginIpBan getIpBanService()
+	ServiceLoginIpBan getIpBanService()
 	{
 		return ipBanService;
 	}
@@ -148,7 +191,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para registro de acessos no servidor.
 	 */
 
-	public ServiceLoginLog getLogService()
+	ServiceLoginLog getLogService()
 	{
 		return logService;
 	}
@@ -157,7 +200,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para acesso de contas (serviço principal)
 	 */
 
-	public ServiceLoginServer getLoginService()
+	ServiceLoginServer getLoginService()
 	{
 		return loginService;
 	}
@@ -166,7 +209,7 @@ public class LoginServer extends Server
 	 * @return aquisição do serviço para autenticação de acessos.
 	 */
 
-	public ServiceLoginAuth getAuthService()
+	ServiceLoginAuth getAuthService()
 	{
 		return authService;
 	}
@@ -178,6 +221,65 @@ public class LoginServer extends Server
 	public ServiceLoginAccount getAccountService()
 	{
 		return accountService;
+	}
+
+	/**
+	 * @return aquisição do controle para gerenciar as contas dos jogadores.
+	 */
+
+	AccountControl getAccountControl()
+	{
+		return accountControl;
+	}
+
+	/**
+	 * @return aquisição do controle para gerenciar os grupos de jogadores.
+	 */
+
+	GroupControl getGroupControl()
+	{
+		return groupControl;
+	}
+
+	/**
+	 * @return aquisição do controle para gerenciar os códigos PIN de contas.
+	 */
+
+	PincodeControl getPincodeControl()
+	{
+		return pincodeControl;
+	}
+
+	/**
+	 * @return aquisição do controle para registrar acesso ao banco de dados.
+	 */
+
+	LoginLogControl getLoginLogControl()
+	{
+		return logControl;
+	}
+
+	IpBanControl getIpBanControl()
+	{
+		return ipbanControl;
+	}
+
+	/**
+	 * @return aquisição do controle para identificar jogadores online.
+	 */
+
+	OnlineControl getOnlineControl()
+	{
+		return onlineControl;
+	}
+
+	/**
+	 * @return aquisição do controle para autenticação dos jogadores.
+	 */
+
+	AuthControl getAuthControl()
+	{
+		return authControl;
 	}
 
 	@Override
@@ -247,6 +349,17 @@ public class LoginServer extends Server
 			authService.init();
 			ipBanService.init();
 
+			accountControl = new AccountControl(getMySQL().getConnection());
+			groupControl = new GroupControl(getMySQL().getConnection());
+			pincodeControl = new PincodeControl(getMySQL().getConnection());
+			logControl = new LoginLogControl(getMySQL().getConnection());
+			ipbanControl = new IpBanControl(getMySQL().getConnection());
+			onlineControl = new OnlineControl(getTimerSystem().getTimers());
+			authControl = new AuthControl();
+
+			accountControl.setGroupControl(groupControl);
+			accountControl.setPincodeControl(pincodeControl);
+
 			if (getConfigs().getBool(LOG_LOGIN))
 				logService.init();
 
@@ -303,6 +416,19 @@ public class LoginServer extends Server
 			charServers.clear();
 			charService.destroy();
 			loginService.destroy();
+
+			groupControl.clear();
+			onlineControl.clear();
+			authControl.clear();
+			ipbanControl.clear();
+
+			accountControl = null;
+			groupControl = null;
+			pincodeControl = null;
+			logControl = null;
+			ipbanControl = null;
+			onlineControl = null;
+			authControl = null;
 
 			if (getConfigs().getBool(IPBAN_ENABLED))
 				ipBanService.destroy();

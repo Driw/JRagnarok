@@ -16,10 +16,6 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
-import org.diverproject.jragnarok.server.login.control.AuthControl;
-import org.diverproject.jragnarok.server.login.control.GroupControl;
-import org.diverproject.jragnarok.server.login.control.OnlineControl;
-import org.diverproject.jragnarok.server.login.control.PincodeControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
 import org.diverproject.jragnarok.server.login.structures.ClientHashNode;
@@ -46,31 +42,6 @@ import org.diverproject.util.collection.Node;
 public class ServiceLoginServer extends AbstractServiceLogin
 {
 	/**
-	 * Controle para persistência das contas de jogadores.
-	 */
-	private AccountControl accountControl;
-
-	/**
-	 * Controle para persistência e cache dos grupos de jogadores.
-	 */
-	private GroupControl groupControl;
-
-	/**
-	 * Controle para persistência dos código PIN das contas de jogadores.
-	 */
-	private PincodeControl pincodeControl;
-
-	/**
-	 * Controlador para identificar jogadores online.
-	 */
-	private OnlineControl onlineControl;
-
-	/**
-	 * Controlador para identificar jogadores autenticados.
-	 */
-	private AuthControl authControl;
-
-	/**
 	 * Constrói um novo serviço para realizar a autenticação e obtenção de contas.
 	 * @param server referência do servidor de acesso do qual deseja criar o serviço.
 	 * @throws RagnarokException caso não haja uma conexão válida estabelecida com o MySQL.
@@ -79,85 +50,6 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	public ServiceLoginServer(LoginServer server) throws RagnarokException
 	{
 		super(server);
-	}
-
-	/**
-	 * @return aquisição do controle para gerenciar as contas dos jogadores.
-	 */
-
-	AccountControl getAccountControl()
-	{
-		return accountControl;
-	}
-
-	/**
-	 * @return aquisição do controle para gerenciar os grupos de jogadores.
-	 */
-
-	GroupControl getGroupControl()
-	{
-		return groupControl;
-	}
-
-	/**
-	 * @return aquisição do controle para gerenciar os códigos PIN de contas.
-	 */
-
-	PincodeControl getPincodeControl()
-	{
-		return pincodeControl;
-	}
-
-	/**
-	 * @return aquisição do controle para identificar jogadores online.
-	 */
-
-	OnlineControl getOnlineControl()
-	{
-		return onlineControl;
-	}
-
-	/**
-	 * @return aquisição do controle para autenticação dos jogadores.
-	 */
-
-	AuthControl getAuthControl()
-	{
-		return authControl;
-	}
-
-	/**
-	 * Inicializa o serviço para recebimento de novos clientes no servidor.
-	 * @throws RagnarokException apenas se houver falha de conexão.
-	 */
-
-	public void init() throws RagnarokException
-	{
-		accountControl = new AccountControl(getConnection());
-		groupControl = new GroupControl(getConnection());
-		pincodeControl = new PincodeControl(getConnection());
-
-		accountControl.setGroupControl(groupControl);
-		accountControl.setPincodeControl(pincodeControl);
-
-		onlineControl = new OnlineControl(getTimerSystem().getTimers());
-		authControl = new AuthControl();
-	}
-
-	/**
-	 * Limpa as informações contidas de usuários online e autenticações feitas.
-	 * Após isso destrói o controlador de usuários online e autenticações feitas.
-	 */
-
-	public void destroy()
-	{
-		groupControl.clear();
-		onlineControl.clear();
-		authControl.clear();
-
-		accountControl = null;
-		onlineControl = null;
-		authControl = null;
 	}
 
 	/**

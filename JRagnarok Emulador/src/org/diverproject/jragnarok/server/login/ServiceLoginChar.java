@@ -21,9 +21,6 @@ import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 
 public class ServiceLoginChar extends AbstractServiceLogin
 {
-	private ServiceLoginClient client;
-	private ServiceLoginAccount account;
-
 	public ServiceLoginChar(LoginServer server)
 	{
 		super(server);

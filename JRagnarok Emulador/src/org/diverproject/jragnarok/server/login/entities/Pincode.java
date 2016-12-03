@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server.login.entities;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.PINCODE_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
+import static org.diverproject.jragnarok.JRagnarokUtil.random;
 
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
@@ -12,6 +12,7 @@ public class Pincode
 	private boolean enabled;
 	private String code;
 	private Time changed;
+	private int seed;
 
 	public Pincode()
 	{
@@ -46,7 +47,8 @@ public class Pincode
 
 	public void setCode(String code)
 	{
-		this.code = strcap(code, PINCODE_LENGTH);
+		if (code == null || code.length() == PINCODE_LENGTH)
+			this.code = code;
 	}
 
 	public Time getChanged()
@@ -57,6 +59,16 @@ public class Pincode
 	public void setChangedNow()
 	{
 		changed.set(System.currentTimeMillis());
+	}
+
+	public int getSeed()
+	{
+		return seed;
+	}
+
+	public void genSeed()
+	{
+		seed = random();
 	}
 
 	@Override

@@ -79,42 +79,6 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 */
 	private static final int AUTH_TIMEOUT = seconds(30);
 
-
-	/**
-	 * Serviço para registro dos acessos.
-	 */
-	private ServiceLoginLog log;
-
-	/**
-	 * Serviço para banimento por endereço de IP.
-	 */
-	private ServiceLoginIpBan ipban;
-
-	/**
-	 * Serviço para acesso de clientes com o servidor de acesso.
-	 */
-	private ServiceLoginServer login;
-
-	/**
-	 * Serviço para acesso de servidores com o servidor de acesso.
-	 */
-	private ServiceLoginChar character;
-
-	/**
-	 * Serviço para envio de dados para o(s) cliente(s).
-	 */
-	private ServiceLoginClient client;
-
-	/**
-	 * Controlador para identificar jogadores online.
-	 */
-	private OnlineControl onlines;
-
-	/**
-	 * Controlador para identificar jogadores autenticados.
-	 */
-	private AuthControl control;
-
 	/**
 	 * Cria um novo serviço para autenticação de solicitações dos acessos ao servidor.
 	 * Esse serviço fará o contato com o banco de dados e autenticações necessárias.
@@ -124,22 +88,6 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	public ServiceLoginAuth(LoginServer server)
 	{
 		super(server);
-	}
-
-	/**
-	 * Inicializa o serviço para recebimento de novos clientes no servidor.
-	 */
-
-	public void init()
-	{
-		log = getServer().getLogService();
-		ipban = getServer().getIpBanService();
-		login = getServer().getLoginService();
-		character = getServer().getCharService();
-		client = getServer().getClientService();
-
-		onlines = getServer().getLoginService().getOnlineControl();
-		control = getServer().getLoginService().getAuthControl();
 	}
 
 	/**
@@ -418,7 +366,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		online.setAccountID(sd.getID());
 		online.setWaitingDisconnect(waitingDisconnect);
 		online.setCharServer(OnlineLogin.NONE);
-		onlines.add(online);
+		onlineControl.add(online);
 	}
 
 	/**
@@ -534,7 +482,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	private boolean authIsntOnline(LoginSessionData sd)
 	{
 		Account account = (Account) sd.getFileDescriptor().getCache();
-		OnlineLogin online = onlines.get(account.getID());
+		OnlineLogin online = onlineControl.get(account.getID());
 
 		if (online != null)
 		{
@@ -549,8 +497,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				return true;
 			}
 
-			control.remove(sd.getID());
-			onlines.remove(online);
+			authControl.remove(sd.getID());
+			onlineControl.remove(online);
 		}
 
 		return true;
@@ -638,7 +586,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			server.setNewDisplay(newDisplay);
 			getServer().getCharServerList().add(server);
 
-			fd.setParseListener(character.parse);
+			fd.setParseListener(loginchar.parse);
 			fd.getFlag().set(FileDescriptor.FLAG_SERVER);
 
 			client.charServerResult(fd, OK);

@@ -69,21 +69,6 @@ import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
 public class ServiceLoginClient extends AbstractServiceLogin
 {
 	/**
-	 * Serviço para registro dos acessos.
-	 */
-	private ServiceLoginLog log;
-
-	/**
-	 * Serviço para banimento por endereço de IP.
-	 */
-	private ServiceLoginIpBan ipban;
-
-	/**
-	 * Serviço para autenticação de acessos.
-	 */
-	private ServiceLoginAuth auth;
-
-	/**
 	 * Cria um novo serviço de recebimento dos novos clientes com o servidor.
 	 * Esse serviço irá repassar o cliente para os métodos corretos conforme pacotes.
 	 * @param server referência do servidor de acesso que deseja criar o serviço.

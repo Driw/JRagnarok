@@ -20,8 +20,6 @@ import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
 import org.diverproject.jragnarok.packets.request.UpdateAccountState;
 import org.diverproject.jragnarok.packets.response.RefuseEnter;
 import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.login.control.AccountControl;
-import org.diverproject.jragnarok.server.login.control.AuthControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
 import org.diverproject.jragnarok.server.login.entities.AuthNode;
@@ -30,36 +28,9 @@ import org.diverproject.util.lang.HexUtil;
 
 public class ServiceLoginAccount extends AbstractServiceLogin
 {
-	/**
-	 * Controle para intermediar a persistência de contas e cache de contas.
-	 */
-	private AccountControl accounts;
-
-	/**
-	 * Serviço para comunicação entre o cliente e servidor.
-	 */
-	private ServiceLoginClient client;
-
-	/**
-	 * Controlador para identificar jogadores autenticados.
-	 */
-	private AuthControl auths;
-
 	public ServiceLoginAccount(LoginServer server)
 	{
 		super(server);
-	}
-
-	/**
-	 * Inicializa o serviço para recebimento de novos clientes no servidor.
-	 */
-
-	public void init()
-	{
-		client = getServer().getClientService();
-
-		accounts = getServer().getLoginService().getAccountControl();
-		auths = getServer().getLoginService().getAuthControl();
 	}
 
 	public boolean dispatch(short command, FileDescriptor fd)
@@ -129,7 +100,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		AuthAccountRequest packet = new AuthAccountRequest();
 		packet.receive(fd);
 
-		AuthNode node = auths.get(packet.getAccountID());
+		AuthNode node = authControl.get(packet.getAccountID());
 		ClientCharServer server = getServer().getCharServerList().get(fd);
 
 		if (server != null &&
@@ -138,7 +109,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 			node.getSeed().getSecond() == packet.getSecondSeed())
 		{
 			client.authAccount(fd, node, packet.getAccountID(), true);
-			auths.remove(node); // cada autenticação é usada uma só vez
+			authControl.remove(node); // cada autenticação é usada uma só vez
 		}
 
 		else if (server != null)
@@ -163,7 +134,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		packet.receive(fd);
 
 		int id = packet.getAccountID();
-		Account account = accounts.get(id);
+		Account account = accountControl.get(id);
 
 		if (account == null)
 			logNotice("conta #%d não encontrada (ip: %s).\n", id, fd.getAddressString());
@@ -182,7 +153,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		AccountInfoRequest packet = new AccountInfoRequest();
 
 		int id = packet.getAccountID();
-		Account account = accounts.get(id);
+		Account account = accountControl.get(id);
 		client.sendAccountInfo(fd, packet, account);
 	}
 
@@ -208,7 +179,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 		else
 		{
-			Account account = accounts.get(packet.getAccountID());
+			Account account = accountControl.get(packet.getAccountID());
 
 			if (account == null)
 				logWarning("conta não encontrada (account: %d, ip: %s).\n", packet.getAccountID(), fd.getAddressString());
@@ -217,7 +188,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 			{
 				account.setEmail(packet.getNewEmail());
 
-				if (accounts.set(account))
+				if (accountControl.set(account))
 					logNotice("endereço de e-mail trocado para '%s' (account: %d, ip: %s).\n", packet.getNewEmail(), packet.getAccountID(), fd.getAddressString());
 				else
 					logWarning("falha ao persistir conta (account: %d, ip: %s).\n", packet.getAccountID(), fd.getAddressString());
@@ -237,7 +208,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		UpdateAccountState packet = new UpdateAccountState();
 		packet.receive(fd);
 
-		Account account = accounts.get(packet.getAccountID());
+		Account account = accountControl.get(packet.getAccountID());
 
 		if (account == null)
 			logWarning("conta não encontrada (account: %d, ip: %s).\n", packet.getAccountID(), fd.getAddressString());
@@ -250,7 +221,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 			AccountState old = account.getState();
 			account.setState(packet.getAccountState());
 
-			if (!accounts.set(account))
+			if (!accountControl.set(account))
 				logWarning("falha na troca de estado (account: %d, ip: %s).\n", packet.getAccountID(), fd.getAddressString());
 
 			else
@@ -273,7 +244,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		BanAccountRequest packet = new BanAccountRequest();
 		packet.receive(fd);
 
-		Account account = accounts.get(packet.getAccountID());
+		Account account = accountControl.get(packet.getAccountID());
 
 		if (account == null)
 			logWarning("conta não encontrada (account: %d, ip: %s).\n", packet.getAccountID(), fd.getAddressString());
@@ -286,7 +257,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 			account.setState(AccountState.BANNED);
 			account.getUnban().set(time);
 
-			if (!accounts.set(account))
+			if (!accountControl.set(account))
 				logWarning("falha ao banir conta (account: %d, ip: %s).\n", packet.getAccountID(), fd.getAddressString());
 
 			else

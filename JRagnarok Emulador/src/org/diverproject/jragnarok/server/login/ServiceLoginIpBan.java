@@ -6,26 +6,20 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_PASS_FAILURE_INTERVAL;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_PASS_FAILURE_LIMIT;
 
-import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
-import org.diverproject.jragnarok.server.login.control.IpBanControl;
 
 public class ServiceLoginIpBan extends AbstractServiceLogin
 {
-	private ServiceLoginLog log;
-	private IpBanControl control;
-
 	public ServiceLoginIpBan(LoginServer server)
 	{
 		super(server);
 	}
 
-	public void init() throws RagnarokException
+	public void init()
 	{
-		log = getServer().getLogService();
-		control = new IpBanControl(getConnection());
+		super.init();
 
 		int interval = getConfigs().getInt(IPBAN_CLEANUP_INTERVAL);
 
@@ -40,12 +34,6 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 		}
 	}
 
-	public void destroy()
-	{
-		control.clear();
-		control = null;
-	}
-
 	private boolean isEnabled()
 	{
 		return getConfigs().getBool(IPBAN_ENABLED);
@@ -56,7 +44,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 		if (!isEnabled())
 			return false;
 
-		return control.addressBanned(ip);
+		return ipbanControl.addressBanned(ip);
 	}
 
 	public void addBanLog(String ip)
@@ -74,7 +62,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 		@Override
 		public void onCall(Timer timer, int now, int tick)
 		{
-			control.cleanup();
+			ipbanControl.cleanup();
 		}
 		
 		@Override

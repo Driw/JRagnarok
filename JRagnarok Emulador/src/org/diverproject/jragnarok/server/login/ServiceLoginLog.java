@@ -25,11 +25,6 @@ import org.diverproject.jragnarok.server.login.entities.LoginLog;
 public class ServiceLoginLog extends AbstractServiceLogin
 {
 	/**
-	 * Controle para registrar acesso ao banco de dados.
-	 */
-	private LoginLogControl control;
-
-	/**
 	 * Cria um novo serviço para registro de acessos no banco de dados.
 	 * @param server servidor de acesso que irá utilizar o serviço.
 	 */
@@ -37,20 +32,6 @@ public class ServiceLoginLog extends AbstractServiceLogin
 	public ServiceLoginLog(LoginServer server)
 	{
 		super(server);
-	}
-
-	/**
-	 * Realiza a inicialização do serviço criando o controle para registro de acessos.
-	 */
-
-	public void init()
-	{
-		try {
-			control = new LoginLogControl(getConnection());
-		} catch (RagnarokException e) {
-			logWarning("inicie ou reinicie o servidor, sem conexão MySQL.\n");
-			logExeception(e);
-		}
 	}
 
 	/**
@@ -85,7 +66,7 @@ public class ServiceLoginLog extends AbstractServiceLogin
 			log.setRCode(code);
 			log.setMessage(message);
 
-			if (!control.insert(log))
+			if (!logControl.insert(log))
 				logWarning("falha ao registrar log (ip: %s, username: %s)", ip, login.getUsername());
 
 		} catch (RagnarokException e) {
@@ -106,7 +87,7 @@ public class ServiceLoginLog extends AbstractServiceLogin
 		int failures = 0;
 
 		try {
-			failures = control.getFailedAttempts(ip, minutes);
+			failures = logControl.getFailedAttempts(ip, minutes);
 		} catch (RagnarokException e) {
 			logExeception(e);
 		}
