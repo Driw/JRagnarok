@@ -1,3 +1,8 @@
+03.12.2016 - 1.2.111
+- CharSessionData atualizado conforme atualizações recentes da rev109.
+- OnlineCharControl atualizado para registrar mensagens em debug das operações.
+	- Também foi separado algumas ações de add() para makeOnline().
+
 03.12.2016 - 1.2.110
 - AuthAccountResponse e AuthAccountReceive agora estão como AuthAccountRequest conforme o sistema define.
 - Implementação do equals para facilitar a comparação entre duas seeds, LoginSeed.

@@ -80,6 +80,20 @@ public class OnlineCharControl extends AbstractControl
 	{
 		cache.add(online.getAccountID(), online);
 
+		logDebug("account#%d adicionado ao cache.\n", online.getAccountID());
+	}
+
+	/**
+	 * Torna um determinado jogador como online mesmo que não esteja em cache.
+	 * Caso não esteja em cache também será adicionado conforme informações abaixo:
+	 * @param online informações referentes ao jogador online.
+	 */
+
+	public void makeOnline(OnlineCharData online)
+	{
+		if (!cache.containsKey(online.getAccountID()))
+			add(online);
+
 		try{
 
 			setAccountOnline(online.getAccountID(), true);
@@ -88,8 +102,6 @@ public class OnlineCharControl extends AbstractControl
 		} catch (RagnarokException e) {
 			logExeception(e);
 		}
-
-		logDebug("account#%d está online.\n", online.getAccountID());
 	}
 
 	/**
@@ -112,7 +124,7 @@ public class OnlineCharControl extends AbstractControl
 
 		cache.removeKey(online.getAccountID());
 
-		logDebug("account#%d não está mais online.\n", online.getAccountID());
+		logDebug("account#%d removido do cache.\n", online.getAccountID());
 	}
 
 	/**
@@ -135,7 +147,17 @@ public class OnlineCharControl extends AbstractControl
 			ps.setBoolean(1, online);
 			ps.setInt(2, accountID);
 
-			return ps.executeUpdate() == 1;
+			boolean result = ps.executeUpdate() == 1;
+
+			if (result)
+			{
+				if (online)
+					logDebug("account#%d está online.\n", accountID);
+				else
+					logDebug("account#%d está offline.\n", accountID);
+			}
+
+			return result;
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e.getMessage());
@@ -162,7 +184,17 @@ public class OnlineCharControl extends AbstractControl
 			ps.setBoolean(1, online);
 			ps.setInt(2, charID);
 
-			return ps.executeUpdate() == 1;
+			boolean result = ps.executeUpdate() == 1;
+
+			if (result)
+			{
+				if (online)
+					logDebug("char#%d está online.\n", charID);
+				else
+					logDebug("char#%d está offline.\n", charID);
+			}
+
+			return result;
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e.getMessage());

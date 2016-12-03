@@ -8,11 +8,11 @@ import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.util.lang.IntUtil.interval;
 
 import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.jragnarok.server.common.LoginSeed;
 import org.diverproject.jragnarok.server.login.entities.Group;
 import org.diverproject.jragnarok.server.login.entities.Pincode;
 import org.diverproject.jragnarok.server.login.entities.Vip;
-import org.diverproject.jragnarok.server.login.structures.ClientType;
-import org.diverproject.jragnarok.server.login.structures.LoginSeed;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
