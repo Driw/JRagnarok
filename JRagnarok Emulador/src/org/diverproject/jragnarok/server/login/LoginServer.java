@@ -348,6 +348,7 @@ public class LoginServer extends Server
 			accountService.init();
 			authService.init();
 			ipBanService.init();
+			logService.init();
 
 			accountControl = new AccountControl(getMySQL().getConnection());
 			groupControl = new GroupControl(getMySQL().getConnection());
@@ -414,21 +415,18 @@ public class LoginServer extends Server
 			getFileDescriptorSystem().execute(onDestroyed);
 
 			charServers.clear();
-			charService.destroy();
-			loginService.destroy();
-
 			groupControl.clear();
 			onlineControl.clear();
 			authControl.clear();
 			ipbanControl.clear();
 
-			accountControl = null;
-			groupControl = null;
-			pincodeControl = null;
-			logControl = null;
-			ipbanControl = null;
-			onlineControl = null;
-			authControl = null;
+			logService.destroy();
+			ipBanService.destroy();
+			authService.destroy();
+			accountService.destroy();
+			clientService.destroy();
+			charService.destroy();
+			loginService.destroy();
 
 			if (getConfigs().getBool(IPBAN_ENABLED))
 				ipBanService.destroy();
@@ -437,6 +435,19 @@ public class LoginServer extends Server
 		@Override
 		public void onDestroyed() throws RagnarokException
 		{
+			charServers = null;
+			groupControl = null;
+			onlineControl = null;
+			authControl = null;
+			ipbanControl = null;
+
+			accountControl = null;
+			groupControl = null;
+			pincodeControl = null;
+			logControl = null;
+			ipbanControl = null;
+			onlineControl = null;
+			authControl = null;
 		}
 	};
 
