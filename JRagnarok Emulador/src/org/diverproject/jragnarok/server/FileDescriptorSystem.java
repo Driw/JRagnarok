@@ -6,6 +6,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.indexOn;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_EOF;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_PING;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_SERVER;
+import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeceptionSource;
 import static org.diverproject.log.LogSystem.logInfo;
@@ -94,6 +95,8 @@ public class FileDescriptorSystem
 
 			if (fd.id < 1)
 				return null;
+
+			logDebug("nova conexão recebida e registrada (id: %d, ip: %s).\n", fd.getID(), fd.getAddressString());
 
 			return fd;
 		}

@@ -1,3 +1,7 @@
+03.12.2016 - 1.2.107
+- Os servidores estavam consumindo muito do processado, solução possivelmente temporária (sleep).
+- ListCharServers deve definir o endereço de IP invertendo os seus valores ao enviar para o cliente.
+
 30.11.2016 - 1.2.106
 - Enviando controles e entidades referentes aos dados iniciais de um personagem.
 - CharServer atualizado para instanciar todos os controles que foram adicionado.

@@ -7,6 +7,7 @@ import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.CharServerList;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
+import org.diverproject.util.lang.Bits;
 import org.diverproject.util.stream.Output;
 
 public class ListCharServers extends ResponsePacket
@@ -40,7 +41,7 @@ public class ListCharServers extends ResponsePacket
 
 			// TODO IP de LAN ou WAN : loginclif.c:128
 
-			output.putInt(server.getIP().get());
+			output.putInt(Bits.swap(server.getIP().get()));
 			output.putShort(s(server.getPort()));
 			output.putString(server.getName(), 20);
 			output.putShort(server.getUsers());

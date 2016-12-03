@@ -589,7 +589,6 @@ public abstract class Server
 					try {
 
 						Socket socket = serverSocket.accept();
-
 						FileDescriptor fd = fileDescriptorSystem.newFileDecriptor(socket, defaultParser);
 
 						if (fd == null)
@@ -627,6 +626,15 @@ public abstract class Server
 					}
 
 					int tick = timerSystem.tick();
+
+					// TODO : Remover mais a frente quando gastar mais processamento?
+					// Esperar ao menos 1ms para o próximo loop garantir ao menos 1 tick.
+					if (tick == 0)
+					{
+						sleep(1);
+						continue;
+					}
+
 					timerSystem.getTimers().update(timerSystem.getCurrentTime(), tick);
 					fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
 				}
