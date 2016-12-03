@@ -286,14 +286,14 @@ public class CharServer extends Server
 		@Override
 		public void onCreated() throws RagnarokException
 		{
+			authControl = new AuthControl();
+			onlineCharControl = new OnlineCharControl(getMySQL().getConnection());
 			experienceControl = new ExperienceControl(getMySQL().getConnection());
 			familyControl = new FamilyControl(getMySQL().getConnection());
 			locationControl = new LocationControl(getMySQL().getConnection());
 			lookControl = new LookControl(getMySQL().getConnection());
 			mercenaryRankControl = new MercenaryRankControl(getMySQL().getConnection());
 			characterControl = new CharacterControl(getMySQL().getConnection());
-			authControl = new AuthControl();
-			onlineCharControl = new OnlineCharControl(getMySQL().getConnection());
 
 			characterControl.setExperiences(experienceControl);
 			characterControl.setFamilies(familyControl);
@@ -301,11 +301,12 @@ public class CharServer extends Server
 			characterControl.setLooks(lookControl);
 			characterControl.setRanks(mercenaryRankControl);
 
-			charClient = new ServiceCharClient(CharServer.this);
 			charServer = new ServiceCharServer(CharServer.this);
 			charLogin = new ServiceCharLogin(CharServer.this);
+			charClient = new ServiceCharClient(CharServer.this);
 			charServerAuth = new ServiceCharServerAuth(CharServer.this);
 
+			charServer.init();
 			charLogin.init();
 			charClient.init();
 			charServerAuth.init();
@@ -337,9 +338,13 @@ public class CharServer extends Server
 		@Override
 		public void onDestroy() throws RagnarokException
 		{
+			charServer.destroy();
+			charLogin.destroy();
 			charClient.destroy();
 			charServerAuth.destroy();
-			charLogin.destroy();
+
+			authControl.clear();
+			onlineCharControl.clear();
 		}
 
 		@Override
@@ -354,9 +359,9 @@ public class CharServer extends Server
 			authControl = null;
 			onlineCharControl = null;
 
-			charClient = null;
 			charServer = null;
 			charLogin = null;
+			charClient = null;
 			charServerAuth = null;
 		}
 	};
