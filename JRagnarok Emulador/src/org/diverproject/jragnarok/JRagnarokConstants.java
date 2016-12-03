@@ -22,6 +22,11 @@ public class JRagnarokConstants
 	 */
 	public static final int MAX_SERVERS = 30;
 
+	/**
+	 * Limite de dígitos permitido em um código pin.
+	 */
+	public static final int MAX_MAP_PER_SERVER = 1500;
+
 
 	/**
 	 * Formato padrão de datas com horário.

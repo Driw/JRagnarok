@@ -1,3 +1,11 @@
+03.12.2016 - 1.2.112
+- MapServerList adicionado para manter todos os servidores de mapa conectados ao servidor de personagem.
+- Novo controle para garantir autenticações existentes dentro do servidor de personagem por AuthControl.
+- OnlineCharData irá armazenar o código de identificação do servidor de mapa como int e não short.
+- AbstractCharService não estava sendo definido da forma correta conforme esperado.
+- Dependências de controles e serviços adicionados a CharServer.
+- ServiceCharLogin estava realizando operações que não lhe pertencem.
+
 03.12.2016 - 1.2.111
 - CharSessionData atualizado conforme atualizações recentes da rev109.
 - OnlineCharControl atualizado para registrar mensagens em debug das operações.

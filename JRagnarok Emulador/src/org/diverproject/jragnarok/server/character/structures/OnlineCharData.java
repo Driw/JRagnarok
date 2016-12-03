@@ -41,7 +41,7 @@ public class OnlineCharData
 	/**
 	 * Código de identificação do servidor que o personagem se encontra online.
 	 */
-	private short server;
+	private int server;
 
 	/**
 	 * Determina se o código PIN foi inserido corretamente com sucesso.
@@ -124,7 +124,7 @@ public class OnlineCharData
 	 * @return aquisição do código de identificação do servidor em que o personagem está online.
 	 */
 
-	public short getServer()
+	public int getServer()
 	{
 		return server;
 	}
@@ -133,7 +133,7 @@ public class OnlineCharData
 	 * @param server código de identificação do servidor em que o personagem está online.
 	 */
 
-	public void setServer(short server)
+	public void setServer(int server)
 	{
 		this.server = server;
 	}

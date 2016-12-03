@@ -1,7 +1,5 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
-import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.hours;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
@@ -14,17 +12,8 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_SERVER_NA
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_USERNAME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACCOUNT_STATE_NOTIFY;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_DATA;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_INFO;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_ACCOUNT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_GLOBAL_ACCREG;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ALREADY_ONLINE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_CHAR_SERVER_CONNECT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SYNCRONIZE_IPADDRESS;
-import static org.diverproject.jragnarok.server.login.structures.AuthResult.OK;
+import static org.diverproject.jragnarok.server.common.AuthResult.OK;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.lang.IntUtil.diff;
@@ -33,19 +22,16 @@ import java.io.IOException;
 import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.receive.AuthAccountResponse;
 import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
 import org.diverproject.jragnarok.packets.request.CharServerConnectRequest;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
 import org.diverproject.jragnarok.packets.response.KeepAliveRequest;
-import org.diverproject.jragnarok.packets.response.RefuseEnter;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.character.structures.CharSessionData;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.SocketUtil;
 
@@ -57,11 +43,6 @@ public class ServiceCharLogin extends ServiceCharServer
 	 * Descritor de Arquivo para com o servidor de acesso.
 	 */
 	private FileDescriptor fd;
-
-	/**
-	 * Serviço de comunicação entre o servidor de personagem e o cliente.
-	 */
-	private ServiceCharClient charClient;
 
 	public ServiceCharLogin(CharServer server)
 	{
@@ -88,8 +69,6 @@ public class ServiceCharLogin extends ServiceCharServer
 		sendAccountsTimer.setListener(sendAccounts);
 		sendAccountsTimer.setTick(ts.getCurrentTime() + seconds(1));
 		ts.getTimers().addLoop(sendAccountsTimer, hours(1));
-
-		charClient = new ServiceCharClient(getServer());
 	}
 
 	/**
@@ -250,22 +229,9 @@ public class ServiceCharLogin extends ServiceCharServer
 
 		short command = ack.getPacketID();
 
-		Object cache = fd.getCache();
-		CharSessionData sd = (cache != null && cache instanceof CharSessionData) ? (CharSessionData) cache : null;
-
 		switch (command)
 		{
 			case PACKET_RES_CHAR_SERVER_CONNECT: return parseLoginResult(fd);
-			case PACKET_RES_AUTH_ACCOUNT: return acknowledgeAccount(fd, sd);
-
-			case PACKET_REQ_ACCOUNT_DATA:
-			case PACKET_REQ_KEEP_ALIVE:
-			case PACKET_RES_KEEP_ALIVE:
-			case PACKET_REQ_ACCOUNT_INFO:
-			case PACKET_REQ_GLOBAL_ACCREG:
-			case PACKET_ACCOUNT_STATE_NOTIFY:
-			case PACKET_ALREADY_ONLINE:
-			case PACKET_SYNCRONIZE_IPADDRESS:
 		}
 
 		return false;
@@ -279,39 +245,9 @@ public class ServiceCharLogin extends ServiceCharServer
 		return packet.getResult() == OK;
 	}
 
-	private boolean acknowledgeAccount(FileDescriptor fd, CharSessionData sd)
+	public FileDescriptor getFileDescriptor()
 	{
-		AuthAccountResponse packet = new AuthAccountResponse();
-		packet.receive(fd, false);
-
-		if ((sd = (fd.getCache() == null) ? null : (CharSessionData) fd.getCache()) != null &&
-			getFileDescriptorSystem().isAlive(packet.getRequestID()) &&
-			!sd.isAuth() && sd.getAccountID() == packet.getAccountID() &&
-			sd.getSeed().getFirst() == packet.getFirstSeed() &&
-			sd.getSeed().getSecond() == packet.getSecondSeed())
-		{
-			sd.setVersion(packet.getVersion());
-			sd.setClientType(packet.getClientType());
-
-			int required = dateToVersion(PACKETVER);
-
-			if (sd.getVersion() != required)
-				logWarning("client desatualizado (aid: %d, version: %d, required: %d).\n", sd.getAccountID(), sd.getVersion(), required);
-
-			fd = getFileDescriptorSystem().get(packet.getRequestID());
-
-			switch (packet.getResult())
-			{
-				case AuthAccountResponse.OK:
-					return charClient.charAuthOk(fd, sd);
-
-				case AuthAccountResponse.FAILED:
-					charClient.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
-					return true;
-			}
-		}
-
-		return false;
+		return fd;
 	}
 
 	// TODO reset

@@ -36,6 +36,7 @@ public class RagnarokPacket
 	public static final short PACKET_ACCOUNT_STATE_UPDATE = 0x2724;
 	public static final short PACKET_ACCOUNT_STATE_NOTIFY = 0x2725;
 	public static final short PACKET_REQ_GLOBAL_ACCREG = 0x2726;
+	public static final short PACKET_SET_ACCOUNT_ONLINE = 0x272B;
 	public static final short PACKET_ALREADY_ONLINE = 0x2734;
 	public static final short PACKET_SYNCRONIZE_IPADDRESS = 0x2735;
 

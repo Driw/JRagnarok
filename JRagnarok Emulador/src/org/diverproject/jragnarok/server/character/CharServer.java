@@ -8,12 +8,14 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
+import org.diverproject.jragnarok.server.character.control.AuthControl;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.character.control.ExperienceControl;
 import org.diverproject.jragnarok.server.character.control.FamilyControl;
 import org.diverproject.jragnarok.server.character.control.LocationControl;
 import org.diverproject.jragnarok.server.character.control.LookControl;
 import org.diverproject.jragnarok.server.character.control.MercenaryRankControl;
+import org.diverproject.jragnarok.server.character.control.OnlineCharControl;
 
 /**
  * <h1>Servidor de Personagem</h1>
@@ -46,6 +48,11 @@ import org.diverproject.jragnarok.server.character.control.MercenaryRankControl;
 public class CharServer extends Server
 {
 	/**
+	 * Lista dos Servidores de Mapa disponíveis.
+	 */
+	private MapServerList mapServers;
+
+	/**
 	 * Serviço para comunicação inicial com o cliente.
 	 */
 	private ServiceCharClient charClient;
@@ -60,6 +67,21 @@ public class CharServer extends Server
 	 */
 	private ServiceCharLogin charLogin;
 
+	/**
+	 * Serviço para autenticação dos jogadores no servidor.
+	 */
+	private ServiceCharServerAuth charServerAuth;
+
+
+	/**
+	 * Controle para autenticação de jogadores online.
+	 */
+	private AuthControl authControl;
+
+	/**
+	 * Controle para dados de personagens online.
+	 */
+	private OnlineCharControl onlineCharControl;
 
 	/**
 	 * Controle para gerenciar dados dos personagens.
@@ -89,7 +111,7 @@ public class CharServer extends Server
 	/**
 	 * Controle para gerenciar a classificação no sistema de assistentes dos personagens.
 	 */
-	private MercenaryRankControl ranks;
+	private MercenaryRankControl mercenaryRankControl;
 
 	/**
 	 * Cria uma nova instância de um servidor de personagem inicialização o seu listener.
@@ -98,6 +120,15 @@ public class CharServer extends Server
 	public CharServer()
 	{
 		setListener(listener);
+	}
+
+	/**
+	 * @return aquisição da lista dos servidores de mapa disponíveis.
+	 */
+
+	public MapServerList getMapServers()
+	{
+		return mapServers;
 	}
 
 	/**
@@ -128,10 +159,47 @@ public class CharServer extends Server
 	}
 
 	/**
+	 * @return aquisição do serviço para autenticação dos jogadores no servidor.
+	 */
+
+	public ServiceCharServerAuth getCharServerAuth()
+	{
+		return charServerAuth;
+	}
+
+
+	/**
+	 * @return aquisição do controle para autenticação dos jogadores online.
+	 */
+
+	public AuthControl getAuthControl()
+	{
+		return authControl;
+	}
+
+	/**
+	 * @return aquisição do controle para dados de personagens online.
+	 */
+
+	public OnlineCharControl getOnlineCharControl()
+	{
+		return onlineCharControl;
+	}
+
+	/**
+	 * @return aquisição do controle dos dados básicos dos personagens.
+	 */
+
+	public CharacterControl getCharacterControl()
+	{
+		return characterControl;
+	}
+
+	/**
 	 * @return aquisição do controle para níveis de experiência dos personagens.
 	 */
 
-	public ExperienceControl getExperiences()
+	public ExperienceControl getExperienceControl()
 	{
 		return experienceControl;
 	}
@@ -140,7 +208,7 @@ public class CharServer extends Server
 	 * @return aquisição do controle para relações familiares dos personagens.
 	 */
 
-	public FamilyControl getFamilies()
+	public FamilyControl getFamilyControl()
 	{
 		return familyControl;
 	}
@@ -149,7 +217,7 @@ public class CharServer extends Server
 	 * @return aquisição do controle para localizações dos personagens.
 	 */
 
-	public LocationControl getLocations()
+	public LocationControl getLocationControl()
 	{
 		return locationControl;
 	}
@@ -158,7 +226,7 @@ public class CharServer extends Server
 	 * @return aquisição do controle para aparência dos personagens.
 	 */
 
-	public LookControl getLooks()
+	public LookControl getLookControl()
 	{
 		return lookControl;
 	}
@@ -167,9 +235,9 @@ public class CharServer extends Server
 	 * @return aquisição do controle para classificação dos assistentes.
 	 */
 
-	public MercenaryRankControl getRanks()
+	public MercenaryRankControl getMercenaryRankControl()
 	{
-		return ranks;
+		return mercenaryRankControl;
 	}
 
 	@Override
@@ -222,20 +290,25 @@ public class CharServer extends Server
 			familyControl = new FamilyControl(getMySQL().getConnection());
 			locationControl = new LocationControl(getMySQL().getConnection());
 			lookControl = new LookControl(getMySQL().getConnection());
-			ranks = new MercenaryRankControl(getMySQL().getConnection());
+			mercenaryRankControl = new MercenaryRankControl(getMySQL().getConnection());
 			characterControl = new CharacterControl(getMySQL().getConnection());
+			authControl = new AuthControl();
+			onlineCharControl = new OnlineCharControl(getMySQL().getConnection());
 
 			characterControl.setExperiences(experienceControl);
 			characterControl.setFamilies(familyControl);
 			characterControl.setLocations(locationControl);
 			characterControl.setLooks(lookControl);
-			characterControl.setRanks(ranks);
+			characterControl.setRanks(mercenaryRankControl);
 
 			charClient = new ServiceCharClient(CharServer.this);
 			charServer = new ServiceCharServer(CharServer.this);
 			charLogin = new ServiceCharLogin(CharServer.this);
+			charServerAuth = new ServiceCharServerAuth(CharServer.this);
 
 			charLogin.init();
+			charClient.init();
+			charServerAuth.init();
 
 			setDefaultParser(charClient.parse);
 		};
@@ -264,6 +337,8 @@ public class CharServer extends Server
 		@Override
 		public void onDestroy() throws RagnarokException
 		{
+			charClient.destroy();
+			charServerAuth.destroy();
 			charLogin.destroy();
 		}
 
@@ -274,12 +349,15 @@ public class CharServer extends Server
 			familyControl = null;
 			locationControl = null;
 			lookControl = null;
-			ranks = null;
+			mercenaryRankControl = null;
 			characterControl = null;
+			authControl = null;
+			onlineCharControl = null;
 
 			charClient = null;
 			charServer = null;
 			charLogin = null;
+			charServerAuth = null;
 		}
 	};
 }
