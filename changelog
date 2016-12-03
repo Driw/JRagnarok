@@ -1,3 +1,7 @@
+03.12.2016 - 1.2.110
+- AuthAccountResponse e AuthAccountReceive agora estão como AuthAccountRequest conforme o sistema define.
+- Implementação do equals para facilitar a comparação entre duas seeds, LoginSeed.
+
 03.12.2016 - 1.2.109
 - Movendo algumas estruturas para server.common pois podem ser utilizadas por todos os servidores.
 	- Junto destas foram movidos enumerações referentes aos pacotes.

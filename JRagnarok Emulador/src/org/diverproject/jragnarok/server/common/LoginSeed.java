@@ -30,6 +30,20 @@ public class LoginSeed
 	}
 
 	@Override
+	public boolean equals(Object object)
+	{
+		if (object instanceof LoginSeed)
+		{
+			LoginSeed seed = (LoginSeed) object;
+
+			return	seed.first == first &&
+					seed.second == second;
+		}
+
+		return false;
+	}
+
+	@Override
 	public String toString()
 	{
 		ObjectDescription description = new ObjectDescription(getClass());

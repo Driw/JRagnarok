@@ -22,7 +22,7 @@ public class RagnarokPacket
 
 	public static final short PACKET_REQ_CHAR_SERVER_CONNECT = 0x2710;
 	public static final short PACKET_RES_CHAR_SERVER_CONNECT = 0x2711;
-	public static final short PACKET_AUTH_ACCOUNT_REQ = 0x2712;
+	public static final short PACKET_REQ_AUTH_ACCOUNT = 0x2712;
 	public static final short PACKET_RES_AUTH_ACCOUNT = 0x2713;
 	public static final short PACKET_UPDATE_USER_COUNT = 0x2714;
 	// 0x2715

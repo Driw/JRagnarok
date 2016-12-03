@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.packets.response;
+package org.diverproject.jragnarok.packets.request;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_ACCOUNT;
 
@@ -6,7 +6,7 @@ import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.util.stream.Output;
 
-public class AuthAccountResponse extends ResponsePacket
+public class AuthAccountResult extends ResponsePacket
 {
 	public static final byte OK = 0;
 	public static final byte FAILED = 1;

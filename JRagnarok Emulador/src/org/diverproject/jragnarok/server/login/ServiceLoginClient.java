@@ -22,9 +22,9 @@ import org.diverproject.jragnarok.packets.request.AccountDataResult;
 import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
 import org.diverproject.jragnarok.packets.request.AccountInfoResult;
 import org.diverproject.jragnarok.packets.request.AccountStateNotify;
+import org.diverproject.jragnarok.packets.request.AuthAccountResult;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
 import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
-import org.diverproject.jragnarok.packets.response.AuthAccountResponse;
 import org.diverproject.jragnarok.packets.response.ListCharServers;
 import org.diverproject.jragnarok.packets.response.NotifyAuth;
 import org.diverproject.jragnarok.packets.response.KeepAliveResult;
@@ -403,7 +403,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void authAccount(FileDescriptor fd, AuthNode node, int fdID, boolean ok)
 	{
-		AuthAccountResponse response = new AuthAccountResponse();
+		AuthAccountResult response = new AuthAccountResult();
 		response.setAccountID(node.getAccountID());
 		response.setFirstSeed(node.getSeed().getFirst());
 		response.setSecondSeed(node.getSeed().getSecond());
@@ -411,14 +411,14 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		if (ok)
 		{
-			response.setResult(AuthAccountResponse.OK);
+			response.setResult(AuthAccountResult.OK);
 			response.setVersion(node.getVersion());
 			response.setClientType(node.getClientType());
 		}
 
 		else
 		{
-			response.setResult(AuthAccountResponse.FAILED);
+			response.setResult(AuthAccountResult.FAILED);
 			response.setVersion(0);
 			response.setClientType(ClientType.CT_NONE);
 		}

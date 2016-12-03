@@ -7,14 +7,14 @@ import static org.diverproject.jragnarok.JRagnarokUtil.time;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_INFO;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACCOUNT_STATE_UPDATE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AUTH_ACCOUNT_REQ;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_AUTH_ACCOUNT;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
-import org.diverproject.jragnarok.packets.receive.AuthAccountResponse;
 import org.diverproject.jragnarok.packets.request.AccountDataRequest;
 import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
+import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
 import org.diverproject.jragnarok.packets.request.BanAccountRequest;
 import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
 import org.diverproject.jragnarok.packets.request.UpdateAccountState;
@@ -66,7 +66,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	{
 		switch (command)
 		{
-			case PACKET_AUTH_ACCOUNT_REQ:
+			case PACKET_REQ_AUTH_ACCOUNT:
 				requestAuthAccount(fd);
 				return true;
 
@@ -126,7 +126,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 	private void requestAuthAccount(FileDescriptor fd)
 	{
-		AuthAccountResponse packet = new AuthAccountResponse();
+		AuthAccountRequest packet = new AuthAccountRequest();
 		packet.receive(fd);
 
 		AuthNode node = auths.get(packet.getAccountID());
