@@ -47,6 +47,7 @@ import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.structures.CharSessionData;
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.SocketUtil;
 
 public class ServiceCharLogin extends ServiceCharServer
 {
@@ -142,7 +143,7 @@ public class ServiceCharLogin extends ServiceCharServer
 
 				String username = getConfigs().getString(CHAR_USERNAME);
 				String password = getConfigs().getString(CHAR_PASSWORD);
-				int serverIP = getConfigs().getInt(CHAR_IP);
+				int serverIP = SocketUtil.socketIPInt(getConfigs().getString(CHAR_IP));
 				short serverPort = s(getConfigs().getInt(CHAR_PORT));
 				String serverName = getConfigs().getString(CHAR_SERVER_NAME);
 				short type = s(getConfigs().getInt(CHAR_MAINTANCE));

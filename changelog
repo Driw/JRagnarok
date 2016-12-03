@@ -1,3 +1,8 @@
+03.12.2016 - 1.2.108
+- CharServer estava enviando endereço de IP nulo para LoginServer em checkLoginConnection.
+- Inicialização do desenvolvimento para análise de pacotes recebidos de clientes em ServiceCharClient.
+	- Adicionando apenas log para mostrar pacote desconhecido pelo serviço.
+
 03.12.2016 - 1.2.107
 - Os servidores estavam consumindo muito do processado, solução possivelmente temporária (sleep).
 - ListCharServers deve definir o endereço de IP invertendo os seus valores ao enviar para o cliente.
