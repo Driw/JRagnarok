@@ -103,6 +103,14 @@ public class JRagnarokConfigs
 	public static final String CLIENT_CHECK_VERSION = CLIENT_CONFIGS+ ".check_version";
 	public static final String CLIENT_VERSION = CLIENT_CONFIGS+ ".version";
 
+	public static final String PINCODE_CONFIGS = "pincode";
+	public static final String PINCODE_ENABLED = PINCODE_CONFIGS+ ".enabled";
+	public static final String PINCODE_CHANGE_TIME = PINCODE_CONFIGS+ ".change_time";
+	public static final String PINCODE_MAXTRY = PINCODE_CONFIGS+ ".maxtry";
+	public static final String PINCODE_FORCE = PINCODE_CONFIGS+ ".force";
+	public static final String PINCODE_ALLOW_REPEATED = PINCODE_CONFIGS+ ".allow_repeated";
+	public static final String PINCODE_ALLOW_SEQUENTIAL = PINCODE_CONFIGS+ ".allow_sequential";
+
 	public static final String SERVER_THREAD_PRIORITY = SERVER_CONFIGS+ ".thread_priority";
 
 	public static final Configurations newSystemConfigs()
@@ -192,6 +200,12 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigString(CHAR_SERVER_NAME, "Char Server"));
 		configurations.add(new ConfigInt(CHAR_MAINTANCE, 0));
 		configurations.add(new ConfigInt(CHAR_NEW_DISPLAY, 0));
+		configurations.add(new ConfigBoolean(PINCODE_ENABLED, true));
+		configurations.add(new ConfigInt(PINCODE_CHANGE_TIME, 0));
+		configurations.add(new ConfigInt(PINCODE_MAXTRY, 3));
+		configurations.add(new ConfigBoolean(PINCODE_FORCE, true));
+		configurations.add(new ConfigBoolean(PINCODE_ALLOW_REPEATED, false));
+		configurations.add(new ConfigBoolean(PINCODE_ALLOW_SEQUENTIAL, false));
 
 		return configurations;
 	}
