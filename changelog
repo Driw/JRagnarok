@@ -1,3 +1,6 @@
+05.12.2016 - 1.3.123
+- AuthNode e OnlineLogin não são entidades já que não são persistidas no banco de dados.
+
 05.12.2016 - 1.3.122
 - Inicialização da implementação da análise da comunicação entre o servidor de acesso e de personagem.
 	- ServiceCharLogin recebeu o switch do comando (pacote) e iniciou algumas implementações.

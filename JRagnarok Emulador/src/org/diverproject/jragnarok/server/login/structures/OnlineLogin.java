@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.entities;
+package org.diverproject.jragnarok.server.login.structures;
 
 import org.diverproject.jragnarok.server.Timer;
 

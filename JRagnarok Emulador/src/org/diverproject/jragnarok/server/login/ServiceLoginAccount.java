@@ -21,7 +21,7 @@ import org.diverproject.jragnarok.packets.request.UpdateAccountState;
 import org.diverproject.jragnarok.packets.response.RefuseEnter;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
-import org.diverproject.jragnarok.server.login.entities.AuthNode;
+import org.diverproject.jragnarok.server.login.structures.AuthNode;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.util.lang.HexUtil;
 

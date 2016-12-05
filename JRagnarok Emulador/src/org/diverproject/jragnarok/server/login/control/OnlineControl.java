@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.server.login.control;
 import static org.diverproject.log.LogSystem.logDebug;
 
 import org.diverproject.jragnarok.server.TimerMap;
-import org.diverproject.jragnarok.server.login.entities.OnlineLogin;
+import org.diverproject.jragnarok.server.login.structures.OnlineLogin;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;
