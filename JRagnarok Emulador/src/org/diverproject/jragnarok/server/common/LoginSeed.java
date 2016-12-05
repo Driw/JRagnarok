@@ -29,6 +29,11 @@ public class LoginSeed
 		second = random() + 1;
 	}
 
+	public boolean equals(int firstSeed, int secondSeed)
+	{
+		return first == firstSeed && second == secondSeed;
+	}
+
 	@Override
 	public boolean equals(Object object)
 	{

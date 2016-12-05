@@ -1,8 +1,6 @@
 package org.diverproject.jragnarok.server.character;
 
-import org.diverproject.jragnarok.server.ServerService;
-
-public class ServiceCharServer extends ServerService
+public class ServiceCharServer extends AbstractCharService
 {
 	public ServiceCharServer(CharServer server)
 	{
@@ -13,5 +11,17 @@ public class ServiceCharServer extends ServerService
 	protected CharServer getServer()
 	{
 		return (CharServer) super.getServer();
+	}
+
+	public boolean authOk(CFileDescriptor fd)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public int getCountUsers()
+	{
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

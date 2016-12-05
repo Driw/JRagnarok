@@ -30,18 +30,18 @@ public class ServiceCharServerAuth extends AbstractCharService
 		control = null;
 	}
 
-	public boolean parse(FileDescriptor fd, CharSessionData sd)
+	public boolean parse(CFileDescriptor fd)
 	{
 		CharServerSelected packet = new CharServerSelected();
 		packet.receive(fd);
+
+		CharSessionData sd = fd.getSessionData();
 
 		if (sd != null)
 		{
 			logNotice("conexão solicitada (aid: %d, seed: %d|%d).\n", packet.getAccountID(), packet.getFirstSeed(), packet.getSecondSeed());
 			return true;
 		}
-
-		sd = new CharSessionData(fd);
 
 		try {
 
@@ -59,9 +59,9 @@ public class ServiceCharServerAuth extends AbstractCharService
 
 	private boolean parseRequest(FileDescriptor fd, CharSessionData sd)
 	{
-		AuthNode node = control.get(sd.getAccountID());
+		AuthNode node = control.get(sd.getID());
 
-		if (node != null && node.getAccountID() == sd.getAccountID() && node.getSeed().equals(sd.getSeed()))
+		if (node != null && node.getAccountID() == sd.getID() && node.getSeed().equals(sd.getSeed()))
 		{
 			sd.setVersion(node.getVersion());
 			control.remove(node.getAccountID());

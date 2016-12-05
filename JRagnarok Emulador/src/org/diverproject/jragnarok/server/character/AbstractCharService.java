@@ -52,6 +52,11 @@ public class AbstractCharService extends ServerService
 	protected ServiceCharLogin login;
 
 	/**
+	 * Serviço para comunicação com o servidor de mapa.
+	 */
+	protected ServiceCharMap map;
+
+	/**
 	 * Serviço para autenticação dos jogadores no servidor.
 	 */
 	protected ServiceCharServerAuth auth;
