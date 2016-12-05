@@ -7,11 +7,16 @@ import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
 
-public class Account extends Login
+public class Account implements Login
 {
 	private static final String DEFAULT_EMAIL = "a@a.com";
 	private static final String DEFAULT_BIRTHDATE = "0000-00-00";
 
+	private int id;
+	private String username;
+	private String password;
+	private Time lastLogin;
+	private Time registered;
 	private String email;
 	private String birthDate;
 	private byte charSlots;
@@ -29,13 +34,55 @@ public class Account extends Login
 		email = DEFAULT_EMAIL;
 		birthDate = DEFAULT_BIRTHDATE;
 
-		unban = new Time();
+		lastLogin = new Time();
+		registered = new Time();
 		expiration = new Time();
+		unban = new Time();
 		lastIP = new InternetProtocol();
 		pincode = new Pincode();
 		group = new AccountGroup();
 
 		state = AccountState.NONE;
+	}
+
+	public int getID()
+	{
+		return id;
+	}
+
+	public void setID(int id)
+	{
+		this.id = id;
+	}
+
+	public String getUsername()
+	{
+		return username;
+	}
+
+	public void setUsername(String username)
+	{
+		this.username = username;
+	}
+
+	public String getPassword()
+	{
+		return password;
+	}
+
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
+
+	public Time getLastLogin()
+	{
+		return lastLogin;
+	}
+
+	public Time getRegistered()
+	{
+		return registered;
 	}
 
 	public String getEmail()
@@ -135,8 +182,15 @@ public class Account extends Login
 	}
 
 	@Override
-	public void toString(ObjectDescription description)
+	public String toString()
 	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("id", id);
+		description.append("username", username);
+		description.append("password", password);
+		description.append("registered", registered);
+		description.append("lastLogin", lastLogin);
 		description.append("email", email);
 		description.append("birthDate", birthDate);
 		description.append("charSlots", charSlots);
@@ -158,5 +212,7 @@ public class Account extends Login
 			description.append("pincode", pincode.getCode());
 			description.append("pincodChange", pincode.getChanged());
 		}
+
+		return description.toString();
 	}
 }

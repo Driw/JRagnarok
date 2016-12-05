@@ -103,15 +103,17 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		{
 			logDebug("parsing fd#%d.\n", fd.getID());
 
+			LFileDescriptor lfd = (LFileDescriptor) fd;
+
 			if (!fd.isConnected())
 				return false;
 
 			// Já conectou, verificar se está banido
-			if (fd.getCache() == null)
-				if (!parseBanTime(fd))
+			if (lfd.getSessionData().getCache() == null)
+				if (!parseBanTime(lfd))
 					return true;
 
-			return acknowledgePacket(fd);
+			return acknowledgePacket(lfd);
 		}
 	};
 
@@ -121,13 +123,12 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @return true se o pacote recebido for de um tipo válido para análise.
 	 */
 
-	private boolean acknowledgePacket(FileDescriptor fd)
+	private boolean acknowledgePacket(LFileDescriptor fd)
 	{
 		AcknowledgePacket packetReceivePacketID = new AcknowledgePacket();
 		packetReceivePacketID.receive(fd, false);
 
 		short command = packetReceivePacketID.getPacketID();
-		LoginSessionData sd = new LoginSessionData(fd);
 
 		switch (command)
 		{
@@ -136,15 +137,15 @@ public class ServiceLoginClient extends AbstractServiceLogin
 				return true;
 
 			case PACKET_UPDATE_CLIENT_HASH:
-				updateClientHash(fd, sd);
+				updateClientHash(fd);
 				return true;
 
 			case PACKET_REQ_HASH:
-				parseRequestKey(fd, sd);
+				parseRequestKey(fd);
 				return true;
 		}
 
-		return auth.dispatch(command, fd, sd);
+		return auth.dispatch(command, fd);
 	}
 
 	/**
@@ -154,7 +155,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @return true se estiver liberado o acesso ou false se estiver banido.
 	 */
 
-	private boolean parseBanTime(FileDescriptor fd)
+	private boolean parseBanTime(LFileDescriptor fd)
 	{
 		if (getConfigs().getBool("ipban.enabled") && ipban.isBanned(fd.getAddress()))
 		{
@@ -183,7 +184,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param fd referência do objeto contendo a conexão do cliente.
 	 */
 
-	public void keepAlive(FileDescriptor fd)
+	public void keepAlive(LFileDescriptor fd)
 	{
 		KeepAlive keepAlivePacket = new KeepAlive();
 		keepAlivePacket.receive(fd, false);
@@ -193,15 +194,15 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	/**
 	 * Recebe um pacote para atualizar o client hash de um dos clientes conectados.
-	 * @param fd referência da conexão com o cliente que será recebido.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
-	public void updateClientHash(FileDescriptor fd, LoginSessionData sd)
+	public void updateClientHash(LFileDescriptor fd)
 	{
 		UpdateClientHash updateClientHashPacket = new UpdateClientHash();
 		updateClientHashPacket.receive(fd, false);
 
+		LoginSessionData sd = fd.getSessionData();
 		sd.setClientHash(new ClientHash());
 		sd.getClientHash().set(updateClientHashPacket.getHashValue());
 
@@ -210,11 +211,11 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	/**
 	 * Envia o resultado de uma autenticação de conexão com o servidor de acesso.
-	 * @param fd referência da conexão com o cliente que será enviado.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param result resultado da autenticação solicitada pelo cliente.
 	 */
 
-	public void sendAuthResult(FileDescriptor fd, AuthResult result)
+	public void sendAuthResult(LFileDescriptor fd, AuthResult result)
 	{
 		RefuseLoginByte refuseLoginPacket = new RefuseLoginByte();
 		refuseLoginPacket.setResult(result);
@@ -226,11 +227,11 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	/**
 	 * Notifica o cliente que houve algum problema após a autenticação do acesso.
 	 * O acesso foi autenticado porém houve algum problema em liberar o acesso.
-	 * @param fd referência da conexão com o cliente que será enviado.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param result resultado da liberação do acesso para o cliente.
 	 */
 
-	public void sendNotifyResult(FileDescriptor fd, NotifyAuthResult result)
+	public void sendNotifyResult(LFileDescriptor fd, NotifyAuthResult result)
 	{
 		NotifyAuth packet = new NotifyAuth();
 		packet.setResult(result);
@@ -242,12 +243,12 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	/**
 	 * Envia o mesmo pacote para todos do servidor exceto a si mesmo.
 	 * Caso nenhum cliente seja definido será enviados a todos sem exceção.
-	 * @param fd referência da conexão com o cliente que não receberá o pacote
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param packet referência do pacote contendo os dados a serem enviados.
 	 * @return quantidade de clientes que tiverem os dados recebidos.
 	 */
 
-	public int sendAllWithoutOurSelf(FileDescriptor fd, IResponsePacket packet)
+	public int sendAllWithoutOurSelf(LFileDescriptor fd, IResponsePacket packet)
 	{
 		int count = 0;
 
@@ -266,15 +267,15 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	/**
 	 * Analisa uma solicitação de um cliente para gerar uma chave de acesso com o servidor.
 	 * Deve gerar a chave e enviar o mesmo para o cliente possuir a chave de acesso.
-	 * @param fd referência da conexão com o cliente que será enviado.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
-	public void parseRequestKey(FileDescriptor fd, LoginSessionData sd)
+	public void parseRequestKey(LFileDescriptor fd)
 	{
 		short md5KeyLength = (short) (12 + (random() % 4));
 		String md5Key = md5Salt(md5KeyLength);
 
+		LoginSessionData sd = fd.getSessionData();
 		sd.setMd5Key(md5Key);
 		sd.setMd5KeyLenght(md5KeyLength);
 
@@ -288,39 +289,42 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	/**
 	 * Envia ao cliente uma lista contendo os dados dos servidores de personagens.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
-	public void sendCharServerList(LoginSessionData sd)
+	public void sendCharServerList(LFileDescriptor fd)
 	{
+		LoginSessionData sd = fd.getSessionData();
 		CharServerList servers = getServer().getCharServerList();
 
 		ListCharServers packet = new ListCharServers();
 		packet.setServers(servers);
 		packet.setSessionData(sd);
-		packet.send(sd.getFileDescriptor());
+		packet.send(fd);
 
-		logDebug("char-server list sent fd#%d.\n", sd.getFileDescriptor().getID());
+		logDebug("char-server list sent fd#%d.\n", fd.getID());
 	}
 
 	/**
 	 * Notifica o cliente de que sua solicitação de acesso foi recusada pelo servidor.
 	 * Nesta notificação é permitido definir até quando o jogador será recusado.
-	 * @param sd sessão correspondente ao cliente que foi recusado pelo servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param result resultado da solicitação do acesso com o servidor.
 	 * @param blockDate até quando o jogador está sendo bloqueado (20b).
 	 */
 
-	public void refuseLogin(LoginSessionData sd, AuthResult result, String blockDate)
+	public void refuseLogin(LFileDescriptor fd, AuthResult result, String blockDate)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
 		if (sd.getVersion() >= dateToVersion(20120000))
 		{
 			RefuseLoginInt packet = new RefuseLoginInt();
 			packet.setBlockDate(blockDate);
 			packet.setResult(result);
-			packet.send(sd.getFileDescriptor());
+			packet.send(fd);
 
-			logDebug("refuse login int sent fd#%d.\n", sd.getFileDescriptor().getID());
+			logDebug("refuse login int sent fd#%d.\n", fd.getID());
 		}
 
 		else
@@ -328,19 +332,19 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			RefuseLoginByte packet = new RefuseLoginByte();
 			packet.setBlockDate(blockDate);
 			packet.setResult(result);
-			packet.send(sd.getFileDescriptor());
+			packet.send(fd);
 
-			logDebug("refuse login byte sent fd#%d.\n", sd.getFileDescriptor().getID());
+			logDebug("refuse login byte sent fd#%d.\n", fd.getID());
 		}
 	}
 
 	/**
 	 * Recusa a entrada de uma determinada sessão no servidor de acesso.
-	 * @param fd conexão do servidor de personagem com este servidor de acesso.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param result resultado que será mostrado ao cliente.
 	 */
 
-	public void refuseEnter(FileDescriptor fd, byte result)
+	public void refuseEnter(LFileDescriptor fd, byte result)
 	{
 		RefuseEnter packet = new RefuseEnter();
 		packet.setResult(result);
@@ -351,11 +355,11 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	/**
 	 * Notifica um conexão com um servidor de personagem o resultado do seu acesso.
-	 * @param fd conexão do servidor de personagem com este servidor de acesso.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param result resultado da solicitação de acesso da conexão acima.
 	 */
 
-	public void charServerResult(FileDescriptor fd, AuthResult result)
+	public void charServerResult(LFileDescriptor fd, AuthResult result)
 	{
 		CharServerConnectResult packet = new CharServerConnectResult();
 		packet.setResult(result);
@@ -367,10 +371,10 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	/**
 	 * Envia um pacote para uma conexão afim de mantê-la viva no sistema.
 	 * Esse pacote é enviado a um servidor de personagem quando este solicita um ping.
-	 * @param fd conexão do servidor de personagem com este servidor de acesso.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
-	public void pingCharRequest(FileDescriptor fd)
+	public void pingCharRequest(LFileDescriptor fd)
 	{
 		KeepAliveResult packet = new KeepAliveResult();
 		packet.send(fd);
@@ -380,13 +384,13 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	/**
 	 * Responde ao servidor de personagem que a conta possui os dados autenticados.
-	 * @param fd conexão do servidor de personagem com este servidor de acesso.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param node nó contendo as informações do acesso autenticado.
 	 * @param fdID código de identificação da sessão do servidor de personagens.
 	 * @param ok true se tiver sido autenticado ou false caso contrário.
 	 */
 
-	public void authAccount(FileDescriptor fd, AuthNode node, int fdID, boolean ok)
+	public void authAccount(LFileDescriptor fd, AuthNode node, int fdID, boolean ok)
 	{
 		AuthAccountResult response = new AuthAccountResult();
 		response.setAccountID(node.getAccountID());
@@ -413,11 +417,11 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	/**
 	 * Envia os dados de uma conta solicitada por um determinado servidor de personagem.
-	 * @param fd referência da conexão com o servidor para enviar e receber dados.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param account conta do qual terá os dados enviados ao servidor acima.
 	 */
 
-	public void sendAccountData(FileDescriptor fd, Account account)
+	public void sendAccountData(LFileDescriptor fd, Account account)
 	{
 		AccountDataResult packet = new AccountDataResult();
 		packet.setAccountID(account.getID());
@@ -460,7 +464,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		logDebug("account data sent fd#%d.\n", fd.getID());
 	}
 
-	public void sendAccountInfo(FileDescriptor fd, AccountInfoRequest ack, Account account)
+	public void sendAccountInfo(LFileDescriptor fd, AccountInfoRequest ack, Account account)
 	{
 		AccountInfoResult packet = new AccountInfoResult();
 		packet.setMapFD(ack.getMapFD());
@@ -493,12 +497,12 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	/**
 	 * Envia a todas as conexões estabelecidas que uma conta teve seu estado alterado.
-	 * @param fd referência da conexão com o servidor para enviar e receber dados.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param account referência da conta do qual está sendo alterada no sistema.
 	 * @param banned true se tiver sendo banida ou false se for outro estado.
 	 */
 
-	public void sendNotifyAccountState(FileDescriptor fd, Account account, boolean banned)
+	public void sendNotifyAccountState(LFileDescriptor fd, Account account, boolean banned)
 	{
 		AccountStateNotify notify = new AccountStateNotify();
 		notify.setAccountID(account.getID());

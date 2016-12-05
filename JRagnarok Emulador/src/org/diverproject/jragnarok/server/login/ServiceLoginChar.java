@@ -80,14 +80,16 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		@Override
 		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
+			LFileDescriptor lfd = (LFileDescriptor) fd;
+
 			if (!fd.isConnected())
 				return false;
 
-			return acknowledgePacket(fd);
+			return acknowledgePacket(lfd);
 		}
 	};
 
-	private boolean acknowledgePacket(FileDescriptor fd)
+	private boolean acknowledgePacket(LFileDescriptor fd)
 	{
 		AcknowledgePacket packet = new AcknowledgePacket();
 		packet.receive(fd, false);
@@ -115,7 +117,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	 * @param fd conexão do servidor de personagem que está enviando.
 	 */
 
-	private void updateUserCount(FileDescriptor fd)
+	private void updateUserCount(LFileDescriptor fd)
 	{
 		UpdateUserCount packet = new UpdateUserCount();
 		packet.receive(fd);

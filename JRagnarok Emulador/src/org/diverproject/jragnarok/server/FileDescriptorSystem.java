@@ -11,8 +11,6 @@ import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeceptionSource;
 import static org.diverproject.log.LogSystem.logInfo;
 
-import java.net.Socket;
-
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.util.collection.List;
@@ -70,35 +68,27 @@ public class FileDescriptorSystem
 	}
 
 	/**
-	 * Cria um novo Descritor de Arquivo que irá permitir trabalhar com uma conexão socket.
-	 * @param socket referência da conexão socket que foi estabelecida com o cliente.
-	 * @param listener quem deverá fazer a análise da conexão estabelecida com o servidor.
-	 * @return aquisição de uma novo Descritor de Arquivo a partir do socket definido.
+	 * Adiciona um Descritor de Arquivo ao sistema para que possa ser atualizado.
+	 * @param fd descritor de arquivo que será adicionado ao sistema.
+	 * @return true se conseguir adicionar ou false se já estiver cheio.
 	 */
 
-	public FileDescriptor newFileDecriptor(Socket socket, FileDescriptorListener listener)
+	public boolean addFileDecriptor(FileDescriptor fd)
 	{
 		synchronized (sessions)
 		{
-			FileDescriptor fd = new FileDescriptor(socket);
-			fd.setParseListener(listener);
-
-			if (!sessions.add(fd))
+			if (sessions.isFull() || !sessions.add(fd))
 			{
 				fd.close();
-
-				return null;
+				return false;
 			}
 
 			fd.id = indexOn(sessions, fd) + 1;
 			fd.system = this;
 
-			if (fd.id < 1)
-				return null;
-
 			logDebug("nova conexão recebida e registrada (id: %d, ip: %s).\n", fd.getID(), fd.getAddressString());
 
-			return fd;
+			return true;
 		}
 	}
 

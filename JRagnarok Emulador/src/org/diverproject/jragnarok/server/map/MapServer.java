@@ -4,8 +4,12 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.MAP_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.MAP_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newMapServerConfigs;
 
+import java.net.Socket;
+
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 
@@ -26,6 +30,15 @@ public class MapServer extends Server
 	public int getPort()
 	{
 		return getConfigs().getInt(MAP_PORT);
+	}
+
+	@Override
+	protected FileDescriptor acceptSocket(Socket socket, FileDescriptorListener listener)
+	{
+		MFileDescriptor fd = new MFileDescriptor(socket);
+		fd.setParseListener(listener);
+
+		return fd;
 	}
 
 	private final ServerListener listener = new ServerListener()

@@ -1,11 +1,11 @@
 package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
 import static org.diverproject.log.LogSystem.logExeception;
 
 import java.io.IOException;
 import java.net.Socket;
 
+import org.diverproject.jragnarok.server.common.SessionData;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.implementation.PacketBuilder;
@@ -28,7 +28,7 @@ import org.diverproject.util.stream.implementation.PacketBuilder;
  * @author Andrew
  */
 
-public class FileDescriptor
+public abstract class FileDescriptor
 {
 	/**
 	 * Flag que define o fim do descritor.
@@ -97,11 +97,6 @@ public class FileDescriptor
 	private FileDescriptorListener parseListener;
 
 	/**
-	 * Objeto em cache utilizado por esse descritor.
-	 */
-	private Object cache;
-
-	/**
 	 * Criador de pacotes.
 	 */
 	private PacketBuilder packetBuilder;
@@ -111,7 +106,7 @@ public class FileDescriptor
 	 * @param socket referência da conexão do cliente com o servidor.
 	 */
 
-	FileDescriptor(Socket socket)
+	public FileDescriptor(Socket socket)
 	{
 		this.socket = socket;
 		this.flag = new BitWise(FLAG_STRING);
@@ -202,26 +197,6 @@ public class FileDescriptor
 	}
 
 	/**
-	 * Cache permite vincular um determinado objeto para que possa ser usado.
-	 * @return aquisição do objeto em cache no descritor.
-	 */
-
-	public Object getCache()
-	{
-		return cache;
-	}
-
-	/**
-	 * Cache permite vincular um determinado objeto para que possa ser usado.
-	 * @param cache referência do objeto a armazenar em cache.
-	 */
-
-	public void setCache(Object cache)
-	{
-		this.cache = cache;
-	}
-
-	/**
 	 * O construtor de pacotes irá permitir o recebimento e envio de dados por pacote.
 	 * Através dele será possível dizer se é input/output, tamanho e nome do pacote.
 	 * @return aquisição do criador de pacotes desse Descritor de Arquivo.
@@ -251,7 +226,6 @@ public class FileDescriptor
 			socket.close();
 
 			socket = null;
-			cache = null;
 			parseListener = null;
 
 		} catch (IOException e) {
@@ -288,6 +262,15 @@ public class FileDescriptor
 		}
 	}
 
+	/**
+	 * Toda conexão estabelecida pode possuir dados relacionados a sua própria sessão.
+	 * Esses dados podem consistir em nome de usuário, código da conta ou personagem.
+	 * As informações nele contido irá depender do servidor do qual o está usando.
+	 * @return aquisição dos dados da sessão respectivo a esse descritor de arquivo.
+	 */
+
+	public abstract SessionData getSessionData();
+
 	@Override
 	public String toString()
 	{
@@ -296,9 +279,6 @@ public class FileDescriptor
 		description.append("id", id);
 		description.append("address", address.getString());
 		description.append("parse", parseListener);
-
-		if (cache != null)
-			description.append("cache", nameOf(cache));
 
 		return description.toString();
 	}

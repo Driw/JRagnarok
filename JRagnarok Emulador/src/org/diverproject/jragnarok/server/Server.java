@@ -292,7 +292,7 @@ public abstract class Server
 	/**
 	 * O analisador padrão é usado para determinar o despache dos novos clientes.
 	 * Toda nova conexão recebida será despachada para esse listener.
-	 * @param defaultParser referência do objeto que implementa esse listener.
+	 * @param defaultParser procedimento a ser executado pelas novas conexões.
 	 */
 
 	protected void setDefaultParser(FileDescriptorListener defaultParser)
@@ -589,7 +589,8 @@ public abstract class Server
 					try {
 
 						Socket socket = serverSocket.accept();
-						FileDescriptor fd = fileDescriptorSystem.newFileDecriptor(socket, defaultParser);
+						FileDescriptor fd = Server.this.acceptSocket(socket, defaultParser);
+						fileDescriptorSystem.addFileDecriptor(fd);
 
 						if (fd == null)
 							log("servidor está cheio, %s recusado.\n", SocketUtil.socketIP(socket));
@@ -646,6 +647,16 @@ public abstract class Server
 
 		logInfo("thread do servidor criada.\n");
 	}
+
+	/**
+	 * Procedimento chamado no momento em que uma conexão socket for recebida.
+	 * Deverá criar um descritor de arquivo conforme as necessidades do servidor.
+	 * @param socket nova conexão socket recebida pelo servidor.
+	 * @param listener procedimento a ser executado pelas novas conexões.
+	 * @return aquisição do descritor de arquivo referente a conexão socket.
+	 */
+
+	protected abstract FileDescriptor acceptSocket(Socket socket, FileDescriptorListener listener);
 
 	/**
 	 * Inicialização do servidor socket para receber as conexões dos clientes.

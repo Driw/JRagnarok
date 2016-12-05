@@ -46,7 +46,6 @@ import org.diverproject.jragnarok.server.login.control.AuthControl;
 import org.diverproject.jragnarok.server.login.control.OnlineControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AuthNode;
-import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.jragnarok.server.login.entities.OnlineLogin;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
@@ -54,6 +53,7 @@ import org.diverproject.util.SocketUtil;
 import org.diverproject.util.Time;
 import org.diverproject.util.lang.HexUtil;
 import org.diverproject.util.lang.IntUtil;
+
 /**
  * <h1>Serviço para Autenticar Acesso</h1>
  *
@@ -94,12 +94,11 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * Despacha um determinado cliente para o seu respectivo tipo de acesso solicitado.
 	 * Existem diversos tipos de acessos e cada um deles contém informações diferentes.
 	 * @param command código do pacote que foi recebido do cliente.
-	 * @param fd referência da conexão com o cliente para enviar e receber dados.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @return true se despachar corretamente ou false caso contrário.
 	 */
 
-	public boolean dispatch(short command, FileDescriptor fd, LoginSessionData sd)
+	public boolean dispatch(short command, LFileDescriptor fd)
 	{
 		switch (command)
 		{
@@ -112,10 +111,10 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			case PACKET_LOGIN_MD5:
 			case PACKET_LOGIN_MD5MAC:
 			case PACKET_LOGIN_MD5INFO:
-				return requestAuth(fd, sd, command);
+				return requestAuth(fd, command);
 
 			case PACKET_REQ_CHAR_SERVER_CONNECT:
-				return requestCharConnect(fd, sd);
+				return requestCharConnect(fd);
 
 			default:
 				String packet = HexUtil.parseInt(command, 4);
@@ -130,15 +129,15 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * Efetua a solicitação de acesso com o servidor de personagens recebido de um cliente.
 	 * Para este caso o cliente já é reconhecido como um jogador através do executável.
 	 * Deverá receber os dados do cliente adequadamente conforme o tipo de autenticação.
-	 * @param fd referência da conexão com o cliente para receber e enviar dados.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param command qual o comando que foi executado (tipo de pacote).
 	 * @return true se efetuar a análise com êxito ou false caso contrário.
 	 */
 
-	private boolean requestAuth(FileDescriptor fd, LoginSessionData sd, short command)
+	private boolean requestAuth(LFileDescriptor fd, short command)
 	{
 		boolean usingRawPassword = true;
+		LoginSessionData sd = fd.getSessionData();
 
 		switch (command)
 		{
@@ -209,22 +208,24 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				break;
 		}
 
-		return parseRequest(usingRawPassword, sd);
+		return parseRequest(fd, usingRawPassword);
 	}
 
 	/**
 	 * Procedimento que irá fazer a conclusão da autenticação da solicitação de um cliente.
 	 * Neste momentos os dados passados pelo cliente já terão sido lidos e guardados na sessão.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param usingRawPassword true se estiver usando senha direta ou false se for md5.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
 	 * @return true se for autenticado com êxito ou false caso contrário.
 	 */
 
-	private boolean parseRequest(boolean usingRawPassword, LoginSessionData sd)
+	private boolean parseRequest(LFileDescriptor fd, boolean usingRawPassword)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
 		if (usingRawPassword)
 		{
-			logNotice("solicitação de conexão de %s (ip: %s, version: %d)\n", sd.getUsername(), sd.getAddressString(), sd.getVersion());
+			logNotice("solicitação de conexão de %s (ip: %s, version: %d)\n", sd.getUsername(), fd.getAddressString(), sd.getVersion());
 
 			if (getConfigs().getBool("login.use_md5_password"))
 				sd.setPassword(md5Encrypt(sd.getPassword()));
@@ -234,7 +235,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		else
 		{
-			log("solicitação de conexão passdenc de %s (ip: %s, version: %d)\n", sd.getUsername(), sd.getAddressString(), sd.getVersion());
+			log("solicitação de conexão passdenc de %s (ip: %s, version: %d)\n", sd.getUsername(), fd.getAddressString(), sd.getVersion());
 
 			sd.getPassDencrypt().set(LoginSessionData.PASSWORD_DENCRYPT);
 			sd.getPassDencrypt().set(LoginSessionData.PASSWORD_DENCRYPT2);
@@ -243,74 +244,77 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		if (sd.getPassDencrypt().getValue() != 0 && getConfigs().getBool("login.use_md5_password"))
 		{
-			client.sendAuthResult(sd.getFileDescriptor(), AuthResult.REJECTED_FROM_SERVER);
+			client.sendAuthResult(fd, AuthResult.REJECTED_FROM_SERVER);
 			return false;
 		}
 
-		AuthResult result = login.authLogin(sd, false);
+		AuthResult result = login.authLogin(fd, false);
 
 		if (result != AuthResult.OK)
 		{
-			authFailed(sd, result);
+			authFailed(fd, result);
 			return false;
 		}
 
-		authOk(sd);
+		authOk(fd);
 		return true;
 	}
 
 	/**
 	 * Chamado internamente sempre que uma solicitação de acesso tiver falhado na autenticação.
 	 * Deve registrar a falha se habilitado o log e responder ao cliente qual o motivo da falha.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param result resultando obtido da autenticação feita com o cliente.
 	 */
 
-	private void authFailed(LoginSessionData sd, AuthResult result)
+	private void authFailed(LFileDescriptor fd, AuthResult result)
 	{
-		authFailedLog(sd, result);
-		authFailedResponse(sd, result);
+		authFailedLog(fd, result);
+		authFailedResponse(fd, result);
 	}
 
 	/**
 	 * Registra uma solicitação de acesso que não foi autenticada corretamente.
 	 * Esse registro é feito no banco de dados para identificar quem falhou.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param result resultando obtido da autenticação feita com o cliente.
 	 */
 
-	private void authFailedLog(LoginSessionData sd, AuthResult result)
+	private void authFailedLog(LFileDescriptor fd, AuthResult result)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
 		if (getConfigs().getBool("log.login"))
 		{
 			if (IntUtil.interval(result.CODE, 0, 15))
-				log.add(sd.getAddress(), sd, result.CODE, loginMessage(result.CODE));
+				log.add(fd.getAddress(), sd, result.CODE, loginMessage(result.CODE));
 
 			else if (IntUtil.interval(result.CODE, 99, 104))
-				log.add(sd.getAddress(), sd, result.CODE, loginMessage(result.CODE-83));
+				log.add(fd.getAddress(), sd, result.CODE, loginMessage(result.CODE-83));
 
 			else
-				log.add(sd.getAddress(), sd, result.CODE, loginMessage(22));
+				log.add(fd.getAddress(), sd, result.CODE, loginMessage(22));
 		}		
 
 		if (result.CODE == 0 || result.CODE == 1)
-			ipban.addBanLog(sd.getAddressString());
+			ipban.addBanLog(fd.getAddressString());
 	}
 
 	/**
 	 * Procedimento que irá responder ao cliente os detalhes do resultado da autenticação.
 	 * Caso o cliente esteja banido no servidor irá informar até quando o mesmo ocorre.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param result resultando obtido da autenticação feita com o cliente.
 	 */
 
-	private void authFailedResponse(LoginSessionData sd, AuthResult result)
+	private void authFailedResponse(LFileDescriptor fd, AuthResult result)
 	{
 		String blockDate = "";
+		LoginSessionData sd = fd.getSessionData();
 
 		if (result == AuthResult.BANNED_UNTIL)
 		{
-			Account account = (Account) sd.getFileDescriptor().getCache();
+			Account account = (Account) sd.getCache();
 			Time unbanTime = account.getUnban();
 
 			if (unbanTime != null && unbanTime.get() > 0)
@@ -319,38 +323,37 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				blockDate = "! Banido !";
 		}
 
-		client.refuseLogin(sd, result, blockDate);
+		client.refuseLogin(fd, result, blockDate);
 	}
 
 	/**
 	 * Chamado internamente sempre que uma solicitação de acesso tiver sido aprovada na autenticação.
 	 * O segundo passo é verificar a conexão e estado do servidor, grupos habilitados e se está online.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
-	private void authOk(LoginSessionData sd)
+	private void authOk(LFileDescriptor fd)
 	{
-		if (!authServerConnected(sd) || !authServerState(sd) || !authGroupAccount(sd) || !authIsntOnline(sd))
+		LoginSessionData sd = fd.getSessionData();
+
+		if (!authServerConnected(fd) || !authServerState(sd) || !authGroupAccount(fd) || !authIsntOnline(fd))
 		{
-			client.sendNotifyResult(sd.getFileDescriptor(), SERVER_CLOSED);
+			client.sendNotifyResult(fd, SERVER_CLOSED);
 			return;
 		}
 
-		Login login = new Login();
-		login.setID(sd.getID());
-		login.setUsername(sd.getUsername());
-		login.setPassword(sd.getPassword());
+		Account account = (Account) sd.getCache();
 
-		log.add(new InternetProtocol(sd.getAddress()), login, 100, "login ok");
+		log.add(new InternetProtocol(fd.getAddress()), account, 100, "login ok");
 
 		logNotice("conexão da conta '%s' aceita.\n", sd.getUsername());
 
-		client.sendCharServerList(sd);
+		client.sendCharServerList(fd);
 
 		AuthNode node = new AuthNode();
 		node.setAccountID(sd.getID());
 		node.setSeed(sd.getSeed());
-		node.getIP().set(sd.getAddress());
+		node.getIP().set(fd.getAddress());
 		node.setVersion(sd.getVersion());
 		node.setClientType(sd.getClientType());
 
@@ -371,13 +374,14 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 	/**
 	 * Faz a autenticação para verificar se há algum servidor de personagens conectado.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @return true se houver ao menos um servidor ou false se não houver nenhum
 	 */
 
-	private boolean authServerConnected(LoginSessionData sd)
+	private boolean authServerConnected(LFileDescriptor fd)
 	{
-		Account account = (Account) sd.getFileDescriptor().getCache();
+		LoginSessionData sd = fd.getSessionData();
+		Account account = (Account) sd.getCache();
 		String username = account.getUsername();
 
 		int serverConnect = 0;
@@ -412,11 +416,11 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * Faz a autenticação para verificar se o cliente está contido nos grupos habilitados.
 	 * Essa autenticação só será válida caso tenha sido configurado grupos de acesso.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @return true se estiver habilitado a conectar-se nesse servidor.
 	 */
 
-	private boolean authGroupAccount(LoginSessionData sd)
+	private boolean authGroupAccount(LFileDescriptor fd)
 	{
 		int groupToConnect = getConfigs().getInt("login.group_to_connnect");
 		int minGroupToConnect = getConfigs().getInt("login.min_group_to_connect");
@@ -424,7 +428,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		if (groupToConnect == 0 && minGroupToConnect == 0)
 			return true;
 
-		Account account = (Account) sd.getFileDescriptor().getCache();
+		Account account = (Account) fd.getSessionData().getCache();
 
 		return	authGroupToConnect(account, groupToConnect) ||
 				authMinGroupToConnect(account, groupToConnect, minGroupToConnect);
@@ -475,13 +479,14 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * Autentica um cliente verificando se há um outro cliente usando a conta acessada.
 	 * Caso haja um cliente usado a conta, deverá avisar quem está online e rejeitar o acesso.
-	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @return true se não houver ninguém na conta online ou false caso contrário.
 	 */
 
-	private boolean authIsntOnline(LoginSessionData sd)
+	private boolean authIsntOnline(LFileDescriptor fd)
 	{
-		Account account = (Account) sd.getFileDescriptor().getCache();
+		LoginSessionData sd = fd.getSessionData();
+		Account account = (Account) sd.getCache();
 		OnlineLogin online = onlines.get(account.getID());
 
 		if (online != null)
@@ -493,7 +498,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 			if (server != null)
 			{
-				authIsOnline(sd.getFileDescriptor(), account, online, server);
+				authIsOnline(fd, account, online, server);
 				return true;
 			}
 
@@ -507,13 +512,13 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * A autenticação do cliente indicou que a conta já está sendo usada (online).
 	 * Notificar ao cliente de que a conta que o servidor ainda o considera online.
-	 * @param fd referência da conexão com o cliente para receber e enviar dados.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param account objeto contendo os detalhes da conta que está sendo acessada.
 	 * @param online objeto que contém o gatilho para efetuar logout forçado.
 	 * @param server servidor de personagens do qual a conta está online.
 	 */
 
-	private void authIsOnline(FileDescriptor fd, Account account, OnlineLogin online, ClientCharServer server)
+	private void authIsOnline(LFileDescriptor fd, Account account, OnlineLogin online, ClientCharServer server)
 	{
 		logNotice("usuário '%s' já está online em '%s'.\n", account.getUsername(), server.getName());
 
@@ -540,16 +545,17 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 	/**
 	 * Chamado quando um servidor de personagens solicita a conexão com o servidor de acesso.
-	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
 	 * @return true se tiver sido autorizado ou false caso contrário.
 	 */
 
-	private boolean requestCharConnect(FileDescriptor fd, LoginSessionData sd)
+	private boolean requestCharConnect(LFileDescriptor fd)
 	{
 		CharServerConnectRequest ccPacket = new CharServerConnectRequest();
 		ccPacket.receive(fd, false);
 
+		LoginSessionData sd = fd.getSessionData();
 		sd.setUsername(ccPacket.getUsername());
 		sd.setPassword(ccPacket.getPassword());
 
@@ -565,12 +571,12 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		short type = ccPacket.getType();
 		short newDisplay = ccPacket.getNewDisplay();
 
-		logInfo("conexão solicitada do servidor de personagens %s@%s (account: %s, pass: %s).\n", serverName, sd.getAddressString(), sd.getUsername(), sd.getPassword());
+		logInfo("conexão solicitada do servidor de personagens %s@%s (account: %s, pass: %s).\n", serverName, fd.getAddressString(), sd.getUsername(), sd.getPassword());
 
 		String message = format("charserver - %s@%s:%d", serverName, SocketUtil.socketIP(serverIP), serverPort);
 		log.add(fd.getAddress(), sd, 100, message);
 
-		AuthResult result = login.authLogin(sd, true);
+		AuthResult result = login.authLogin(fd, true);
 
 		if (getServer().isState(ServerState.RUNNING) && result == AuthResult.OK && fd.isConnected())
 		{

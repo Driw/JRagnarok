@@ -7,9 +7,8 @@ import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.util.lang.IntUtil.interval;
 
-import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.common.LoginSeed;
+import org.diverproject.jragnarok.server.common.SessionData;
 import org.diverproject.jragnarok.server.login.entities.Group;
 import org.diverproject.jragnarok.server.login.entities.Pincode;
 import org.diverproject.jragnarok.server.login.entities.Vip;
@@ -17,11 +16,8 @@ import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
 
-public class CharSessionData
+public class CharSessionData extends SessionData
 {
-	private FileDescriptor fileDescriptor;
-
-	private int accountID;
 	private boolean auth;
 
 	private LoginSeed seed;
@@ -39,47 +35,13 @@ public class CharSessionData
 
 	private BitWise flag;
 	private Time charBlockTime;
-	private int version;
-	private ClientType clientType;
 
-	public CharSessionData(FileDescriptor fileDecriptor)
+	public CharSessionData()
 	{
-		this.fileDescriptor = fileDecriptor;
-
 		this.charBlockTime = new Time();
 		this.expiration = new Time();
 		this.flag = new BitWise();
 		this.chars = new CharData[MAX_CHARS];
-	}
-
-	public FileDescriptor getFileDescriptor()
-	{
-		return fileDescriptor;
-	}
-
-	void setFileDescriptor(FileDescriptor fileDecriptor)
-	{
-		this.fileDescriptor = fileDecriptor;
-	}
-
-	public int getAddress()
-	{
-		return fileDescriptor.getAddress();
-	}
-
-	public String getAddressString()
-	{
-		return fileDescriptor.getAddressString();
-	}
-
-	public int getAccountID()
-	{
-		return accountID;
-	}
-
-	public void setAccountID(int accountID)
-	{
-		this.accountID = accountID;
 	}
 
 	public boolean isAuth()
@@ -196,33 +158,9 @@ public class CharSessionData
 		return charBlockTime;
 	}
 
-	public int getVersion()
-	{
-		return version;
-	}
-
-	public void setVersion(int version)
-	{
-		this.version = version;
-	}
-
-	public ClientType getClientType()
-	{
-		return clientType;
-	}
-
-	public void setClientType(ClientType clientType)
-	{
-		this.clientType = clientType;
-	}
-
 	@Override
-	public String toString()
+	public void toString(ObjectDescription description)
 	{
-		ObjectDescription description = new ObjectDescription(getClass());
-
-		description.append("fd", fileDescriptor.getID());
-
 		if (auth)
 			description.append("auth");
 
@@ -249,9 +187,5 @@ public class CharSessionData
 
 		description.append("flag", flag.toStringProperties());
 		description.append("charBlockTime", charBlockTime);
-		description.append("version", version);
-		description.append("clientType", clientType);
-
-		return description.toString();
 	}
 }

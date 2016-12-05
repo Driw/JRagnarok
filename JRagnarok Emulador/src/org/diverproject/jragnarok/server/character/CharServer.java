@@ -4,8 +4,12 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newCharServerConfigs;
 
+import java.net.Socket;
+
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.character.control.AuthControl;
@@ -252,6 +256,15 @@ public class CharServer extends Server
 		return getConfigs().getInt(CHAR_PORT);
 	}
 
+	@Override
+	protected FileDescriptor acceptSocket(Socket socket, FileDescriptorListener listener)
+	{
+		CFileDescriptor fd = new CFileDescriptor(socket);
+		fd.setParseListener(listener);
+
+		return fd;
+	}
+
 	/**
 	 * Listener que irá executar as operações necessárias conforme mudanças de estado do servidor.
 	 */
@@ -306,7 +319,6 @@ public class CharServer extends Server
 			charClient = new ServiceCharClient(CharServer.this);
 			charServerAuth = new ServiceCharServerAuth(CharServer.this);
 
-			charServer.init();
 			charLogin.init();
 			charClient.init();
 			charServerAuth.init();
@@ -338,7 +350,6 @@ public class CharServer extends Server
 		@Override
 		public void onDestroy() throws RagnarokException
 		{
-			charServer.destroy();
 			charLogin.destroy();
 			charClient.destroy();
 			charServerAuth.destroy();

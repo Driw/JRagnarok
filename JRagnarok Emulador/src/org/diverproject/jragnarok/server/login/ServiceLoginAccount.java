@@ -19,7 +19,6 @@ import org.diverproject.jragnarok.packets.request.BanAccountRequest;
 import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
 import org.diverproject.jragnarok.packets.request.UpdateAccountState;
 import org.diverproject.jragnarok.packets.response.RefuseEnter;
-import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
 import org.diverproject.jragnarok.server.login.entities.AuthNode;
@@ -33,7 +32,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		super(server);
 	}
 
-	public boolean dispatch(short command, FileDescriptor fd)
+	public boolean dispatch(short command, LFileDescriptor fd)
 	{
 		switch (command)
 		{
@@ -59,7 +58,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		}
 	}
 
-	private boolean individualRequests(short command, FileDescriptor fd)
+	private boolean individualRequests(short command, LFileDescriptor fd)
 	{
 		switch (command)
 		{
@@ -95,7 +94,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o cliente da solicitação.
 	 */
 
-	private void requestAuthAccount(FileDescriptor fd)
+	private void requestAuthAccount(LFileDescriptor fd)
 	{
 		AuthAccountRequest packet = new AuthAccountRequest();
 		packet.receive(fd);
@@ -128,7 +127,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o cliente da solicitação.
 	 */
 
-	private void requestAccountData(FileDescriptor fd)
+	private void requestAccountData(LFileDescriptor fd)
 	{
 		AccountDataRequest packet = new AccountDataRequest();
 		packet.receive(fd);
@@ -148,7 +147,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o cliente da solicitação.
 	 */
 
-	private void requestAccountInfo(FileDescriptor fd)
+	private void requestAccountInfo(LFileDescriptor fd)
 	{
 		AccountInfoRequest packet = new AccountInfoRequest();
 
@@ -163,7 +162,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o cliente da solicitação.
 	 */
 
-	private void ackChangeEmail(FileDescriptor fd)
+	private void ackChangeEmail(LFileDescriptor fd)
 	{
 		ChangeEmailRequest packet = new ChangeEmailRequest();
 		packet.receive(fd);
@@ -203,7 +202,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o cliente da solicitação.
 	 */
 
-	private void updateAccountState(FileDescriptor fd)
+	private void updateAccountState(LFileDescriptor fd)
 	{
 		UpdateAccountState packet = new UpdateAccountState();
 		packet.receive(fd);
@@ -239,7 +238,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o cliente da solicitação.
 	 */
 
-	private void banAccount(FileDescriptor fd)
+	private void banAccount(LFileDescriptor fd)
 	{
 		BanAccountRequest packet = new BanAccountRequest();
 		packet.receive(fd);

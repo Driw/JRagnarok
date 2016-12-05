@@ -13,10 +13,13 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newLoginServer
 import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
 import static org.diverproject.log.LogSystem.logInfo;
 
+import java.net.Socket;
+
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorAction;
+import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.Timer;
@@ -30,7 +33,7 @@ import org.diverproject.jragnarok.server.login.control.IpBanControl;
 import org.diverproject.jragnarok.server.login.control.LoginLogControl;
 import org.diverproject.jragnarok.server.login.control.OnlineControl;
 import org.diverproject.jragnarok.server.login.control.PincodeControl;
-import org.diverproject.jragnarok.server.login.entities.Login;
+import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 
 /**
@@ -294,6 +297,15 @@ public class LoginServer extends Server
 		return getConfigs().getInt(LOGIN_PORT);
 	}
 
+	@Override
+	protected LFileDescriptor acceptSocket(Socket socket, FileDescriptorListener listener)
+	{
+		LFileDescriptor fd = new LFileDescriptor(socket);
+		fd.setParseListener(listener);
+
+		return fd;
+	}
+
 	/**
 	 * Listener que implementa os métodos para alteração de estado do servidor.
 	 */
@@ -383,13 +395,13 @@ public class LoginServer extends Server
 		{
 			logInfo("o servidor de acesso está pronto (porta: %d).\n", getPort());
 
-			Login login = new Login();
-			login.setUsername(getConfigs().getString(LOGIN_USERNAME));
-			login.setPassword(getConfigs().getString(LOGIN_PASSWORD));
+			Account account = new Account();
+			account.setUsername(getConfigs().getString(LOGIN_USERNAME));
+			account.setPassword(getConfigs().getString(LOGIN_PASSWORD));
 
 			// TODO confirmar usuário e senha
 
-			logService.add(getAddress(), login, 100, "login server started");
+			logService.add(getAddress(), account, 100, "login server started");
 		}
 
 		@Override

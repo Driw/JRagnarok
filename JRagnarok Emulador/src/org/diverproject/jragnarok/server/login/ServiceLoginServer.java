@@ -56,24 +56,25 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * Procedimento chamado quando o serviço de identificação do cliente tiver autenticado o mesmo.
 	 * Aqui deverá ser autenticado os dados que foram passados pelo cliente em relação a uma conta.
 	 * Deverá garantir primeiramente que o nome de usuário é válido para se fazer um acesso.
-	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param server true se o cliente for um servidor ou false caso seja um jogador.
 	 * @return resultado da autenticação da solicitação para acesso de uma conta.
 	 */
 
-	public AuthResult authLogin(LoginSessionData sd, boolean server)
+	public AuthResult authLogin(LFileDescriptor fd, boolean server)
 	{
 		AuthResult result = null;
+		LoginSessionData sd = fd.getSessionData();
 
 		if ((result = authClientVersion(sd)) != OK)
 			return result;
 
-		if ((result = makeLoginAccount(sd, server)) != OK)
+		if ((result = makeLoginAccount(fd, server)) != OK)
 			return result;
 
-		Account account = (Account) sd.getFileDescriptor().getCache();
+		Account account = (Account) sd.getCache();
 
-		logNotice("autenticação aceita (id: %d, username: %s, ip: %s).\n", account.getID(), account.getUsername(), sd.getAddressString());
+		logNotice("autenticação aceita (id: %d, username: %s, ip: %s).\n", account.getID(), account.getUsername(), fd.getAddressString());
 
 		sd.setID(account.getID());
 		sd.getLastLogin().set(account.getLastLogin().get());
@@ -83,11 +84,11 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		sd.getSeed().genSecond();
 
 		account.getLastLogin().set(now());
-		account.getLastIP().set(sd.getAddress());
+		account.getLastIP().set(fd.getAddress());
 		account.setLoginCount(account.getLoginCount() + 1);
 
 		if (!accounts.set(account))
-			logError("falha ao persistir conta (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
+			logError("falha ao persistir conta (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
 
 		return OK;
 	}
@@ -117,40 +118,41 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 	/**
 	 * Comunica-se com o controle de contas para obter todos os dados da conta desejada.
-	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param server true se o cliente for um servidor ou false se for um jogador.
 	 * @return resultado da obtenção dos dados da conta que o cliente passou,
 	 * caso os dados tenham sido obtidos com êxito ficaram no cache do FileDescriptor.
 	 */
 
-	private AuthResult makeLoginAccount(LoginSessionData sd, boolean server)
+	private AuthResult makeLoginAccount(LFileDescriptor fd, boolean server)
 	{
+		LoginSessionData sd = fd.getSessionData();
 		Account account = accounts.get(sd.getUsername());
 
 		if (account == null)
 		{
-			logNotice("usuário não encontrado (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
+			logNotice("usuário não encontrado (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
 			return UNREGISTERED_ID;
 		}
 
 		AuthResult result = AuthResult.OK;
 
-		if ((result = authPassword(sd, account)) != OK)
+		if ((result = authPassword(fd, account)) != OK)
 			return result;
 
-		if ((result = authExpirationTime(sd, account)) != OK)
+		if ((result = authExpirationTime(fd, account)) != OK)
 			return result;
 
-		if ((result = authBanTime(sd, account)) != OK)
+		if ((result = authBanTime(fd, account)) != OK)
 			return result;
 
-		if ((result = checkState(sd, account)) != OK)
+		if ((result = checkState(fd, account)) != OK)
 			return result;
 
-		if ((result = authClientHash(sd, account, server)) != OK)
+		if ((result = authClientHash(fd, account, server)) != OK)
 			return result;
 
-		sd.getFileDescriptor().setCache(account);
+		sd.setCache(account);
 
 		return OK;
 	}
@@ -158,18 +160,19 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	/**
 	 * Autentica se a senha passada pelo cliente corresponde com a senha da conta acessada.
 	 * Caso não sejam iguais o cliente receberá uma mensagem de que a conta não pode ser acessada.
-	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
 	 * @return resultado da autenticação da senha passada pelo cliente com a da conta.
 	 */
 
-	private AuthResult authPassword(LoginSessionData sd, Account account)
+	private AuthResult authPassword(LFileDescriptor fd, Account account)
 	{
+		LoginSessionData sd = fd.getSessionData();
 		String password = account.getPassword();
 
 		if (!sd.getPassword().equals(password))
 		{
-			logNotice("senha incorreta (username: %s, password: %s, receive pass: %s, ip: %s).\n", sd.getUsername(), sd.getPassword(), password, sd.getAddressString());
+			logNotice("senha incorreta (username: %s, password: %s, receive pass: %s, ip: %s).\n", sd.getUsername(), sd.getPassword(), password, fd.getAddressString());
 			return INCORRECT_PASSWORD;
 		}
 
@@ -179,16 +182,18 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	/**
 	 * Autentica o tempo de expiração da conta acessada pelo cliente.
 	 * Caso a conta já tenha sido expirada o cliente deverá ser informado sobre.
-	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
 	 * @return resultado da autenticação sobre o tempo de expiração da conta.
 	 */
 
-	private AuthResult authExpirationTime(LoginSessionData sd, Account account)
+	private AuthResult authExpirationTime(LFileDescriptor fd, Account account)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
 		if (!account.getExpiration().isNull() && account.getExpiration().get() < now())
 		{
-			logNotice("conta expirada (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
+			logNotice("conta expirada (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
 			return EXPIRED;
 		}
 
@@ -198,16 +203,18 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	/**
 	 * Autentica o tempo de banimento da conta acessada pelo cliente.
 	 * Caso a conta ainda esteja banida o cliente deverá ser informado sobre.
-	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
 	 * @return resultado da autenticação sobre o tempo de banimento da conta.
 	 */
 
-	private AuthResult authBanTime(LoginSessionData sd, Account account)
+	private AuthResult authBanTime(LFileDescriptor fd, Account account)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
 		if (!account.getUnban().isNull() && account.getUnban().get() < now())
 		{
-			logNotice("conta banida (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
+			logNotice("conta banida (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
 			return BANNED_UNTIL;
 		}
 
@@ -217,16 +224,18 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	/**
 	 * Autentica o estado atual da conta acessada pelo cliente.
 	 * Caso a conta esteja em um estado inacessível o cliente deve ser informado sobre.
-	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
 	 * @return resultado da autenticação do estado atual da conta.
 	 */
 
-	private AuthResult checkState(LoginSessionData sd, Account account)
+	private AuthResult checkState(LFileDescriptor fd, Account account)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
 		if (account.getState() != NONE)
 		{
-			logNotice("conexão recusada (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
+			logNotice("conexão recusada (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
 			return AuthResult.parse(account.getState().CODE - 1);
 		}
 
@@ -235,19 +244,21 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 	/**
 	 * Autentica o hash passado pelo cliente para realizar o acesso com o servidor.
-	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
 	 * @param server true se o cliente for um servidor ou false caso seja um jogador.
 	 * @return resultado da autenticação do hash passado pelo cliente para com o servidor.
 	 */
 
-	private AuthResult authClientHash(LoginSessionData sd, Account account, boolean server)
+	private AuthResult authClientHash(LFileDescriptor fd, Account account, boolean server)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
 		if (getConfigs().getBool("client.hash_check") && !server)
 		{
 			if (sd.getClientHash() == null)
 			{
-				logNotice("client não enviou hash (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
+				logNotice("client não enviou hash (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
 				return EXE_LASTED_VERSION;
 			}
 
@@ -272,7 +283,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 			if (!match)
 			{
-				logNotice("client hash inválido (username: %s, ip: %s).\n", sd.getUsername(), sd.getAddressString());
+				logNotice("client hash inválido (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
 				return EXE_LASTED_VERSION;
 			}
 		}
