@@ -1,47 +1,47 @@
 package org.diverproject.jragnarok.packets.request;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_USER_COUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHAR_MAP_USER_COUNT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
-public class UpdateUserCount extends RequestPacket
+public class CharMapUserCountRequest extends RequestPacket
 {
-	private int count;
+	private int users;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putInt(count);
+		output.putInt(users);
 	}
 
 	@Override
 	protected void receiveInput(Input input)
 	{
-		count = input.getInt();
+		users = input.getInt();
 	}
 
-	public int getCount()
+	public int getUsers()
 	{
-		return count;
+		return users;
 	}
 
-	public void setCount(int count)
+	public void setUsers(int users)
 	{
-		this.count = count;
+		this.users = users;
 	}
 
 	@Override
 	public String getName()
 	{
-		return "UPDATE_USER_COUNT";
+		return "REQ_CHAR_MAP_USER_COUNT";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_UPDATE_USER_COUNT;
+		return PACKET_REQ_CHAR_MAP_USER_COUNT;
 	}
 
 	@Override

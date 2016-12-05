@@ -1,3 +1,12 @@
+05.12.2016 - 1.3.121
+- OnlineCharControl não possuía cleanup para limpar usuários que já estão offline.
+- Pequenos ajustes para CharServer referentes a serviço e CFileDescriptor.
+
+05.12.2016 - 1.3.120
+- Adicionando mais códigos de identificação dos pacotes disponíveis no sistema.
+- AuthAccountResult não estava sendo implementado como PacketRequest.
+- UpdateUserCount precisava do setUsers para funcionar adequadamente.
+
 05.12.2016 - 1.3.119
 - Configurações do sistema de Código PIN adicionado.
 

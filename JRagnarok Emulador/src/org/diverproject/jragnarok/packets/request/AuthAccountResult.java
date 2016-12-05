@@ -2,11 +2,12 @@ package org.diverproject.jragnarok.packets.request;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_ACCOUNT;
 
-import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
-public class AuthAccountResult extends ResponsePacket
+public class AuthAccountResult extends RequestPacket
 {
 	public static final byte OK = 0;
 	public static final byte FAILED = 1;
@@ -31,9 +32,31 @@ public class AuthAccountResult extends ResponsePacket
 		output.putByte(clientType.CODE);
 	}
 
+	@Override
+	protected void receiveInput(Input input)
+	{
+		accountID = input.getInt();
+		firstSeed = input.getInt();
+		secondSeed = input.getInt();
+		result = input.getByte();
+		requestID = input.getInt();
+		version = input.getInt();
+		clientType = ClientType.parse(input.getByte());
+	}
+
+	public int getAccountID()
+	{
+		return accountID;
+	}
+
 	public void setAccountID(int accountID)
 	{
 		this.accountID = accountID;
+	}
+
+	public int getFirstSeed()
+	{
+		return firstSeed;
 	}
 
 	public void setFirstSeed(int firstSeed)
@@ -41,9 +64,19 @@ public class AuthAccountResult extends ResponsePacket
 		this.firstSeed = firstSeed;
 	}
 
+	public int getSecondSeed()
+	{
+		return secondSeed;
+	}
+
 	public void setSecondSeed(int secondSeed)
 	{
 		this.secondSeed = secondSeed;
+	}
+
+	public byte getResult()
+	{
+		return result;
 	}
 
 	public void setResult(byte result)
@@ -51,9 +84,19 @@ public class AuthAccountResult extends ResponsePacket
 		this.result = result;
 	}
 
+	public int getRequestID()
+	{
+		return requestID;
+	}
+
 	public void setRequestID(int requestID)
 	{
 		this.requestID = requestID;
+	}
+
+	public int getVersion()
+	{
+		return version;
 	}
 
 	public void setVersion(int version)
@@ -61,9 +104,14 @@ public class AuthAccountResult extends ResponsePacket
 		this.version = version;
 	}
 
-	public void setClientType(ClientType clienType)
+	public ClientType getClientType()
 	{
-		this.clientType = clienType;
+		return clientType;
+	}
+
+	public void setClientType(ClientType clientType)
+	{
+		this.clientType = clientType;
 	}
 
 	@Override

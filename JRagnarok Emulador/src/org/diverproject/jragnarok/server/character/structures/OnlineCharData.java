@@ -19,6 +19,17 @@ import org.diverproject.util.ObjectDescription;
 public class OnlineCharData
 {
 	/**
+	 * Código para definir que o servidor é desconhecido.
+	 */
+	public static final int UNKNOW_SERVER = -2;
+
+	/**
+	 * Código para definir que nenhum servidor foi selecionado.
+	 */
+	public static final int NO_SERVER = 1;
+
+
+	/**
 	 * Descritor de Arquivo da conexão do jogador.
 	 */
 	private FileDescriptor fd;

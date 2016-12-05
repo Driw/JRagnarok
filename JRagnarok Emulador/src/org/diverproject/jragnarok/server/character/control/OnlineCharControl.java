@@ -8,6 +8,7 @@ import static org.diverproject.log.LogSystem.logExeception;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Iterator;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
@@ -27,7 +28,7 @@ import org.diverproject.util.collection.abstraction.IntegerLittleMap;
  * @author Andrew
  */
 
-public class OnlineCharControl extends AbstractControl
+public class OnlineCharControl extends AbstractControl implements Iterable<OnlineCharData>
 {
 	/**
 	 * Mapeamento dos jogadores que se encontram online no sistema.
@@ -55,7 +56,7 @@ public class OnlineCharControl extends AbstractControl
 			ps.executeUpdate();
 
 		} catch (SQLException | RagnarokException e) {
-			logError("falha ao deixar jogadores como offline:");
+			logError("falha ao deixar jogadores como offline:\n");
 			logExeception(e);
 		}
 	}
@@ -202,6 +203,32 @@ public class OnlineCharControl extends AbstractControl
 	}
 
 	/**
+	 * Efetua uma limpeza deixando jogadores offline em servidores desconhecidos,
+	 * como também remover informações dos jogadores que não estejam em um servidor.
+	 */
+
+	public void cleanup()
+	{
+		for (OnlineCharData online : cache)
+		{
+			if (online.getFileDescriptor() != null)
+				continue;
+
+			if (online.getServer() == OnlineCharData.UNKNOW_SERVER)
+				try {
+					setCharOnline(online.getCharID(), false);
+				} catch (RagnarokException e) {
+					logExeception(e);
+				}
+
+			if (online.getServer() < 0)
+				cache.remove(online);
+		}
+
+		logDebug("%d jogadores online.\n", cache.size());
+	}
+
+	/**
 	 * Atualiza a informação de todos os jogadores e conta online para offline.
 	 * Além disso remove todos os objetos contendo os dados de online do controle.
 	 */
@@ -222,5 +249,11 @@ public class OnlineCharControl extends AbstractControl
 	public void toString(ObjectDescription description)
 	{
 		description.append("online", cache.size());
+	}
+
+	@Override
+	public Iterator<OnlineCharData> iterator()
+	{
+		return cache.iterator();
 	}
 }
