@@ -31,10 +31,13 @@ public class CharSessionData extends SessionData
 	private Group group;
 	private Pincode pincode;
 
+	private byte charSlots;
 	private CharData chars[];
 
 	private BitWise flag;
 	private Time charBlockTime;
+
+	private int charactersMove;
 
 	public CharSessionData()
 	{
@@ -99,11 +102,6 @@ public class CharSessionData extends SessionData
 		return expiration;
 	}
 
-	public void setExpiration(Time expiration)
-	{
-		this.expiration = expiration;
-	}
-
 	public Vip getVip()
 	{
 		return vip;
@@ -134,18 +132,25 @@ public class CharSessionData extends SessionData
 		this.pincode = pincode;
 	}
 
-	public CharData getChars(int index)
+	public byte getCharSlots()
+	{
+		return charSlots;
+	}
+
+	public void setCharSlots(byte charSlots)
+	{
+		this.charSlots = charSlots;
+	}
+
+	public CharData getCharData(int index)
 	{
 		return interval(index, 0, chars.length - 1) ? chars[index] : null;
 	}
 
-	public void setChars(CharData... chars)
+	public void setCharData(CharData data, int index)
 	{
-		for (int i = 0; i < chars.length; i++)
-			this.chars[i] = chars[i];
-
-		for (int i = chars.length; i < this.chars.length; i++)
-			this.chars[i] = null;
+		if (interval(index, 0, chars.length - 1))
+			chars[index] = data;
 	}
 
 	public BitWise getFlag()
@@ -156,6 +161,16 @@ public class CharSessionData extends SessionData
 	public Time getCharBlockTime()
 	{
 		return charBlockTime;
+	}
+
+	public int getCharactersMove()
+	{
+		return charactersMove;
+	}
+
+	public void setCharactersMove(int charactersMove)
+	{
+		this.charactersMove = charactersMove;
 	}
 
 	@Override

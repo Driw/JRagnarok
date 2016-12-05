@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.packets.request;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_ACCOUNT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
@@ -9,13 +10,10 @@ import org.diverproject.util.stream.Output;
 
 public class AuthAccountResult extends RequestPacket
 {
-	public static final byte OK = 0;
-	public static final byte FAILED = 1;
-
 	private int accountID;
 	private int firstSeed;
 	private int secondSeed;
-	private byte result;
+	private boolean result;
 	private int requestID;
 	private int version;
 	private ClientType clientType;
@@ -26,7 +24,7 @@ public class AuthAccountResult extends RequestPacket
 		output.putInt(accountID);
 		output.putInt(firstSeed);
 		output.putInt(secondSeed);
-		output.putByte(result);
+		output.putByte(b(result ? 1 : 0));
 		output.putInt(requestID);
 		output.putInt(version);
 		output.putByte(clientType.CODE);
@@ -38,7 +36,7 @@ public class AuthAccountResult extends RequestPacket
 		accountID = input.getInt();
 		firstSeed = input.getInt();
 		secondSeed = input.getInt();
-		result = input.getByte();
+		result = input.getByte() == 1 ? true : false;
 		requestID = input.getInt();
 		version = input.getInt();
 		clientType = ClientType.parse(input.getByte());
@@ -74,12 +72,12 @@ public class AuthAccountResult extends RequestPacket
 		this.secondSeed = secondSeed;
 	}
 
-	public byte getResult()
+	public boolean isResult()
 	{
 		return result;
 	}
 
-	public void setResult(byte result)
+	public void setResult(boolean result)
 	{
 		this.result = result;
 	}

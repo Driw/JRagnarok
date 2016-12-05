@@ -1,12 +1,19 @@
 package org.diverproject.jragnarok.server.character.structures;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_HP;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SP;
 import static org.diverproject.jragnarok.JRagnarokConstants.MIN_NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.util.lang.IntUtil.interval;
+import static org.diverproject.util.lang.IntUtil.limit;
 import static org.diverproject.util.lang.IntUtil.min;
 
+import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.Time;
 import org.diverproject.util.lang.ShortUtil;
+import org.diverproject.util.lang.StringUtil;
 
 /**
  * <h1>Personagem</h1>
@@ -36,6 +43,12 @@ public class Character
 	public static final String UNKNOWN = "Desconhecido";
 
 	/**
+	 * Tamanho em bytes dos dados enviados de um personagem por pacote.
+	 */
+	public static final int PACKET_BYTES = 144;
+
+
+	/**
 	 * Código de identificação do personagem.
 	 */
 	private int id;
@@ -58,12 +71,12 @@ public class Character
 	/**
 	 * Pontos de atributos disponíveis para distribuir.
 	 */
-	private int statusPoint;
+	private short statusPoint;
 
 	/**
 	 * Pontos de habilidades disponíveis para distribuir.
 	 */
-	private int skillPoint;
+	private short skillPoint;
 
 	/**
 	 * Código de identificação da classe.
@@ -71,9 +84,34 @@ public class Character
 	private short jobID;
 
 	/**
+	 * Quantidade atual de HP.
+	 */
+	private int hp;
+
+	/**
+	 * Quantidade máxima de SP.
+	 */
+	private int maxHP;
+
+	/**
+	 * Quantidade atual de SP.
+	 */
+	private short sp;
+
+	/**
+	 * Quantidade máxima de SP.
+	 */
+	private short maxSP;
+
+	/**
 	 * Tempo em minutos de chat banido por abuso do chat.
 	 */
 	private short manner;
+
+	/**
+	 * TODO ?
+	 */
+	private short karma;
 
 	/**
 	 * Nível de base.
@@ -86,44 +124,74 @@ public class Character
 	private int jobLevel;
 
 	/**
-	 * Pontos distribuídos em força.
+	 * Código de identificação do grupo.
 	 */
-	private int strength;
-
-	/**
-	 * Pontos distribuídos em agilidade.
-	 */
-	private int agility;
-
-	/**
-	 * Pontos distribuídos em vitalidade.
-	 */
-	private int vitality;
-
-	/**
-	 * Pontos distribuídos em inteligência.
-	 */
-	private int intelligence;
-
-	/**
-	 * Pontos distribuídos em destreza.
-	 */
-	private int dexterity;
-
-	/**
-	 * Pontos distribuídos em sorte.
-	 */
-	private int luck;
-
-	/* TODO
 	private int partyID;
+
+	/**
+	 * Código de identificação do clã.
+	 */
 	private int guildID;
+
+	/**
+	 * Código de identificação do mascote.
+	 */
 	private int petID;
+
+	/**
+	 * Código de identificação do homúnculo.
+	 */
 	private int homunculuID;
+
+	/**
+	 * Código de identificação do assistente.
+	 */
 	private int mercenaryID;
+
+	/**
+	 * Código de identificação do elemental.
+	 */
 	private int elementalID;
+
+	/**
+	 * Código de identificação da tribo.
+	 */
 	private int clanID;
-	*/
+
+	/**
+	 * Efeitos de estado do personagem.
+	 */
+	private BitWise effectState;
+
+	/**
+	 * TODO what is that?
+	 */
+	private short rename;
+
+	/**
+	 * Horário em que o personagem será excluído.
+	 */
+	private Time deleteDate;
+
+	/**
+	 * Quantidade de vezes que o personagem foi movido.
+	 */
+	private short moves;
+
+	/**
+	 * Font que deve ser escolhida quando o jogador entrar no jogo.
+	 */
+	private short font;
+
+	/**
+	 * TODO what is that?
+	 */
+	private int uniqueItemCounter;
+
+	/***
+	 * Atributos básicos do personagem.
+	 */
+	private Stats stats;
 
 	/**
 	 * Informações sobre o visual do personagem.
@@ -158,11 +226,13 @@ public class Character
 
 	public Character()
 	{
+		stats = new Stats();
 		look = new Look();
 		family = new Family();
 		experience = new Experience();
 		mercenaryRank = new MercenaryRank();
 		locations = new Locations();
+		effectState = new BitWise(/* TODO: properties name */);
 
 		sex = 'M';
 		name = UNKNOWN;
@@ -188,6 +258,7 @@ public class Character
 		if (this.id == 0)
 		{
 			this.id = id;
+			this.stats.setID(id);
 			this.look.setID(id);
 			this.family.setID(id);
 			this.experience.setID(id);
@@ -261,7 +332,7 @@ public class Character
 	 * @return aquisição da quantidade de pontos de atributos disponíveis.
 	 */
 
-	public int getStatusPoint()
+	public short getStatusPoint()
 	{
 		return statusPoint;
 	}
@@ -270,16 +341,16 @@ public class Character
 	 * @param statusPoint quantidade de pontos de atributos disponíveis.
 	 */
 
-	public void setStatusPoint(int statusPoint)
+	public void setStatusPoint(short statusPoint)
 	{
-		this.statusPoint = min(statusPoint, 0);
+		this.statusPoint = ShortUtil.min(statusPoint, (short) 0);
 	}
 
 	/**
 	 * @return quantidade de pontos de habilidades disponíveis.
 	 */
 
-	public int getSkillPoint()
+	public short getSkillPoint()
 	{
 		return skillPoint;
 	}
@@ -288,9 +359,9 @@ public class Character
 	 * @param skillPoint quantidade de pontos de habilidades disponíveis.
 	 */
 
-	public void setSkillPoint(int skillPoint)
+	public void setSkillPoint(short skillPoint)
 	{
-		this.skillPoint = min(skillPoint, 0);
+		this.skillPoint = ShortUtil.min(skillPoint, (short) 0);
 	}
 
 	/**
@@ -312,6 +383,78 @@ public class Character
 	}
 
 	/**
+	 * @return aquisição da quantidade atual de HP.
+	 */
+
+	public int getHP()
+	{
+		return hp;
+	}
+
+	/**
+	 * @param hp quantidade atual de HP.
+	 */
+
+	public void setHP(int hp)
+	{
+		this.hp = limit(hp, 0, maxHP);
+	}
+
+	/**
+	 * @return aquisição da quantidade máxima de HP.
+	 */
+
+	public int getMaxHP()
+	{
+		return maxHP;
+	}
+
+	/**
+	 * @param maxHP quantidade máxima de HP.
+	 */
+
+	public void setMaxHP(short maxHP)
+	{
+		this.maxHP = limit(maxHP, 1, MAX_HP);
+	}
+
+	/**
+	 * @return aquisição da quantidade atual de SP.
+	 */
+
+	public short getSP()
+	{
+		return sp;
+	}
+
+	/**
+	 * @param sp quantidade atual de SP.
+	 */
+
+	public void setSP(short sp)
+	{
+		this.sp = ShortUtil.limit(sp, (short) 0, maxSP);
+	}
+
+	/**
+	 * @return aquisição da quantidade máxima de SP.
+	 */
+
+	public short getMaxSP()
+	{
+		return maxSP;
+	}
+
+	/**
+	 * @param maxSP quantidade máxima de SP.
+	 */
+
+	public void setMaxSP(short maxSP)
+	{
+		this.maxSP = ShortUtil.limit(maxSP, (short) 0, (short) MAX_SP);
+	}
+
+	/**
 	 * @return aquisição do tempo em minutos banido do chat.
 	 */
 
@@ -327,6 +470,24 @@ public class Character
 	public void setManner(short manner)
 	{
 		this.manner = ShortUtil.min(manner, (short) 0);
+	}
+
+	/**
+	 * @return the karma TODO
+	 */
+
+	public short getKarma()
+	{
+		return karma;
+	}
+
+	/**
+	 * @param karma the karma to set TODO
+	 */
+
+	public void setKarma(short karma)
+	{
+		this.karma = karma;
 	}
 
 	/**
@@ -366,111 +527,228 @@ public class Character
 	}
 
 	/**
-	 * @return aquisição de pontos distribuídos em força.
+	 * @return aquisição do código de identificação do grupo.
 	 */
 
-	public int getStrength()
+	public int getPartyID()
 	{
-		return strength;
+		return partyID;
 	}
 
 	/**
-	 * @param strength pontos distribuídos em força.
+	 * @param partyID código de identificação do grupo.
 	 */
 
-	public void setStrength(int strength)
+	public void setPartyID(int partyID)
 	{
-		this.strength = min(strength, 1);
+		this.partyID = partyID;
 	}
 
 	/**
-	 * @return aquisição de pontos distribuídos em agilidade.
+	 * @return aquisição do código de identificação do clã.
 	 */
 
-	public int getAgility()
+	public int getGuildID()
 	{
-		return agility;
+		return guildID;
 	}
 
 	/**
-	 * @param agility pontos distribuídos em agilidade.
+	 * @param guildID código de identificação do clã.
 	 */
 
-	public void setAgility(int agility)
+	public void setGuildID(int guildID)
 	{
-		this.agility = min(agility, 1);
+		this.guildID = guildID;
 	}
 
 	/**
-	 * @return aquisição de pontos distribuídos em vitalidade.
+	 * @return aquisição do código de identificação do mascote.
 	 */
 
-	public int getVitality()
+	public int getPetID()
 	{
-		return vitality;
+		return petID;
 	}
 
 	/**
-	 * @param vitality pontos distribuídos em vitalidade.
+	 * @param petID código de identificação do mascote.
 	 */
 
-	public void setVitality(int vitality)
+	public void setPetID(int petID)
 	{
-		this.vitality = min(vitality, 1);
+		this.petID = petID;
 	}
 
 	/**
-	 * @return aquisição de pontos distribuídos em inteligência.
+	 * @return aquisição do código de identificação do homúnculo.
 	 */
 
-	public int getIntelligence()
+	public int getHomunculuID()
 	{
-		return intelligence;
+		return homunculuID;
 	}
 
 	/**
-	 * @param intelligence pontos distribuídos em inteligência.
+	 * @param homunculuID código de identificação do homúnculo.
 	 */
 
-	public void setIntelligence(int intelligence)
+	public void setHomunculuID(int homunculuID)
 	{
-		this.intelligence = min(intelligence, 1);
+		this.homunculuID = homunculuID;
 	}
 
 	/**
-	 * @return aquisição de pontos distribuídos em destreza.
+	 * @return aquisição do código de identificação do assistente.
 	 */
 
-	public int getDexterity()
+	public int getMercenaryID()
 	{
-		return dexterity;
+		return mercenaryID;
 	}
 
 	/**
-	 * @param dexterity pontos distribuídos em destreza.
+	 * @param mercenaryID código de identificação do assistente.
 	 */
 
-	public void setDexterity(int dexterity)
+	public void setMercenaryID(int mercenaryID)
 	{
-		this.dexterity = min(dexterity, 1);
+		this.mercenaryID = mercenaryID;
 	}
 
 	/**
-	 * @return aquisição de pontos distribuídos em sorte.
+	 * @return aquisição do código de identificação do elemental.
 	 */
 
-	public int getLuck()
+	public int getElementalID()
 	{
-		return luck;
+		return elementalID;
 	}
 
 	/**
-	 * @param luck pontos distribuídos em sorte.
+	 * @param elementalID código de identificação do elemental.
 	 */
 
-	public void setLuck(int luck)
+	public void setElementalID(int elementalID)
 	{
-		this.luck = min(luck, 1);
+		this.elementalID = elementalID;
+	}
+
+	/**
+	 * @return aquisição do código de identificação da tribo.
+	 */
+
+	public int getClanID()
+	{
+		return clanID;
+	}
+
+	/**
+	 * @param clanID código de identificação da tribo.
+	 */
+
+	public void setClanID(int clanID)
+	{
+		this.clanID = clanID;
+	}
+
+	/**
+	 * @return aquisição dos efeitos do personagem.
+	 */
+
+	public BitWise getEffectState()
+	{
+		return effectState;
+	}
+
+	/**
+	 * @return TODO
+	 */
+
+	public short getRename()
+	{
+		return rename;
+	}
+
+	/**
+	 * @param rename TODO
+	 */
+
+	public void setRename(short rename)
+	{
+		this.rename = rename;
+	}
+
+	/**
+	 * @return aquisição do horário em que o personagem será excluído.
+	 */
+
+	public Time getDeleteDate()
+	{
+		return deleteDate;
+	}
+
+	/**
+	 * @return aquisição da quantidade de vezes que o personagem foi movido.
+	 */
+
+	public short getMoves()
+	{
+		return moves;
+	}
+
+	/**
+	 * @param moves quantidade de vezes que o personagem foi movido.
+	 */
+
+	public void setMoves(short moves)
+	{
+		this.moves = moves;
+	}
+
+	/**
+	 * @return aquisição da font que deve ser escolhida quando o jogador entrar no jogo.
+	 */
+
+	public short getFont()
+	{
+		return font;
+	}
+
+	/**
+	 * @param font font que deve ser escolhida quando o jogador entrar no jogo.
+	 */
+
+	public void setFont(short font)
+	{
+		this.font = font;
+	}
+
+	/**
+	 * @return TODO
+	 */
+
+	public int getUniqueItemCounter()
+	{
+		return uniqueItemCounter;
+	}
+
+	/**
+	 * @param uniqueItemCounter TODO
+	 */
+
+	public void setUniqueItemCounter(int uniqueItemCounter)
+	{
+		this.uniqueItemCounter = uniqueItemCounter;
+	}
+
+	/**
+	 * @return aquisição dos atributos básicos do personagem.
+	 */
+
+	public Stats getStats()
+	{
+		return stats;
 	}
 
 	/**
@@ -581,19 +859,21 @@ public class Character
 		description.append("id", id);
 		description.append("name", name);
 		description.append("sex", sex);
-		description.append("zeny", zeny);
+		description.append("zeny", StringUtil.money(zeny));
+		description.append("level", format("%d/%d", baseLevel, jobLevel));
 		description.append("statusPoint", statusPoint);
 		description.append("skillPoint", skillPoint);
+		description.append("hp", format("%d/%d", hp, maxHP));
+		description.append("sp", format("%d/%d", sp, maxSP));
 		description.append("jobID", jobID);
 		description.append("manner", manner);
-		description.append("baseLevel", baseLevel);
-		description.append("jobLevel", jobLevel);
-		description.append("strength", strength);
-		description.append("agility", agility);
-		description.append("vitality", vitality);
-		description.append("intelligence", intelligence);
-		description.append("dexterity", dexterity);
-		description.append("luck", luck);
+		description.append("karma", karma);
+		description.append("effectState", effectState);
+		description.append("rename", rename);
+		description.append("deleteDate", deleteDate);
+		description.append("moves", moves);
+		description.append("font", font);
+		description.append("uniqueItemCounter", uniqueItemCounter);
 
 		return description.toString();
 	}

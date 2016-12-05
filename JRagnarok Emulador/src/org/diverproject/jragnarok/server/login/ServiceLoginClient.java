@@ -400,14 +400,14 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		if (ok)
 		{
-			response.setResult(AuthAccountResult.OK);
+			response.setResult(true);
 			response.setVersion(node.getVersion());
 			response.setClientType(node.getClientType());
 		}
 
 		else
 		{
-			response.setResult(AuthAccountResult.FAILED);
+			response.setResult(false);
 			response.setVersion(0);
 			response.setClientType(ClientType.CT_NONE);
 		}

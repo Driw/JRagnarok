@@ -144,16 +144,21 @@ CREATE TABLE characters
 	status_point INT NOT NULL DEFAULT 0,
 	skill_point INT NOT NULL DEFAULT 0,
 	jobid SMALLINT NOT NULL DEFAULT 0,
+	max_hp INT NOT NULL default 0,
+	hp INT NOT NULL default 0,
+	max_sp SMALLINT NOT NULL default 0,
+	sp SMALLINT NOT NULL default 0,
 	manner SMALLINT NOT NULL DEFAULT 0,
+	effect_state INT NOT NULL DEFAULT 0,
+	karma INT NOT NULL DEFAULT 0,
 	base_level INT NOT NULL DEFAULT 0,
 	job_level INT NOT NULL DEFAULT 0,
-	strength INT NOT NULL DEFAULT 0,
-	agility INT NOT NULL DEFAULT 0,
-	vitality INT NOT NULL DEFAULT 0,
-	inteligence INT NOT NULL DEFAULT 0,
-	dexterity INT NOT NULL DEFAULT 0,
-	luck INT NOT NULL DEFAULT 0,
 	online TINYINT(1) NOT NULL DEFAULT 0,
+	rename TINYINT(3) NOT NULL DEFAULT 0,
+	delete_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	moves TINYINT NOT NULL DEFAULT 0,
+	font TINYINT NOT NULL DEFAULT 0,
+	unique_item_counter INT NOT NULL 0,
 
 	UNIQUE (name),
 	PRIMARY KEY (id)
@@ -171,6 +176,19 @@ CREATE TABLE accounts_char_list
 	FOREIGN KEY (charid) REFERENCES characters(id)
 
 ) ENGINE=MyISAM;
+
+CREATE TABLE characters_stats
+(
+	charid INT NOT NULL,
+	strength INT NOT NULL DEFAULT 0,
+	agility INT NOT NULL DEFAULT 0,
+	vitality INT NOT NULL DEFAULT 0,
+	intelligence INT NOT NULL DEFAULT 0,
+	dexterity INT NOT NULL DEFAULT 0,
+	luck INT NOT NULL DEFAULT 0,
+
+	PRIMARY KEY (charid)
+);
 
 CREATE TABLE characters_look
 (
