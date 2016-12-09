@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.character.structures;
 
+import org.diverproject.util.CanCopy;
 import org.diverproject.util.ObjectDescription;
 
 /**
@@ -14,13 +15,8 @@ import org.diverproject.util.ObjectDescription;
  * @author Andrew
  */
 
-public class Look
+public class Look implements CanCopy<Look>
 {
-	/**
-	 * Código de identificação do personagem.
-	 */
-	private int id;
-
 	/**
 	 * código visual do estilo de cabelo.
 	 */
@@ -70,24 +66,6 @@ public class Look
 	 * código visual da capa.
 	 */
 	private short robe;
-
-	/**
-	 * @return aquisição do código de identificação do personagem.
-	 */
-
-	public int getID()
-	{
-		return id;
-	}
-
-	/**
-	 * @param id código de identificação do personagem.
-	 */
-
-	public void setID(int id)
-	{
-		this.id = id;
-	}
 
 	/**
 	 * @return aquisição do código visual do estilo do cabelo.
@@ -267,6 +245,24 @@ public class Look
 	public void setRobe(short robe)
 	{
 		this.robe = robe;
+	}
+
+	@Override
+	public void copyFrom(Look e)
+	{
+		if (e != null)
+		{
+			hair = e.hair;
+			hairColor = e.hairColor;
+			clothesColor = e.clothesColor;
+			body = e.body;
+			weapon = e.weapon;
+			shield = e.shield;
+			headTop = e.headTop;
+			headMid = e.headMid;
+			headBottom = e.headBottom;
+			robe = e.robe;
+		}
 	}
 
 	@Override

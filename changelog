@@ -1,3 +1,9 @@
+09.12.2016 - 1.3.124
+- Coluna unban faltando em characters adicionado e algumas em characters_look renomeadas.
+- CharacterControl irá possuir as funcionalidades dos controles de suas dependências.
+	- Não é necessário ter um controle para cada dependência.
+- Dependências de Character agora irão implementar CanCopy e não carregaram o charid.
+
 05.12.2016 - 1.3.123b
 - Atributos de Character restantes adicionados e separando atributos para outra classe.
 	- Tabelas do banco de dados também foram atualizadas.

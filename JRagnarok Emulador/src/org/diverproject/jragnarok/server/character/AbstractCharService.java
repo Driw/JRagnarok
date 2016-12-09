@@ -3,11 +3,6 @@ package org.diverproject.jragnarok.server.character;
 import org.diverproject.jragnarok.server.ServerService;
 import org.diverproject.jragnarok.server.character.control.AuthControl;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
-import org.diverproject.jragnarok.server.character.control.ExperienceControl;
-import org.diverproject.jragnarok.server.character.control.FamilyControl;
-import org.diverproject.jragnarok.server.character.control.LocationControl;
-import org.diverproject.jragnarok.server.character.control.LookControl;
-import org.diverproject.jragnarok.server.character.control.MercenaryRankControl;
 import org.diverproject.jragnarok.server.character.control.OnlineCharControl;
 import org.diverproject.util.ObjectDescription;
 
@@ -24,11 +19,6 @@ import org.diverproject.util.ObjectDescription;
  * @see ServiceCharServerAuth
  * @see AuthControl
  * @see CharacterControl
- * @see ExperienceControl
- * @see FamilyControl
- * @see LocationControl
- * @see LookControl
- * @see MercenaryRankControl
  * @see OnlineCharControl
  *
  * @author Andrew
@@ -78,31 +68,6 @@ public class AbstractCharService extends ServerService
 	protected CharacterControl characters;
 
 	/**
-	 * Controle para gerenciar os níveis de experiência dos personagens.
-	 */
-	protected ExperienceControl experiences;
-
-	/**
-	 * Controle para gerenciar a relação familiar dos personagens.
-	 */
-	protected FamilyControl families;
-
-	/**
-	 * Controle para gerenciar as localizações como pontos de retorno dos personagens.
-	 */
-	protected LocationControl locations;
-
-	/**
-	 * Controle para gerenciar a aparência de estilos e cores dos personagens.
-	 */
-	protected LookControl looks;
-
-	/**
-	 * Controle para gerenciar a classificação no sistema de assistentes dos personagens.
-	 */
-	protected MercenaryRankControl mercenaryRankControl;
-
-	/**
 	 * Instancia um novo serviço abstrato que permite irá permitir a comunicação entre serviços.
 	 * Todos os serviços e controles podem ser solicitados internamente por esta classe.
 	 * @param server referência do servidor de acesso que detém este serviço.
@@ -128,11 +93,6 @@ public class AbstractCharService extends ServerService
 		auths = getServer().getAuthControl();
 		onlines = getServer().getOnlineCharControl();
 		characters = getServer().getCharacterControl();
-		experiences = getServer().getExperienceControl();
-		families = getServer().getFamilyControl();
-		locations = getServer().getLocationControl();
-		looks = getServer().getLookControl();
-		mercenaryRankControl = getServer().getMercenaryRankControl();
 	}
 
 	/**
@@ -150,11 +110,6 @@ public class AbstractCharService extends ServerService
 		auths = null;
 		onlines = null;
 		characters = null;
-		experiences = null;
-		families = null;
-		locations = null;
-		looks = null;
-		mercenaryRankControl = null;
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.character.structures;
 
+import org.diverproject.util.CanCopy;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.lang.ShortUtil;
 
@@ -13,15 +14,18 @@ import org.diverproject.util.lang.ShortUtil;
  * @author Andrew
  */
 
-public class Stats
+public class Stats implements CanCopy<Stats>
 {
+	/**
+	 * Quantidade mínima de pontos distribuídos em um atributo.
+	 */
 	private static final short MIN_STAT = 1;
-	private static final short MAX_STAT = 32767;
 
 	/**
-	 * Código de identificação do personagem.
+	 * Quantidade máxima de pontos distribuídos em um atributo.
 	 */
-	private int id;
+	private static final short MAX_STAT = 32767;
+
 
 	/**
 	 * Pontos distribuídos em força.
@@ -52,25 +56,6 @@ public class Stats
 	 * Pontos distribuídos em sorte.
 	 */
 	private short luck;
-
-	/**
-	 * @return aquisição do código de identificação do personagem.
-	 */
-
-	public int getID()
-	{
-		return id;
-	}
-
-	/**
-	 * @param id código de identificação do personagem.
-	 */
-
-	public void setID(int id)
-	{
-		if (this.id == 0)
-			this.id = id;
-	}
 
 	/**
 	 * @return aquisição de pontos distribuídos em força.
@@ -181,11 +166,24 @@ public class Stats
 	}
 
 	@Override
+	public void copyFrom(Stats e)
+	{
+		if (e != null)
+		{
+			strength = e.strength;
+			agility = e.agility;
+			vitality = e.vitality;
+			intelligence = e.intelligence;
+			dexterity = e.dexterity;
+			luck = e.luck;
+		}
+	}
+
+	@Override
 	public String toString()
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("id", id);
 		description.append("str", strength);
 		description.append("agi", agility);
 		description.append("vit", vitality);

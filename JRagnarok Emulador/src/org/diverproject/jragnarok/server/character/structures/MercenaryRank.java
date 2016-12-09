@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.server.character.structures;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 
+import org.diverproject.util.CanCopy;
 import org.diverproject.util.ObjectDescription;
 
 /**
@@ -18,14 +19,8 @@ import org.diverproject.util.ObjectDescription;
  * @author Andrew
  */
 
-public class MercenaryRank
+public class MercenaryRank implements CanCopy<MercenaryRank>
 {
-
-	/**
-	 * Código de identificação do personagem.
-	 */
-	private int id;
-
 	/**
 	 * Nível de confiança dos assistentes arqueiros.
 	 */
@@ -55,24 +50,6 @@ public class MercenaryRank
 	 * Quantidade de assistentes espadachins já contratados.
 	 */
 	private int swordCalls;
-
-	/**
-	 * @return aquisição do código de identificação do personagem.
-	 */
-
-	public int getID()
-	{
-		return id;
-	}
-
-	/**
-	 * @param id código de identificação do personagem.
-	 */
-
-	public void setID(int id)
-	{
-		this.id = id;
-	}
 
 	/**
 	 * @return aquisição do nível de confiança dos assistentes arqueiros.
@@ -183,11 +160,24 @@ public class MercenaryRank
 	}
 
 	@Override
+	public void copyFrom(MercenaryRank e)
+	{
+		if (e != null)
+		{
+			archerFaith = e.archerFaith;
+			archerCalls = e.archerCalls;
+			spearFaith = e.spearFaith;
+			spearCalls = e.spearCalls;
+			swordFaith = e.swordFaith;
+			swordCalls = e.swordCalls;
+		}
+	}
+
+	@Override
 	public String toString()
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("charid", id);
 		description.append("archer", format("%d/%d", archerFaith, archerCalls));
 		description.append("spear", format("%d/%d", spearFaith, spearCalls));
 		description.append("sword", format("%d/%d", swordFaith, swordCalls));

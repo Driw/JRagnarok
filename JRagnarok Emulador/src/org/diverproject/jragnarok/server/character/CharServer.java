@@ -13,11 +13,6 @@ import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.character.control.AuthControl;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
-import org.diverproject.jragnarok.server.character.control.ExperienceControl;
-import org.diverproject.jragnarok.server.character.control.FamilyControl;
-import org.diverproject.jragnarok.server.character.control.LocationControl;
-import org.diverproject.jragnarok.server.character.control.LookControl;
-import org.diverproject.jragnarok.server.character.control.MercenaryRankControl;
 import org.diverproject.jragnarok.server.character.control.OnlineCharControl;
 
 /**
@@ -39,11 +34,6 @@ import org.diverproject.jragnarok.server.character.control.OnlineCharControl;
  * @see ServiceCharServer
  * @see ServiceCharLogin
  * @see CharacterControl
- * @see ExperienceControl
- * @see FamilyControl
- * @see LocationControl
- * @see LookControl
- * @see MercenaryRankControl
  *
  * @author Andrew
  */
@@ -90,31 +80,6 @@ public class CharServer extends Server
 	 * Controle para gerenciar dados dos personagens.
 	 */
 	private CharacterControl characterControl;
-
-	/**
-	 * Controle para gerenciar os níveis de experiência dos personagens.
-	 */
-	private ExperienceControl experienceControl;
-
-	/**
-	 * Controle para gerenciar a relação familiar dos personagens.
-	 */
-	private FamilyControl familyControl;
-
-	/**
-	 * Controle para gerenciar as localizações como pontos de retorno dos personagens.
-	 */
-	private LocationControl locationControl;
-
-	/**
-	 * Controle para gerenciar a aparência de estilos e cores dos personagens.
-	 */
-	private LookControl lookControl;
-
-	/**
-	 * Controle para gerenciar a classificação no sistema de assistentes dos personagens.
-	 */
-	private MercenaryRankControl mercenaryRankControl;
 
 	/**
 	 * Cria uma nova instância de um servidor de personagem inicialização o seu listener.
@@ -198,51 +163,6 @@ public class CharServer extends Server
 		return characterControl;
 	}
 
-	/**
-	 * @return aquisição do controle para níveis de experiência dos personagens.
-	 */
-
-	public ExperienceControl getExperienceControl()
-	{
-		return experienceControl;
-	}
-
-	/**
-	 * @return aquisição do controle para relações familiares dos personagens.
-	 */
-
-	public FamilyControl getFamilyControl()
-	{
-		return familyControl;
-	}
-
-	/**
-	 * @return aquisição do controle para localizações dos personagens.
-	 */
-
-	public LocationControl getLocationControl()
-	{
-		return locationControl;
-	}
-
-	/**
-	 * @return aquisição do controle para aparência dos personagens.
-	 */
-
-	public LookControl getLookControl()
-	{
-		return lookControl;
-	}
-
-	/**
-	 * @return aquisição do controle para classificação dos assistentes.
-	 */
-
-	public MercenaryRankControl getMercenaryRankControl()
-	{
-		return mercenaryRankControl;
-	}
-
 	@Override
 	public String getHost()
 	{
@@ -300,18 +220,7 @@ public class CharServer extends Server
 		{
 			authControl = new AuthControl();
 			onlineCharControl = new OnlineCharControl(getMySQL().getConnection());
-			experienceControl = new ExperienceControl(getMySQL().getConnection());
-			familyControl = new FamilyControl(getMySQL().getConnection());
-			locationControl = new LocationControl(getMySQL().getConnection());
-			lookControl = new LookControl(getMySQL().getConnection());
-			mercenaryRankControl = new MercenaryRankControl(getMySQL().getConnection());
 			characterControl = new CharacterControl(getMySQL().getConnection());
-
-			characterControl.setExperiences(experienceControl);
-			characterControl.setFamilies(familyControl);
-			characterControl.setLocations(locationControl);
-			characterControl.setLooks(lookControl);
-			characterControl.setRanks(mercenaryRankControl);
 
 			charServer = new ServiceCharServer(CharServer.this);
 			charLogin = new ServiceCharLogin(CharServer.this);
@@ -362,11 +271,6 @@ public class CharServer extends Server
 		@Override
 		public void onDestroyed() throws RagnarokException
 		{
-			experienceControl = null;
-			familyControl = null;
-			locationControl = null;
-			lookControl = null;
-			mercenaryRankControl = null;
 			characterControl = null;
 			authControl = null;
 			onlineCharControl = null;

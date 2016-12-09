@@ -50,6 +50,17 @@ public class MapPoint extends Point
 	}
 
 	@Override
+	public MapPoint clone()
+	{
+		MapPoint point = new MapPoint();
+		point.map = map;
+		point.setX(getX());
+		point.setY(getY());
+
+		return point;
+	}
+
+	@Override
 	public String toString()
 	{
 		ObjectDescription description = new ObjectDescription(getClass());

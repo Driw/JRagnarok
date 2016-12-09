@@ -181,7 +181,7 @@ public class Character
 	/**
 	 * Font que deve ser escolhida quando o jogador entrar no jogo.
 	 */
-	private short font;
+	private byte font;
 
 	/**
 	 * TODO what is that?
@@ -256,15 +256,7 @@ public class Character
 	public void setID(int id)
 	{
 		if (this.id == 0)
-		{
 			this.id = id;
-			this.stats.setID(id);
-			this.look.setID(id);
-			this.family.setID(id);
-			this.experience.setID(id);
-			this.mercenaryRank.setID(id);
-			this.locations.setID(id);
-		}
 	}
 
 	/**
@@ -413,7 +405,7 @@ public class Character
 	 * @param maxHP quantidade máxima de HP.
 	 */
 
-	public void setMaxHP(short maxHP)
+	public void setMaxHP(int maxHP)
 	{
 		this.maxHP = limit(maxHP, 1, MAX_HP);
 	}
@@ -710,7 +702,7 @@ public class Character
 	 * @return aquisição da font que deve ser escolhida quando o jogador entrar no jogo.
 	 */
 
-	public short getFont()
+	public byte getFont()
 	{
 		return font;
 	}
@@ -719,7 +711,7 @@ public class Character
 	 * @param font font que deve ser escolhida quando o jogador entrar no jogo.
 	 */
 
-	public void setFont(short font)
+	public void setFont(byte font)
 	{
 		this.font = font;
 	}
@@ -752,6 +744,16 @@ public class Character
 	}
 
 	/**
+	 * Será definido apenas se não for nulo.
+	 * @param stats tipos de aparências visuais do personagem.
+	 */
+
+	public void setStats(Stats stats)
+	{
+		this.stats.copyFrom(stats);
+	}
+
+	/**
 	 * @return aquisição dos tipos de aparências visuais do personagem.
 	 */
 
@@ -761,14 +763,12 @@ public class Character
 	}
 
 	/**
-	 * Será definido apenas se não for nulo e tiver o mesmo código de identificação.
 	 * @param look tipos de aparências visuais do personagem.
 	 */
 
 	public void setLook(Look look)
 	{
-		if (look != null && look.getID() == id)
-			this.look = look;
+		this.look.copyFrom(look);
 	}
 
 	/**
@@ -781,14 +781,12 @@ public class Character
 	}
 
 	/**
-	 * Será definido apenas se não for nulo e tiver o mesmo código de identificação.
 	 * @param family identificação dos personagens que compõe a família.
 	 */
 
 	public void setFamily(Family family)
 	{
-		if (family != null && family.getID() == id)
-			this.family = family;
+		this.family.copyFrom(family);
 	}
 
 	/**
@@ -801,14 +799,12 @@ public class Character
 	}
 
 	/**
-	 * Será definido apenas se não for nulo e tiver o mesmo código de identificação.
 	 * @param experience níveis de experiências já obtidos.
 	 */
 
 	public void setExperience(Experience experience)
 	{
-		if (experience != null && experience.getID() == id)
-			this.experience = experience;
+		this.experience.copyFrom(experience);
 	}
 
 	/**
@@ -821,14 +817,12 @@ public class Character
 	}
 
 	/**
-	 * Será definido apenas se não for nulo e tiver o mesmo código de identificação.
 	 * @param mercenaryRank classificação de uso do sistema de assistentes.
 	 */
 
 	public void setMercenaryRank(MercenaryRank mercenaryRank)
 	{
-		if (mercenaryRank != null && mercenaryRank.getID() == id)
-			this.mercenaryRank = mercenaryRank;
+		this.mercenaryRank.copyFrom(mercenaryRank);
 	}
 
 	/**
@@ -841,14 +835,12 @@ public class Character
 	}
 
 	/**
-	 * Será definido apenas se não for nulo e tiver o mesmo código de identificação.
 	 * @param locations localizações para pontos de retorno.
 	 */
 
 	public void setLocations(Locations locations)
 	{
-		if (locations != null && locations.getID() == id)
-			this.locations = locations;
+		this.locations.copyFrom(locations);
 	}
 
 	@Override

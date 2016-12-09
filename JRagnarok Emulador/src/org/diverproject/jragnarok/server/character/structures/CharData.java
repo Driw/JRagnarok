@@ -39,11 +39,6 @@ public class CharData
 		return unban;
 	}
 
-	public void setUnban(Time unban)
-	{
-		this.unban = unban;
-	}
-
 	@Override
 	public String toString()
 	{

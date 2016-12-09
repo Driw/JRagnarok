@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.character.structures;
 
+import org.diverproject.util.CanCopy;
 import org.diverproject.util.ObjectDescription;
 
 /**
@@ -15,13 +16,8 @@ import org.diverproject.util.ObjectDescription;
  * @author Andrew
  */
 
-public class Family
+public class Family implements CanCopy<Family>
 {
-	/**
-	 * Código de identificação do personagem.
-	 */
-	private int id;
-
 	/**
 	 * ID (personagem) do conjugue deste personagem.
 	 */
@@ -41,24 +37,6 @@ public class Family
 	 * ID (personagem) do filho deste personagem.
 	 */
 	private int child;
-
-	/**
-	 * @return aquisição do código de identificação do personagem.
-	 */
-
-	public int getID()
-	{
-		return id;
-	}
-
-	/**
-	 * @param id código de identificação do personagem.
-	 */
-
-	public void setID(int id)
-	{
-		this.id = id;
-	}
 
 	/**
 	 * @return aquisição do id do personagem que é o conjugue deste personagem.
@@ -133,11 +111,22 @@ public class Family
 	}
 
 	@Override
+	public void copyFrom(Family e)
+	{
+		if (e != null)
+		{
+			partner = e.partner;
+			father = e.father;
+			mother = e.mother;
+			child = e.child;
+		}
+	}
+
+	@Override
 	public String toString()
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("charid", id);
 		description.append("partner", partner);
 		description.append("father", father);
 		description.append("mother", mother);

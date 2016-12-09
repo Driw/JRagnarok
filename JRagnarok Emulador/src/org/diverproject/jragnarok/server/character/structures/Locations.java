@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MEMOPOINTS;
 import static org.diverproject.util.lang.IntUtil.interval;
 
 import org.diverproject.jragnarok.util.MapPoint;
+import org.diverproject.util.CanCopy;
 import org.diverproject.util.ObjectDescription;
 
 /**
@@ -21,13 +22,8 @@ import org.diverproject.util.ObjectDescription;
  * @author Andrew
  */
 
-public class Locations
+public class Locations implements CanCopy<Locations>
 {
-	/**
-	 * Código de identificação do personagem.
-	 */
-	private int id;
-
 	/**
 	 * Localização da onde o personagem se encontra.
 	 */
@@ -53,22 +49,6 @@ public class Locations
 		lastPoint = new MapPoint();
 		savePoint = new MapPoint();
 		memoPoints = new MapPoint[MAX_MEMOPOINTS];
-	}
-
-	/**
-	 * @return aquisição do código de identificação do personagem.
-	 */
-	public int getID()
-	{
-		return id;
-	}
-
-	/**
-	 * @param id código de identificação do personagem.
-	 */
-	public void setID(int id)
-	{
-		this.id = id;
 	}
 
 	/**
@@ -112,6 +92,21 @@ public class Locations
 			memoPoints[index] = new MapPoint();
 
 		return memoPoints[index];
+	}
+
+	@Override
+	public void copyFrom(Locations e)
+	{
+		if (e != null)
+		{
+			lastPoint = e.lastPoint.clone();
+			savePoint = e.savePoint.clone();
+			memoPoints = e.memoPoints.clone();
+
+			for (int i = 0; i < memoPoints.length; i++)
+				if (memoPoints[i] != null)
+					memoPoints[i] = memoPoints[i].clone();
+		}
 	}
 
 	@Override

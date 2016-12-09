@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.character.structures;
 
+import org.diverproject.util.CanCopy;
 import org.diverproject.util.ObjectDescription;
 
 /**
@@ -16,13 +17,8 @@ import org.diverproject.util.ObjectDescription;
  * @author Andrew
  */
 
-public class Experience
+public class Experience implements CanCopy<Experience>
 {
-	/**
-	 * Código de identificação do personagem.
-	 */
-	private int id;
-
 	/**
 	 * Quantidade de experiência no nível de base atual.
 	 */
@@ -37,24 +33,6 @@ public class Experience
 	 * Quantidade de fama do personagem.
 	 */
 	private int fame;
-
-	/**
-	 * @return aquisição do código de identificação do personagem.
-	 */
-
-	public int getID()
-	{
-		return id;
-	}
-
-	/**
-	 * @param id código de identificação do personagem.
-	 */
-
-	public void setID(int id)
-	{
-		this.id = id;
-	}
 
 	/**
 	 * @return aquisição da quantidade de experiência no nível de base atual.
@@ -108,6 +86,17 @@ public class Experience
 	public void setFame(int fame)
 	{
 		this.fame = fame;
+	}
+
+	@Override
+	public void copyFrom(Experience e)
+	{
+		if (e != null)
+		{
+			base = e.base;
+			job = e.job;
+			fame = e.fame;
+		}
 	}
 
 	@Override
