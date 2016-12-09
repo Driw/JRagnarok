@@ -76,24 +76,55 @@ public class JRagnarokConstants
 
 
 	/**
-	 * Limite de personagens por contas comuns (0: ilimitado).
+	 * Limite mínimo de personagens por contas comuns.
 	 */
-	public static final int MAX_CHARS = 9;
+	public static final byte MIN_CHARS = 3;
 
 	/**
-	 * Limite de personagens por contas VIP (0: ilimitado).
+	 * Limite máximo de personagens por contas comuns (0: ilimitado).
 	 */
-	public static final int MAX_CHAR_VIP = 0;
+	public static final byte MAX_CHARS = 9;
+
+	/**
+	 * Limite máximo de personagens por contas VIP (0: ilimitado).
+	 */
+	public static final byte MAX_CHAR_VIP = 0;
 
 	/**
 	 * TODO what is that?
 	 */
-	public static final int MAX_CHAR_BILLING = 0;
+	public static final byte MAX_CHAR_BILLING = 0;
 
 	/**
 	 * Limite de pontos salvos por personagem.
 	 */
 	public static final int MAX_MEMOPOINTS = 3;
+
+	/**
+	 * Limite máximo na quantidade de HP.
+	 */
+	public static final int MAX_HP = 10000000;
+
+	/**
+	 * Limite máximo na quantidade de SP.
+	 */
+	public static final int MAX_SP = 32768;
+
+	/**
+	 * Velocidade padrão de movimento dos personagens.
+	 */
+	public static final int DEFAULT_WALK_SPEED = 150;
+
+
+	/**
+	 * Quantidade de caracteres permitido para definir a abreviatura do nome do mapa.
+	 */
+	public static final int MAP_NAME_LENGTH = 12;
+
+	/**
+	 * Quantidade de caracteres permitido para definir o nome do mapa.
+	 */
+	public static final int MAP_NAME_LENGTH_EXT = MAP_NAME_LENGTH + 4;
 
 	private JRagnarokConstants()
 	{

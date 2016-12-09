@@ -86,9 +86,24 @@ public class Tables
 	private String ipBan;
 
 	/**
+	 * Tabela contendo a vinculação dos personagens com as contas.
+	 */
+	private String accountsCharacters;
+
+	/**
 	 * Tabela contendo todos os dados básicos dos personagens.
 	 */
 	private String characters;
+
+	/**
+	 * Tabela contendo os atributos básicos distribuídos nos personagens.
+	 */
+	private String charStats;
+
+	/**
+	 * Tabela contendo todas da aparência atual dos personagens.
+	 */
+	private String charLook;
 
 	/**
 	 * Tabela contendo todas as experiências obtidas pelos personagens.
@@ -120,6 +135,7 @@ public class Tables
 		loginLog = "login_log";
 
 		accounts = "accounts";
+		accountsCharacters = "accounts_char_list";
 		accountsGroup = "accounts_groups";
 		pincodes = "pincodes";
 
@@ -134,6 +150,8 @@ public class Tables
 		ipBan = "ipban_list";
 
 		characters = "characters";
+		charStats = "characters_stats";
+		charLook = "characters_look";
 		charExperiences = "characters_exp";
 		charFamily = "characters_family";
 		charLocations = "characters_locations";
@@ -174,6 +192,24 @@ public class Tables
 	public void setAccounts(String account)
 	{
 		this.accounts = account;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela contendo os dados básicos dos personagens.
+	 */
+
+	public String getCharacters()
+	{
+		return characters;
+	}
+
+	/**
+	 * @param ipBan nome da tabela contendo os dados básicos dos personagens.
+	 */
+
+	public void setCharacters(String characters)
+	{
+		this.characters = characters;
 	}
 
 	/**
@@ -339,28 +375,64 @@ public class Tables
 	}
 
 	/**
-	 * @return aquisição do nome da tabela contendo os dados básicos dos personagens.
+	 * @return aquisição do nome da tabela contendo a vinculação dos personagens com as contas.
 	 */
 
-	public String getCharacters()
+	public String getAccountsCharacters()
 	{
-		return characters;
+		return accountsCharacters;
 	}
 
 	/**
-	 * @param ipBan nome da tabela contendo os dados básicos dos personagens.
+	 * @param accountCharacters tabela contendo a vinculação dos personagens com as contas.
 	 */
 
-	public void setCharacters(String characters)
+	public void setAccountsCharacters(String accountCharacters)
 	{
-		this.characters = characters;
+		this.accountsCharacters = accountCharacters;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela contendo os atributos básicos distribuídos nos personagens.
+	 */
+
+	public String getCharStats()
+	{
+		return charStats;
+	}
+
+	/**
+	 * @param charStats nome da tabela contendo os atributos básicos distribuídos nos personagens.
+	 */
+
+	public void setCharStats(String charStats)
+	{
+		this.charStats = charStats;
+	}
+
+	/**
+	 * @return aquisição da tabela contendo todas da aparência atual dos personagens.
+	 */
+
+	public String getCharLook()
+	{
+		return charLook;
+	}
+
+	/**
+	 * @param charLook tabela contendo todas da aparência atual dos personagens.
+	 */
+
+	public void setCharLook(String charLook)
+	{
+		this.charLook = charLook;
 	}
 
 	/**
 	 * @return aquisição do nome da tabela contendo a experiências obtidas pelos personagens.
 	 */
 
-	public String getCharExperiences()
+	public String getCharExperience()
 	{
 		return charExperiences;
 	}
