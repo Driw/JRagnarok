@@ -61,6 +61,11 @@ public class CharServer extends Server
 	private ServiceCharLogin charLogin;
 
 	/**
+	 * Serviço para comunicação com o servidor de mapa.
+	 */
+	private ServiceCharMap charMap;
+
+	/**
 	 * Serviço para autenticação dos jogadores no servidor.
 	 */
 	private ServiceCharServerAuth charServerAuth;
@@ -124,6 +129,15 @@ public class CharServer extends Server
 	public ServiceCharLogin getCharLogin()
 	{
 		return charLogin;
+	}
+
+	/**
+	 * @return aquisição do serviço para comunicação com o servidor de mapa.
+	 */
+
+	public ServiceCharMap getCharMap()
+	{
+		return charMap;
 	}
 
 	/**
@@ -224,11 +238,13 @@ public class CharServer extends Server
 
 			charServer = new ServiceCharServer(CharServer.this);
 			charLogin = new ServiceCharLogin(CharServer.this);
+			charMap = new ServiceCharMap(CharServer.this);
 			charClient = new ServiceCharClient(CharServer.this);
 			charServerAuth = new ServiceCharServerAuth(CharServer.this);
 
 			charServer.init();
 			charLogin.init();
+			charMap.init();
 			charClient.init();
 			charServerAuth.init();
 
@@ -261,6 +277,7 @@ public class CharServer extends Server
 		{
 			charServer.destroy();
 			charLogin.destroy();
+			charMap.destroy();
 			charClient.destroy();
 			charServerAuth.destroy();
 
@@ -277,6 +294,7 @@ public class CharServer extends Server
 
 			charServer = null;
 			charLogin = null;
+			charMap = null;
 			charClient = null;
 			charServerAuth = null;
 		}

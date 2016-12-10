@@ -80,7 +80,7 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.character.control.ChangeSex;
+import org.diverproject.jragnarok.server.character.structures.ChangeSex;
 import org.diverproject.jragnarok.server.character.structures.CharSessionData;
 import org.diverproject.jragnarok.server.character.structures.ClientMapServer;
 import org.diverproject.jragnarok.server.character.structures.OnlineCharData;
@@ -145,6 +145,8 @@ public class ServiceCharLogin extends AbstractCharService
 	@Override
 	public void init()
 	{
+		super.init();
+
 		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
 

@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
+import org.diverproject.jragnarok.server.character.structures.ChangeSex;
 import org.diverproject.jragnarok.server.character.structures.CharData;
 import org.diverproject.jragnarok.server.character.structures.Character;
 import org.diverproject.jragnarok.server.character.structures.Experience;

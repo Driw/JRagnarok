@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.character.control;
+package org.diverproject.jragnarok.server.character.structures;
 
 import org.diverproject.util.ObjectDescription;
 

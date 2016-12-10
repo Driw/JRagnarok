@@ -23,6 +23,8 @@ public class ServiceCharServer extends AbstractCharService
 	@Override
 	public void init()
 	{
+		super.init();
+
 		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
 

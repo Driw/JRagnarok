@@ -88,6 +88,7 @@ public class AbstractCharService extends ServerService
 		client = getServer().getCharClient();
 		character = getServer().getCharServer();
 		login = getServer().getCharLogin();
+		map = getServer().getCharMap();
 		auth = getServer().getCharServerAuth();
 
 		auths = getServer().getAuthControl();
@@ -105,6 +106,7 @@ public class AbstractCharService extends ServerService
 		client = null;
 		character = null;
 		login = null;
+		map = null;
 		auth = null;
 
 		auths = null;
