@@ -14,9 +14,8 @@ import org.diverproject.util.stream.Output;
 
 public class AccountInfoResult extends RequestPacket
 {
-	private int mapfd;
-	private int ufd;
-	private int aid;
+	private int serverFD;
+	private int userFD;
 	private int accountID;
 	private boolean useData;
 	private int groupID;
@@ -33,7 +32,7 @@ public class AccountInfoResult extends RequestPacket
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putInts(mapfd, ufd, aid, accountID);
+		output.putInts(serverFD, userFD, accountID);
 		output.putByte(b(useData ? 1 : 0));
 
 		if (useData)
@@ -51,44 +50,32 @@ public class AccountInfoResult extends RequestPacket
 	@Override
 	protected void receiveInput(Input input)
 	{
-		mapfd = input.getInt();
-		ufd = input.getInt();
-		aid = input.getInt();
+		serverFD = input.getInt();
+		userFD = input.getInt();
 		accountID = input.getInt();
 		useData = input.getByte() == 1;
 	}
 
 	public int getMapFD()
 	{
-		return mapfd;
+		return serverFD;
 	}
 
 	public void setMapFD(int mapfd)
 	{
 		if (mapfd > 0)
-			this.mapfd = mapfd;
+			this.serverFD = mapfd;
 	}
 
 	public int getUFD()
 	{
-		return ufd;
+		return userFD;
 	}
 
 	public void setUFD(int ufd)
 	{
 		if (ufd > 0)
-			this.ufd = ufd;
-	}
-
-	public int getAID()
-	{
-		return aid;
-	}
-
-	public void setAID(int aid)
-	{
-		if (aid > 0)
-			this.aid = aid;
+			this.userFD = ufd;
 	}
 
 	public int getAccountID()

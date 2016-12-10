@@ -1,6 +1,5 @@
 package org.diverproject.jragnarok.packets.request;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_INFO;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
@@ -9,77 +8,46 @@ import org.diverproject.util.stream.Output;
 
 public class AccountInfoRequest extends RequestPacket
 {
-	private int mapfd;
-	private int ufd;
-	private int aid;
-	private int groupID;
+	private int ServerFD;
+	private int userFD;
 	private int accountID;
-	private boolean useData;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putInt(mapfd);
-		output.putInt(ufd);
-		output.putInt(aid);
-		output.putInt(groupID);
+		output.putInt(ServerFD);
+		output.putInt(userFD);
 		output.putInt(accountID);
-		output.putByte(b(useData ? 1 : 0));
 	}
 
 	@Override
 	protected void receiveInput(Input input)
 	{
-		mapfd = input.getInt();
-		ufd = input.getInt();
-		aid = input.getInt();
-		groupID = input.getInt();
+		ServerFD = input.getInt();
+		userFD = input.getInt();
 		accountID = input.getInt();
-		useData = input.getByte() == 1;
 	}
 
-	public int getMapFD()
+	public int getServerFD()
 	{
-		return mapfd;
+		return ServerFD;
 	}
 
-	public void setMapFD(int mapfd)
+	public void setServerFD(int mapfd)
 	{
 		if (mapfd > 0)
-			this.mapfd = mapfd;
+			this.ServerFD = mapfd;
 	}
 
 	public int getUFD()
 	{
-		return ufd;
+		return userFD;
 	}
 
-	public void setUFD(int ufd)
+	public void setUserFD(int userFD)
 	{
-		if (ufd > 0)
-			this.ufd = ufd;
-	}
-
-	public int getAID()
-	{
-		return aid;
-	}
-
-	public void setAID(int aid)
-	{
-		if (aid > 0)
-			this.aid = aid;
-	}
-
-	public int getGroupID()
-	{
-		return groupID;
-	}
-
-	public void setGroupID(int groupID)
-	{
-		if (groupID > 0)
-			this.groupID = groupID;
+		if (userFD > 0)
+			this.userFD = userFD;
 	}
 
 	public int getAccountID()
@@ -91,16 +59,6 @@ public class AccountInfoRequest extends RequestPacket
 	{
 		if (accountID > 0)
 			this.accountID = accountID;
-	}
-
-	public boolean hasData()
-	{
-		return useData;
-	}
-
-	public void setData(boolean use)
-	{
-		this.useData = use;
 	}
 
 	@Override
@@ -118,6 +76,6 @@ public class AccountInfoRequest extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 21;
+		return 12;
 	}
 }

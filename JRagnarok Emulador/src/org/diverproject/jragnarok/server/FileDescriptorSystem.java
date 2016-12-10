@@ -11,6 +11,8 @@ import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeceptionSource;
 import static org.diverproject.log.LogSystem.logInfo;
 
+import java.util.Iterator;
+
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.util.collection.List;
@@ -37,7 +39,7 @@ import org.diverproject.util.collection.abstraction.LoopList;
  * @author Andrew Mello
  */
 
-public class FileDescriptorSystem
+public class FileDescriptorSystem implements Iterable<FileDescriptor>
 {
 	/**
 	 * Lista contendo todas as conexões sockets.
@@ -180,7 +182,7 @@ public class FileDescriptorSystem
 		}
 	}
 
-	private void setExceptionsEOF(FileDescriptor fd, Exception e, String message)
+	public static void setExceptionsEOF(FileDescriptor fd, Exception e, String message)
 	{
 		logError(message+ ":\n");
 		logExeceptionSource(e);
@@ -193,7 +195,7 @@ public class FileDescriptorSystem
 	 * @param fd referência do arquivo descritor do qual será terminado.
 	 */
 
-	private void setEndOfFile(FileDescriptor fd)
+	public static void setEndOfFile(FileDescriptor fd)
 	{
 		fd.getFlag().set(FLAG_EOF);
 	}
@@ -247,5 +249,11 @@ public class FileDescriptorSystem
 	{
 		sessions.clear();
 		actions.clear();
+	}
+
+	@Override
+	public Iterator<FileDescriptor> iterator()
+	{
+		return sessions.iterator();
 	}
 }

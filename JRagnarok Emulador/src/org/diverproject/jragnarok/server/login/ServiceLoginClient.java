@@ -467,9 +467,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	public void sendAccountInfo(LFileDescriptor fd, AccountInfoRequest ack, Account account)
 	{
 		AccountInfoResult packet = new AccountInfoResult();
-		packet.setMapFD(ack.getMapFD());
+		packet.setMapFD(ack.getServerFD());
 		packet.setUFD(packet.getUFD());
-		packet.setAID(packet.getAID());
 		packet.setAccountID(account.getID());
 		packet.setData(account != null);
 
@@ -482,13 +481,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			packet.setLastIP(account.getLastIP().get());
 			packet.setLastLogin(i(account.getLastLogin().get()));
 			packet.setBirthdate(account.getBirthDate());
-
-			if (ack.getGroupID() >= account.getGroup().getID())
-			{
-				packet.setPassword(account.getPassword());
-				packet.setPincode(account.getPincode().getCode());
-			}
-
+			packet.setPassword(account.getPassword());
+			packet.setPincode(account.getPincode().getCode());
 			packet.setUsername(account.getUsername());
 		}
 
