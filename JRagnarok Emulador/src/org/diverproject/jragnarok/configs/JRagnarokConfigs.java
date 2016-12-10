@@ -78,6 +78,15 @@ public class JRagnarokConfigs
 	public static final String CHAR_SERVER_NAME = CHAR_CONFIGS+ ".name";
 	public static final String CHAR_MAINTANCE = CHAR_CONFIGS+ ".maintance";
 	public static final String CHAR_NEW_DISPLAY = CHAR_CONFIGS+ ".new_display";
+	public static final String CHAR_MAX_USERS = CHAR_CONFIGS+ ".max_users";
+	public static final String CHAR_OVERLOAD_BYPASS = CHAR_CONFIGS+ ".overload_bypass";
+	public static final String CHAR_MOVE_ENABLED = CHAR_CONFIGS+ ".move_enabled";
+	public static final String CHAR_MOVE_TO_USED = CHAR_CONFIGS+ ".movetoused";
+	public static final String CHAR_MOVE_UNLIMITED = CHAR_CONFIGS+ ".moves_unlimited";
+	public static final String CHAR_CHECKDB = CHAR_CONFIGS+ ".checkdb";
+	public static final String CHAR_DEFAULT_MAP = CHAR_CONFIGS+ ".default_map";
+	public static final String CHAR_DEFAULT_MAP_X = CHAR_CONFIGS+ ".default_map_x";
+	public static final String CHAR_DEFAULT_MAP_Y = CHAR_CONFIGS+ ".default_map_y";
 
 	public static final String MAP_CONFIGS = "map";
 	public static final String MAP_IP = MAP_CONFIGS+ ".ip";
@@ -200,6 +209,15 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigString(CHAR_SERVER_NAME, "Char Server"));
 		configurations.add(new ConfigInt(CHAR_MAINTANCE, 0));
 		configurations.add(new ConfigInt(CHAR_NEW_DISPLAY, 0));
+		configurations.add(new ConfigInt(CHAR_MAX_USERS, -1));
+		configurations.add(new ConfigInt(CHAR_OVERLOAD_BYPASS, 99));
+		configurations.add(new ConfigBoolean(CHAR_MOVE_ENABLED, true));
+		configurations.add(new ConfigBoolean(CHAR_MOVE_TO_USED, true));
+		configurations.add(new ConfigBoolean(CHAR_MOVE_UNLIMITED, false));
+		configurations.add(new ConfigBoolean(CHAR_CHECKDB, false));
+		configurations.add(new ConfigString(CHAR_DEFAULT_MAP, "prontera"));
+		configurations.add(new ConfigInt(CHAR_DEFAULT_MAP_X, 156));
+		configurations.add(new ConfigInt(CHAR_DEFAULT_MAP_Y, 191));
 		configurations.add(new ConfigBoolean(PINCODE_ENABLED, true));
 		configurations.add(new ConfigInt(PINCODE_CHANGE_TIME, 0));
 		configurations.add(new ConfigInt(PINCODE_MAXTRY, 3));
