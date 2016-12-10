@@ -293,6 +293,9 @@ public class ServiceCharLogin extends AbstractCharService
 		@Override
 		public void onCall(Timer timer, int now, int tick)
 		{
+			if (!isConnected())
+				return;
+
 			List<Integer> accounts = new DynamicList<>();
 
 			for (OnlineCharData online : onlines)
@@ -563,6 +566,9 @@ public class ServiceCharLogin extends AbstractCharService
 	{
 		CharServerConnectResult packet = new CharServerConnectResult();
 		packet.receive(fd, false);
+
+		if (packet.getResult() == OK)
+			this.fd = fd;
 
 		return packet.getResult() == OK;
 	}

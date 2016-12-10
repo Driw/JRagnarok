@@ -47,7 +47,7 @@ public class OnlineCharControl extends AbstractControl implements Iterable<Onlin
 
 		this.cache = new IntegerLittleMap<>();
 
-		String table = Tables.getInstance().getAccounts();
+		String table = Tables.getInstance().getCharacters();
 		String sql = format("UPDATE %s SET online = 0", table);
 
 		try {

@@ -1,3 +1,8 @@
+10.12.2016 - 1.3.134
+- OnlineCharControl estava tentando atualizar a tabela de contas e não dos personagens.
+- ServiceCharLogin.sendAccounts() causava exception quando não houvesse conexão com o servidor de acesso.
+- A conexão no servidor de personagem com o servidor de acesso será alocada após parseLoginResult().
+
 10.12.2016 - 1.3.133
 - LoginServer deve inicializar primeiramente os controles e só depois os serviços.
 - Após a mudança de AbstractLoginService, ServiceLoginChar e ServiceLoginClient não foram atualizados.
