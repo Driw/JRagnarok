@@ -1,7 +1,16 @@
 package org.diverproject.jragnarok.server.character;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MIN_CHARS;
+import static org.diverproject.jragnarok.JRagnarokUtil.b;
+import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_ENABLED;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_UNLIMITED;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CHAR_SERVER_SELECTED;
 import static org.diverproject.log.LogSystem.logDebug;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokException;
@@ -10,12 +19,17 @@ import org.diverproject.jragnarok.packets.response.NotifyAuth;
 import org.diverproject.jragnarok.packets.response.PincodeSendState;
 import org.diverproject.jragnarok.packets.response.PincodeSendState.PincodeState;
 import org.diverproject.jragnarok.packets.response.RefuseEnter;
+import org.diverproject.jragnarok.packets.response.SendAccountChars;
+import org.diverproject.jragnarok.packets.response.SendAccountSlot;
+import org.diverproject.jragnarok.packets.response.SendCharPageCount;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.character.control.OnlineCharControl;
+import org.diverproject.jragnarok.server.character.structures.Character;
 import org.diverproject.jragnarok.server.character.structures.CharSessionData;
 import org.diverproject.jragnarok.server.character.structures.OnlineCharData;
 import org.diverproject.jragnarok.server.common.NotifyAuthResult;
+import org.diverproject.util.collection.Index;
 import org.diverproject.util.lang.HexUtil;
 
 /**
@@ -81,7 +95,7 @@ public class ServiceCharClient extends AbstractCharService
 	 * @return true se deve manter a conexão ou false caso contrário.
 	 */
 
-	private boolean acknowledgePacket(CFileDescriptor fd)
+	public boolean acknowledgePacket(CFileDescriptor fd)
 	{
 		AcknowledgePacket packetReceivePacketID = new AcknowledgePacket();
 		packetReceivePacketID.receive(fd, false);
@@ -110,7 +124,7 @@ public class ServiceCharClient extends AbstractCharService
 	 * @return sempre false, pois deve fechar a sessão do jogador com o servidor.
 	 */
 
-	private boolean parseAlreadyAuth(CFileDescriptor fd)
+	public boolean parseAlreadyAuth(CFileDescriptor fd)
 	{
 		CharSessionData sd = fd.getSessionData();
 		OnlineCharData online = onlines.get(sd.getID());
@@ -134,11 +148,11 @@ public class ServiceCharClient extends AbstractCharService
 
 	public void sendNotifyResult(CFileDescriptor fd, NotifyAuthResult result)
 	{
+		logDebug("notificar resultado (fd: %d).\n", fd.getID());
+
 		NotifyAuth packet = new NotifyAuth();
 		packet.setResult(result);
 		packet.send(fd);
-
-		logDebug("notify result sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -149,11 +163,11 @@ public class ServiceCharClient extends AbstractCharService
 
 	public void refuseEnter(CFileDescriptor fd, byte result)
 	{
+		logDebug("entrada rejeitada em (fd: %d).\n", fd.getID());
+
 		RefuseEnter packet = new RefuseEnter();
 		packet.setResult(result);
 		packet.send(fd);
-
-		logDebug("refuse enter sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -163,8 +177,11 @@ public class ServiceCharClient extends AbstractCharService
 	 * @param state estado do qual o código PIN deve assumir.
 	 */
 
-	public void pincodeSendState(CFileDescriptor fd, CharSessionData sd, PincodeState state)
+	public void pincodeSendState(CFileDescriptor fd, PincodeState state)
 	{
+		logDebug("enviando estado de código pin (fd: %d).\n", fd.getID());
+
+		CharSessionData sd = fd.getSessionData();
 		sd.getPincode().genSeed();
 
 		PincodeSendState packet = new PincodeSendState();
@@ -172,7 +189,207 @@ public class ServiceCharClient extends AbstractCharService
 		packet.setAccountID(sd.getID());
 		packet.setState(state.CODE);
 		packet.send(fd);
+	}
 
-		logDebug("send pincode state fd#%d.\n", fd.getID());
+	/**
+	 * Envia todos os dados para a exibição da lista de personagens de uma conta de acordo com o cliente.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void sendCharList(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("enviando lista de personagens de account#%d (fd: %d).\n", sd.getID(), fd.getID());
+
+		if (sd.getVersion() >= dateToVersion(20130000))
+		{
+			sendAccountSlot(fd);
+			sendAccountChars(fd);
+			sendCharPageCount(fd);
+		}
+
+		else
+			sendAccountChars(fd);
+
+		if (sd.getVersion() >= dateToVersion(20060819))
+			;
+	}
+
+	/**
+	 * Envia ao cliente os dados relacionados a quantidade de slots disponíveis para personagens.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void sendAccountSlot(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("enviando dados de slot de account#%d (fd: %d)", sd.getID(), fd.getID());
+
+		SendAccountSlot packet = new SendAccountSlot();
+		packet.setMinChars(b(MIN_CHARS));
+		packet.setCharsVip(sd.getVip().getCharSlotCount());
+		packet.setCharsBilling(sd.getVip().getCharBilling());
+		packet.setCharsSlot(sd.getCharSlots());
+		packet.setMaxChars(b(MAX_CHARS));
+	}
+
+	/**
+	 * Envia todos os dados dos personagens da conta respectiva a sessão que foi estabelecida.
+	 * Os dados são enviados ao cliente para que ele possa exibir a seleção do personagem.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	private void sendAccountChars(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("enviando dados dos personagens de account#%d (fd: %d).\n", sd.getID(), fd.getID());
+
+		for (int i = 0; i < MAX_CHARS; i++)
+			sd.setCharData(null, i);
+
+		if (sd.getVersion() >= dateToVersion(20100413))
+		{
+			try {
+
+				Index<Character> characters = this.characters.list(sd.getID());
+
+				SendAccountChars packet = new SendAccountChars();
+				packet.setTotalSlots(MAX_CHARS);
+				packet.setPremiumStartSlot(MIN_CHARS);
+				packet.setPremiumEndSlot(b(MIN_CHARS + sd.getVip().getCharSlotCount()));
+				packet.setDummyBeginBilling(b(0));
+				packet.setFirstTime(0);
+				packet.setSecondTime(0);
+				packet.setDummyEndBilling(null);
+				packet.setCode(0);
+				packet.setCharMoveCount(sd.getCharactersMove());
+				packet.setCharMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
+				packet.setCharMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));
+				packet.setCharacters(characters);
+				packet.send(fd);
+
+			} catch (RagnarokException e) {
+				logError("falha ao carregar dados dos personagens (aid: %d):", sd.getID());
+				logExeception(e);
+			}
+		}
+	}
+
+	/**
+	 * Envia ao cliente a quantidade de páginas disponíveis para seleção de personagens.
+	 * Cada página é composta por 3 slots para alocação de um único personagem no mesmo.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void sendCharPageCount(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		SendCharPageCount packet = new SendCharPageCount();
+		packet.setCharSlots(sd.getCharSlots());
+		packet.setPageCount(sd.getCharSlots() / 3);
+		packet.send(fd);
+	}
+
+	// TODO chclif_char_delete2_ack
+	// TODO chclif_char_delete2_accept_ack
+	// TODO chclif_char_delete2_cancel_ack
+	// TODO chclif_parse_char_delete2_req
+	// TODO chclif_delchar_check
+	// TODO chclif_parse_char_delete2_accept
+	// TODO chclif_parse_char_delete2_cancel
+	// TODO chclif_parse_maplogin
+	// TODO chclif_parse_reqtoconnect
+	// TODO chclif_parse_req_charlist
+	// TODO chclif_parse_charselect
+	// TODO chclif_parse_createnewchar
+	// TODO chclif_refuse_delchar
+	// TODO chclif_parse_delchar
+	// TODO chclif_parse_reqrename
+	// TODO charblock_timer
+	// TODO chclif_block_character
+	// TODO chclif_parse_ackrename
+	// TODO chclif_ack_captcha
+	// TODO chclif_reject
+	// TODO chclif_parse_reqcaptcha
+	// TODO chclif_parse_chkcaptcha
+
+	public boolean isPincodeAllowed(String pincode)
+	{
+		// TODO pincode_allowed
+		return false;
+	}
+
+	public void parsePincodeSetNew(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("definindo primeiro código PIN (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_parse_pincode_setnew
+	}
+
+	public void parsePincodeChange(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("alterando código PIN existente (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_parse_pincode_change
+	}
+
+	public void parsePincodeCheck(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("recebendo código PIN inserido (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_parse_pincode_check
+	}
+
+	public void reqPincodeWindow(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("solicitar tela para digitar código PIN (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_parse_reqpincode_window
+	}
+
+	public void sendPincodeState(CFileDescriptor fd, PincodeState state)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("enviando código PIN paraa atuar em %s (fd: %d, aid: %d).\n", state, fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_pincode_sendstate
+	}
+
+	public void parseMoveCharSlot(CFileDescriptor fd)
+	{
+		// TODO chclif_parse_moveCharSlot
+	}
+
+	public void sendMoveCharSlotResult(CFileDescriptor fd)
+	{
+		// TODO chclif_moveCharSlotReply
 	}
 }

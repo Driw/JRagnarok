@@ -1,38 +1,28 @@
 package org.diverproject.jragnarok.packets.request;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHANGE_SEX;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
-public class AccountDataRequest extends RequestPacket
+public class ChangeSexRequest extends RequestPacket
 {
-	private int fdID;
 	private int accountID;
+	private char sex;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putInt(fdID);
 		output.putInt(accountID);
+		output.putChar(sex);
 	}
 
 	@Override
 	protected void receiveInput(Input input)
 	{
-		fdID = input.getInt();
 		accountID = input.getInt();
-	}
-
-	public int getFdID()
-	{
-		return fdID;
-	}
-
-	public void setFdID(int fdID)
-	{
-		this.fdID = fdID;
+		sex = input.getChar();
 	}
 
 	public int getAccountID()
@@ -45,21 +35,31 @@ public class AccountDataRequest extends RequestPacket
 		this.accountID = accountID;
 	}
 
+	public char getSex()
+	{
+		return sex;
+	}
+
+	public void setSex(char sex)
+	{
+		this.sex = sex;
+	}
+
 	@Override
 	public String getName()
 	{
-		return "REQ_ACCOUNT_DATA";
+		return "REQ_CHANGE_SEX";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_REQ_ACCOUNT_DATA;
+		return PACKET_REQ_CHANGE_SEX;
 	}
 
 	@Override
 	protected int length()
 	{
-		return 8;
+		return 5;
 	}
 }

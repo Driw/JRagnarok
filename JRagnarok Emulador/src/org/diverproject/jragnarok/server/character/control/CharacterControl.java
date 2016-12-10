@@ -18,6 +18,8 @@ import org.diverproject.jragnarok.server.character.structures.Character;
 import org.diverproject.jragnarok.server.character.structures.Experience;
 import org.diverproject.jragnarok.server.character.structures.MercenaryRank;
 import org.diverproject.util.collection.Index;
+import org.diverproject.util.collection.List;
+import org.diverproject.util.collection.abstraction.DynamicList;
 import org.diverproject.util.collection.abstraction.StaticArray;
 
 /**
@@ -1155,5 +1157,123 @@ public class CharacterControl extends AbstractControl
 				characters.add(i, get(ids[i]));
 
 		return characters;
+	}
+
+	/**
+	 * Atualiza o sexo de um determinado personagem conforme as especificações abaixo:
+	 * @param charID código de identificação do personagem que terá o sexo alterado.
+	 * @param sex caracter que representa o sexo do personagem (M: masculino, F: feminino).
+	 * @return true se conseguir alterar ou false se não encontrar ou for igual ao atual.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean setSex(int charID, char sex) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharacters();
+		String sql = format("UPDATE %s SET sex = ? WHERE id = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setString(1, java.lang.Character.toString(sex));
+			ps.setInt(2, charID);
+
+			if (ps.executeUpdate() == 1)
+			{
+				logDebug("character#%d agora é do sexo '%s'.\n", Character.sexOf(sex));
+				return true;
+			}
+
+			logDebug("character#%d não se tornou '%s'.\n", Character.sexOf(sex));
+			return false;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Solicita ao banco de dados identificações específicas para a alteração do sexo de um personagem.
+	 * As identificações são referentes a conta do personagem, clã em que se encontra e sua classe.
+	 * @param charID código de identificação do personagem do qual deseja obter as informações.
+	 * @return objeto contendo as informações para alteração do sexo ou null se não encontrar o personagem.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public ChangeSex getChangeSex(int charID) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharacters();
+		String tableCharList = Tables.getInstance().getAccountsCharacters();
+		String sql = format("SELECT %s.account, %s.jobid, %s.guildid FROM %s "
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"WHERE %s.id = ?",
+						tableCharList, table, table, table,
+						tableCharList, tableCharList, table, table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, charID);
+
+			ResultSet rs = ps.executeQuery();
+			ChangeSex change = null;
+
+			if (rs.next())
+			{
+				change = new ChangeSex();
+				change.setCharID(charID);
+				change.setAccountID(rs.getInt("account"));
+				change.setClassID(rs.getInt("jobid"));
+				change.setGuildID(rs.getInt("guilid"));
+			}
+
+			return null;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Solicita ao banco de dados identificações específicas para a alteração do sexo de vários personagens.
+	 * As identificações são referentes ao código do personagem, clã em que se encontra e sua classe.
+	 * @param accountID código de identificação da conta que será listado os personagens a serem alterados.
+	 * @return lista contendo as informações para alteração do sexo dos personagens da conta passada.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public List<ChangeSex> listChangeSex(int accountID) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharacters();
+		String tableCharList = Tables.getInstance().getAccountsCharacters();
+		String sql = format("SELECT %s.charid, %s.jobid, %s.guildid FROM %s "
+						+	"INNER JOIN %s ON %s.account = %s.id ",
+						tableCharList, table, table, table,
+						tableCharList, tableCharList, table);
+
+		try {
+
+			List<ChangeSex> changes = new DynamicList<>();
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, accountID);
+
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next())
+			{
+				ChangeSex change = new ChangeSex();
+				change.setAccountID(accountID);
+				change.setCharID(rs.getInt("charid"));
+				change.setClassID(rs.getInt("jobid"));
+				change.setGuildID(rs.getInt("guilid"));
+				changes.add(change);
+			}
+
+			return changes;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
 	}
 }

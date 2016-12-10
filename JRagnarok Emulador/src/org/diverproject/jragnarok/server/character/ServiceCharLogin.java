@@ -1,25 +1,32 @@
 package org.diverproject.jragnarok.server.character;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MIN_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
+import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.hours;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MAINTANCE;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MAX_USERS;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_NEW_DISPLAY;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_OVERLOAD_BYPASS;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PASSWORD;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_SERVER_NAME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_USERNAME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_BAN_NOTIFICATION;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_CHANGE_TIME;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_FORCE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_BAN_NOTIFICATION;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ALREADY_ONLINE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHANGE_SEX;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_GLOBAL_ACCREG;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_VIP;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_ACCOUNT_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_ACCOUNT_INFO;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_ACCOUNT;
@@ -27,7 +34,10 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_CHAR_
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.jragnarok.server.common.AuthResult.OK;
 import static org.diverproject.log.LogSystem.logDebug;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
+import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.lang.IntUtil.diff;
 
@@ -35,28 +45,53 @@ import java.io.IOException;
 import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
 import org.diverproject.jragnarok.packets.request.AccountDataRequest;
+import org.diverproject.jragnarok.packets.request.AccountDataResult;
+import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
+import org.diverproject.jragnarok.packets.request.AccountInfoResult;
+import org.diverproject.jragnarok.packets.request.AlreadyOnline;
 import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
 import org.diverproject.jragnarok.packets.request.AuthAccountResult;
+import org.diverproject.jragnarok.packets.request.BanNotificationRequest;
+import org.diverproject.jragnarok.packets.request.BanNotificationResult;
+import org.diverproject.jragnarok.packets.request.ChangeSexNotify;
+import org.diverproject.jragnarok.packets.request.ChangeSexRequest;
 import org.diverproject.jragnarok.packets.request.CharMapUserCountRequest;
 import org.diverproject.jragnarok.packets.request.CharServerConnectRequest;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
+import org.diverproject.jragnarok.packets.request.GlobalAccountRegRequest;
+import org.diverproject.jragnarok.packets.request.GlobalAccountRegResult;
+import org.diverproject.jragnarok.packets.request.NotifyPinError;
+import org.diverproject.jragnarok.packets.request.NotifyPinUpdate;
 import org.diverproject.jragnarok.packets.request.SendAccountRequest;
+import org.diverproject.jragnarok.packets.request.SetAccountOffline;
+import org.diverproject.jragnarok.packets.request.SetAccountOnline;
+import org.diverproject.jragnarok.packets.request.SetAllAccountOffline;
 import org.diverproject.jragnarok.packets.request.UpdateUserCount;
 import org.diverproject.jragnarok.packets.response.KeepAliveRequest;
 import org.diverproject.jragnarok.packets.response.RefuseEnter;
+import org.diverproject.jragnarok.packets.response.PincodeSendState.PincodeState;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
+import org.diverproject.jragnarok.server.FileDescriptorSystem;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
+import org.diverproject.jragnarok.server.character.control.ChangeSex;
 import org.diverproject.jragnarok.server.character.structures.CharSessionData;
+import org.diverproject.jragnarok.server.character.structures.ClientMapServer;
 import org.diverproject.jragnarok.server.character.structures.OnlineCharData;
+import org.diverproject.jragnarok.server.common.GlobalAccountReg;
+import org.diverproject.jragnarok.server.common.NotifyAuthResult;
+import org.diverproject.util.BitWise8;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.DynamicList;
+import org.diverproject.util.lang.ByteUtil;
+import org.diverproject.util.lang.HexUtil;
 
 /**
  * <h1>Serviço de Comunicação do Servidor de Acesso</h1>
@@ -78,9 +113,9 @@ import org.diverproject.util.collection.abstraction.DynamicList;
 public class ServiceCharLogin extends AbstractCharService
 {
 	/**
-	 * TODO
+	 * Tempo em milissegundos de espera máxima para manter uma conexão viva.
 	 */
-	protected static final int STALL_TIME = 60;
+	protected static final int STALL_TIME = seconds(60);
 
 	/**
 	 * Descritor de Arquivo para com o servidor de acesso.
@@ -158,7 +193,27 @@ public class ServiceCharLogin extends AbstractCharService
 		return fd != null && fd.isConnected();
 	}
 
-	// TODO public void onDisconnect;
+	/**
+	 * Verifica sa há conexão com o servidor de acesso para enviar os dados do pacote.
+	 * Se houver envia os dados de um pacote para um determinado descritor de arquivo.
+	 * Caso contrário envia ao cliente um pacote mostrando que este foi rejeitado.
+	 * @param fd código de identificação da conexão do cliente com o servidor.
+	 * @param packet pacote contendo os dados do qual serão enviados.
+	 * @return true se houver a conexão com o servidor de acesso ou false caso contrário.
+	 */
+
+	public boolean sendPacket(CFileDescriptor fd, IResponsePacket packet)
+	{
+		if (!isConnected())
+		{
+			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
+			return false;
+		}
+
+		packet.send(fd);
+
+		return true;
+	}
 
 	/**
 	 * Listener usado através de um temporizador que tem como objeto garantir que o
@@ -315,11 +370,12 @@ public class ServiceCharLogin extends AbstractCharService
 			CFileDescriptor cfd = (CFileDescriptor) fd;
 			parsePing(cfd);
 
-			return parseCommand(cfd);
+			return acknowledgePacket(cfd);
 		}
 	};
 
 	/**
+	 * Verifica se a conexão está em estado para solicitação de um ping.
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
@@ -327,9 +383,11 @@ public class ServiceCharLogin extends AbstractCharService
 	{
 		if (fd.getFlag().is(FileDescriptor.FLAG_PING))
 		{
+			// Tempo de limite de espera alcançado - fechar conexão
 			if (diff(getTimerSystem().getCurrentTime(), fd.getTimeout()) > STALL_TIME * 2)
 				fd.getFlag().set(FileDescriptor.FLAG_EOF);
 
+			// Ping ainda não foi enviado - enviar
 			else if (!fd.getFlag().is(FileDescriptor.FLAG_PING_SENT))
 			{
 				KeepAliveRequest packet = new KeepAliveRequest();
@@ -341,13 +399,13 @@ public class ServiceCharLogin extends AbstractCharService
 	}
 
 	/**
-	 * Procedimento que deverá verificar qual o código do comando passado pelo servidor de acesso.
+	 * Procedimento que verifica qual o código do comando passado pelo servidor de acesso.
 	 * A partir deste comando deverá repassar a conexão para o procedimento correto.
 	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor.
-	 * @return true se deve manter a conexão ou false para encerrar.
+	 * @return true para manter a conexão aberta ou false para fechar.
 	 */
 
-	protected boolean parseCommand(CFileDescriptor fd)
+	protected boolean acknowledgePacket(CFileDescriptor fd)
 	{
 		AcknowledgePacket ack = new AcknowledgePacket();
 		ack.receive(fd, false);
@@ -356,29 +414,150 @@ public class ServiceCharLogin extends AbstractCharService
 
 		switch (command)
 		{
-			case PACKET_RES_CHAR_SERVER_CONNECT: return parseLoginResult(fd);
-			case PACKET_RES_AUTH_ACCOUNT: return parseAuthAccount(fd);
-			case PACKET_RES_ACCOUNT_DATA: return parseAccountData(fd);
-			case PACKET_REQ_KEEP_ALIVE: return keepAlive(fd);
-			case PACKET_RES_ACCOUNT_INFO: return parseAccountInfo(fd);
-			case PACKET_REQ_CHANGE_SEX: return parseChangeSex(fd);
-			case PACKET_REQ_GLOBAL_ACCREG: return parseGlobalAccountReg(fd);
-			case PACKET_BAN_NOTIFICATION: return banNofitication(fd);
-			case PACKET_ALREADY_ONLINE: return alreadyOnline(fd);
-			case PACKET_SYNCRONIZE_IPADDRESS: return synconize(fd);
-			case PACKET_REQ_VIP: return parseVip(fd);
+			case PACKET_REQ_KEEP_ALIVE:
+				return keepAlive(fd);
+
+			case PACKET_REQ_CHANGE_SEX:
+				return reqChangeSex(fd);
+
+			case PACKET_REQ_GLOBAL_ACCREG:
+				reqGlobalAccountReg(fd);
+				return true;
 		}
 
-		return false;
+		return acknowledgeResultPackets(fd, command);
+	}
+
+	/**
+	 * Análise de pacotes contento a resposta de uma solicitação feita ao servidor de acesso.
+	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 * @param command código do comando identificado no reconhecimento de pacote.
+	 * @return true para manter a conexão aberta ou false para fechar.
+	 */
+
+	public boolean acknowledgeResultPackets(CFileDescriptor fd, short command)
+	{
+		switch (command)
+		{
+			case PACKET_RES_CHAR_SERVER_CONNECT:
+				return parseLoginResult(fd);
+
+			case PACKET_RES_AUTH_ACCOUNT:
+				return parseAuthAccount(fd);
+
+			case PACKET_RES_ACCOUNT_DATA:
+				return parseAccountData(fd);
+
+			case PACKET_RES_ACCOUNT_INFO:
+				parseAccountInfo(fd);
+				return true;
+
+			case PACKET_REQ_BAN_NOTIFICATION:
+				banNofitication(fd);
+				return true;
+
+			case PACKET_ALREADY_ONLINE:
+				alreadyOnline(fd);
+				return true;
+
+			case PACKET_SYNCRONIZE_IPADDRESS:
+			default:
+				String packet = HexUtil.parseInt(command, 4);
+				String address = fd.getAddressString();
+				logNotice("fim de conexão inesperado (pacote: 0x%s, ip: %s)\n", packet, address);
+				fd.close();
+				return false;
+		}
+	}
+
+	/**
+	 * Notifica uma determinada conexão de um cliente que sua conta acaba de ser banida no sistema.
+	 * Será identificado o código da conta do jogador, o tipo de alteração e até quando será banido.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void banNofitication(CFileDescriptor fd)
+	{
+		BanNotificationRequest packet = new BanNotificationRequest();
+		packet.receive(fd);
+
+		BanNotificationResult result = new BanNotificationResult();
+		result.setAccountID(packet.getAccountID());
+		result.setType(packet.getType());
+		result.setUnbanTime(packet.getUnbanTime());
+
+		map.sendAll(result);
+		character.disconnectPlayer(packet.getAccountID());
+	}
+
+	/**
+	 * Notifica um jogador em um servidor de mapas que sua conta está sendo usada por outro jogador.
+	 * Esse chamado ocorre quando um jogador tenta entrar em uma conta que já se encontra online.
+	 * @param fd conexão do descritor de arquivo da conexão com o servidor de mapas.
+	 */
+
+	public void alreadyOnline(CFileDescriptor sfd)
+	{
+		AlreadyOnline packet = new AlreadyOnline();
+		packet.receive(sfd);
+
+		OnlineCharData online = onlines.get(packet.getAccountID());
+
+		if (online != null)
+		{
+			// Conta já marcada como online
+			if (online.getServer() > OnlineCharData.NO_SERVER)
+			{
+				ClientMapServer server = getServer().getMapServers().get(online.getServer());
+				map.disconnectPlayer(server.getFileDecriptor(), online.getAccountID(), online.getCharID(), 2);
+
+				TimerSystem ts = getTimerSystem();
+				TimerMap timers = ts.getTimers();
+				timers.delete(online.getWaitingDisconnect());
+
+				Timer waitingDisconnect = timers.acquireTimer();
+				waitingDisconnect.setTick(ts.getCurrentTime());
+				waitingDisconnect.setObjectID(online.getAccountID());
+				waitingDisconnect.setListener(character.waitinDisconnect);
+				timers.addInterval(waitingDisconnect, ServiceCharServer.AUTH_TIMEOUT);
+			}
+
+			else
+			{
+				CFileDescriptor fd = null;
+
+				for (FileDescriptor ifd : getFileDescriptorSystem())
+					if (fd instanceof CFileDescriptor)
+					{
+						CFileDescriptor cfd = (CFileDescriptor) ifd;
+
+						if (cfd.getSessionData().getID() == packet.getAccountID())
+						{
+							fd = cfd;
+							break;
+						}
+					}
+
+				if (fd != null)
+					character.setCharOffline(-1, packet.getAccountID());
+				else
+				{
+					client.sendNotifyResult(fd, NotifyAuthResult.ALREADY_ONLINE);
+					FileDescriptorSystem.setEndOfFile(fd);
+				}
+			}
+		}
+
+		auths.remove(packet.getAccountID());
 	}
 
 	/**
 	 * Analisa a resposta de uma solicitação para se conectar com o servidor de acesso.
 	 * @param fd conexão do descritor de arquivo da conexão com o servidor de acesso.
-	 * @return true se deve manter a conexão ou false para encerrar.
+	 * @return true para manter a conexão aberta ou false para fechar.
 	 */
 
-	private boolean parseLoginResult(CFileDescriptor fd)
+	public boolean parseLoginResult(CFileDescriptor fd)
 	{
 		CharServerConnectResult packet = new CharServerConnectResult();
 		packet.receive(fd, false);
@@ -387,20 +566,16 @@ public class ServiceCharLogin extends AbstractCharService
 	}
 
 	/**
-	 * Faz uma solicitação ao servidor de acesso sobre a autenticação de uma conta.
+	 * Solicita ao servidor de acesso a autenticação de uma determinada conta acessada.
 	 * Essa autenticação fica no servidor de acesso até que o de personagem solicite.
 	 * Em último caso pode ser removido também devido a inatividade do jogador.
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @return true se houver conexão com o servidor de acesso ou false caso contrário.
+	 * @return true para manter a conexão aberta ou false para fechar.
 	 */
 
 	public boolean reqAuthAccount(CFileDescriptor fd)
 	{
-		if (!isConnected())
-		{
-			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
-			return false;
-		}
+		logDebug("solicitando autenticação de conta (fd: %d).\n", fd.getID());
 
 		CharSessionData sd = fd.getSessionData();
 
@@ -410,17 +585,22 @@ public class ServiceCharLogin extends AbstractCharService
 		packet.setSecondSeed(sd.getSeed().getSecond());
 		packet.setIP(fd.getAddress());
 		packet.setFdID(fd.getID());
-		packet.send(getFileDescriptor());
 
-		logDebug("fd#%d request auth account from login-server.\n", fd.getID());
-
-		return true;
+		return sendPacket(fd, packet);
 	}
 
-	private boolean parseAuthAccount(CFileDescriptor lfd)
+	/**
+	 * Recebe o resultado obtido do servidor de acesso da autenticação de uma conta.
+	 * @param lfd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 * @return true para manter a conexão aberta ou false para fechar.
+	 */
+
+	public boolean parseAuthAccount(CFileDescriptor lfd)
 	{
+		logDebug("recebendo resultado da autenticação de conta.\n");
+
 		AuthAccountResult packet = new AuthAccountResult();
-		packet.receive(fd);
+		packet.receive(lfd);
 
 		if (getFileDescriptorSystem().isAlive(packet.getRequestID()))
 		{
@@ -438,15 +618,10 @@ public class ServiceCharLogin extends AbstractCharService
 				if (sd.getVersion() != serverVersion)
 					logWarning("account#%d com versão %d e o servidor foi compilado para %d.\n", sd.getID(), sd.getVersion(), serverVersion);
 
-				switch (packet.getResult())
-				{
-					case 0:
-						return character.authOk(fd);
+				if (packet.isResult())
+					return character.authOk(fd);
 
-					case 1:
-						client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
-						return false;
-				}
+				client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
 			}
 		}
 
@@ -456,119 +631,434 @@ public class ServiceCharLogin extends AbstractCharService
 	/**
 	 * Faz uma solicitação ao servidor de acesso sobre os dados de uma conta.
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @return true se houver conexão com o servidor de acesso ou false caso contrário.
+	 * @return true para manter a conexão aberta ou false para fechar.
 	 */
 
 	public boolean reqAccountData(CFileDescriptor fd)
 	{
-		if (!isConnected())
-		{
-			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
-			return false;
-		}
+		logDebug("solicitando dados de conta (fd: %d).\n", fd.getID());
 
 		CharSessionData sd = fd.getSessionData();
 		AccountDataRequest packet = new AccountDataRequest();
+		packet.setFdID(fd.getID());
+		packet.setAccountID(sd.getID());
+
+		return sendPacket(fd, packet);
+	}
+
+	/**
+	 * Recebe os dados de uma conta do servidor de acesso que foi solicitada.
+	 * @param lfd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 * @return true para manter a conexão aberta ou false para fechar.
+	 */
+
+	public boolean parseAccountData(CFileDescriptor lfd)
+	{
+		logDebug("recebendo resultado dos dados de conta.\n");
+
+		AccountDataResult packet = new AccountDataResult();
+		packet.receive(lfd);
+
+		CFileDescriptor fd = (CFileDescriptor) getFileDescriptorSystem().get(packet.getFdID());
+		CharSessionData sd = fd.getSessionData();
+
+		if (!sd.isAuth() || sd.getID() == packet.getAccountID())
+			return false;
+
+		sd.setEmail(packet.getEmail());
+		sd.getExpiration().set(packet.getExpirationTime());
+
+		if (MAX_CHARS != 0 && packet.getCharSlots() > MAX_CHARS)
+			logWarning("limite de personagens permitidos por conta (aid: %d)", sd.getID());
+
+		sd.setCharSlots(ByteUtil.limit(packet.getCharSlots(), b(MIN_CHARS), b(MAX_CHARS)));
+		sd.setBirthdate(packet.getBirthdate());
+
+		// TODO sd.setGroup(group);
+		// TODO sd.setPincode(pincode);
+		// TODO sd.setVip(vip);
+
+		OnlineCharData online = onlines.get(sd.getID());
+		boolean enabled = false;
+
+		if (online != null)
+		{
+			int maxUsers = getConfigs().getInt(CHAR_MAX_USERS);
+			int overloadBypass = getConfigs().getInt(CHAR_OVERLOAD_BYPASS);
+
+			ClientMapServer server = getServer().getMapServers().get(online.getServer());
+
+			if (server != null && server.getFileDecriptor().isConnected())
+			{
+				if (maxUsers == 0 && sd.getGroup().getLevel() >= overloadBypass)
+					enabled = true;
+
+				else if (maxUsers > 0 && character.getCountUsers() >= maxUsers && sd.getGroup().getLevel() >= overloadBypass)
+					enabled = true;
+			}
+		}
+
+		if (enabled)
+		{
+			client.sendCharList(fd);
+
+			if (sd.getVersion() >= dateToVersion(20110309))
+				pincodeStart(fd);
+		}
+
+		else
+			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
+
+		return enabled;
+	}
+
+	/**
+	 * Solicita ao servidor de acesso informações básicas de uma conta especifica.
+	 * A conta em questão será aquela utilizada pelo jogador da conexão abaixo:
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @return true se conseguir enviar a solicitação ou false caso contrário.
+	 */
+
+	public boolean reqAccountInfo(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("solicitando informações de conta (fd: %d, aid: %d).\n", sd.getID());
+
+		AccountInfoRequest packet = new AccountInfoRequest();
+		packet.setServerFD(getFileDescriptor().getID());
+		packet.setUserFD(sd.getID());
+		packet.setAccountID(sd.getID());
+
+		return sendPacket(fd, packet);
+	}
+
+	/**
+	 * Recebe do servidor de acesso as informações básicas da conta de um jogador conectado.
+	 * @param lfd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 */
+
+	public void parseAccountInfo(CFileDescriptor lfd)
+	{
+		AccountInfoResult packet = new AccountInfoResult();
+		packet.receive(lfd);
+
+		logDebug("recebendo informações da conta do servidor de acesso (aid: %d).\n", packet.getAccountID());
+
+		map.receiveAccountInfo(packet);
+	}
+
+	/**
+	 * Mantém a conexão de um descritor de arquivo vida dentro do sistema com um "ping".
+	 * @param lfd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 * @return true se ainda estiver conectado ou false caso contrário.
+	 */
+
+	public boolean keepAlive(CFileDescriptor lfd)
+	{
+		logDebug("recebendo ping do servidor de acesso (ip: %s).\n", getFileDescriptor().getAddressString());
+
+		lfd.getFlag().unset(FileDescriptor.FLAG_PING);
+
+		return lfd.isConnected();
+	}
+
+	/**
+	 * Recebe a solicitação para alteração do sexo dos personagens de uma determinada conta.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @return true se conseguir alterar ou false caso a conta não tenha sido definida.
+	 */
+
+	public boolean reqChangeSex(CFileDescriptor fd)
+	{
+		ChangeSexRequest packet = new ChangeSexRequest();
+		packet.receive(fd);
+
+		logDebug("solicitado alterar sexo dos personagens (fd: %d, aid: %d).\n", fd.getID(), packet.getAccountID());
+
+		if (packet.getAccountID() > 0)
+		{
+			try {
+
+				List<ChangeSex> changes = characters.listChangeSex(packet.getAccountID());
+
+				for (ChangeSex change : changes)
+					setCharSex(change, packet.getSex());
+
+				return true;
+
+			} catch (RagnarokException e) {
+
+				logError("falha ao tentar alterar o sexo dos personagens (fd: %d, aid: %d):.\n", fd.getID(), packet.getAccountID());
+				logExeception(e);
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Faz a alteração do sexo de um determinado personagem e notifica aos servidores.
+	 * @param charID código de identificação do personagem que terá o sexo alterado.
+	 * @param sex caracter que representa o seu novo sexo (M: masculino, F: feminino).
+	 * @return true se for alterado com sucesso ou false se não encontrar o personagem.
+	 */
+
+	public boolean parseChangeCharSex(int charID, char sex)
+	{
+		try {
+
+			if (!characters.setSex(charID, sex))
+				return false;
+
+			characters.setSex(charID, sex);
+			ChangeSex change = characters.getChangeSex(charID);
+
+			setCharSex(change, sex);
+			character.disconnectPlayer(change.getAccountID());
+
+			ChangeSexNotify packet = new ChangeSexNotify();
+			packet.setAccountID(change.getAccountID());
+			packet.setSex(sex);
+
+			map.sendAll(packet);
+
+			return true;
+
+		} catch (RagnarokException e) {
+
+			logError("falha ao tentar alterar o sexo do personagem (charid: %d);\n", charID);
+			logExeception(e);
+
+			return false;
+		}
+	}
+
+	/**
+	 * TODO
+	 * @param change
+	 * @param sex
+	 */
+
+	private void setCharSex(ChangeSex change, char sex)
+	{
+		// TODO chlogif_parse_change_sex_sub
+		
+	}
+
+	/**
+	 * TODO
+	 * @param fd
+	 */
+
+	public void reqGlobalAccountReg(CFileDescriptor fd)
+	{
+		GlobalAccountRegRequest packet = new GlobalAccountRegRequest();
+		packet.receive(fd);
+
+		GlobalAccountRegResult result = new GlobalAccountRegResult();
+		result.setRegisters(packet.getRegisters());
+
+		map.sendAll(result);
+	}
+
+	/**
+	 * TODO
+	 * @param register
+	 */
+
+	public void sendGlobalAccountReg(GlobalAccountReg register)
+	{
+		// TODO chlogif_send_global_accreg
+		
+	}
+
+	/**
+	 * TODO
+	 * @param aid
+	 * @param flag
+	 * @param timeDiff
+	 * @param mapFD
+	 * @return
+	 */
+
+	public boolean reqVipData(int aid, BitWise8 flag, int timeDiff, int mapFD)
+	{
+		// TODO chlogif_reqvipdata
+
+		return false;
+	}
+
+	/**
+	 * TODO
+	 * @param fd
+	 * @return
+	 */
+
+	public boolean parseVipData(CFileDescriptor fd)
+	{
+		// TODO chlogif_parse_vipack
+
+		return false;
+	}
+
+	/**
+	 * Analise a situação do sistema de código PIN conforme configurações e estado do jogador.
+	 * Se estiver habilitado antes de tudo verifica se a conta possuir um código PIn definido
+	 * ou ainda então se a conta deseja utilizar o sistema de código PIN como segurança extra.
+	 * Se não houver solicita a criação de um código PIN ao mesmo, caso já esteja definido
+	 * verifica se o código PIN já não expirou (se habilitado a expiração), se estiver irá
+	 * solicitar a alteração do código PIN, caso passe por tudo isso solicita o código PIN.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void pincodeStart(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+		{
+			logDebug("sistema de código pin iniciado (aid: %d).\n", sd.getID());
+
+			// Não há código PIN definido
+			if (sd.getPincode().getCode() == null)
+			{
+				if (getConfigs().getBool(PINCODE_FORCE))
+					client.pincodeSendState(fd, PincodeState.NEW);
+				else
+					client.pincodeSendState(fd, PincodeState.SKIP);
+			}
+
+			// Código PIN definido mas não habilitado
+			else if (!sd.getPincode().isEnabled())
+				client.pincodeSendState(fd, PincodeState.OK);
+
+			// Código PIN habilitado e definido
+			else
+			{
+				int changeTime = getConfigs().getInt(PINCODE_CHANGE_TIME);
+
+				if (changeTime > 0 && sd.getPincode().getChanged().pass(changeTime))
+					client.pincodeSendState(fd, PincodeState.EXPIRED);
+
+				else
+				{
+					OnlineCharData online = onlines.get(sd.getID());
+
+					if (online != null && online.isPincodeSuccess())
+						client.pincodeSendState(fd, PincodeState.SKIP);
+					else
+						client.pincodeSendState(fd, PincodeState.ASK);
+				}
+			}
+		}
+
+		else
+			client.pincodeSendState(fd, PincodeState.OK);
+	}
+
+	/**
+	 * Notifica ao servidor de acesso que o código pin inserido estava incorreto.
+	 * Essa ação deverá resultar no fechamento da conexão com o servidor de acesso.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @return true se houver conexão com o servidor de acesso ou false caso contrário.
+	 */
+
+	public boolean notifyLoginPinError(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("notificar código pin incorreto (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		NotifyPinError packet = new NotifyPinError();
 		packet.setAccountID(sd.getID());
 		packet.send(getFileDescriptor());
 
-		logDebug("fd#%d request account data from login-server.\n", fd.getID());
-
-		return true;
+		return sendPacket(fd, packet);
 	}
 
-	public boolean reqAccountData(int accountID)
+	/**
+	 * Solicitar ao servidor de acesso que atualize do código PIN de uma conta.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param pincode novo código pin do qual a conta deverá assumir.
+	 * @return true se houver conexão com o servidor de acesso ou false caso contrário.
+	 */
+
+	public boolean notifyLoginPinUpdate(CFileDescriptor fd, String pincode)
 	{
-		if (!isConnected())
-		{
-			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
-			return false;
-		}
+		CharSessionData sd = fd.getSessionData();
 
-		AccountDataRequest packet = new AccountDataRequest();
-		packet.setAccountID(accountID);
-		packet.send(getFileDescriptor());
+		logDebug("notificar atualização de código pin (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
 
-		logDebug("account#%d data request.\n", accountID, fd.getID());
+		NotifyPinUpdate packet = new NotifyPinUpdate();
+		packet.setAccountID(sd.getID());
+		packet.setPincode(pincode);
 
-		return true;
-	}
-
-	private boolean parseAccountData(CFileDescriptor fd)
-	{
-		// TODO chlogif_parse_reqaccdata
-		return false;
-	}
-
-	private boolean keepAlive(CFileDescriptor fd)
-	{
-		fd.getFlag().unset(FileDescriptor.FLAG_PING);
-
-		return fd.isConnected();
-	}
-
-	private boolean parseAccountInfo(CFileDescriptor fd)
-	{
-		// TODO chlogif_parse_AccInfoAck
-		return false;
-	}
-
-	private boolean parseChangeSex(CFileDescriptor fd)
-	{
-		// TODO chlogif_parse_ackchangesex
-		return false;
-	}
-
-	private boolean parseGlobalAccountReg(CFileDescriptor fd)
-	{
-		// TODO chlogif_parse_ack_global_accreg
-		return false;
-	}
-
-	private boolean banNofitication(CFileDescriptor fd)
-	{
-		// TODO chlogif_parse_accbannotification
-		return false;
-	}
-
-	private boolean alreadyOnline(CFileDescriptor fd)
-	{
-		// TODO chlogif_parse_askkick
-		return false;
-	}
-
-	private boolean synconize(CFileDescriptor fd)
-	{
-		// TODO chlogif_parse_updip
-		return false;
-	}
-
-	private boolean parseVip(CFileDescriptor fd)
-	{
-		// TODO chlogif_parse_vipack
-		return false;
+		return sendPacket(fd, packet);
 	}
 
 	/**
 	 * Envia ao servidor de acesso a quantidade de jogadores online no servidor.
 	 * @param users quantidade atual de jogadores online no servidor.
-	 * @return true se houver conexão com o servidor de acesso ou false caso contrário.
+	 * @return true para manter a conexão aberta ou false para fechar.
 	 */
 
 	public boolean updateUserCount(int users)
 	{
-		if (!isConnected())
-		{
-			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
-			return false;
-		}
+		logDebug("atualizar contagem de jogadores online.\n", fd.getID());
 
 		UpdateUserCount packet = new UpdateUserCount();
 		packet.setCount(users);
-		packet.send(getFileDescriptor());
 
-		logDebug("update user count.\n", fd.getID());
+		return sendPacket(fd, packet);
+	}
 
-		return true;
+	/**
+	 * Envia ao servidor de acesso em que se está conectado para definir todas as contas como offline.
+	 */
+
+	public void setAllAccountOffline()
+	{
+		if (isConnected())
+		{
+			logDebug("solicitado ao servidor de acesso para todas as contas ficarem offline.\n");
+
+			SetAllAccountOffline packet = new SetAllAccountOffline();
+			packet.send(getFileDescriptor());
+		}
+	}
+
+	/**
+	 * Envia ao servidor de acesso em que se está conectado para definir uma conta como offline.
+	 * @param accountID código de identificação da conta que ficará offline no servidor.
+	 */
+
+	public void setAccountOffline(int accountID)
+	{
+		if (isConnected())
+		{
+			logDebug("solicitado ao servidor de acesso para account#%d ficar offline.\n", accountID);
+
+			SetAccountOffline packet = new SetAccountOffline();
+			packet.setAccountID(accountID);
+			packet.send(getFileDescriptor());
+		}
+	}
+
+	/**
+	 * Envia ao servidor de acesso em que se está conectado para definir uma conta como online.
+	 * @param accountID código de identificação da conta que ficará online no servidor.
+	 */
+
+	public void setAccountOnline(int accountID)
+	{
+		if (isConnected())
+		{
+			logDebug("solicitado ao servidor de acesso para account#%d ficar online.\n", accountID);
+
+			SetAccountOnline packet = new SetAccountOnline();
+			packet.setAccountID(accountID);
+			packet.send(getFileDescriptor());
+		}
 	}
 }

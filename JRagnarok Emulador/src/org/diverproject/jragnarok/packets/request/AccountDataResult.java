@@ -13,6 +13,7 @@ import org.diverproject.util.stream.Output;
 
 public class AccountDataResult extends RequestPacket
 {
+	private int fdID;
 	private int accountID;
 	private String email;
 	private int expirationTime;
@@ -28,6 +29,7 @@ public class AccountDataResult extends RequestPacket
 	@Override
 	protected void sendOutput(Output output)
 	{
+		output.putInt(fdID);
 		output.putInt(accountID);
 		output.putString(email, EMAIL_LENGTH);
 		output.putInt(expirationTime);
@@ -44,6 +46,7 @@ public class AccountDataResult extends RequestPacket
 	@Override
 	protected void receiveInput(Input input)
 	{
+		fdID = input.getInt();
 		accountID = input.getInt();
 		email = strclr(input.getString(EMAIL_LENGTH));
 		expirationTime = input.getInt();
@@ -55,6 +58,16 @@ public class AccountDataResult extends RequestPacket
 		vip = input.getByte() == 1;
 		charVip = input.getByte();
 		charBilling = input.getByte();
+	}
+
+	public int getFdID()
+	{
+		return fdID;
+	}
+
+	public void setFdID(int fdID)
+	{
+		this.fdID = fdID;
 	}
 
 	public int getAccountID()

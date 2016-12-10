@@ -1,38 +1,26 @@
 package org.diverproject.jragnarok.packets.request;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_NOTIFY_PIN_ERROR;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
-public class AccountDataRequest extends RequestPacket
+public class NotifyPinError extends RequestPacket
 {
-	private int fdID;
 	private int accountID;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putInt(fdID);
 		output.putInt(accountID);
 	}
 
 	@Override
 	protected void receiveInput(Input input)
 	{
-		fdID = input.getInt();
 		accountID = input.getInt();
-	}
-
-	public int getFdID()
-	{
-		return fdID;
-	}
-
-	public void setFdID(int fdID)
-	{
-		this.fdID = fdID;
 	}
 
 	public int getAccountID()
@@ -48,18 +36,28 @@ public class AccountDataRequest extends RequestPacket
 	@Override
 	public String getName()
 	{
-		return "REQ_ACCOUNT_DATA";
+		return "NOTIFY_PIN_ERROR";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_REQ_ACCOUNT_DATA;
+		return PACKET_NOTIFY_PIN_ERROR;
 	}
 
 	@Override
 	protected int length()
 	{
-		return 8;
+		return 4;
+	}
+
+	@Override
+	public String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("accountID", accountID);
+
+		return description.toString();
 	}
 }

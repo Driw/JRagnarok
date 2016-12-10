@@ -1,43 +1,54 @@
 package org.diverproject.jragnarok.server.character;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.receive.CharServerSelected;
-import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.character.control.AuthControl;
+import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerListener;
+import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.character.entities.AuthNode;
 import org.diverproject.jragnarok.server.character.structures.CharSessionData;
+import org.diverproject.jragnarok.server.character.structures.OnlineCharData;
+import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.util.stream.Output;
 import org.diverproject.util.stream.StreamException;
 
 public class ServiceCharServerAuth extends AbstractCharService
 {
-	private AuthControl control;
-
 	public ServiceCharServerAuth(CharServer server)
 	{
 		super(server);
 	}
 
-	public void init()
-	{
-		control = getServer().getAuthControl();
-	}
+	/**
+	 * Procedimento de chamada em um temporizador para remover um jogador online do sistema.
+	 * Isso não irá notificar o jogador de que ficou online, apenas remover do sistema.
+	 */
 
-	public void destroy()
+	private final TimerListener waitingDisconnect = new TimerListener()
 	{
-		control = null;
-	}
+		@Override
+		public void onCall(Timer timer, int now, int tick)
+		{
+			OnlineCharData online = onlines.get(timer.getObjectID());
+			onlines.remove(online);
+		}
+		
+		@Override
+		public String getName()
+		{
+			return "waitingDisconnect";
+		}
+	};
 
 	public boolean parse(CFileDescriptor fd)
 	{
 		CharServerSelected packet = new CharServerSelected();
 		packet.receive(fd);
 
-		CharSessionData sd = fd.getSessionData();
-
-		if (sd != null)
+		if (fd.getSessionData().getID() == 0)
 		{
 			logNotice("conexão solicitada (aid: %d, seed: %d|%d).\n", packet.getAccountID(), packet.getFirstSeed(), packet.getSecondSeed());
 			return true;
@@ -54,29 +65,68 @@ public class ServiceCharServerAuth extends AbstractCharService
 			throw new RagnarokRuntimeException(e.getMessage());
 		}
 
-		return parseRequest(fd, sd);
+		return parseRequest(fd);
 	}
 
-	private boolean parseRequest(FileDescriptor fd, CharSessionData sd)
+	private boolean parseRequest(CFileDescriptor fd)
 	{
-		AuthNode node = control.get(sd.getID());
+		CharSessionData sd = fd.getSessionData();
+		AuthNode node = auths.get(sd.getID());
 
 		if (node != null && node.getAccountID() == sd.getID() && node.getSeed().equals(sd.getSeed()))
 		{
 			sd.setVersion(node.getVersion());
-			control.remove(node.getAccountID());
+			auths.remove(node.getAccountID());
 
-			authOk(fd, sd);
+			authOk(fd);
 		}
 
-		//else
-			//client.reqAuthAccount(fd, sd);
+		else
+			login.reqAuthAccount(fd);
 
 		return true;
 	}
 
-	private void authOk(FileDescriptor fd, CharSessionData sd)
+	private void authOk(CFileDescriptor fd)
 	{
-		
+		CharSessionData sd = fd.getSessionData();
+		OnlineCharData online = onlines.get(sd.getID());
+
+		if (online != null)
+		{
+			// Personagem online, dar kick do servidor
+			if (online.getServer() > -1)
+			{
+				// TODO char.c:1891
+
+				if (online.getWaitingDisconnect() == null)
+				{
+					TimerMap timers = getTimerSystem().getTimers();
+
+					Timer timer = timers.acquireTimer();
+					timer.setListener(waitingDisconnect);
+					timer.setObjectID(online.getAccountID());
+					timers.addInterval(timer, seconds(20));
+
+					online.setWaitingDisconnect(timer);
+				}
+
+				client.sendNotifyResult(fd, NotifyAuthResult.RECOGNIZES_LAST_LOGIN);
+				return;
+			}
+
+			// Já está conectado mas não selecionou um personagem
+			if (online.getFileDescriptor() != null && online.getFileDescriptor().getID() != fd.getID())
+			{
+				client.sendNotifyResult(fd, NotifyAuthResult.RECOGNIZES_LAST_LOGIN);
+				return;
+			}
+
+			online.setFileDescriptor(fd);
+		}
+
+		sd.setAuth(true);
+		login.reqAccountData(fd);
+		character.setCharSelect(fd);
 	}
 }

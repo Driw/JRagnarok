@@ -869,4 +869,16 @@ public class Character
 
 		return description.toString();
 	}
+
+	public static String sexOf(char sex)
+	{
+		switch (sex)
+		{
+			case 'm': case 'M': return "masculino";
+			case 'f': case 'F': return "feminino";
+			case 's': case 'S': return "servidor";
+		}
+
+		return null;
+	}
 }

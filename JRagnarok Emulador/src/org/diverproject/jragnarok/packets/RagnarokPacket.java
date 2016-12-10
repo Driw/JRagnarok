@@ -8,6 +8,7 @@ public class RagnarokPacket
 	public static final short PACKET_CHAR_SERVER_SELECTED = 0x0065;
 	public static final short PACKET_REFUSE_LOGIN = 0x006A;
 	public static final short PACKET_LIST_SERVERS = 0x0069;
+	public static final short PACKET_SEND_ACCOUNT_CHARS = 0x006B;
 	public static final short PACKET_REFUSE_ENTER = 0x006C;
 	public static final short PACKET_NOTIFY_AUTH = 0x0081;
 	public static final short PACKET_KEEP_ALIVE = 0x0200;
@@ -19,9 +20,11 @@ public class RagnarokPacket
 	public static final short PACKET_LOGIN_MD5INFO = 0x01FA;
 	public static final short PACKET_LOGIN_MD5MAC = 0x027C;
 	public static final short PACKET_LOGIN_SSO = 0x0825;
+	public static final short PACKET_SEND_ACCOUNT_SLOT = 0x082D;
 	public static final short PACKET_REFUSE_LOGIN_R2 = 0x083E;
 	public static final short PACKET_PINCODE_SEND_STATE = 0x08B9;
 	public static final short PACKET_REQ_HASH = 0x01DB;
+	public static final short PACKET_SEND_CHAR_PAGE_COUNT = 0x09A0;
 
 	// -- SERVIDORES (LOGIN|CHAR|MAP SERVERS) --
 
@@ -54,16 +57,17 @@ public class RagnarokPacket
 	// 0x272E
 	// 0x272F
 	// 0x2730
-	public static final short PACKET_BAN_NOTIFICATION = 0x2731;
+	public static final short PACKET_REQ_BAN_NOTIFICATION = 0x2731;
 	// 0x2732
 	// 0x2733
 	public static final short PACKET_ALREADY_ONLINE = 0x2734;
 	public static final short PACKET_SYNCRONIZE_IPADDRESS = 0x2735;
-	// 0x2736
+	public static final short PACKET_UPDATE_IP = 0x2736;
 	public static final short PACKET_SET_ALL_ACC_OFFLINE = 0x2737;
 	public static final short PACKET_NOTIFY_PIN_UPDATE = 0x2738;
 	public static final short PACKET_NOTIFY_PIN_ERROR = 0x2739;
-	public static final short PACKET_REQ_VIP = 0x2743;
+	public static final short PACKET_REQ_VIP_DATA = 0x2742;
+	public static final short PACKET_RES_VIP_DATA = 0x2743;
 
 	// 0x2AF9
 	// 0x2AF0
@@ -74,4 +78,9 @@ public class RagnarokPacket
 	// 0x2AFE
 	// 0x2AFF
 	public static final short PACKET_REQ_CHAR_MAP_USER_COUNT = 0x2B00;
+	public static final short PACKET_CHANGE_SEX_NOTIFY = 0x2B0D;
+	public static final short PACKET_RES_BAN_NOTIFICATION = 0x2B14;
+	public static final short PACKET_BROADCAST_UPDATE_IP = 0x2B1E;
+
+	public static final short PACKET_RES_GLOBAL_ACCREG = 0x3804;
 }

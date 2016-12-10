@@ -5,7 +5,8 @@ import org.diverproject.jragnaork.RagnarokRuntimeException;
 public enum NotifyAuthResult
 {
 	SERVER_CLOSED(1),
-	RECOGNIZES_LAST_LOGIN(8),;
+	ALREADY_ONLINE(2),
+	RECOGNIZES_LAST_LOGIN(8);
 
 	public final byte CODE;
 
