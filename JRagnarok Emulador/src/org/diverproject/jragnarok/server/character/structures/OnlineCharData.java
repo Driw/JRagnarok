@@ -26,7 +26,7 @@ public class OnlineCharData
 	/**
 	 * Código para definir que nenhum servidor foi selecionado.
 	 */
-	public static final int NO_SERVER = 1;
+	public static final int NO_SERVER = -1;
 
 
 	/**

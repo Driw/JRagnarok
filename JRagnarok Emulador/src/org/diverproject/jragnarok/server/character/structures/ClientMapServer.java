@@ -2,32 +2,27 @@ package org.diverproject.jragnarok.server.character.structures;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_PER_SERVER;
 
-import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
+import org.diverproject.jragnarok.server.character.CFileDescriptor;
 import org.diverproject.util.ObjectDescription;
 
 public class ClientMapServer
 {
-	private FileDescriptor fd;
+	private CFileDescriptor fd;
 	private InternetProtocol ip;
 	private short port;
 	private short users;
 	private short map[];
 
-	public ClientMapServer(FileDescriptor fileDecriptor)
+	public ClientMapServer(CFileDescriptor fileDecriptor)
 	{
 		this.fd = fileDecriptor;
 		this.map = new short[MAX_MAP_PER_SERVER];
 	}
 
-	public FileDescriptor getFileDecriptor()
+	public CFileDescriptor getFileDecriptor()
 	{
 		return fd;
-	}
-
-	public void setFileDecriptor(FileDescriptor fileDecriptor)
-	{
-		this.fd = fileDecriptor;
 	}
 
 	public InternetProtocol getIP()
