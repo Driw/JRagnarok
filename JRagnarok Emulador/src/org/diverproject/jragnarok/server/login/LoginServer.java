@@ -346,6 +346,17 @@ public class LoginServer extends Server
 		@Override
 		public void onCreated() throws RagnarokException
 		{
+			accountControl = new AccountControl(getMySQL().getConnection());
+			groupControl = new GroupControl(getMySQL().getConnection());
+			pincodeControl = new PincodeControl(getMySQL().getConnection());
+			logControl = new LoginLogControl(getMySQL().getConnection());
+			ipbanControl = new IpBanControl(getMySQL().getConnection());
+			onlineControl = new OnlineControl(getTimerSystem().getTimers());
+			authControl = new AuthControl();
+
+			accountControl.setGroupControl(groupControl);
+			accountControl.setPincodeControl(pincodeControl);
+
 			accountService = new ServiceLoginAccount(LoginServer.this);
 			authService = new ServiceLoginAuth(LoginServer.this);
 			charService = new ServiceLoginChar(LoginServer.this);
@@ -361,17 +372,6 @@ public class LoginServer extends Server
 			authService.init();
 			ipBanService.init();
 			logService.init();
-
-			accountControl = new AccountControl(getMySQL().getConnection());
-			groupControl = new GroupControl(getMySQL().getConnection());
-			pincodeControl = new PincodeControl(getMySQL().getConnection());
-			logControl = new LoginLogControl(getMySQL().getConnection());
-			ipbanControl = new IpBanControl(getMySQL().getConnection());
-			onlineControl = new OnlineControl(getTimerSystem().getTimers());
-			authControl = new AuthControl();
-
-			accountControl.setGroupControl(groupControl);
-			accountControl.setPincodeControl(pincodeControl);
 
 			if (getConfigs().getBool(LOG_LOGIN))
 				logService.init();
@@ -426,12 +426,6 @@ public class LoginServer extends Server
 
 			getFileDescriptorSystem().execute(onDestroyed);
 
-			charServers.clear();
-			groupControl.clear();
-			onlineControl.clear();
-			authControl.clear();
-			ipbanControl.clear();
-
 			logService.destroy();
 			ipBanService.destroy();
 			authService.destroy();
@@ -442,6 +436,12 @@ public class LoginServer extends Server
 
 			if (getConfigs().getBool(IPBAN_ENABLED))
 				ipBanService.destroy();
+
+			charServers.clear();
+			groupControl.clear();
+			onlineControl.clear();
+			authControl.clear();
+			ipbanControl.clear();
 		}
 
 		@Override
@@ -453,13 +453,13 @@ public class LoginServer extends Server
 			authControl = null;
 			ipbanControl = null;
 
-			accountControl = null;
-			groupControl = null;
-			pincodeControl = null;
-			logControl = null;
-			ipbanControl = null;
-			onlineControl = null;
-			authControl = null;
+			logService = null;
+			ipBanService = null;
+			authService = null;
+			accountService = null;
+			clientService = null;
+			charService = null;
+			loginService = null;
 		}
 	};
 

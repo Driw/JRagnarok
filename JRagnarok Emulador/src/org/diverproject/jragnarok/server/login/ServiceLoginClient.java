@@ -85,6 +85,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void init()
 	{
+		super.init();
+
 		log = getServer().getLogService();
 		ipban = getServer().getIpBanService();
 		auth = getServer().getAuthService();
@@ -101,7 +103,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		@Override
 		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
-			logDebug("parsing fd#%d.\n", fd.getID());
+			logDebug("recebendo pacote (fd: %d).\n", fd.getID());
 
 			LFileDescriptor lfd = (LFileDescriptor) fd;
 
@@ -186,10 +188,10 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void keepAlive(LFileDescriptor fd)
 	{
+		logDebug("ping recebido (fd: %d).\n", fd.getID());
+
 		KeepAlive keepAlivePacket = new KeepAlive();
 		keepAlivePacket.receive(fd, false);
-
-		logDebug("keep alive received fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -199,14 +201,14 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void updateClientHash(LFileDescriptor fd)
 	{
+		logDebug("atualização para client hash recebido (fd: %d).\n", fd.getID());
+
 		UpdateClientHash updateClientHashPacket = new UpdateClientHash();
 		updateClientHashPacket.receive(fd, false);
 
 		LoginSessionData sd = fd.getSessionData();
 		sd.setClientHash(new ClientHash());
 		sd.getClientHash().set(updateClientHashPacket.getHashValue());
-
-		logDebug("update client hash received fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -217,11 +219,11 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void sendAuthResult(LFileDescriptor fd, AuthResult result)
 	{
+		logDebug("enviando resultado de autenticação (fd: %d, result: %s).\n", fd.getID(), result);
+
 		RefuseLoginByte refuseLoginPacket = new RefuseLoginByte();
 		refuseLoginPacket.setResult(result);
 		refuseLoginPacket.send(fd);
-
-		logDebug("refuse login byte sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -233,11 +235,11 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void sendNotifyResult(LFileDescriptor fd, NotifyAuthResult result)
 	{
+		logDebug("notificando autenticação (fd: %d, result: %s).\n", fd.getID(), result);
+
 		NotifyAuth packet = new NotifyAuth();
 		packet.setResult(result);
 		packet.send(fd);
-
-		logDebug("notify result sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -259,7 +261,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 				count++;
 			}
 
-		logDebug("%d sessions receive %s.\n", count, nameOf(packet));
+		logDebug("%d sessões receberam '%s'.\n", count, nameOf(packet));
 
 		return count;
 	}
@@ -272,6 +274,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void parseRequestKey(LFileDescriptor fd)
 	{
+		logDebug("enviando chave md5 (fd: %d).\n", fd.getID());
+
 		short md5KeyLength = (short) (12 + (random() % 4));
 		String md5Key = md5Salt(md5KeyLength);
 
@@ -283,8 +287,6 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setMD5KeyLength(md5KeyLength);
 		packet.setMD5Key(md5Key);
 		packet.send(fd);
-
-		logDebug("md5 key sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -294,6 +296,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void sendCharServerList(LFileDescriptor fd)
 	{
+		logDebug("lista com servidores de personagem enviado (fd: %d).\n", fd.getID());
+
 		LoginSessionData sd = fd.getSessionData();
 		CharServerList servers = getServer().getCharServerList();
 
@@ -301,8 +305,6 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setServers(servers);
 		packet.setSessionData(sd);
 		packet.send(fd);
-
-		logDebug("char-server list sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -317,14 +319,14 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		LoginSessionData sd = fd.getSessionData();
 
+		logDebug("acesso recusado (fd: %d, user: %s, result: %s).\n", fd.getID(), sd.getUsername(), result);
+
 		if (sd.getVersion() >= dateToVersion(20120000))
 		{
 			RefuseLoginInt packet = new RefuseLoginInt();
 			packet.setBlockDate(blockDate);
 			packet.setResult(result);
 			packet.send(fd);
-
-			logDebug("refuse login int sent fd#%d.\n", fd.getID());
 		}
 
 		else
@@ -333,8 +335,6 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			packet.setBlockDate(blockDate);
 			packet.setResult(result);
 			packet.send(fd);
-
-			logDebug("refuse login byte sent fd#%d.\n", fd.getID());
 		}
 	}
 
@@ -346,11 +346,13 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void refuseEnter(LFileDescriptor fd, byte result)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
+		logDebug("entrada recusada (fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
+
 		RefuseEnter packet = new RefuseEnter();
 		packet.setResult(result);
 		packet.send(fd);
-
-		logDebug("refuse enter sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -361,11 +363,13 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void charServerResult(LFileDescriptor fd, AuthResult result)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
+		logDebug("servidor de personagem conectado (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
+
 		CharServerConnectResult packet = new CharServerConnectResult();
 		packet.setResult(result);
 		packet.send(fd);
-
-		logDebug("char-server connect result sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -376,10 +380,12 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void pingCharRequest(LFileDescriptor fd)
 	{
+		LoginSessionData sd = fd.getSessionData();
+
+		logDebug("pingar servidor de personagem (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
+
 		KeepAliveResult packet = new KeepAliveResult();
 		packet.send(fd);
-
-		logDebug("keep alive char-server sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -398,6 +404,10 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		response.setSecondSeed(node.getSeed().getSecond());
 		response.setRequestID(fdID);
 
+		LoginSessionData sd = fd.getSessionData();
+
+		logDebug("autenticar conta (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
+
 		if (ok)
 		{
 			response.setResult(true);
@@ -411,8 +421,6 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			response.setVersion(0);
 			response.setClientType(ClientType.CT_NONE);
 		}
-
-		logDebug("auth account sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -430,6 +438,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setGroupID(b(account.getGroup().getID()));
 		packet.setCharSlots(account.getCharSlots());
 		packet.setBirthdate(account.getBirthDate());
+
+		logDebug("enviando dados de uma conta (server-fd: %d, username: %s).\n", fd.getID(), account.getUsername());
 
 		if (account.getPincode() != null)
 		{
@@ -460,9 +470,14 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		}
 
 		packet.send(fd);
-
-		logDebug("account data sent fd#%d.\n", fd.getID());
 	}
+
+	/**
+	 * Envia a um servidor de personagem o resultado da solicitação das informações de uma conta.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param ack pacote contendo as informações da solicitação que foi desejada.
+	 * @param account conta respectiva a solicitação desejada.
+	 */
 
 	public void sendAccountInfo(LFileDescriptor fd, AccountInfoRequest ack, Account account)
 	{
@@ -474,6 +489,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		if (account != null)
 		{
+			logDebug("enviando informações de uma conta (server-fd: %d, username: %s).\n", fd.getID(), account.getUsername());
+
 			packet.setGroupID(account.getGroup().getID());
 			packet.setLoginCount(account.getLoginCount());
 			packet.setState(account.getState().CODE);
@@ -485,8 +502,6 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			packet.setPincode(account.getPincode().getCode());
 			packet.setUsername(account.getUsername());
 		}
-
-		logDebug("account info sent fd#%d.\n", fd.getID());
 	}
 
 	/**
@@ -498,6 +513,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void sendNotifyAccountState(LFileDescriptor fd, Account account, boolean banned)
 	{
+		logDebug("notificando alteração de estado (fd: %d, username: %s).\n", fd.getID(), account.getUsername());
+
 		AccountStateNotify notify = new AccountStateNotify();
 		notify.setAccountID(account.getID());
 		notify.setValue(banned ? i(account.getUnban().get()) : account.getState().CODE);

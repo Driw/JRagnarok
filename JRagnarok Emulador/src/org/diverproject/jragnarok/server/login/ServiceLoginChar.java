@@ -28,6 +28,8 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 	public void init()
 	{
+		super.init();
+
 		client = getServer().getClientService();
 		account = getServer().getAccountService();
 
