@@ -29,6 +29,7 @@ import static org.diverproject.jragnarok.server.ServerState.NONE;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.ServerState.STOPED;
 import static org.diverproject.log.LogSystem.log;
+import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
@@ -82,19 +83,6 @@ public abstract class Server
 	 * TODO what is that?
 	 */
 	private static final int SOCKET_BACKLOG = 50;
-
-	/**
-	 * Valor das preferências para definir o leitor de configurações:
-	 * <code>INTERNAL_LOG_ALL</code>, <code>LOG_EXCEPTIONS</code>, <code>THROWS_FORMAT</code>,
-	 * <code>THROWS_EXCEPTIONS</code>, <code>THROWS_NOTFOUND</code> e <code>THROWS_UNEXPECETED</code>.
-	 */
-	public static final int CONFIG_READ_PREFERENCES =
-			ConfigReader.PREFERENCES_INTERNAL_LOG_READ +
-			ConfigReader.PREFERENCES_LOG_EXCEPTIONS +
-			ConfigReader.PREFERENCES_THROWS_FORMAT +
-			ConfigReader.PREFERENCES_THROWS_EXCEPTIONS +
-			ConfigReader.PREFERENCES_THROWS_NOTFOUND +
-			ConfigReader.PREFERENCES_THROWS_UNEXPECTED;
 
 
 	/**
@@ -590,7 +578,9 @@ public abstract class Server
 
 						Socket socket = serverSocket.accept();
 						FileDescriptor fd = Server.this.acceptSocket(socket, defaultParser);
-						fileDescriptorSystem.addFileDecriptor(fd);
+
+						if (fileDescriptorSystem.addFileDecriptor(fd))
+							logDebug("nova conexão em '%s' (id: %d, ip: %s).\n", getThreadName(), fd.getID(), fd.getAddressString());
 
 						if (fd == null)
 							log("servidor está cheio, %s recusado.\n", SocketUtil.socketIP(socket));
@@ -636,8 +626,15 @@ public abstract class Server
 						continue;
 					}
 
-					timerSystem.getTimers().update(timerSystem.getCurrentTime(), tick);
-					fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
+					try {
+
+						timerSystem.getTimers().update(timerSystem.getCurrentTime(), tick);
+						fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
+
+					} catch (Exception e) {
+						logExeception(e);
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -701,7 +698,7 @@ public abstract class Server
 		Configurations configs = getConfigs();
 
 		ConfigReader reader = new ConfigReader();
-		reader.getPreferences().set(CONFIG_READ_PREFERENCES);
+		reader.getPreferences().set(ConfigReader.DEFAULT_PREFERENCES);
 		reader.setConfigurations(configs);
 
 		String serverFolder = configs.getString(SYSTEM_SERVER_FOLDER);

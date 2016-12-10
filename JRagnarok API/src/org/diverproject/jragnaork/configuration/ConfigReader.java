@@ -86,6 +86,19 @@ public class ConfigReader
 	{ "SAVE_EXCEPTIONS", "THROWS_EXCEPTIONS", "NOTFOUND", "UNEXPECTED" };
 
 	/**
+	 * Valor das preferências para definir o leitor de configurações:
+	 * <code>INTERNAL_LOG_ALL</code>, <code>LOG_EXCEPTIONS</code>, <code>THROWS_FORMAT</code>,
+	 * <code>THROWS_EXCEPTIONS</code>, <code>THROWS_NOTFOUND</code> e <code>THROWS_UNEXPECETED</code>.
+	 */
+	public static final int DEFAULT_PREFERENCES =
+			ConfigReader.PREFERENCES_INTERNAL_LOG_READ +
+			ConfigReader.PREFERENCES_LOG_EXCEPTIONS +
+			ConfigReader.PREFERENCES_THROWS_FORMAT +
+			ConfigReader.PREFERENCES_THROWS_EXCEPTIONS +
+			ConfigReader.PREFERENCES_THROWS_NOTFOUND +
+			ConfigReader.PREFERENCES_THROWS_UNEXPECTED;
+
+	/**
 	 * Caminho referente ao arquivo que será lido.
 	 */
 	private String filePath;
@@ -252,11 +265,17 @@ public class ConfigReader
 
 				Config<?> config = configurations.get(name);
 
-				if (config == null && preferences.is(PREFERENCES_THROWS_NOTFOUND))
-					newException("configuração '%s' não encontrada (linha: %d)", name, i);
+				if (config == null)
+				{
+					if (preferences.is(PREFERENCES_THROWS_NOTFOUND))
+						newException("configuração '%s' não encontrada (linha: %d)", name, i);
+				}
 
-				else if (!config.setRaw(value) && preferences.is(PREFERENCES_THROWS_UNEXPECTED))
-					newException("configuração '%s' não aceitou '%s' (linha: %d)", name, value, i);
+				else if (!config.setRaw(value))
+				{
+					if (preferences.is(PREFERENCES_THROWS_UNEXPECTED))
+						newException("configuração '%s' não aceitou '%s' (linha: %d)", name, value, i);
+				}
 
 				else
 				{

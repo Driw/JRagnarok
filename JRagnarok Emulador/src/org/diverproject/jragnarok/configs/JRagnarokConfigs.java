@@ -26,6 +26,9 @@ public class JRagnarokConfigs
 	public static final String SYSTEM_USE_LOG = SYSTEM_CONFIGS+ ".use_log";
 	public static final String SYSTEM_LOG_FILENAME = SYSTEM_CONFIGS+ ".log_filename";
 	public static final String SYSTEM_SERVER_DEFAULT_FILES = SYSTEM_CONFIGS+ ".default_files";
+	public static final String SYSTEM_SERVER_DEFAULT_LOGIN_FILES = SYSTEM_CONFIGS+ ".default_login_files";
+	public static final String SYSTEM_SERVER_DEFAULT_CHAR_FILES = SYSTEM_CONFIGS+ ".default_char_files";
+	public static final String SYSTEM_SERVER_DEFAULT_MAP_FILES = SYSTEM_CONFIGS+ ".default_map_files";
 	public static final String SYSTEM_SERVER_DEFAULT_FOLDER = SYSTEM_CONFIGS+ ".default_folder";
 
 	public static final String SERVER_CONFIGS = "server";

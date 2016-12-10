@@ -9,6 +9,10 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.FILE_CONFIG_TY
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.FILE_SYSTEM;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_LOGINID;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_LOG_FILENAME;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_CHAR_FILES;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FILES;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_LOGIN_FILES;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_MAP_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FOLDER;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_CONFIGS;
@@ -366,6 +370,9 @@ public class JRagnarok
 		server.setID(id);
 		server.setConfigurations(configs);
 
+		String files = configs.getString(SYSTEM_SERVER_DEFAULT_FILES)+ "," +configs.getString(SYSTEM_SERVER_DEFAULT_LOGIN_FILES);
+		configs.add(SYSTEM_SERVER_DEFAULT_FILES, files, true);
+
 		SERVERS.add(server);
 	}
 
@@ -381,6 +388,9 @@ public class JRagnarok
 		server.setID(id);
 		server.setConfigurations(configs);
 
+		String files = configs.getString(SYSTEM_SERVER_DEFAULT_FILES)+ "," +configs.getString(SYSTEM_SERVER_DEFAULT_CHAR_FILES);
+		configs.add(SYSTEM_SERVER_DEFAULT_FILES, files, true);
+
 		SERVERS.add(server);
 	}
 
@@ -395,6 +405,9 @@ public class JRagnarok
 		MapServer server = new MapServer();
 		server.setID(id);
 		server.setConfigurations(configs);
+
+		String files = configs.getString(SYSTEM_SERVER_DEFAULT_FILES)+ "," +configs.getString(SYSTEM_SERVER_DEFAULT_MAP_FILES);
+		configs.add(SYSTEM_SERVER_DEFAULT_FILES, files, true);
 
 		SERVERS.add(server);		
 	}
