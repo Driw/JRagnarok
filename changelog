@@ -1,3 +1,6 @@
+10.12.2016 - 1.3.127
+- AlreadyOnlne é um pacote entre servidores, portanto deve ser do tipo request.
+
 10.12.2016 - 1.3.126
 - Configurações para limitação de personagens no servidor de acesso e para movimentar personagens de slot.
 

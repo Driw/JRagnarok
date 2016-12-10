@@ -1,11 +1,12 @@
-package org.diverproject.jragnarok.packets.response;
+package org.diverproject.jragnarok.packets.request;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ALREADY_ONLINE;
 
-import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
-public class AlreadyOnline extends ResponsePacket
+public class AlreadyOnline extends RequestPacket
 {
 	private int accountID;
 
@@ -13,6 +14,17 @@ public class AlreadyOnline extends ResponsePacket
 	protected void sendOutput(Output output)
 	{
 		output.putInt(accountID);
+	}
+
+	@Override
+	protected void receiveInput(Input input)
+	{
+		accountID = input.getInt();
+	}
+
+	public int getAccountID()
+	{
+		return accountID;
 	}
 
 	public void setAccountID(int accountID)
