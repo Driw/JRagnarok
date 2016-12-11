@@ -1,38 +1,22 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PASSWORD;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_USERNAME;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOG_LOGIN;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newClientConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newIPBanConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newLogConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newLoginServerConfigs;
-import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
 import static org.diverproject.log.LogSystem.logInfo;
 
 import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
-import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.FileDescriptorAction;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
-import org.diverproject.jragnarok.server.Timer;
-import org.diverproject.jragnarok.server.TimerListener;
-import org.diverproject.jragnarok.server.TimerMap;
-import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.login.control.AccountControl;
-import org.diverproject.jragnarok.server.login.control.AuthControl;
-import org.diverproject.jragnarok.server.login.control.GroupControl;
-import org.diverproject.jragnarok.server.login.control.IpBanControl;
-import org.diverproject.jragnarok.server.login.control.LoginLogControl;
-import org.diverproject.jragnarok.server.login.control.OnlineControl;
-import org.diverproject.jragnarok.server.login.control.PincodeControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 
@@ -54,12 +38,7 @@ import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
  *
  * @see Server
  * @see ServerListener
- * @see CharServerList
- * @see ServiceLoginChar
- * @see ServiceLoginClient
- * @see ServiceLoginIpBan
- * @see ServiceLoginLog
- * @see ServiceLoginServer
+ * @see LoginServerFacade
  *
  * @author Andrew Mello
  */
@@ -72,75 +51,9 @@ public class LoginServer extends Server
 	private CharServerList charServers;
 
 	/**
-	 * Serviço para comunicação com o servidor de personagens.
+	 * Façade contento os serviços e controles disponíveis.
 	 */
-	private ServiceLoginChar charService;
-
-	/**
-	 * Serviço para comunicação entre o servidor e o cliente.
-	 */
-	private ServiceLoginClient clientService;
-
-	/**
-	 * Serviço para banimento de acessos por endereço de IP.
-	 */
-	private ServiceLoginIpBan ipBanService;
-
-	/**
-	 * Serviço para registro de acessos.
-	 */
-	private ServiceLoginLog logService;
-
-	/**
-	 * Serviço para acesso de contas (serviço principal)
-	 */
-	private ServiceLoginServer loginService;
-
-	/**
-	 * Serviço para autenticação de acessos.
-	 */
-	private ServiceLoginAuth authService;
-
-	/**
-	 * Serviço para trabalhar com as contas dos jogadores.
-	 */
-	private ServiceLoginAccount accountService;
-
-
-	/**
-	 * Controle para persistência das contas de jogadores.
-	 */
-	private AccountControl accountControl;
-
-	/**
-	 * Controle para persistência e cache dos grupos de jogadores.
-	 */
-	private GroupControl groupControl;
-
-	/**
-	 * Controle para persistência dos código PIN das contas de jogadores.
-	 */
-	private PincodeControl pincodeControl;
-
-	/**
-	 * Controle para registrar acesso ao banco de dados.
-	 */
-	private LoginLogControl logControl;
-
-	/**
-	 * Controle para banimento de endereços de IP.
-	 */
-	private IpBanControl ipbanControl;
-
-	/**
-	 * Controlador para identificar jogadores online.
-	 */
-	private OnlineControl onlineControl;
-
-	/**
-	 * Controlador para identificar jogadores autenticados.
-	 */
-	private AuthControl authControl;
+	private LoginServerFacade facade;
 
 	/**
 	 * Cria um novo micro servidor para receber os novos acessos de clientes.
@@ -150,139 +63,24 @@ public class LoginServer extends Server
 	public LoginServer()
 	{
 		setListener(listener);
-
-		charServers = new CharServerList();
 	}
 
 	/**
 	 * @return aquisição dos servidores de personagens disponíveis para acesso.
 	 */
 
-	CharServerList getCharServerList()
+	public CharServerList getCharServerList()
 	{
 		return charServers;
 	}
 
 	/**
-	 * @return aquisição do serviço para comunicação com o servidor de personagens.
+	 * @return aquisição do façade que possui os serviços e controles do servidor de acesso.
 	 */
 
-	ServiceLoginChar getCharService()
+	public LoginServerFacade getFacade()
 	{
-		return charService;
-	}
-
-	/**
-	 * @return aquisição do serviço para comunicação do servidor com o cliente.
-	 */
-
-	ServiceLoginClient getClientService()
-	{
-		return clientService;
-	}
-
-	/**
-	 * @return aquisição do serviço para banimento de acessos por endereço de IP.
-	 */
-
-	ServiceLoginIpBan getIpBanService()
-	{
-		return ipBanService;
-	}
-
-	/**
-	 * @return aquisição do serviço para registro de acessos no servidor.
-	 */
-
-	ServiceLoginLog getLogService()
-	{
-		return logService;
-	}
-
-	/**
-	 * @return aquisição do serviço para acesso de contas (serviço principal)
-	 */
-
-	ServiceLoginServer getLoginService()
-	{
-		return loginService;
-	}
-
-	/**
-	 * @return aquisição do serviço para autenticação de acessos.
-	 */
-
-	ServiceLoginAuth getAuthService()
-	{
-		return authService;
-	}
-
-	/**
-	 * @return aquisição do serviço para trabalhar com as contas dos jogadores.
-	 */
-
-	public ServiceLoginAccount getAccountService()
-	{
-		return accountService;
-	}
-
-	/**
-	 * @return aquisição do controle para gerenciar as contas dos jogadores.
-	 */
-
-	AccountControl getAccountControl()
-	{
-		return accountControl;
-	}
-
-	/**
-	 * @return aquisição do controle para gerenciar os grupos de jogadores.
-	 */
-
-	GroupControl getGroupControl()
-	{
-		return groupControl;
-	}
-
-	/**
-	 * @return aquisição do controle para gerenciar os códigos PIN de contas.
-	 */
-
-	PincodeControl getPincodeControl()
-	{
-		return pincodeControl;
-	}
-
-	/**
-	 * @return aquisição do controle para registrar acesso ao banco de dados.
-	 */
-
-	LoginLogControl getLoginLogControl()
-	{
-		return logControl;
-	}
-
-	IpBanControl getIpBanControl()
-	{
-		return ipbanControl;
-	}
-
-	/**
-	 * @return aquisição do controle para identificar jogadores online.
-	 */
-
-	OnlineControl getOnlineControl()
-	{
-		return onlineControl;
-	}
-
-	/**
-	 * @return aquisição do controle para autenticação dos jogadores.
-	 */
-
-	AuthControl getAuthControl()
-	{
-		return authControl;
+		return facade;
 	}
 
 	@Override
@@ -346,46 +144,12 @@ public class LoginServer extends Server
 		@Override
 		public void onCreated() throws RagnarokException
 		{
-			accountControl = new AccountControl(getMySQL().getConnection());
-			groupControl = new GroupControl(getMySQL().getConnection());
-			pincodeControl = new PincodeControl(getMySQL().getConnection());
-			logControl = new LoginLogControl(getMySQL().getConnection());
-			ipbanControl = new IpBanControl(getMySQL().getConnection());
-			onlineControl = new OnlineControl(getTimerSystem().getTimers());
-			authControl = new AuthControl();
+			charServers = new CharServerList();
 
-			accountControl.setGroupControl(groupControl);
-			accountControl.setPincodeControl(pincodeControl);
+			facade = new LoginServerFacade();
+			facade.create(LoginServer.this);
 
-			accountService = new ServiceLoginAccount(LoginServer.this);
-			authService = new ServiceLoginAuth(LoginServer.this);
-			charService = new ServiceLoginChar(LoginServer.this);
-			clientService = new ServiceLoginClient(LoginServer.this);
-			ipBanService = new ServiceLoginIpBan(LoginServer.this);
-			logService = new ServiceLoginLog(LoginServer.this);
-			loginService = new ServiceLoginServer(LoginServer.this);
-
-			loginService.init();
-			charService.init();
-			clientService.init();
-			accountService.init();
-			authService.init();
-
-			if (getConfigs().getBool(LOG_LOGIN))
-				logService.init();
-
-			if (getConfigs().getBool(IPBAN_ENABLED))
-				ipBanService.init();
-
-			setDefaultParser(clientService.parse);
-
-			TimerSystem ts = getTimerSystem();
-			TimerMap timers = ts.getTimers();
-
-			Timer odcTimer = timers.acquireTimer();
-			odcTimer.setTick(ts.getCurrentTime() + minutes(10));
-			odcTimer.setListener(onlineDataCleanup);
-			ts.getTimers().addLoop(odcTimer, minutes(10));
+			setDefaultParser(facade.getClientService().parse);
 		}
 
 		@Override
@@ -399,7 +163,7 @@ public class LoginServer extends Server
 
 			// TODO confirmar usuário e senha
 
-			logService.add(getAddress(), account, 100, "login server started");
+			facade.getLogService().add(getAddress(), account, 100, "login server started");
 		}
 
 		@Override
@@ -422,81 +186,17 @@ public class LoginServer extends Server
 			for (ClientCharServer client : charServers)
 				client.getFileDecriptor().close();
 
-			getFileDescriptorSystem().execute(onDestroyed);
-
-			logService.destroy();
-			ipBanService.destroy();
-			authService.destroy();
-			accountService.destroy();
-			clientService.destroy();
-			charService.destroy();
-			loginService.destroy();
-
-			if (getConfigs().getBool(IPBAN_ENABLED))
-				ipBanService.destroy();
-
 			charServers.clear();
-			groupControl.clear();
-			onlineControl.clear();
-			authControl.clear();
-			ipbanControl.clear();
+			facade.destroy(LoginServer.this);
 		}
 
 		@Override
 		public void onDestroyed() throws RagnarokException
 		{
+			facade.destroyed();
+
 			charServers = null;
-			groupControl = null;
-			onlineControl = null;
-			authControl = null;
-			ipbanControl = null;
-
-			logService = null;
-			ipBanService = null;
-			authService = null;
-			accountService = null;
-			clientService = null;
-			charService = null;
-			loginService = null;
-		}
-	};
-
-	private final TimerListener onlineDataCleanup = new TimerListener()
-	{
-		@Override
-		public void onCall(Timer timer, int now, int tick)
-		{
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public String getName()
-		{
-			return "onlineDataCleanup";
-		};
-
-		@Override
-		public String toString()
-		{
-			return getName();
-		}
-	};
-
-	private final FileDescriptorAction onDestroyed = new FileDescriptorAction()
-	{
-		@Override
-		public void execute(FileDescriptor fd)
-		{
-			// TODO usar algum pacote que avise do desligamento do servidor
-
-			fd.close();
-		}
-
-		@Override
-		public String toString()
-		{
-			return "onDestroyed";
+			facade = null;
 		}
 	};
 }

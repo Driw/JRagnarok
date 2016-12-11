@@ -30,9 +30,6 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	{
 		super.init();
 
-		client = getServer().getClientService();
-		account = getServer().getAccountService();
-
 		int interval = getConfigs().getInt(LOGIN_IP_SYNC_INTERVAL);
 
 		if (interval > 0)

@@ -11,7 +11,6 @@ import static org.diverproject.jragnarok.server.login.entities.AccountState.NONE
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logNotice;
 
-import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.common.AuthResult;
@@ -44,10 +43,9 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	/**
 	 * Constrói um novo serviço para realizar a autenticação e obtenção de contas.
 	 * @param server referência do servidor de acesso do qual deseja criar o serviço.
-	 * @throws RagnarokException caso não haja uma conexão válida estabelecida com o MySQL.
 	 */
 
-	public ServiceLoginServer(LoginServer server) throws RagnarokException
+	public ServiceLoginServer(LoginServer server)
 	{
 		super(server);
 	}

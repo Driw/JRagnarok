@@ -125,21 +125,21 @@ public class AbstractServiceLogin extends ServerService
 
 	public void init()
 	{
-		loginchar = getServer().getCharService();
-		client = getServer().getClientService();
-		ipban = getServer().getIpBanService();
-		log = getServer().getLogService();
-		login = getServer().getLoginService();
-		auth = getServer().getAuthService();
-		account = getServer().getAccountService();
+		loginchar = getServer().getFacade().getCharService();
+		client = getServer().getFacade().getClientService();
+		ipban = getServer().getFacade().getIpBanService();
+		log = getServer().getFacade().getLogService();
+		login = getServer().getFacade().getLoginService();
+		auth = getServer().getFacade().getAuthService();
+		account = getServer().getFacade().getAccountService();
 
-		accounts = getServer().getAccountControl();
-		groups = getServer().getGroupControl();
-		pincodes = getServer().getPincodeControl();
-		logs = getServer().getLoginLogControl();
-		ipbans = getServer().getIpBanControl();
-		onlines = getServer().getOnlineControl();
-		auths = getServer().getAuthControl();
+		accounts = getServer().getFacade().getAccountControl();
+		groups = getServer().getFacade().getGroupControl();
+		pincodes = getServer().getFacade().getPincodeControl();
+		logs = getServer().getFacade().getLoginLogControl();
+		ipbans = getServer().getFacade().getIpBanControl();
+		onlines = getServer().getFacade().getOnlineControl();
+		auths = getServer().getFacade().getAuthControl();
 	}
 
 	/**

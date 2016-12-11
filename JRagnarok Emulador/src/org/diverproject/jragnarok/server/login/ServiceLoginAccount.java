@@ -18,11 +18,9 @@ import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
 import org.diverproject.jragnarok.packets.request.BanAccountRequest;
 import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
 import org.diverproject.jragnarok.packets.request.UpdateAccountState;
-import org.diverproject.jragnarok.packets.response.RefuseEnter;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
 import org.diverproject.jragnarok.server.login.structures.AuthNode;
-import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 import org.diverproject.util.lang.HexUtil;
 
 public class ServiceLoginAccount extends AbstractServiceLogin
@@ -100,25 +98,21 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		packet.receive(fd);
 
 		AuthNode node = auths.get(packet.getAccountID());
-		ClientCharServer server = getServer().getCharServerList().get(fd);
 
-		if (server != null &&
+		if (node != null &&
 			node.getAccountID() == packet.getAccountID() &&
 			node.getSeed().getFirst() == packet.getFirstSeed() &&
 			node.getSeed().getSecond() == packet.getSecondSeed())
 		{
-			client.authAccount(fd, node, packet.getAccountID(), true);
+			client.authAccount(fd, packet, node);
 			auths.remove(node); // cada autenticação é usada uma só vez
 		}
 
-		else if (server != null)
-		{
-			logInfo("autenticação da conta '%s' RECUSADA (char-server: %s, ip: %s).\n", server.getName(), fd.getAddressString());
-			client.authAccount(fd, node, packet.getAccountID(), false);
-		}
-
 		else
-			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
+		{
+			logInfo("autenticação de conta RECUSADA (server-fd: %d, ufd: %d).\n", fd.getID(), packet.getFileDescriptorID());
+			client.authAccount(fd, packet);
+		}
 	}
 
 	/**

@@ -22,6 +22,7 @@ import org.diverproject.jragnarok.packets.request.AccountDataResult;
 import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
 import org.diverproject.jragnarok.packets.request.AccountInfoResult;
 import org.diverproject.jragnarok.packets.request.AccountStateNotify;
+import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
 import org.diverproject.jragnarok.packets.request.AuthAccountResult;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
 import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
@@ -87,9 +88,9 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		super.init();
 
-		log = getServer().getLogService();
-		ipban = getServer().getIpBanService();
-		auth = getServer().getAuthService();
+		log = getServer().getFacade().getLogService();
+		ipban = getServer().getFacade().getIpBanService();
+		auth = getServer().getFacade().getAuthService();
 	}
 
 	/**
@@ -389,38 +390,47 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	}
 
 	/**
-	 * Responde ao servidor de personagem que a conta possui os dados autenticados.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @param node nó contendo as informações do acesso autenticado.
-	 * @param fdID código de identificação da sessão do servidor de personagens.
-	 * @param ok true se tiver sido autenticado ou false caso contrário.
+	 * Responde ao servidor de personagem que a conta solicitada possui autenticação.
+	 * Os dados para a autenticação serão enviados ao servidor de personagem.
+	 * @param fd código de identificação da conexão do servidor de personagem com o sistema.
+	 * @param packet pacote contendo as informações para serem retornadas já que não autenticação.
+	 * @param node nó contendo as informações para autenticação do cliente no servidor de personagem.
 	 */
 
-	public void authAccount(LFileDescriptor fd, AuthNode node, int fdID, boolean ok)
+	public void authAccount(LFileDescriptor fd, AuthAccountRequest packet, AuthNode node)
 	{
+		logDebug("enviando autenticação de conta (server-fd: %d, aid: %s).\n", fd.getID(), node.getAccountID());
+
 		AuthAccountResult response = new AuthAccountResult();
+		response.setFileDescriptorID(packet.getFileDescriptorID());
 		response.setAccountID(node.getAccountID());
 		response.setFirstSeed(node.getSeed().getFirst());
 		response.setSecondSeed(node.getSeed().getSecond());
-		response.setRequestID(fdID);
+		response.setVersion(node.getVersion());
+		response.setClientType(node.getClientType());
+		response.setVersion(node.getVersion());
+		response.setClientType(node.getClientType());
+		response.send(fd);
+	}
 
-		LoginSessionData sd = fd.getSessionData();
+	/**
+	 * Responde ao servidor de personagem que a conta solicitada para autenticar não foi encontrado.
+	 * @param fd código de identificação da conexão do servidor de personagem com o sistema.
+	 * @param packet pacote contendo as informações para serem retornadas já que não autenticação.
+	 */
 
-		logDebug("autenticar conta (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
+	public void authAccount(LFileDescriptor fd, AuthAccountRequest packet)
+	{
+		logDebug("enviando autenticação de conta não encontrada (server-fd: %d).\n", fd.getID());
 
-		if (ok)
-		{
-			response.setResult(true);
-			response.setVersion(node.getVersion());
-			response.setClientType(node.getClientType());
-		}
-
-		else
-		{
-			response.setResult(false);
-			response.setVersion(0);
-			response.setClientType(ClientType.CT_NONE);
-		}
+		AuthAccountResult response = new AuthAccountResult();
+		response.setFileDescriptorID(packet.getFileDescriptorID());
+		response.setAccountID(packet.getAccountID());
+		response.setFirstSeed(packet.getFirstSeed());
+		response.setSecondSeed(packet.getSecondSeed());
+		response.setVersion(0);
+		response.setClientType(ClientType.CT_NONE);
+		response.send(fd);
 	}
 
 	/**
