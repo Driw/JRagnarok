@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.server.character;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.request.AccountInfoResult;
 import org.diverproject.jragnarok.server.character.structures.ClientMapServer;
+import org.diverproject.jragnarok.server.common.DisconnectPlayer;
 
 public class ServiceCharMap extends AbstractCharService
 {
@@ -38,7 +39,7 @@ public class ServiceCharMap extends AbstractCharService
 		return false;
 	}
 
-	public void disconnectPlayer(CFileDescriptor fd, int accountID, int charID, int reason) // TODO reason enum
+	public void disconnectPlayer(CFileDescriptor fd, int charID, DisconnectPlayer reason)
 	{
 		// TODO mapif_disconnectplayer
 

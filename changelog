@@ -1,3 +1,11 @@
+11.12.2016 - 1.3.137
+- CharSessionData não inicializava LoginSeed e LoginSeed agora permite definir valores.
+- ServiceCharClient estava chamando parseAlreadyAuth() de forma inadequada.
+	- O procedimento também não estava implementado adequadamente.
+- AuthAccountResult deve receber o fd de quem solicitou a autenticação (cliente).
+- ServiceCharMap.disconnectPlayer() deverá receber um enum do tipo DisconnectPlayer.
+	- ServiceCharServerAuth atualizado conforme modificação acima.
+
 11.12.2016 - 1.3.136
 - LoginServer pode acabar inicializando ServiceLoginIpBan e/ou ServiceLoginLog duas vezes.
 - Corrigindo mensagem de log para IpBanControl.cleanup() e query para IpBanDAO.cleanup().

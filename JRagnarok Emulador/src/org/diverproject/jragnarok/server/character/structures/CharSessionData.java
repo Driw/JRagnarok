@@ -45,6 +45,7 @@ public class CharSessionData extends SessionData
 		this.expiration = new Time();
 		this.flag = new BitWise();
 		this.chars = new CharData[MAX_CHARS];
+		this.seed = new LoginSeed();
 	}
 
 	public boolean isAuth()
@@ -60,11 +61,6 @@ public class CharSessionData extends SessionData
 	public LoginSeed getSeed()
 	{
 		return seed;
-	}
-
-	public void setSeed(LoginSeed seed)
-	{
-		this.seed = seed;
 	}
 
 	public String getNewName()

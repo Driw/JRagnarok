@@ -1,6 +1,8 @@
 package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
+import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONLINE;
+import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
@@ -17,6 +19,11 @@ import org.diverproject.util.stream.StreamException;
 
 public class ServiceCharServerAuth extends AbstractCharService
 {
+	/**
+	 * Cria uma nova instância de um serviço para autenticação de clientes no servidor de personagem.
+	 * @param server referência do servidor de personagem que irá utilizar este serviço.
+	 */
+
 	public ServiceCharServerAuth(CharServer server)
 	{
 		super(server);
@@ -43,16 +50,32 @@ public class ServiceCharServerAuth extends AbstractCharService
 		}
 	};
 
+	/**
+	 * Garante a autenticação de uma determinada sessão no sistema após selecionar este servidor de personagem.
+	 * Caso uma sessão já tenha sido criada para o cliente deverá ignorar este chamado (não fazer nada).
+	 * Caso contrário solicita dados ao servidor de acesso afim de garantir a autenticação no sistema.
+	 * @param fd código de identificação do descritor de arquivo do cliente com o servidor.
+	 * @return true para manter a conexão do cliente ou false para fechar sua conexão.
+	 */
+
 	public boolean parse(CFileDescriptor fd)
 	{
 		CharServerSelected packet = new CharServerSelected();
 		packet.receive(fd);
 
-		if (fd.getSessionData().getID() == 0)
+		logNotice("conexão solicitada (aid: %d, seed: %d|%d).\n", packet.getAccountID(), packet.getFirstSeed(), packet.getSecondSeed());
+
+		CharSessionData sd = fd.getSessionData();
+
+		if (sd.getID() > 0)
 		{
-			logNotice("conexão solicitada (aid: %d, seed: %d|%d).\n", packet.getAccountID(), packet.getFirstSeed(), packet.getSecondSeed());
+			logNotice("cliente já autenticado (aid: %d).\n", sd.getID());
 			return true;
 		}
+
+		sd.setID(packet.getAccountID());
+		sd.getSeed().set(packet.getFirstSeed(), packet.getSecondSeed());
+		sd.setAuth(false);
 
 		try {
 
@@ -65,10 +88,17 @@ public class ServiceCharServerAuth extends AbstractCharService
 			throw new RagnarokRuntimeException(e.getMessage());
 		}
 
-		return parseRequest(fd);
+		return parseAuthAccount(fd);
 	}
 
-	private boolean parseRequest(CFileDescriptor fd)
+	/**
+	 * Verifica se existe alguma autenticação da conta do cliente no sistema para ser utilizado.
+	 * Se houver uma irá concluir a autenticação do cliente caso contrário faz a solicitação de uma.
+	 * @param fd código de identificação do descritor de arquivo do cliente com o servidor.
+	 * @return true para manter a conexão do cliente ou false para fechar sua conexão.
+	 */
+
+	private boolean parseAuthAccount(CFileDescriptor fd)
 	{
 		CharSessionData sd = fd.getSessionData();
 		AuthNode node = auths.get(sd.getID());
@@ -82,10 +112,16 @@ public class ServiceCharServerAuth extends AbstractCharService
 		}
 
 		else
-			login.reqAuthAccount(fd);
+			return login.reqAuthAccount(fd);
 
 		return true;
 	}
+
+	/**
+	 * Realiza a autenticação de uma sessão do qual já se encontra online ou possuía uma autenticação.
+	 * Em todo caso fecha a conexão referente a essa sessão existente e atualiza com a conexão abaixo:
+	 * @param fd código de identificação do descritor de arquivo do cliente com o servidor.
+	 */
 
 	private void authOk(CFileDescriptor fd)
 	{
@@ -97,7 +133,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 			// Personagem online, dar kick do servidor
 			if (online.getServer() > -1)
 			{
-				// TODO char.c:1891
+				map.disconnectPlayer(fd, online.getCharID(), KICK_ONLINE);
 
 				if (online.getWaitingDisconnect() == null)
 				{
@@ -128,5 +164,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 		sd.setAuth(true);
 		login.reqAccountData(fd);
 		character.setCharSelect(fd);
+
+		logDebug("atualizando autenticação encontrada (aid: %d).\n", sd.getID());
 	}
 }

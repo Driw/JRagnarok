@@ -3,6 +3,8 @@ package org.diverproject.jragnarok.packets.request;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_AUTH_ACCOUNT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.SocketUtil;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -12,7 +14,7 @@ public class AuthAccountRequest extends RequestPacket
 	private int firstSeed;
 	private int secondSeed;
 	private int ip;
-	private int fdID;
+	private int fileDescriptorID;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -21,7 +23,7 @@ public class AuthAccountRequest extends RequestPacket
 		output.putInt(firstSeed);
 		output.putInt(secondSeed);
 		output.putInt(ip);
-		output.putInt(fdID);
+		output.putInt(fileDescriptorID);
 	}
 
 	@Override
@@ -31,7 +33,7 @@ public class AuthAccountRequest extends RequestPacket
 		firstSeed = input.getInt();
 		secondSeed = input.getInt();
 		ip = input.getInt();
-		fdID = input.getInt();
+		fileDescriptorID = input.getInt();
 	}
 
 	public int getAccountID()
@@ -74,14 +76,14 @@ public class AuthAccountRequest extends RequestPacket
 		this.ip = ip;
 	}
 
-	public int getFdID()
+	public int getFileDescriptorID()
 	{
-		return fdID;
+		return fileDescriptorID;
 	}
 
-	public void setFdID(int fdID)
+	public void setFileDescriptorID(int fdID)
 	{
-		this.fdID = fdID;
+		this.fileDescriptorID = fdID;
 	}
 
 	@Override
@@ -100,5 +102,17 @@ public class AuthAccountRequest extends RequestPacket
 	public short getIdentify()
 	{
 		return PACKET_REQ_AUTH_ACCOUNT;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("firstSeed", firstSeed);
+		description.append("secondSeed", secondSeed);
+		description.append("ip", SocketUtil.socketIP(ip));
+		description.append("fileDescriptorID", fileDescriptorID);
 	}
 }

@@ -47,12 +47,6 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		}
 	}
 
-	public void destroy()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
 	private TimerListener syncronizeIpAddress = new TimerListener()
 	{
 		@Override

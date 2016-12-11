@@ -1,8 +1,11 @@
 package org.diverproject.jragnarok.packets.receive;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CHAR_SERVER_SELECTED;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
+import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 
 public class CharServerSelected extends ReceivePacket
@@ -10,6 +13,7 @@ public class CharServerSelected extends ReceivePacket
 	private int accountID;
 	private int firstSeed;
 	private int secondSeed;
+	private ClientType clientType;
 	private char sex;
 
 	@Override
@@ -18,9 +22,7 @@ public class CharServerSelected extends ReceivePacket
 		accountID = input.getInt();
 		firstSeed = input.getInt();
 		secondSeed = input.getInt();
-
-		input.skipe(2);
-
+		clientType = ClientType.parse(b(input.getShort()));
 		sex = (char) input.getByte();
 	}
 
@@ -52,6 +54,15 @@ public class CharServerSelected extends ReceivePacket
 	}
 
 	/**
+	 * @return aquisição do tipo de cliente.
+	 */
+
+	public ClientType getClientType()
+	{
+		return clientType;
+	}
+
+	/**
 	 * @return aquisição do sexo da conta acessada.
 	 */
 
@@ -75,6 +86,18 @@ public class CharServerSelected extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 0;
+		return 15;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("firstSeed", firstSeed);
+		description.append("secondSeed", secondSeed);
+		description.append("clientType", clientType);
+		description.append("sex", sex);
 	}
 }

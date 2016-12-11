@@ -1,31 +1,33 @@
 package org.diverproject.jragnarok.packets.request;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.b;
+import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_ACCOUNT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
 public class AuthAccountResult extends RequestPacket
 {
+	private int fileDescriptorID;
 	private int accountID;
 	private int firstSeed;
 	private int secondSeed;
 	private boolean result;
-	private int requestID;
 	private int version;
 	private ClientType clientType;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
+		output.putInt(fileDescriptorID);
 		output.putInt(accountID);
 		output.putInt(firstSeed);
 		output.putInt(secondSeed);
 		output.putByte(b(result ? 1 : 0));
-		output.putInt(requestID);
 		output.putInt(version);
 		output.putByte(clientType.CODE);
 	}
@@ -33,13 +35,23 @@ public class AuthAccountResult extends RequestPacket
 	@Override
 	protected void receiveInput(Input input)
 	{
+		fileDescriptorID = input.getInt();
 		accountID = input.getInt();
 		firstSeed = input.getInt();
 		secondSeed = input.getInt();
 		result = input.getByte() == 1 ? true : false;
-		requestID = input.getInt();
 		version = input.getInt();
 		clientType = ClientType.parse(input.getByte());
+	}
+
+	public int getFileDescriptorID()
+	{
+		return fileDescriptorID;
+	}
+
+	public void setFileDescriptorID(int fileDescriptorID)
+	{
+		this.fileDescriptorID = fileDescriptorID;
 	}
 
 	public int getAccountID()
@@ -82,16 +94,6 @@ public class AuthAccountResult extends RequestPacket
 		this.result = result;
 	}
 
-	public int getRequestID()
-	{
-		return requestID;
-	}
-
-	public void setRequestID(int requestID)
-	{
-		this.requestID = requestID;
-	}
-
 	public int getVersion()
 	{
 		return version;
@@ -128,5 +130,21 @@ public class AuthAccountResult extends RequestPacket
 	public short getIdentify()
 	{
 		return PACKET_RES_AUTH_ACCOUNT;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("fdID", fileDescriptorID);
+		description.append("accountID", accountID);
+		description.append("seed", format("%d|%d", firstSeed, secondSeed));
+
+		if (result)
+		{
+			description.append("version", version);
+			description.append("clientType", clientType);
+		}
 	}
 }

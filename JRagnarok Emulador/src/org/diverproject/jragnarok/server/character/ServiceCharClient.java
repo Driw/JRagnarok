@@ -81,8 +81,8 @@ public class ServiceCharClient extends AbstractCharService
 				return false;
 
 			// Já foi autenticado, não deveria estar aqui
-			if (cfd.getSessionData().getCache() == null)
-				return parseAlreadyAuth(cfd);
+			if (fd.getFlag().is(FileDescriptor.FLAG_EOF) && parseAlreadyAuth(cfd))
+				return true;
 
 			return acknowledgePacket(cfd);
 		}
@@ -117,24 +117,31 @@ public class ServiceCharClient extends AbstractCharService
 	}
 
 	/**
-	 * Isso ocorre durante a análise de novos pacotes recebidos do cliente.
-	 * Deverá remover a autenticação de um jogador que já foi possui uma sessão.
-	 * Clientes só devem possuir sessão caso tenham sido autenticados.
+	 * Essa funcionalidade é chamada durante a análise de novos pacotes recebidos pelo cliente.
+	 * Além disso a condição mínima para este chamado é que esteja em EOF (end of file).
+	 * Deve verificar se o jogador (sessão) já foi autenticado e está online no sistema.
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @return sempre false, pois deve fechar a sessão do jogador com o servidor.
+	 * @return true se foi autenticado ou false caso contrário (true fecha conexão).
 	 */
 
 	public boolean parseAlreadyAuth(CFileDescriptor fd)
 	{
 		CharSessionData sd = fd.getSessionData();
-		OnlineCharData online = onlines.get(sd.getID());
 
-		if (online != null && online.getFileDescriptor().getID() == fd.getID())
-			online.setFileDescriptor(null);
+		// Client já autenticado
+		if (sd != null && sd.isAuth())
+		{
+			OnlineCharData online = onlines.get(sd.getID());
 
-		// Se não está em nenhum servidor deixar offline.
-		if (online == null || online.getServer() == -1)
-			onlines.remove(online);
+			if (online != null && online.getFileDescriptor().getID() == fd.getID())
+				online.setFileDescriptor(null);
+
+			// Se não está em nenhum servidor deixar offline.
+			if (online != null && online.getServer() == -1)
+				onlines.remove(online);
+
+			return true;
+		}
 
 		return false;
 	}

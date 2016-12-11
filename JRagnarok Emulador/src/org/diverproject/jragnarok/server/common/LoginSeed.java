@@ -29,6 +29,12 @@ public class LoginSeed
 		second = random() + 1;
 	}
 
+	public void set(int firstSeed, int secondSeed)
+	{
+		first = firstSeed;
+		second = secondSeed;
+	}
+
 	public boolean equals(int firstSeed, int secondSeed)
 	{
 		return first == firstSeed && second == secondSeed;

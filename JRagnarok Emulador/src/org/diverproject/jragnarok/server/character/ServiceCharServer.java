@@ -47,6 +47,12 @@ public class ServiceCharServer extends AbstractCharService
 		{
 			return "onlineDataCleanup";
 		}
+
+		@Override
+		public String toString()
+		{
+			return getName();
+		}
 	};
 
 	public final TimerListener waitinDisconnect = new TimerListener()
