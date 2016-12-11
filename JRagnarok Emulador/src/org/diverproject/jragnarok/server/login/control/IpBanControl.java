@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.server.login.control;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import java.sql.Connection;
@@ -126,7 +127,7 @@ public class IpBanControl
 	{
 		try {
 
-			logWarning("%s lista de endereços liberados (%d).\n", dao.cleanup());
+			logNotice("%d lista de endereços liberados.\n", dao.cleanup());
 
 			for (int i = 0; i < cache.size(); i++)
 				if (cache.get(i).getResumeTime().get() <= now())

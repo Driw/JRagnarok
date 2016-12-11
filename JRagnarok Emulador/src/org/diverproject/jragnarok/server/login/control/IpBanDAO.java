@@ -195,7 +195,7 @@ public class IpBanDAO extends AbstractControl
 	public int cleanup() throws RagnarokException
 	{
 		String table = Tables.getInstance().getIpBan();
-		String sql = format("DROP FROM %s WHERE resume_time <= NOW()", table);
+		String sql = format("DELETE FROM %s WHERE resume_time <= NOW()", table);
 
 		try {
 

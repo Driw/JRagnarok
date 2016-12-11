@@ -1,3 +1,7 @@
+11.12.2016 - 1.3.136
+- LoginServer pode acabar inicializando ServiceLoginIpBan e/ou ServiceLoginLog duas vezes.
+- Corrigindo mensagem de log para IpBanControl.cleanup() e query para IpBanDAO.cleanup().
+
 11.12.2016 - 1.3.135
 - Configuração para o tempo de intervalo na sincronização de endereço de IP definido.
 - Mensagem de log em FileDescriptorSystem ao encerrar sessão melhor definida (identifica cliente/servidor).
