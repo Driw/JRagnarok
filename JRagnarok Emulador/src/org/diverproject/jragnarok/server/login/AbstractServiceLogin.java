@@ -35,7 +35,7 @@ import org.diverproject.util.ObjectDescription;
  * @author Andrew
  */
 
-public class AbstractServiceLogin extends ServerService
+class AbstractServiceLogin extends ServerService
 {
 	/**
 	 * Serviço para comunicação com o servidor de personagens.

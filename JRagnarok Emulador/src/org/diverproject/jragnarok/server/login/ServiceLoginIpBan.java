@@ -5,7 +5,11 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_CLEANUP_
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_PASS_FAILURE_INTERVAL;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_PASS_FAILURE_LIMIT;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logNotice;
 
+import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
@@ -62,7 +66,14 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 		@Override
 		public void onCall(Timer timer, int now, int tick)
 		{
-			ipbans.cleanup();
+			try {
+
+				logNotice("%d listas de endereços de IP banidos expirados.\n", ipbans.cleanup());
+
+			} catch (RagnarokException e) {
+				logError("falha durante a limpeza de endereços de IP banidos expirados:\n");
+				logExeception(e);
+			}
 		}
 		
 		@Override

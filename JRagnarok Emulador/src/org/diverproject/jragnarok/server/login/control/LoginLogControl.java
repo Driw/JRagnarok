@@ -88,10 +88,9 @@ public class LoginLogControl extends AbstractControl
 	 * @param log referência do objeto de registro de acesso a inserir.
 	 * @return true se tiver conseguido inserir ou false caso contrário.
 	 * @throws RagnarokException parâmetro inválido ou falha de conexão.
-	 * @see Tables
 	 */
 
-	public boolean insert(LoginLog log) throws RagnarokException
+	public boolean add(LoginLog log) throws RagnarokException
 	{
 		if (log == null)
 			throw new RagnarokException("registro nulo");

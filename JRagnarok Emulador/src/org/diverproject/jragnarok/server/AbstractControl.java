@@ -105,6 +105,14 @@ public abstract class AbstractControl
 
 	protected void toString(ObjectDescription description)
 	{
+		
+	}
+
+	@Override
+	public final String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
 		try {
 
 			if (connection.isClosed())
@@ -114,13 +122,7 @@ public abstract class AbstractControl
 
 		} catch (SQLException e) {
 			description.append("closed", e.getMessage());
-		}		
-	}
-
-	@Override
-	public final String toString()
-	{
-		ObjectDescription description = new ObjectDescription(getClass());
+		}
 
 		toString(description);
 

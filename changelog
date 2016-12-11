@@ -1,3 +1,8 @@
+11.12.2016 - 1.3.139
+- IpBanDAO excluído, agora IpBanControl deverá realizar os chamados com o banco de dados.
+- Pequeno ajuste em AbstractControl para evitar chamado super.toString desnecessário.
+- ServiceLoginClient não precisa realizar um init() especificado para si.
+
 11.12.2016 - 1.3.138
 - LoginServerFacade adicionado para alocar todos os serviços e controles de LoginServer.
 	- Serviços atualizados conforme as mudanças com LoginServerFacade.

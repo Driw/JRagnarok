@@ -81,19 +81,6 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	}
 
 	/**
-	 * Inicializa o serviço para recebimento de novos clientes no servidor.
-	 */
-
-	public void init()
-	{
-		super.init();
-
-		log = getServer().getFacade().getLogService();
-		ipban = getServer().getFacade().getIpBanService();
-		auth = getServer().getFacade().getAuthService();
-	}
-
-	/**
 	 * Listener usado para receber novas conexões solicitadas com o servidor de acesso.
 	 * A análise verifica se a conexão já foi feita e se tiver verifica se está banido.
 	 * Caso não esteja banido ou não haja conexão estabelece uma nova conexão.
