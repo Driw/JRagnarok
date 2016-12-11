@@ -119,7 +119,10 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 				if (!fd.isConnected())
 					fd.close();
 
-				logInfo("sessão #%d fechada e removida (ip: %s).\n", fd.getID(), fd.getAddressString());
+				if (fd.getFlag().is(FLAG_SERVER))
+					logInfo("sessão server#%d fechada e removida (ip: %s).\n", fd.getID(), fd.getAddressString());
+				else
+					logInfo("sessão client#%d fechada e removida (ip: %s).\n", fd.getID(), fd.getAddressString());
 
 				sessions.remove(i);
 			}
@@ -186,7 +189,8 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 
 		e.printStackTrace();
 
-		setEndOfFile(fd);
+		if (!fd.getFlag().is(FLAG_SERVER))
+			setEndOfFile(fd);
 	}
 
 	/**

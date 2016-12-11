@@ -212,7 +212,7 @@ public class Timer implements Comparable<Timer>
 		description.append("tick", tick);
 		description.append("interval", interval);
 		description.append("type", type);
-		description.append("listener", listener);
+		description.append("listener", listener.getName());
 
 		return description.toString();
 	}

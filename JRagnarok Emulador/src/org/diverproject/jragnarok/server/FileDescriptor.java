@@ -278,6 +278,7 @@ public abstract class FileDescriptor
 
 		description.append("id", id);
 		description.append("address", address.getString());
+		description.append("flag", flag.toStringProperties());
 		description.append("parse", parseListener);
 
 		return description.toString();

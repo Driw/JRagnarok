@@ -171,9 +171,6 @@ public class TimerMap implements Iterable<Timer>
 	{
 		for (Timer timer : this)
 		{
-			if (timer.getTick() > now)
-				break;
-
 			switch (timer.getType())
 			{
 				case TIMER_ONCE_AUTODEL:
@@ -182,7 +179,7 @@ public class TimerMap implements Iterable<Timer>
 					break;
 
 				case TIMER_INTERVAL:
-					if (timer.getTick() + timer.getInterval() >= now)
+					if (timer.getTick() >= now)
 					{
 						timer.getListener().onCall(timer, now, tick);
 						timer.setType(TIMER_REMOVE);
@@ -190,7 +187,7 @@ public class TimerMap implements Iterable<Timer>
 					break;
 
 				case TIMER_LOOP:
-					if (timer.getTick() + timer.getInterval() >= now)
+					if (now >= timer.getTick())
 					{
 						timer.getListener().onCall(timer, now, tick);
 						timer.setTick(now + timer.getInterval());
@@ -199,9 +196,8 @@ public class TimerMap implements Iterable<Timer>
 					break;
 
 				case TIMER_REMOVE:
-					delete(timer);
-
 				default:
+					delete(timer);
 			}
 		}
 	}
