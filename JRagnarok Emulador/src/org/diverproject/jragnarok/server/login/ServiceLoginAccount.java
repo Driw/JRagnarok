@@ -13,7 +13,6 @@ import org.diverproject.jragnarok.packets.request.BanAccountRequest;
 import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
 import org.diverproject.jragnarok.packets.request.UpdateAccountState;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
-import org.diverproject.jragnarok.server.login.control.AuthAccountMap;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
 import org.diverproject.jragnarok.server.login.structures.AuthNode;

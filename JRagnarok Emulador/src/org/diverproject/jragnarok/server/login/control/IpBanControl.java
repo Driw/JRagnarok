@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
+import org.diverproject.jragnarok.server.login.entities.IpBanList;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.collection.List;

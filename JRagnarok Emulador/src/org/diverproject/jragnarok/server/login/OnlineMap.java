@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.control;
+package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.log.LogSystem.logDebug;
 

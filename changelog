@@ -1,3 +1,7 @@
+12.12.2016 - 1.4.143
+- AuthAccountMap e OnlineMap movidos de login.control para login, são coleções e não controles.
+- IpBanList foi movido de login.control para login.entities já que é uma entidade.
+
 12.12.2016 - 1.4.142
 - Enviando diagrama feito no Visual Paradigm sendo iniciado pelo LoginServer.
 

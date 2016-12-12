@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.control;
+package org.diverproject.jragnarok.server.login;
 
 import org.diverproject.jragnarok.server.login.structures.AuthNode;
 import org.diverproject.util.ObjectDescription;
