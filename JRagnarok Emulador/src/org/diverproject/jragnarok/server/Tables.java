@@ -56,29 +56,19 @@ public class Tables
 	private String groups;
 
 	/**
-	 * Tabela contendo todos os comandos habilitados dos grupos.
-	 */
-	private String groupCommandsList;
-
-	/**
-	 * Tabela contendo todas as permissões habilitadas dos grupos.
-	 */
-	private String groupPermissionsList;
-
-	/**
 	 * Tabela contendo todos os comandos para jogadores.
 	 */
-	private String groupCommands;
+	private String groupsCommands;
 
 	/**
 	 * Tabela contendo todas as permissões para jogadores.
 	 */
-	private String groupPermissions;
+	private String groupsPermissions;
 
 	/**
 	 * Tabela contendo as configurações dos acessos vip.
 	 */
-	private String vip;
+	private String vips;
 
 	/**
 	 * Tabela contendo a lista de endereços IP banidos.
@@ -140,12 +130,10 @@ public class Tables
 		pincodes = "pincodes";
 
 		groups = "groups";
-		groupPermissionsList = "group_permissions_list";
-		groupCommandsList = "group_commands_list";
-		groupPermissions = "group_permissions";
-		groupCommands = "group_commands";
+		groupsPermissions = "groups_permissions";
+		groupsCommands = "groups_commands";
 
-		vip = "vip";
+		vips = "vips";
 
 		ipBan = "ipban_list";
 
@@ -267,93 +255,57 @@ public class Tables
 	}
 
 	/**
-	 * @return aquisição do nome da tabela contendo todos os comandos habilitados dos grupos.
-	 */
-
-	public String getGroupCommandsList()
-	{
-		return groupCommandsList;
-	}
-
-	/**
-	 * @param groupCommands nome da tabela contendo todos os comandos habilitados dos grupos.
-	 */
-
-	public void setGroupCommandsList(String groupCommands)
-	{
-		this.groupCommandsList = groupCommands;
-	}
-
-	/**
-	 * @return aquisição do nome da tabela contendo todas as permissões habilitados dos grupos.
-	 */
-
-	public String getGroupPermissionsList()
-	{
-		return groupPermissionsList;
-	}
-
-	/**
-	 * @param groupPermissions nome da tabela contendo todas as permissões habilitados dos grupos.
-	 */
-
-	public void setGroupPermissionsList(String groupPermissions)
-	{
-		this.groupPermissionsList = groupPermissions;
-	}
-
-	/**
 	 * @return aquisição do nome da tabela com os comandos disponíveis para grupos.
 	 */
 
-	public String getGroupCommands()
+	public String getGroupsCommands()
 	{
-		return groupCommands;
+		return groupsCommands;
 	}
 
 	/**
-	 * @param groupCommands nome da tabela com os comandos disponíveis para grupos.
+	 * @param groupsCommands nome da tabela com os comandos disponíveis para grupos.
 	 */
 
-	public void setGroupCommands(String groupCommands)
+	public void setGroupsCommands(String groupsCommands)
 	{
-		this.groupCommands = groupCommands;
+		this.groupsCommands = groupsCommands;
 	}
 
 	/**
 	 * @return aquisição do nome da tabela com as permissões disponíveis para grupos.
 	 */
 
-	public String getGroupPermissions()
+	public String getGroupsPermissions()
 	{
-		return groupPermissions;
+		return groupsPermissions;
 	}
 
 	/**
-	 * @param groupPermissions nome da tabela com as permissões disponíveis para grupos.
+	 * @param groupsPermissions nome da tabela com as permissões disponíveis para grupos.
 	 */
 
-	public void setGroupPermissions(String groupPermissions)
+	public void setGroupsPermissions(String groupsPermissions)
 	{
-		this.groupPermissions = groupPermissions;
+		this.groupsPermissions = groupsPermissions;
 	}
 
 	/**
 	 * @return aquisição do nome da tabela contendo as configurações dos acessos vip.
 	 */
 
-	public String getVip()
+	public String getVips()
 	{
-		return vip;
+		return vips;
 	}
 
 	/**
-	 * @param vip nome da tabela contendo as configurações dos acessos vip.
+	 * @param vips nome da tabela contendo as configurações dos acessos vip.
 	 */
 
-	public void setVip(String vip)
+	public void setVips(String vips)
 	{
-		this.vip = vip;
+		this.vips = vips;
 	}
 
 	/**

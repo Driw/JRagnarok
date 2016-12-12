@@ -10,7 +10,7 @@ public class Group
 	private Group parent;
 	private GroupCommands commands;
 	private GroupPermissions permissions;
-	private boolean logEnabled;
+	private boolean logCommands;
 
 	public Group()
 	{
@@ -68,14 +68,14 @@ public class Group
 		return permissions;
 	}
 
-	public boolean isLogEnabled()
+	public boolean isLogCommands()
 	{
-		return logEnabled;
+		return logCommands;
 	}
 
-	public void setLogEnabled(boolean logEnabled)
+	public void setLogCommands(boolean logCommands)
 	{
-		this.logEnabled = logEnabled;
+		this.logCommands = logCommands;
 	}
 
 	@Override

@@ -16,54 +16,36 @@ CREATE TABLE IF NOT EXISTS groups
 	level INT NOT NULL,
 	name VARCHAR(24) NOT NULL,
 	parent INT,
-	log_enabled TINYINT(1) NOT NULL DEFAULT 0,
+	log_commands TINYINT(1) NOT NULL DEFAULT 0,
 
 	PRIMARY KEY (id),
 	CONSTRAINT SelfKey FOREIGN KEY (parent) REFERENCES groups (id) ON DELETE NO ACTION ON UPDATE NO ACTION
 
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS group_commands
-(
-	id INT AUTO_INCREMENT,
-	name VARCHAR(24) NOT NULL,
-
-	PRIMARY KEY (id)
-
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS group_permissions
-(
-	id INT AUTO_INCREMENT,
-	name VARCHAR(24) NOT NULL,
-
-	PRIMARY KEY (id)
-
-) ENGINE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS groups_commands_list
+CREATE TABLE IF NOT EXISTS groups_commands
 (
 	groupid INT NOT NULL,
-	command INT NOT NULL,
+	command VARCHAR(24) NOT NULL,
+	enabled TINYINT NOT NULL,
 
 	PRIMARY KEY (groupid, command),
-	FOREIGN KEY (groupid) REFERENCES groups (id),
-	FOREIGN KEY (command) REFERENCES commands (id)
+	FOREIGN KEY (groupid) REFERENCES groups (id)
 
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS groups_permissions_list
+CREATE TABLE IF NOT EXISTS groups_permissions
 (
 	groupid INT NOT NULL,
-	permission INT NOT NULL,
+	command VARCHAR(24) NOT NULL,
+	enabled TINYINT NOT NULL,
 
-	PRIMARY KEY (groupid, permission),
-	FOREIGN KEY (groupid) REFERENCES groups (id),
-	FOREIGN KEY (permission) REFERENCES permissions (id)
+	PRIMARY KEY (groupid, command),
+	FOREIGN KEY (groupid) REFERENCES groups (id)
 
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS vip
+CREATE TABLE IF NOT EXISTS vips
 (
 	id INT AUTO_INCREMENT,
 	name VARCHAR(24) NOT NULL,

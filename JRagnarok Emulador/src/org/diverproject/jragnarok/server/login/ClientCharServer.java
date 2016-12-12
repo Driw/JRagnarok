@@ -63,6 +63,15 @@ public class ClientCharServer
 	private boolean newDisplay;
 
 	/**
+	 * Cria uma nova instância de um cliente para um servidor de personagem no servidor de acesso.
+	 */
+
+	public ClientCharServer()
+	{
+		ip = new InternetProtocol();
+	}
+
+	/**
 	 * @return aquisição do descritor de arquivo do servidor de personagem.
 	 */
 

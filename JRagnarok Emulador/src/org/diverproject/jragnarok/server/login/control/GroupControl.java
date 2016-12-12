@@ -1,6 +1,9 @@
 package org.diverproject.jragnarok.server.login.control;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.log.LogSystem.logDebug;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logExeception;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,9 +15,7 @@ import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
 import org.diverproject.jragnarok.server.login.entities.AccountGroup;
 import org.diverproject.jragnarok.server.login.entities.Group;
-import org.diverproject.jragnarok.server.login.entities.GroupCommand;
 import org.diverproject.jragnarok.server.login.entities.GroupCommands;
-import org.diverproject.jragnarok.server.login.entities.GroupPermission;
 import org.diverproject.jragnarok.server.login.entities.GroupPermissions;
 import org.diverproject.jragnarok.server.login.entities.Vip;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;
@@ -55,9 +56,55 @@ public class GroupControl extends AbstractControl
 	public GroupControl(Connection connection)
 	{
 		super(connection);
+	}
 
-		groups = new IntegerLittleMap<>();
-		vips = new IntegerLittleMap<>();
+	/**
+	 * Procedimento interno usado para se criar um novo objeto com informações de um grupo de conta.
+	 * @param rs resultado obtido da consulta no banco de dados contendo os dados do grupo.
+	 * @return aquisição de um grupo de conta criado a partir das informações da consulta passada.
+	 * @throws SQLException apenas se houver falha de conexão com o banco de dados.
+	 * @throws RagnarokException durante o carregamento das permissões e comandos do grupo.
+	 */
+
+	private Group newGroup(ResultSet rs) throws SQLException, RagnarokException
+	{
+		Group group = new Group();
+		group.setID(rs.getInt("id"));
+		group.setLevel(rs.getInt("level"));
+		group.setName(rs.getString("name"));
+		group.setLogCommands(rs.getBoolean("log_commands"));
+
+		int parentID = rs.getInt("parent");
+
+		if (parentID > 0)
+		{
+			Group parent = getGroup(parentID);
+			group.setParent(parent);
+		}
+
+		loadGroupPermissions(group);
+		loadGroupCommands(group);
+
+		return group;
+	}
+
+	/**
+	 * Procedimento interno usado para se criar um novo objeto com informações de um vip.
+	 * @param rs resultado obtido da consulta no banco de dados contendo os dados do vip.
+	 * @return aquisição de um vip criado a partir das informações da consulta passada.
+	 * @throws SQLException apenas se houver falha de conexão com o banco de dados.
+	 * @throws RagnarokException apenas se houver falha de conexão com o banco de dados.
+	 */
+
+	private Vip newVip(ResultSet rs) throws SQLException, RagnarokException
+	{
+		Vip vip = new Vip();
+		vip.setID(rs.getInt("id"));
+		vip.setCharSlotCount(rs.getByte("char_slot_count"));
+		vip.setMaxStorage(rs.getShort("max_storage"));
+		vip.setGroup(getGroup(rs.getInt("groupid")));
+
+		return vip;
 	}
 
 	/**
@@ -93,7 +140,7 @@ public class GroupControl extends AbstractControl
 				Group group = groups.get(currentGroupID);
 
 				if (group == null)
-					group = get(currentGroupID);
+					group = getGroup(currentGroupID);
 
 				accountGroup.setCurrentGroup(group);
 			}
@@ -103,7 +150,7 @@ public class GroupControl extends AbstractControl
 				Group group = groups.get(currentGroupID);
 
 				if (group == null)
-					group = get(oldGroupID);
+					group = getGroup(oldGroupID);
 
 				accountGroup.setOldGroup(group);
 			}
@@ -118,6 +165,8 @@ public class GroupControl extends AbstractControl
 				accountGroup.setVip(vip);
 			}
 
+			logDebug("dados do grupo de uma conta recarregados (aid: %d).\n", accountGroup.getID());
+
 		} catch (SQLException e) {
 			throw new RagnarokException(e);
 		}
@@ -129,7 +178,7 @@ public class GroupControl extends AbstractControl
 	 * @throws RagnarokException falha de conexão ou inconsistência nos dados.
 	 */
 
-	public Group get(int groupID) throws RagnarokException
+	public Group getGroup(int groupID) throws RagnarokException
 	{
 		Group group = groups.get(groupID);
 
@@ -137,7 +186,7 @@ public class GroupControl extends AbstractControl
 			return group;
 
 		String table = Tables.getInstance().getGroups();
-		String sql = format("SELECT level, name, parent, log_enabled FROM %s WHERE id = ?", table);
+		String sql = format("SELECT id, level, name, parent, log_commands FROM %s WHERE id = ?", table);
 
 		try {
 
@@ -149,23 +198,15 @@ public class GroupControl extends AbstractControl
 			if (!rs.next())
 				throw new RagnarokException("grupo de conta '%d' não encontrado", groupID);
 
-			group = new Group();
-			group.setLevel(rs.getInt("level"));
-			group.setName(rs.getString("name"));
-			group.setLogEnabled(rs.getBoolean("log_enabled"));
+			group = newGroup(rs);
 
-			int parentID = rs.getInt("parent");
-
-			if (parentID > 0)
+			if (groups.add(group.getID(), group))
 			{
-				Group parent = get(parentID);
-				group.setParent(parent);
+				int csize = group.getCommands().size();
+				int psize = group.getPermissions().size();
+
+				logDebug("novo grupo carregado do banco de dados (gid: %d, commands: %d, permissions: %d).\n", group.getID(), csize, psize);
 			}
-
-			loadGroupPermissions(group);
-			loadGroupCommands(group);
-
-			groups.add(group.getID(), group);
 
 			return group;
 
@@ -183,13 +224,8 @@ public class GroupControl extends AbstractControl
 
 	private void loadGroupPermissions(Group group) throws RagnarokException
 	{
-		String table = Tables.getInstance().getGroupPermissionsList();
-		String permissionsTable = Tables.getInstance().getGroupPermissions();
-
-		String sql = format("SELECT id, name FROM %s"
-						+ " INNER JOIN %s ON %s.id = %s.permission"
-						+ " WHERE groupid = ?",
-						table, permissionsTable, permissionsTable, table);
+		String table = Tables.getInstance().getGroupsPermissions();
+		String sql = format("SELECT permission, enabled FROM %s WHERE groupid = ?", table);
 
 		try {
 
@@ -200,12 +236,7 @@ public class GroupControl extends AbstractControl
 			GroupPermissions permissions = group.getPermissions();
 
 			while (rs.next())
-			{
-				GroupPermission permission = new GroupPermission();
-				permission.setID(rs.getInt("id"));
-				permission.setName(rs.getString("name"));
-				permissions.add(permission);
-			}
+				permissions.set(rs.getString("permission"), rs.getInt("enabled"));
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e);
@@ -221,13 +252,8 @@ public class GroupControl extends AbstractControl
 
 	private void loadGroupCommands(Group group) throws RagnarokException
 	{
-		String table = Tables.getInstance().getGroupCommandsList();
-		String commandsTable = Tables.getInstance().getGroupCommands();
-
-		String sql = format("SELECT id, name FROM %s"
-						+ " INNER JOIN %s ON %s.id = %s.command"
-						+ " WHERE groupid = ?",
-						table, commandsTable, commandsTable, table);
+		String table = Tables.getInstance().getGroupsCommands();
+		String sql = format("SELECT command, enabled FROM %s WHERE groupid = ?", table);
 
 		try {
 
@@ -238,12 +264,7 @@ public class GroupControl extends AbstractControl
 			GroupCommands commands = group.getCommands();
 
 			while (rs.next())
-			{
-				GroupCommand command = new GroupCommand();
-				command.setID(rs.getInt("id"));
-				command.setName(rs.getString("name"));
-				commands.add(command);
-			}
+				commands.set(rs.getString("command"), rs.getInt("enabled"));
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e);
@@ -263,7 +284,7 @@ public class GroupControl extends AbstractControl
 		if (vip != null)
 			return vip;
 
-		String table = Tables.getInstance().getVip();
+		String table = Tables.getInstance().getVips();
 		String sql = format("name, groupid, char_slot_count, max_storage FROM %s WHERE id = ?", table);
 
 		try {
@@ -276,12 +297,10 @@ public class GroupControl extends AbstractControl
 			if (!rs.next())
 				throw new RagnarokException("acesso vip '%d' não encontrado", vipID);
 
-			vip = new Vip();
-			vip.setID(vipID);
-			vip.setCharSlotCount(rs.getByte("char_slot_count"));
-			vip.setMaxStorage(rs.getShort("max_storage"));
-			vip.getGroup().setID(rs.getInt("groupid"));
-			vips.add(vipID, vip);
+			vip = newVip(rs);
+
+			if (vips.add(vipID, vip))
+				logDebug("novo vip carregado do banco de dados (vid: %d).\n", vip.getID());
 
 			return vip;
 
@@ -291,11 +310,101 @@ public class GroupControl extends AbstractControl
 	}
 
 	/**
+	 * A inicialização desse grupo consiste em carregar todas as informações de grupos de conta e vip.
+	 * @throws RagnarokException apenas se houver falha de conexão com o banco de dados.
+	 */
+
+	public void init()
+	{
+		groups = new IntegerLittleMap<>();
+		vips = new IntegerLittleMap<>();
+
+		try {
+			initGroups();
+			initVips();
+		} catch (RagnarokException e) {
+			logError("falha ao tentar iniciar o controle de grupos:\n");
+			logExeception(e);
+		}
+	}
+
+	/**
+	 * Carrega todas as informações necessárias para a criação de um grupo de contas no sistema.
+	 * @throws RagnarokException apenas se houver falha de conexão com o banco de dados.
+	 */
+
+	private void initGroups() throws RagnarokException
+	{
+		String table = Tables.getInstance().getGroups();
+		String sql = format("SELECT id FROM %s", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next())
+			{
+				Group group = getGroup(rs.getInt("id"));
+				groups.add(group.getID(), group);
+			}
+
+			logDebug("foram encontrados %d grupos em '%s'.\n", groups.size(), table);
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e);
+		}
+	}
+
+	/**
+	 * Carrega todas as informações necessárias para a criação de um vip no sistema.
+	 * @throws RagnarokException apenas se houver falha de conexão com o banco de dados.
+	 */
+
+	private void initVips() throws RagnarokException
+	{
+		String table = Tables.getInstance().getVips();
+		String sql = format("SELECT id FROM %s", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next())
+			{
+				Vip vip = getVip(rs.getInt("id"));
+				vips.add(vip.getID(), vip);
+			}
+
+			logDebug("foram encontrados %d vip em '%s'.\n", groups.size(), table);
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e);
+		}
+
+	}
+
+	/**
+	 * Libera todos os objetos contidos em cache neste controle (contas de grupo e vip).
+	 */
+
+	public void destroy()
+	{
+		clear();
+
+		groups = null;
+		vips = null;
+	}
+
+	/**
 	 * Realiza uma limpeza no cache que mantém dados de grupos e acessos vip carregados.
 	 */
 
 	public void clear()
 	{
+		logDebug("liberando %d grupo de contas e %d vip liberados.\n", groups.size(), vips.size());
+
 		groups.clear();
 		vips.clear();
 	}

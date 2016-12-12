@@ -1,7 +1,162 @@
 
-INSERT INTO groups (level, name, log_enabled) VALUES (0, 'Servidores', 1);
-INSERT INTO groups (level, name, log_enabled) VALUES (0, 'Jogadores Comuns', 1);
+INSERT INTO groups (id, level, name, parent, log_commands) VALUES
+(1, 0, 'Servidores', NULL, 1),
+(2, 0, 'Jogadores Comuns', NULL, 0),
+(3, 0, 'Jogador Avançado', 2, 0),
+(4, 0, 'Doadores', 2, 0),
+(5, 1, 'Equipe de Suporte', 3, 1),
+(6, 1, 'Gerente de Script', 5, 1),
+(7, 1, 'Gerente de Eventos', 5, 1),
+(8, 2, 'Aplicador de Lei', 5, 1),
+(9, 99, 'Administrador', 8, 1);
 
-INSERT INTO pincodes (enabled, code, changed) VALUES (0, '1001', '1970-01-01 00:00:00');
+INSERT INTO groups_commands (groupid, command, enabled) VALUES
+-- Servidores
+-- Jogadores Comuns
+-- Jogador Avançado
+(3, 'commands', 1),
+(3, 'charcommands', 1),
+(3, 'help', 1),
+(3, 'rates', 1),
+(3, 'uptime', 1),
+(3, 'showdelay', 1),
+(3, 'exp', 1),
+(3, 'mobinfo', 1),
+(3, 'iteminfo', 1),
+(3, 'whodrops', 1),
+(3, 'time', 1),
+(3, 'jailtime', 1),
+(3, 'hominfo', 1),
+(3, 'homstats', 1),
+(3, 'showexp', 1),
+(3, 'showzeny', 1),
+(3, 'whereis', 1),
+(3, 'refresh', 1),
+(3, 'noask', 1),
+(3, 'noks', 1),
+(3, 'autoloot', 1),
+(3, 'alootid', 1),
+(3, 'autoloottype', 1),
+(3, 'autotrade', 1),
+(3, 'request', 1),
+(3, 'go', 1),
+(3, 'breakguild', 1),
+(3, 'channel', 1),
+(3, 'langtype', 1),
+-- Doadores
+(4, 'rates', 1),
+(4, 'who', 1),
+-- Equipe de Suporte
+(5, 'version', 1),
+(5, 'where', 1),
+(5, 'jumpto', 1),
+(5, 'who', 1),
+(5, 'who2', 1),
+(5, 'who3', 1),
+(5, 'whomap', 1),
+(5, 'whomap2', 1),
+(5, 'whomap3', 1),
+(5, 'users', 1),
+(5, 'broadcast', 1),
+(5, 'localbroadcast', 1),
+-- Gerente de Script
+(6, 'tonpc', 1),
+(6, 'hidenpc', 1),
+(6, 'shownpc', 1),
+(6, 'loadnpc', 1),
+(6, 'unloadnpc', 1),
+(6, 'npcmove', 1),
+(6, 'addwarp', 1),
+-- Gerente de Eventos
+(7, 'monster', 1),
+(7, 'monstersmall', 1),
+(7, 'monsterbig', 1),
+(7, 'killmonster2', 1),
+(7, 'cleanarea', 1),
+(7, 'cleanmap', 1),
+(7, 'item', 3),
+(7, 'zeny', 3),
+(7, 'disguise', 3),
+(7, 'undisguise', 3),
+(7, 'size', 1),
+(7, 'raise', 1),
+(7, 'raisemap', 1),
+(7, 'day', 1),
+(7, 'night', 1),
+(7, 'skillon', 1),
+(7, 'skilloff', 1),
+(7, 'pvpon', 1),
+(7, 'pvpoff', 1),
+(7, 'gvgon', 1),
+(7, 'gvgoff', 1),
+(7, 'allowks', 1),
+(7, 'me', 1),
+(7, 'marry', 1),
+(7, 'divorce', 1),
+(7, 'refreshall', 1),
+-- Aplicador de Lei
+(8, 'hide', 1),
+(8, 'follow', 1),
+(8, 'kick', 1),
+(8, 'disguise', 1),
+(8, 'fakename', 1),
+(8, 'option', 1),
+(8, 'speed', 1),
+(8, 'warp', 1),
+(8, 'kill', 1),
+(8, 'recall', 1),
+(8, 'ban', 1),
+(8, 'block', 1),
+(8, 'jail', 1),
+(8, 'jailfor', 1),
+(8, 'mute', 1),
+(8, 'storagelist', 1),
+(8, 'cartlist', 1),
+(8, 'itemlist', 1),
+(8, 'stats', 1),
+-- Administrador
+(9, 'all_commands', 1);
+
+INSERT INTO groups_permissions (groupid, command, enabled) VALUES
+-- Jogador Comum
+(2, 'can_trade', 1),
+(2, 'can_party', 1),
+(2, 'command_enable', 1),
+-- Super Jogador
+-- Doadores
+-- Equipe de Suporte
+(5, 'receive_requests', 1),
+(5, 'view_equipment', 1),
+-- Gerente de Script
+(6, 'can_trade', 0),
+(6, 'any_warp', 1),
+-- Gerente de Eventos
+(7, 'any_warp', 1),
+-- Aplicador de Lei
+(8, 'join_chat', 1),
+(8, 'kick_chat', 1),
+(8, 'hide_session', 1),
+(8, 'who_display_aid', 1),
+(8, 'hack_info', 1),
+(8, 'any_warp', 1),
+(8, 'view_hpmeter', 1),
+-- Administrador
+(9, 'can_trade', 1),
+(9, 'can_party', 1),
+(9, 'all_skill', 0),
+(9, 'all_equipment', 0),
+(9, 'skill_unconditional', 0),
+(9, 'use_check', 1),
+(9, 'use_changemaptype', 1),
+(9, 'all_commands', 1),
+(9, 'channel_admin', 1),
+(9, 'can_trade_bounded', 1),
+(9, 'item_unconditional', 0),
+(9, 'bypass_stat_onclone', 1),
+(9, 'bypass_max_stat', 1),
+(9, 'all_permission', 1);
+
+INSERT INTO pincodes (id, enabled, code, changed) VALUES (1, 0, '1001', '1970-01-01 00:00:00');
 
 INSERT INTO accounts (id, username, password, groupid, pincode) VALUES (1, 'server', 'jragnarok', 1, 1);
+

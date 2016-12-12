@@ -21,6 +21,9 @@ import org.diverproject.jragnarok.server.login.entities.AccountState;
  * Possuindo métodos básicos para garantir o gerenciamento destas contas no banco de dados.
  * O gerenciamento deverá incluir métodos para se: obter dados e atualizar os dados.</p>
  *
+ * <p>Este controle ainda irá comunicar-se com outros dois controles caso necessário.
+ * O primeiro controle é para gerenciamento de código PIN e o segundo para grupo de contas.</p>
+ *
  * @see Connection
  * @see AbstractControl
  * @see PincodeControl
@@ -49,8 +52,6 @@ public class AccountControl extends AbstractControl
 	public AccountControl(Connection connection)
 	{
 		super(connection);
-
-		groups = new GroupControl(connection);
 	}
 
 	/**

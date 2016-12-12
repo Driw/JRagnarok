@@ -2,44 +2,59 @@ package org.diverproject.jragnarok.server.login.entities;
 
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Map;
+import org.diverproject.util.collection.Map.MapItem;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;
 
 public class GroupCommands
 {
-	private Map<String, GroupCommand> commands;
+	public static final String ENABLED_ALL = "all_commands";
+
+	private boolean enabledAll;
+	private Map<String, Integer> commands;
 
 	public GroupCommands()
 	{
 		commands = new StringSimpleMap<>();
 	}
 
-	public boolean add(GroupCommand command)
+	public void set(String command, int bitmask)
 	{
 		if (command != null)
-			return commands.add(command.getName(), command);
+		{
+			if (command.equals(ENABLED_ALL))
+				enabledAll = true;
 
-		return false;
+			else
+			{
+				commands.removeKey(command);
+				commands.add(command, bitmask);
+			}
+		}
 	}
 
-	public boolean remove(GroupCommand command)
+	public void remove(String command)
 	{
-		if (command != null)
-			return commands.removeKey(command.getName());
-
-		return false;
+		commands.removeKey(command);
 	}
 
-	public boolean contains(String name)
+	public boolean contains(String command)
 	{
-		return commands.containsKey(name);
+		return commands.containsKey(command);
 	}
 
-	public boolean contains(GroupCommand command)
+	public boolean is(String command)
 	{
-		if (command != null)
-			return contains(command.getName());
+		return enabledAll || commands.containsKey(command);
+	}
 
-		return false;
+	public boolean is(String command, int bitmask)
+	{
+		if (enabledAll)
+			return true;
+
+		Integer commandMask = commands.get(command);
+
+		return commandMask != null && commandMask == bitmask;
 	}
 
 	public int size()
@@ -52,8 +67,8 @@ public class GroupCommands
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		for (GroupCommand command : commands)
-			description.append(command.getName());
+		for (MapItem<String, Integer> command : commands.iterateItems())
+			description.append(command.key, command.value);
 
 		return description.toString();
 	}

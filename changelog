@@ -1,3 +1,9 @@
+12.12.2016 - 1.4.146b
+- GrouControl agora deverá carregar os grupos de conta e vip quando inicializado por init().
+	- Pequenos aprimoramentos para facilitar possíveis manutenções futuras.
+- ClientCharServer não estava inicializando o seu endereço de IP com InternetProtocol.
+- Alterando a forma como comandos e permissões são definidas aos grupos de conta.
+
 12.12.2016 - 1.4.146
 - Mais documentação das classes em server.login e alguns ajustes textuais de log.
 - Atualizando o Diagrama de Classes conforme o que se está presente em código, apenas server.login.

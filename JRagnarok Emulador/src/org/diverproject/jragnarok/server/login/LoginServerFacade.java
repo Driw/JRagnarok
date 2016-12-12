@@ -279,6 +279,7 @@ class LoginServerFacade
 
 		accountControl.setGroupControl(groupControl);
 		accountControl.setPincodeControl(pincodeControl);
+		groupControl.init();
 
 		accountService = new ServiceLoginAccount(loginServer);
 		authService = new ServiceLoginAuth(loginServer);
@@ -310,6 +311,7 @@ class LoginServerFacade
 
 	public void destroy(LoginServer loginServer)
 	{
+		groupControl.destroy();
 		ipBanService.destroy();
 		authService.destroy();
 		accountService.destroy();
@@ -323,7 +325,6 @@ class LoginServerFacade
 		if (loginServer.getConfigs().getBool(IPBAN_ENABLED))
 			ipBanService.destroy();
 
-		groupControl.clear();
 		onlineControl.clear(loginServer.getTimerSystem().getTimers());
 		authControl.clear();
 		ipbanControl.clear();
