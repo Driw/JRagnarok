@@ -1,3 +1,6 @@
+12.12.2016 - 1.4.142
+- Enviando diagrama feito no Visual Paradigm sendo iniciado pelo LoginServer.
+
 12.12.2016 - 1.4.141
 - O sistema agora irá usar o padrão de projetos Facade para melhor estruturação dos serviços.
 - AuthAccountControl e OnlineControl não eram controles e sim coleções (renomeados adequadamente).
