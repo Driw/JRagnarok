@@ -33,6 +33,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_CHAR_SERVER_CONNECT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.jragnarok.server.common.AuthResult.OK;
+import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONLINE;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
@@ -212,7 +213,7 @@ public class ServiceCharLogin extends AbstractCharService
 			return false;
 		}
 
-		packet.send(fd);
+		packet.send(getFileDescriptor());
 
 		return true;
 	}
@@ -273,7 +274,7 @@ public class ServiceCharLogin extends AbstractCharService
 		@Override
 		public String getName()
 		{
-			return "check_connect_login_server";
+			return "checkLoginConnection";
 		}
 
 		@Override
@@ -514,7 +515,7 @@ public class ServiceCharLogin extends AbstractCharService
 			if (online.getServer() > OnlineCharData.NO_SERVER)
 			{
 				ClientMapServer server = getServer().getMapServers().get(online.getServer());
-				map.disconnectPlayer(server.getFileDecriptor(), online.getAccountID(), online.getCharID(), 2);
+				map.disconnectPlayer(server.getFileDecriptor(), online.getCharID(), KICK_ONLINE);
 
 				TimerSystem ts = getTimerSystem();
 				TimerMap timers = ts.getTimers();
@@ -588,11 +589,11 @@ public class ServiceCharLogin extends AbstractCharService
 		CharSessionData sd = fd.getSessionData();
 
 		AuthAccountRequest packet = new AuthAccountRequest();
+		packet.setFileDescriptorID(fd.getID());
 		packet.setAccountID(sd.getID());
 		packet.setFirstSeed(sd.getSeed().getFirst());
 		packet.setSecondSeed(sd.getSeed().getSecond());
 		packet.setIP(fd.getAddress());
-		packet.setFdID(fd.getID());
 
 		return sendPacket(fd, packet);
 	}
@@ -610,9 +611,11 @@ public class ServiceCharLogin extends AbstractCharService
 		AuthAccountResult packet = new AuthAccountResult();
 		packet.receive(lfd);
 
-		if (getFileDescriptorSystem().isAlive(packet.getRequestID()))
+		int fdID = packet.getFileDescriptorID();
+
+		if (getFileDescriptorSystem().isAlive(fdID))
 		{
-			CFileDescriptor fd = (CFileDescriptor) getFileDescriptorSystem().get(packet.getRequestID());
+			CFileDescriptor fd = (CFileDescriptor) getFileDescriptorSystem().get(fdID);
 			CharSessionData sd = fd.getSessionData();
 
 			if (sd.isAuth() && sd.getID() == packet.getAccountID() &&
@@ -628,9 +631,9 @@ public class ServiceCharLogin extends AbstractCharService
 
 				if (packet.isResult())
 					return character.authOk(fd);
-
-				client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
 			}
+
+			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
 		}
 
 		return false;
