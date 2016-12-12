@@ -8,14 +8,15 @@ import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;
 
 /**
- * <h1>Controle de Jogadores Online</h1>
+ * <h1>Mapeador de Jogadores Online</h1>
  *
- * <p>Através desse controlador um determinado serviço poderá saber se um jogador está online.
+ * <p>Através dessa coleção (mapa) um determinado serviço poderá saber se um jogador está online.
  * Armazena em cache algumas informações do jogador online como a conta e servidor de personagem.
  * É possível saber se está online, adicionar como online, remover e limpar o cache.</p>
  *
  * @see TimerMap
  * @see OnlineLogin
+ * @see IntegerLittleMap
  *
  * @author Andrew
  */
@@ -66,7 +67,7 @@ public class OnlineMap
 
 		cache.add(online.getAccountID(), online);
 
-		logDebug("account#%d está online.\n", online.getAccountID());
+		logDebug("conta agora está online (aid: %d).\n", online.getAccountID());
 	}
 
 	/**
@@ -85,7 +86,7 @@ public class OnlineMap
 
 		cache.remove(online);
 
-		logDebug("account#%d não está mais online.\n", online.getAccountID());
+		logDebug("conta não está mais online (aid: %d).\n", online.getAccountID());
 	}
 
 	/**
@@ -117,7 +118,7 @@ public class OnlineMap
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("online", cache.size());
+		description.append("size", cache.size());
 
 		return description.toString();
 	}

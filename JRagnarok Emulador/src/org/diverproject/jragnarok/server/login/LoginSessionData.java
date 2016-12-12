@@ -270,7 +270,7 @@ public class LoginSessionData extends SessionData implements Login
 		description.append("passDencrypt", passDencrypt);
 
 		if (clientHash != null)
-			description.append("clientHash", new String(clientHash.getHash()));
+			description.append("clientHash", new String(clientHash.getHashString()));
 
 		if (seed != null)
 			description.append("seed", format("%d %d", seed.getFirst(), seed.getSecond()));

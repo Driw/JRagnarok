@@ -33,7 +33,6 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_IP
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_REGISTER;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_USER_COUNT;
 import static org.diverproject.log.LogSystem.logDebug;
-import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
@@ -311,13 +310,15 @@ class LoginServerFacade
 
 	public void destroy(LoginServer loginServer)
 	{
-		logService.destroy();
 		ipBanService.destroy();
 		authService.destroy();
 		accountService.destroy();
 		clientService.destroy();
 		charService.destroy();
 		loginService.destroy();
+
+		if (loginServer.getConfigs().getBool(LOG_LOGIN))
+			logService.destroy();
 
 		if (loginServer.getConfigs().getBool(IPBAN_ENABLED))
 			ipBanService.destroy();
@@ -359,8 +360,6 @@ class LoginServerFacade
 		@Override
 		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
-			logDebug("recebendo pacote (fd: %d).\n", fd.getID());
-
 			LFileDescriptor lfd = (LFileDescriptor) fd;
 
 			if (!fd.isConnected())
@@ -370,6 +369,8 @@ class LoginServerFacade
 			if (lfd.getSessionData().getCache() == null)
 				if (!ipBanService.parseBanTime(lfd))
 					return true;
+
+			logDebug("recebendo pacote de um cliente (fd: %d).\n", fd.getID());
 
 			return ackClientPacket(lfd);
 		}
@@ -437,7 +438,7 @@ class LoginServerFacade
 			default:
 				String packet = HexUtil.parseInt(command, 4);
 				String address = fd.getAddressString();
-				logNotice("fim de conexão inesperado (pacote: 0x%s, ip: %s)\n", packet, address);
+				logWarning("pacote desconhecido recebido (pacote: 0x%s, ip: %s)\n", packet, address);
 				fd.close();
 				return false;
 		}
@@ -458,6 +459,8 @@ class LoginServerFacade
 
 			if (!fd.isConnected())
 				return false;
+
+			logDebug("recebendo pacote de um servidor de personagem (fd: %d).\n", fd.getID());
 
 			return ackCharServerPacket(lfd);
 		}
@@ -593,9 +596,13 @@ class LoginServerFacade
 			case PACKET_REQ_VIP_DATA:
 				accountService.requestVipData(fd);
 				return true;
-		}
 
-		logWarning("pacote inesperado recebido (%s).\n", HexUtil.parseShort(command, 4));
-		return false;
+			default:
+				String packet = HexUtil.parseInt(command, 4);
+				String address = fd.getAddressString();
+				logWarning("pacote desconhecido recebido (pacote: 0x%s, ip: %s)\n", packet, address);
+				fd.close();
+				return false;
+		}
 	}
 }

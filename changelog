@@ -1,3 +1,11 @@
+12.12.2016 - 1.4.146
+- Mais documentação das classes em server.login e alguns ajustes textuais de log.
+- Atualizando o Diagrama de Classes conforme o que se está presente em código, apenas server.login.
+
+12.12.2016 - 1.4.145
+- Pequenos ajustes nas mensagens de logDebug em OnlineMap.
+- ServiceLoginLog não considerava a configuração de uso do serviço em LoginServerFacade.destroy().
+
 12.12.2016 - 1.4.144
 - Agora a configuração char.new_display passa a ser do tipo booleano já que não há outras opções.
 - Todas as classes contidas em login.structures foram movidos para login, não há necessidade de separar.
