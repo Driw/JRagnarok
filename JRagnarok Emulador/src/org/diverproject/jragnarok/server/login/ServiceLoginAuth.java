@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
+import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.binToHex;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.loginMessage;
@@ -13,7 +14,6 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_HAN;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_PCBANG;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_SSO;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHAR_SERVER_CONNECT;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.TimerType.TIMER_INVALID;
 import static org.diverproject.jragnarok.server.common.AuthResult.OK;
@@ -42,8 +42,8 @@ import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.CharServerType;
 import org.diverproject.jragnarok.server.common.ClientType;
-import org.diverproject.jragnarok.server.login.control.AuthControl;
-import org.diverproject.jragnarok.server.login.control.OnlineControl;
+import org.diverproject.jragnarok.server.login.control.AuthAccountMap;
+import org.diverproject.jragnarok.server.login.control.OnlineMap;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.structures.AuthNode;
 import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
@@ -51,7 +51,6 @@ import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
 import org.diverproject.jragnarok.server.login.structures.OnlineLogin;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.Time;
-import org.diverproject.util.lang.HexUtil;
 import org.diverproject.util.lang.IntUtil;
 
 /**
@@ -66,8 +65,10 @@ import org.diverproject.util.lang.IntUtil;
  * @see ServiceLoginServer
  * @see ServiceLoginChar
  * @see ServiceLoginClient
- * @see OnlineControl
- * @see AuthControl
+ * @see ServiceLoginIpBan
+ * @see ServiceLoginLog
+ * @see OnlineMap
+ * @see AuthAccountMap
  *
  * @author Andrew
  */
@@ -78,6 +79,37 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * Tempo para que uma autenticação entre em timeout.
 	 */
 	private static final int AUTH_TIMEOUT = seconds(30);
+
+
+	/**
+	 * Serviço para comunicação entre o servidor e o cliente.
+	 */
+	private ServiceLoginClient client;
+
+	/**
+	 * Serviço para banimento de acessos por endereço de IP.
+	 */
+	private ServiceLoginIpBan ipban;
+
+	/**
+	 * Serviço para registro de acessos.
+	 */
+	private ServiceLoginLog log;
+
+	/**
+	 * Serviço para acesso de contas (serviço principal)
+	 */
+	private ServiceLoginServer login;
+
+	/**
+	 * Controlador para identificar jogadores online.
+	 */
+	private OnlineMap onlines;
+
+	/**
+	 * Controlador para identificar jogadores autenticados.
+	 */
+	private AuthAccountMap auths;
 
 	/**
 	 * Cria um novo serviço para autenticação de solicitações dos acessos ao servidor.
@@ -90,40 +122,27 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		super(server);
 	}
 
-	/**
-	 * Despacha um determinado cliente para o seu respectivo tipo de acesso solicitado.
-	 * Existem diversos tipos de acessos e cada um deles contém informações diferentes.
-	 * @param command código do pacote que foi recebido do cliente.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @return true se despachar corretamente ou false caso contrário.
-	 */
-
-	public boolean dispatch(short command, LFileDescriptor fd)
+	@Override
+	public void init()
 	{
-		switch (command)
-		{
-			// Solicitação de acesso com senha direta
-			case PACKET_LOGIN:
-			case PACKET_LOGIN_PCBANG:
-			case PACKET_LOGIN_HAN:
-			case PACKET_LOGIN_SSO:
-			// Solicitação de acesso com senha MD5
-			case PACKET_LOGIN_MD5:
-			case PACKET_LOGIN_MD5MAC:
-			case PACKET_LOGIN_MD5INFO:
-				return requestAuth(fd, command);
+		client = getServer().getFacade().getClientService();
+		ipban = getServer().getFacade().getIpBanService();
+		log = getServer().getFacade().getLogService();
+		login = getServer().getFacade().getLoginService();
+		onlines = getServer().getFacade().getOnlineControl();
+		auths = getServer().getFacade().getAuthControl();
+	}
 
-			case PACKET_REQ_CHAR_SERVER_CONNECT:
-				return requestCharConnect(fd);
-
-			default:
-				String packet = HexUtil.parseInt(command, 4);
-				String address = fd.getAddressString();
-				logNotice("fim de conexão inesperado (pacote: 0x%s, ip: %s)\n", packet, address);
-				fd.close();
-				return false;
-		}
-	};
+	@Override
+	public void destroy()
+	{
+		client = null;
+		ipban = null;
+		log = null;
+		login = null;
+		onlines = null;
+		auths = null;
+	}
 
 	/**
 	 * Efetua a solicitação de acesso com o servidor de personagens recebido de um cliente.
@@ -134,7 +153,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * @return true se efetuar a análise com êxito ou false caso contrário.
 	 */
 
-	private boolean requestAuth(LFileDescriptor fd, short command)
+	public boolean requestAuth(LFileDescriptor fd, short command)
 	{
 		boolean usingRawPassword = true;
 		LoginSessionData sd = fd.getSessionData();
@@ -230,7 +249,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			if (getConfigs().getBool("login.use_md5_password"))
 				sd.setPassword(md5Encrypt(sd.getPassword()));
 
-			sd.getPassDencrypt().setValue(0);
+			sd.getPassDencrypt().setValue(b(0));
 		}
 
 		else
@@ -248,7 +267,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			return false;
 		}
 
-		AuthResult result = login.authLogin(fd, false);
+		AuthResult result = login.parseAuthLogin(fd, false);
 
 		if (result != AuthResult.OK)
 		{
@@ -356,6 +375,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		node.getIP().set(fd.getAddress());
 		node.setVersion(sd.getVersion());
 		node.setClientType(sd.getClientType());
+		auths.add(node);
 
 		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
@@ -363,13 +383,13 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		Timer waitingDisconnect = timers.acquireTimer();
 		waitingDisconnect.setObjectID(sd.getID());
 		waitingDisconnect.setTick(ts.getCurrentTime() + AUTH_TIMEOUT);
-		waitingDisconnect.setListener(this.login.waitingDisconnectTimer);
+		waitingDisconnect.setListener(this.login.WAITING_DISCONNECT_TIMER);
 
 		OnlineLogin online = new OnlineLogin();
 		online.setAccountID(sd.getID());
 		online.setWaitingDisconnect(waitingDisconnect);
 		online.setCharServer(OnlineLogin.NONE);
-		onlines.add(online);
+		onlines.add(online, getTimerSystem().getTimers());
 	}
 
 	/**
@@ -503,7 +523,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			}
 
 			auths.remove(sd.getID());
-			onlines.remove(online);
+			onlines.remove(online, getTimerSystem().getTimers());
 		}
 
 		return true;
@@ -533,13 +553,11 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 			Timer timer = online.getWaitingDisconnect();
 			timer.setObjectID(fd.getID());
-			timer.setListener(login.waitingDisconnectTimer);
+			timer.setListener(login.WAITING_DISCONNECT_TIMER);
 			timer.setTick(ts.getCurrentTime());
 			ts.getTimers().add(timer);
 
 			client.sendNotifyResult(fd, RECOGNIZES_LAST_LOGIN);
-
-			return;
 		}		
 	}
 
@@ -550,7 +568,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * @return true se tiver sido autorizado ou false caso contrário.
 	 */
 
-	private boolean requestCharConnect(LFileDescriptor fd)
+	public boolean requestCharConnect(LFileDescriptor fd)
 	{
 		CharServerConnectRequest ccPacket = new CharServerConnectRequest();
 		ccPacket.receive(fd, false);
@@ -562,7 +580,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		if (getConfigs().getBool("login.user_md5_password"))
 			sd.setPassword(md5Encrypt(sd.getPassword()));
 
-		sd.getPassDencrypt().setValue(0);
+		sd.getPassDencrypt().setValue(b(0));
 		sd.setVersion(getConfigs().getInt("client.version"));
 
 		String serverName = ccPacket.getServerName();
@@ -576,7 +594,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		String message = format("charserver - %s@%s:%d", serverName, SocketUtil.socketIP(serverIP), serverPort);
 		log.add(fd.getAddress(), sd, 100, message);
 
-		AuthResult result = login.authLogin(fd, true);
+		AuthResult result = login.parseAuthLogin(fd, true);
 
 		if (getServer().isState(ServerState.RUNNING) && result == AuthResult.OK && fd.isConnected())
 		{
@@ -592,16 +610,16 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			server.setNewDisplay(newDisplay);
 			getServer().getCharServerList().add(server);
 
-			fd.setParseListener(loginchar.parse);
+			fd.setParseListener(getServer().getFacade().PARSE_CHAR_SERVER);
 			fd.getFlag().set(FileDescriptor.FLAG_SERVER);
 
-			client.charServerResult(fd, OK);
+			client.sendCharServerResult(fd, OK);
 			return true;
 		}
 
 		logNotice("Conexão com o servidor de personagens '%s' RECUSADA.\n", serverName);
 
-		client.charServerResult(fd, REJECTED_FROM_SERVER);
+		client.sendCharServerResult(fd, REJECTED_FROM_SERVER);
 		return false;
 	}
 }

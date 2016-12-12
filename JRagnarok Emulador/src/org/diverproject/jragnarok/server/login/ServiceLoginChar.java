@@ -3,16 +3,10 @@ package org.diverproject.jragnarok.server.login;
 import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP_SYNC_INTERVAL;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_USER_COUNT;
 import static org.diverproject.log.LogSystem.logInfo;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
 import org.diverproject.jragnarok.packets.request.UpdateUserCount;
 import org.diverproject.jragnarok.packets.response.SyncronizeAddress;
-import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
@@ -26,9 +20,15 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		super(server);
 	}
 
+	/**
+	 * Serviço para comunicação entre o servidor e o cliente.
+	 */
+	protected ServiceLoginClient client;
+
+	@Override
 	public void init()
 	{
-		super.init();
+		client = getServer().getFacade().getClientService();
 
 		int interval = getConfigs().getInt(LOGIN_IP_SYNC_INTERVAL);
 
@@ -38,13 +38,19 @@ public class ServiceLoginChar extends AbstractServiceLogin
 			TimerMap timers = ts.getTimers();
 
 			Timer siaTimer = timers.acquireTimer();
-			siaTimer.setListener(syncronizeIpAddress);
+			siaTimer.setListener(SYNCRONIZE_IPADDRESS);
 			siaTimer.setTick(ts.getCurrentTime() + minutes(interval));
 			ts.getTimers().addLoop(siaTimer, minutes(interval));
 		}
 	}
 
-	private TimerListener syncronizeIpAddress = new TimerListener()
+	@Override
+	public void destroy()
+	{
+		client = null;
+	}
+
+	private final TimerListener SYNCRONIZE_IPADDRESS = new TimerListener()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -68,49 +74,13 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		}
 	};
 
-	public final FileDescriptorListener parse = new FileDescriptorListener()
-	{
-		@Override
-		public boolean onCall(FileDescriptor fd) throws RagnarokException
-		{
-			LFileDescriptor lfd = (LFileDescriptor) fd;
-
-			if (!fd.isConnected())
-				return false;
-
-			return acknowledgePacket(lfd);
-		}
-	};
-
-	private boolean acknowledgePacket(LFileDescriptor fd)
-	{
-		AcknowledgePacket packet = new AcknowledgePacket();
-		packet.receive(fd, false);
-
-		short command = packet.getPacketID();
-
-		switch (command)
-		{
-			case PACKET_RES_KEEP_ALIVE:
-				client.pingCharRequest(fd);
-				return true;
-
-			case PACKET_UPDATE_USER_COUNT:
-				updateUserCount(fd);
-				return true;
-
-			default:
-				return account.dispatch(command, fd);
-		}
-	}
-
 	/**
 	 * Um servidor de personagem envia a quantidade de jogadores online.
 	 * Deve procurar o cliente desse servidor e atualizar a informação.
 	 * @param fd conexão do servidor de personagem que está enviando.
 	 */
 
-	private void updateUserCount(LFileDescriptor fd)
+	public void updateUserCount(LFileDescriptor fd)
 	{
 		UpdateUserCount packet = new UpdateUserCount();
 		packet.receive(fd);

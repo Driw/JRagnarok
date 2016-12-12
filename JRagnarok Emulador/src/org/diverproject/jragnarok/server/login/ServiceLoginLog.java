@@ -16,14 +16,22 @@ import org.diverproject.jragnarok.server.login.entities.LoginLog;
  * A realização desses registros devem ser feitas apenas durante ou pós autenticação de uma conta.
  * Quanto a contagem será necessário especificar um intervalo de tempo para que possa ser realizada.</p>
  *
+ * @see AbstractServiceLogin
+ * @see LoginServer
  * @see LoginLogControl
  * @see Login
+ * @see InternetProtocol
  *
  * @author Andrew
  */
 
 public class ServiceLoginLog extends AbstractServiceLogin
 {
+	/**
+	 * Controle para registrar acesso ao banco de dados.
+	 */
+	private LoginLogControl logs;
+
 	/**
 	 * Cria um novo serviço para registro de acessos no banco de dados.
 	 * @param server servidor de acesso que irá utilizar o serviço.
@@ -32,6 +40,18 @@ public class ServiceLoginLog extends AbstractServiceLogin
 	public ServiceLoginLog(LoginServer server)
 	{
 		super(server);
+	}
+
+	@Override
+	public void init()
+	{
+		logs = getServer().getFacade().getLoginLogControl();
+	}
+
+	@Override
+	public void destroy()
+	{
+		logs = null;
 	}
 
 	/**

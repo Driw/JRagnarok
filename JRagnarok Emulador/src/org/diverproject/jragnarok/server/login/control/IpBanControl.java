@@ -30,7 +30,7 @@ import org.diverproject.util.lang.IntUtil;
  *
  * <p>Todos os métodos irão acessar o cache como também será aplicado as mudanças no banco de dados.
  * As operações disponíveis permitem saber se um endereço de IP se encontra em alguma lista banida.
- * Tal como é permitido selecionar listas de banimentos, adicionar, excluir ou atualizar as inforamções.</p>
+ * Tal como é permitido selecionar listas de banimentos, adicionar, excluir ou atualizar as informações.</p>
  *
  * @see IpBanList
  * @see NodeList

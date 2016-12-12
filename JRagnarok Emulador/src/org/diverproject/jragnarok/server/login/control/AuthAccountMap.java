@@ -6,11 +6,11 @@ import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;
 
 /**
- * <h1>Controle de Jogadores Online</h1>
+ * <h1>Mapeamento de Contas Autenticadas</h1>
  *
- * <p>Controle que permite ao servidor de acesso saber quais os jogadores que estão online.
- * Sempre que um novo jogador entrar no servidor será repassado a esse controle.
- * Deve garantir que jogadores possam ser adicionados, removidos e verificados.</p>
+ * <p>Classe que irá funcionar como coleção para armazenar todas as autenticações de contas disponíveis.
+ * Quando uma conta é autenticada pelo servidor de acesso ficará registrado e uma objeto desta classe.
+ * Assim, quando chegar ao servidor de personagem, este poderá solicitar a autenticação do mesmo.</p>
  *
  * @see IntegerLittleMap
  * @see AuthNode
@@ -18,7 +18,7 @@ import org.diverproject.util.collection.abstraction.IntegerLittleMap;
  * @author Andrew
  */
 
-public class AuthControl
+public class AuthAccountMap
 {
 	/**
 	 * Mapeamento dos jogadores autenticados.
@@ -29,7 +29,7 @@ public class AuthControl
 	 * Cria um novo controle para gerenciar jogadores autenticados no sistema.
 	 */
 
-	public AuthControl()
+	public AuthAccountMap()
 	{
 		cache = new IntegerLittleMap<>();
 	}

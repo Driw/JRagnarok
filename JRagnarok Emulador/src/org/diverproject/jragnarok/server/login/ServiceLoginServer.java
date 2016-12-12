@@ -15,6 +15,7 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
+import org.diverproject.jragnarok.server.login.control.OnlineMap;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.structures.ClientHash;
 import org.diverproject.jragnarok.server.login.structures.ClientHashNode;
@@ -41,6 +42,16 @@ import org.diverproject.util.collection.Node;
 public class ServiceLoginServer extends AbstractServiceLogin
 {
 	/**
+	 * Controle para persistência das contas de jogadores.
+	 */
+	private AccountControl accounts;
+
+	/**
+	 * Controlador para identificar jogadores online.
+	 */
+	private OnlineMap onlines;
+
+	/**
 	 * Constrói um novo serviço para realizar a autenticação e obtenção de contas.
 	 * @param server referência do servidor de acesso do qual deseja criar o serviço.
 	 */
@@ -49,6 +60,45 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	{
 		super(server);
 	}
+
+	@Override
+	public void init()
+	{
+		accounts = getServer().getFacade().getAccountControl();
+		onlines = getServer().getFacade().getOnlineControl();
+	}
+
+	@Override
+	public void destroy()
+	{
+		accounts = null;
+		onlines = null;
+	}
+
+	/**
+	 * Função para temporizadores executarem a remoção de uma conta como acesso online.
+	 */
+
+	public final TimerListener WAITING_DISCONNECT_TIMER = new TimerListener()
+	{
+		@Override
+		public void onCall(Timer timer, int now, int tick)
+		{
+			onlines.remove(timer.getObjectID(), ServiceLoginServer.this.getTimerSystem().getTimers());
+		}
+
+		@Override
+		public String getName()
+		{
+			return "waitingDisconnectTimer";
+		}
+
+		@Override
+		public String toString()
+		{
+			return getName();
+		}
+	};
 
 	/**
 	 * Procedimento chamado quando o serviço de identificação do cliente tiver autenticado o mesmo.
@@ -59,7 +109,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * @return resultado da autenticação da solicitação para acesso de uma conta.
 	 */
 
-	public AuthResult authLogin(LFileDescriptor fd, boolean server)
+	public AuthResult parseAuthLogin(LFileDescriptor fd, boolean server)
 	{
 		AuthResult result = null;
 		LoginSessionData sd = fd.getSessionData();
@@ -87,29 +137,6 @@ public class ServiceLoginServer extends AbstractServiceLogin
 
 		if (!accounts.set(account))
 			logError("falha ao persistir conta (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
-
-		return OK;
-	}
-
-	/**
-	 * Verifica primeiramente se está habilitado a verificação para versão do cliente.
-	 * Caso esteja habilitado a versão do cliente deverá ser igual a da configuração definida.
-	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
-	 * @return resultado da autenticação da versão que o cliente está usando.
-	 */
-
-	private AuthResult authClientVersion(LoginSessionData sd)
-	{
-		if (getConfigs().getBool("client.check_version"))
-		{
-			int version = getConfigs().getInt("client.version");
-
-			if (sd.getVersion() != version)
-			{
-				logNotice("versão inválida (account: %s, version (client/server): %d/%d).\n", sd.getUsername(), sd.getVersion(), version);
-				return EXE_LASTED_VERSION;
-			}
-		}
 
 		return OK;
 	}
@@ -144,13 +171,36 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		if ((result = authBanTime(fd, account)) != OK)
 			return result;
 
-		if ((result = checkState(fd, account)) != OK)
+		if ((result = authAccountState(fd, account)) != OK)
 			return result;
 
 		if ((result = authClientHash(fd, account, server)) != OK)
 			return result;
 
 		sd.setCache(account);
+
+		return OK;
+	}
+
+	/**
+	 * Verifica primeiramente se está habilitado a verificação para versão do cliente.
+	 * Caso esteja habilitado a versão do cliente deverá ser igual a da configuração definida.
+	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
+	 * @return resultado da autenticação da versão que o cliente está usando.
+	 */
+
+	private AuthResult authClientVersion(LoginSessionData sd)
+	{
+		if (getConfigs().getBool("client.check_version"))
+		{
+			int version = getConfigs().getInt("client.version");
+
+			if (sd.getVersion() != version)
+			{
+				logNotice("versão inválida (account: %s, version (client/server): %d/%d).\n", sd.getUsername(), sd.getVersion(), version);
+				return EXE_LASTED_VERSION;
+			}
+		}
 
 		return OK;
 	}
@@ -227,7 +277,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * @return resultado da autenticação do estado atual da conta.
 	 */
 
-	private AuthResult checkState(LFileDescriptor fd, Account account)
+	private AuthResult authAccountState(LFileDescriptor fd, Account account)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
@@ -289,32 +339,29 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		return OK;
 	}
 
-	// lan_subnetcheck(uint32 ip)
-	// login_check_encrypted(const char* str1, const char* str2, const char* passwd)
-	// login_mmo_auth_new(const char* userid, const char* pass, const char sex, const char* last_ip)
-
 	/**
-	 * Função para temporizadores executarem a remoção de uma conta como acesso online.
+	 * TODO
+	 * @param ip
+	 * @return
 	 */
 
-	public TimerListener waitingDisconnectTimer = new TimerListener()
+	public int parseSubnetIP(int ip)
 	{
-		@Override
-		public void onCall(Timer timer, int now, int tick)
-		{
-			onlines.remove(timer.getObjectID());
-		}
+		// TODO lan_subnetcheck
+		return 0;
+	}
 
-		@Override
-		public String getName()
-		{
-			return "waitingDisconnectTimer";
-		}
+	/**
+	 * TODO
+	 * @param firstPass
+	 * @param secondPass
+	 * @param password
+	 * @return
+	 */
 
-		@Override
-		public String toString()
-		{
-			return getName();
-		}
-	};
+	public boolean parseEncryptedPassword(String firstPass, String secondPass, String password)
+	{
+		// TODO login_check_encrypted
+		return false;
+	}
 }

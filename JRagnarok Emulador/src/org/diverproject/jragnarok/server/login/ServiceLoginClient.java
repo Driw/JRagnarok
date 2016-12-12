@@ -6,17 +6,10 @@ import static org.diverproject.jragnarok.JRagnarokUtil.i;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Salt;
 import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
 import static org.diverproject.jragnarok.JRagnarokUtil.random;
-import static org.diverproject.jragnarok.JRagnarokUtil.skip;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_CLIENT_HASH;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_HASH;
-import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logDebug;
 
-import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.receive.KeepAlive;
-import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
 import org.diverproject.jragnarok.packets.receive.UpdateClientHash;
 import org.diverproject.jragnarok.packets.request.AccountDataResult;
 import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
@@ -32,13 +25,9 @@ import org.diverproject.jragnarok.packets.response.KeepAliveResult;
 import org.diverproject.jragnarok.packets.response.RefuseEnter;
 import org.diverproject.jragnarok.packets.response.RefuseLoginByte;
 import org.diverproject.jragnarok.packets.response.RefuseLoginInt;
-import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.common.NotifyAuthResult;
-import org.diverproject.jragnarok.server.login.control.AuthControl;
-import org.diverproject.jragnarok.server.login.control.OnlineControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.Vip;
 import org.diverproject.jragnarok.server.login.structures.AuthNode;
@@ -47,22 +36,22 @@ import org.diverproject.jragnarok.server.login.structures.ClientHash;
 import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
 
 /**
- * Serviço para Acesso dos Clientes
+ * <h1>Serviço para Comunicação com o Cliente</h1>
  *
- * Esse serviço é a primeira fronteira do servidor para se comunicar com o cliente.
- * Nele será recebido uma nova conexão solicitada para com o servidor de acesso.
- * Após receber a conexão deverá analisar e verificar qual o tipo de acesso solicitado.
+ * <p>Através deste serviço será possível que outros serviços solicitem o envio de dados para um cliente.
+ * Este cliente pode ser tanto um jogador utilizando o cliente executável como um servidor (servidor de personagem).
+ * A única responsabilidade deste serviço é conter métodos que permita enviar dados aos clientes (conexões).</p>
  *
- * De acordo com o tipo de acesso solicitado, deverá redirecionar a outros serviços se necessário.
- * Fica sendo de sua responsabilidade garantir a autenticação de qualquer tipo de acesso.
- * Podendo ainda ser necessário comunicar-se com outro serviço para auxiliá-lo.
+ * <p>Além de enviar dados aos clientes pode possuir alguns métodos para receber dados dos clientes.
+ * Por exemplo o pacote para manter a conexão viva no sistema que é recebida em keepAlive().
+ * Este tipo de pacote também poderá ser tratado aqui, já que é uma operação entre cliente/servidor direta.</p>
  *
- * @see ServiceLoginServer
- * @see ServiceLoginLog
- * @see ServiceLoginIpBan
- * @see ServiceLoginChar
- * @see OnlineControl
- * @see AuthControl
+ * <p>Operações indiretas que precisem de outras informações ou solicitações de controles não são tratadas aqui.
+ * Todos os métodos tem como objetivo apenas simplificar a utilização dos pacotes em relação a receber ou enviar.</p>
+ *
+ * @see AbstractServiceLogin
+ * @see LFileDescriptor
+ * @see LoginServer
  *
  * @author Andrew Mello
  */
@@ -80,106 +69,31 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		super(server);
 	}
 
-	/**
-	 * Listener usado para receber novas conexões solicitadas com o servidor de acesso.
-	 * A análise verifica se a conexão já foi feita e se tiver verifica se está banido.
-	 * Caso não esteja banido ou não haja conexão estabelece uma nova conexão.
-	 */
-
-	public FileDescriptorListener parse = new FileDescriptorListener()
+	@Override
+	public void init()
 	{
-		@Override
-		public boolean onCall(FileDescriptor fd) throws RagnarokException
-		{
-			logDebug("recebendo pacote (fd: %d).\n", fd.getID());
-
-			LFileDescriptor lfd = (LFileDescriptor) fd;
-
-			if (!fd.isConnected())
-				return false;
-
-			// Já conectou, verificar se está banido
-			if (lfd.getSessionData().getCache() == null)
-				if (!parseBanTime(lfd))
-					return true;
-
-			return acknowledgePacket(lfd);
-		}
-	};
-
-	/**
-	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
-	 * @param fd referência da conexão com o cliente para enviar e receber dados.
-	 * @return true se o pacote recebido for de um tipo válido para análise.
-	 */
-
-	private boolean acknowledgePacket(LFileDescriptor fd)
-	{
-		AcknowledgePacket packetReceivePacketID = new AcknowledgePacket();
-		packetReceivePacketID.receive(fd, false);
-
-		short command = packetReceivePacketID.getPacketID();
-
-		switch (command)
-		{
-			case PACKET_KEEP_ALIVE:
-				keepAlive(fd);
-				return true;
-
-			case PACKET_UPDATE_CLIENT_HASH:
-				updateClientHash(fd);
-				return true;
-
-			case PACKET_REQ_HASH:
-				parseRequestKey(fd);
-				return true;
-		}
-
-		return auth.dispatch(command, fd);
+		
 	}
 
-	/**
-	 * Verifica se o endereço de IP de uma conexão foi banida afim de recusar seu acesso.
-	 * Essa operação só terá efeito se tiver sido habilitado o banimento por IP.
-	 * @param fd referência da conexão do qual deseja verificar o banimento.
-	 * @return true se estiver liberado o acesso ou false se estiver banido.
-	 */
-
-	private boolean parseBanTime(LFileDescriptor fd)
+	@Override
+	public void destroy()
 	{
-		if (getConfigs().getBool("ipban.enabled") && ipban.isBanned(fd.getAddress()))
-		{
-			log("conexão recusada, ip não autorizado (ip: %s).\n", fd.getAddressString());
-
-			log.add(fd.getAddress(), null, -3, "ip banned");
-			skip(fd, false, 23);
-
-			RefuseLoginByte refuseLoginPacket = new RefuseLoginByte();
-			refuseLoginPacket.setResult(AuthResult.REJECTED_FROM_SERVER);
-			refuseLoginPacket.setBlockDate("");
-			refuseLoginPacket.send(fd);
-
-			fd.close();
-
-			return false;
-		}
-
-		return true;
+		
 	}
 
 	/**
 	 * Envia um pacote para manter a conexão com o jogador, assim é possível evitar timeout.
 	 * Quando uma conexão para de transmitir ou receber dados irá dar timeout no mesmo.
-	 * Se a conexão chegar em timeout significa que o mesmo deverá ser fechado.
-	 * @param fd referência do objeto contendo a conexão do cliente.
+	 * Se a conexão chegar em timeout significa que ficou ociosa e deverá ser fechada.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
 	public void keepAlive(LFileDescriptor fd)
 	{
-		logDebug("ping recebido (fd: %d).\n", fd.getID());
+		logDebug("recebendo ping (fd: %d).\n", fd.getID());
 
-		KeepAlive keepAlivePacket = new KeepAlive();
-		keepAlivePacket.receive(fd, false);
+		KeepAlive packet = new KeepAlive();
+		packet.receive(fd);
 	}
 
 	/**
@@ -189,14 +103,14 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void updateClientHash(LFileDescriptor fd)
 	{
-		logDebug("atualização para client hash recebido (fd: %d).\n", fd.getID());
+		logDebug("recebendo atualização para o cliente hash (fd: %d).\n", fd.getID());
 
-		UpdateClientHash updateClientHashPacket = new UpdateClientHash();
-		updateClientHashPacket.receive(fd, false);
+		UpdateClientHash packet = new UpdateClientHash();
+		packet.receive(fd);
 
 		LoginSessionData sd = fd.getSessionData();
 		sd.setClientHash(new ClientHash());
-		sd.getClientHash().set(updateClientHashPacket.getHashValue());
+		sd.getClientHash().set(packet.getHashValue());
 	}
 
 	/**
@@ -349,7 +263,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param result resultado da solicitação de acesso da conexão acima.
 	 */
 
-	public void charServerResult(LFileDescriptor fd, AuthResult result)
+	public void sendCharServerResult(LFileDescriptor fd, AuthResult result)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
@@ -384,7 +298,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param node nó contendo as informações para autenticação do cliente no servidor de personagem.
 	 */
 
-	public void authAccount(LFileDescriptor fd, AuthAccountRequest packet, AuthNode node)
+	public void sendAuthAccount(LFileDescriptor fd, AuthAccountRequest packet, AuthNode node)
 	{
 		logDebug("enviando autenticação de conta (server-fd: %d, aid: %s).\n", fd.getID(), node.getAccountID());
 
@@ -406,7 +320,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param packet pacote contendo as informações para serem retornadas já que não autenticação.
 	 */
 
-	public void authAccount(LFileDescriptor fd, AuthAccountRequest packet)
+	public void sendAuthAccount(LFileDescriptor fd, AuthAccountRequest packet)
 	{
 		logDebug("enviando autenticação de conta não encontrada (server-fd: %d).\n", fd.getID());
 

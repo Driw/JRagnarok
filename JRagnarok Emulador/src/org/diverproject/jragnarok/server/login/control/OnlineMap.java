@@ -21,13 +21,8 @@ import org.diverproject.util.collection.abstraction.IntegerLittleMap;
  * @author Andrew
  */
 
-public class OnlineControl
+public class OnlineMap
 {
-	/**
-	 * Mapeamento dos temporizadores do sistema.
-	 */
-	private final TimerMap timers;
-
 	/**
 	 * Mapeamento dos jogadores que se encontram online no sistema.
 	 */
@@ -40,9 +35,8 @@ public class OnlineControl
 	 * @param timers mapeamento dos temporizadores do sistema.
 	 */
 
-	public OnlineControl(TimerMap timers)
+	public OnlineMap()
 	{
-		this.timers = timers;
 		this.cache = new IntegerLittleMap<>();
 	}
 
@@ -60,9 +54,10 @@ public class OnlineControl
 	/**
 	 * Adiciona um novo jogador como online através das informações abaixo:
 	 * @param online informações referentes ao jogador online.
+	 * @param timers mapeamento dos temporizadores do objeto acima.
 	 */
 
-	public void add(OnlineLogin online)
+	public void add(OnlineLogin online, TimerMap timers)
 	{
 		if (online.getWaitingDisconnect() != null)
 		{
@@ -78,9 +73,10 @@ public class OnlineControl
 	/**
 	 * Remove um jogador online do sistema conforme informações abaixo:
 	 * @param online informações referentes ao jogador online.
+	 * @param timers mapeamento dos temporizadores do objeto acima.
 	 */
 
-	public void remove(OnlineLogin online)
+	public void remove(OnlineLogin online, TimerMap timers)
 	{
 		if (online.getWaitingDisconnect() != null)
 		{
@@ -96,21 +92,23 @@ public class OnlineControl
 	/**
 	 * Remove um jogador online do sistema conforme informações abaixo:
 	 * @param accountID código de identificação da conta online.
+	 * @param timers mapeamento dos temporizadores do objeto acima.
 	 */
 
-	public void remove(int accountID)
+	public void remove(int accountID, TimerMap timers)
 	{
-		remove(cache.get(accountID));
+		remove(cache.get(accountID), timers);
 	}
 
 	/**
 	 * Remove todas as informações contidas dos jogadores online no sistema.
+	 * @param timers mapeamento dos temporizadores do objeto acima.
 	 */
 
-	public void clear()
+	public void clear(TimerMap timers)
 	{
 		for (OnlineLogin online : cache)
-			remove(online);
+			remove(online, timers);
 
 		cache.clear();
 	}

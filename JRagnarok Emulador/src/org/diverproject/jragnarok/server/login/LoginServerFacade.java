@@ -2,14 +2,52 @@ package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOG_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACCOUNT_STATE_NOTIFY;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACCOUNT_STATE_UPDATE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_HAN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5INFO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5MAC;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_PCBANG;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_SSO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_NOTIFY_PIN_ERROR;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_NOTIFY_PIN_UPDATE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_INFO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_AUTH_ACCOUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHANGE_EMAIL;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHAR_SERVER_CONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_HASH;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_REGISTER;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_UNBAN_ACCOUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_VIP_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SEND_ACCOUNTS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SET_ACCOUNT_OFFLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SET_ACCOUNT_ONLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SET_ALL_ACC_OFFLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_CLIENT_HASH;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_IP;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_REGISTER;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_USER_COUNT;
+import static org.diverproject.log.LogSystem.logDebug;
+import static org.diverproject.log.LogSystem.logNotice;
+import static org.diverproject.log.LogSystem.logWarning;
 
+import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
+import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
-import org.diverproject.jragnarok.server.login.control.AuthControl;
+import org.diverproject.jragnarok.server.login.control.AuthAccountMap;
 import org.diverproject.jragnarok.server.login.control.GroupControl;
 import org.diverproject.jragnarok.server.login.control.IpBanControl;
 import org.diverproject.jragnarok.server.login.control.LoginLogControl;
-import org.diverproject.jragnarok.server.login.control.OnlineControl;
+import org.diverproject.jragnarok.server.login.control.OnlineMap;
 import org.diverproject.jragnarok.server.login.control.PincodeControl;
+import org.diverproject.util.lang.HexUtil;
 
 /**
  * <h1>Servidor de Acesso - Façade</h1>
@@ -94,12 +132,12 @@ class LoginServerFacade
 	/**
 	 * Controlador para identificar jogadores online.
 	 */
-	private OnlineControl onlineControl;
+	private OnlineMap onlineControl;
 
 	/**
 	 * Controlador para identificar jogadores autenticados.
 	 */
-	private AuthControl authControl;
+	private AuthAccountMap authControl;
 
 	/**
 	 * @return aquisição do serviço para comunicação com o servidor de personagens.
@@ -200,6 +238,10 @@ class LoginServerFacade
 		return logControl;
 	}
 
+	/**
+	 * @return aquisição do controle para banimento de endereços IP.
+	 */
+
 	public IpBanControl getIpBanControl()
 	{
 		return ipbanControl;
@@ -209,7 +251,7 @@ class LoginServerFacade
 	 * @return aquisição do controle para identificar jogadores online.
 	 */
 
-	public OnlineControl getOnlineControl()
+	public OnlineMap getOnlineControl()
 	{
 		return onlineControl;
 	}
@@ -218,7 +260,7 @@ class LoginServerFacade
 	 * @return aquisição do controle para autenticação dos jogadores.
 	 */
 
-	public AuthControl getAuthControl()
+	public AuthAccountMap getAuthControl()
 	{
 		return authControl;
 	}
@@ -235,8 +277,8 @@ class LoginServerFacade
 		pincodeControl = new PincodeControl(loginServer.getMySQL().getConnection());
 		logControl = new LoginLogControl(loginServer.getMySQL().getConnection());
 		ipbanControl = new IpBanControl(loginServer.getMySQL().getConnection());
-		onlineControl = new OnlineControl(loginServer.getTimerSystem().getTimers());
-		authControl = new AuthControl();
+		onlineControl = new OnlineMap();
+		authControl = new AuthAccountMap();
 
 		accountControl.setGroupControl(groupControl);
 		accountControl.setPincodeControl(pincodeControl);
@@ -283,9 +325,9 @@ class LoginServerFacade
 			ipBanService.destroy();
 
 		groupControl.clear();
-		onlineControl.clear();
+		onlineControl.clear(loginServer.getTimerSystem().getTimers());
 		authControl.clear();
-		ipbanControl.clear();		
+		ipbanControl.clear();
 	}
 
 	/**
@@ -306,5 +348,256 @@ class LoginServerFacade
 		clientService = null;
 		charService = null;
 		loginService = null;		
+	}
+
+	/**
+	 * Listener usado para receber novas conexões solicitadas com o servidor de acesso.
+	 * A análise verifica se a conexão já foi feita e se tiver verifica se está banido.
+	 * Caso não esteja banido ou não haja conexão estabelece uma nova conexão.
+	 */
+
+	public final FileDescriptorListener PARSE_CLIENT = new FileDescriptorListener()
+	{
+		@Override
+		public boolean onCall(FileDescriptor fd) throws RagnarokException
+		{
+			logDebug("recebendo pacote (fd: %d).\n", fd.getID());
+
+			LFileDescriptor lfd = (LFileDescriptor) fd;
+
+			if (!fd.isConnected())
+				return false;
+
+			// Já conectou, verificar se está banido
+			if (lfd.getSessionData().getCache() == null)
+				if (!ipBanService.parseBanTime(lfd))
+					return true;
+
+			return ackClientPacket(lfd);
+		}
+	};
+
+	/**
+	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
+	 * Neste caso irá identificar o comando e que é esperado como fase inicial do cliente.
+	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
+
+	public boolean ackClientPacket(LFileDescriptor fd)
+	{
+		AcknowledgePacket packetReceivePacketID = new AcknowledgePacket();
+		packetReceivePacketID.receive(fd);
+
+		short command = packetReceivePacketID.getPacketID();
+
+		switch (command)
+		{
+			case PACKET_KEEP_ALIVE:
+				clientService.keepAlive(fd);
+				return true;
+
+			case PACKET_UPDATE_CLIENT_HASH:
+				clientService.updateClientHash(fd);
+				return true;
+
+			case PACKET_REQ_HASH:
+				clientService.parseRequestKey(fd);
+				return true;
+		}
+
+		return dispatchAuthPacket(fd, command);
+	}
+
+	/**
+	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
+	 * Neste caso o comando já está identificado e deverá apenas despachar a conexão.
+	 * Os comandos aqui são de acesso inicial dos clientes com o servidor de acesso.
+	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param command comando que está sendo solicitado (código do pacote recebido).
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
+
+	public boolean dispatchAuthPacket(LFileDescriptor fd, short command)
+	{
+		switch (command)
+		{
+			// Solicitação de acesso com senha direta
+			case PACKET_LOGIN:
+			case PACKET_LOGIN_PCBANG:
+			case PACKET_LOGIN_HAN:
+			case PACKET_LOGIN_SSO:
+			// Solicitação de acesso com senha MD5
+			case PACKET_LOGIN_MD5:
+			case PACKET_LOGIN_MD5MAC:
+			case PACKET_LOGIN_MD5INFO:
+				return authService.requestAuth(fd, command);
+
+			case PACKET_REQ_CHAR_SERVER_CONNECT:
+				return authService.requestCharConnect(fd);
+
+			default:
+				String packet = HexUtil.parseInt(command, 4);
+				String address = fd.getAddressString();
+				logNotice("fim de conexão inesperado (pacote: 0x%s, ip: %s)\n", packet, address);
+				fd.close();
+				return false;
+		}
+	}
+
+	/**
+	 * Listener usado para receber novas conexões solicitadas com o servidor de acesso.
+	 * A análise é feita apenas para as conexões já autorizadas dos servidores de personagem.
+	 * Sempre que autorizado e receber um pacote do mesmo deve ser passado por aqui.
+	 */
+
+	public final FileDescriptorListener PARSE_CHAR_SERVER = new FileDescriptorListener()
+	{
+		@Override
+		public boolean onCall(FileDescriptor fd) throws RagnarokException
+		{
+			LFileDescriptor lfd = (LFileDescriptor) fd;
+
+			if (!fd.isConnected())
+				return false;
+
+			return ackCharServerPacket(lfd);
+		}
+	};
+
+	/**
+	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
+	 * Neste caso o comando já está identificado e deverá apenas despachar a conexão.
+	 * Os comandos aqui são básicos entre os servidores de personagem com o de acesso.
+	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param command comando que está sendo solicitado (código do pacote recebido).
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
+
+	private boolean ackCharServerPacket(LFileDescriptor fd)
+	{
+		AcknowledgePacket packet = new AcknowledgePacket();
+		packet.receive(fd, false);
+
+		short command = packet.getPacketID();
+
+		switch (command)
+		{
+			case PACKET_RES_KEEP_ALIVE:
+				clientService.pingCharRequest(fd);
+				return true;
+
+			case PACKET_UPDATE_USER_COUNT:
+				charService.updateUserCount(fd);
+				return true;
+
+			default:
+				return dispatchAccountPacket(fd, command);
+		}
+	}
+
+	/**
+	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
+	 * Neste caso o comando já está identificado e deverá apenas despachar a conexão.
+	 * Além disso os comandos aqui são esperados que sejam de um servidor de personagem.
+	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param command comando que está sendo solicitado (código do pacote recebido).
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
+
+	public boolean dispatchAccountPacket(LFileDescriptor fd, short command)
+	{
+		switch (command)
+		{
+			case PACKET_REQ_AUTH_ACCOUNT:
+				accountService.requestAuthAccount(fd);
+				return true;
+
+			case PACKET_REQ_ACCOUNT_DATA:
+				accountService.requestAccountData(fd);
+				return true;
+
+			case PACKET_REQ_ACCOUNT_INFO:
+				accountService.requestAccountInfo(fd);
+				return true;
+
+			case PACKET_SET_ACCOUNT_ONLINE:
+				accountService.setAccountOnline(fd);
+				return true;
+
+			case PACKET_SET_ACCOUNT_OFFLINE:
+				accountService.setAccountOffline(fd);
+				return true;
+
+			case PACKET_SEND_ACCOUNTS:
+				accountService.updateOnlineDB(fd);
+				return true;
+
+			case PACKET_SET_ALL_ACC_OFFLINE:
+				accountService.setAllOffline(fd);
+				return true;
+
+
+			default:
+				return dispatchPlayerAccountPacket(fd, command);
+		}
+	}
+
+	/**
+	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
+	 * Neste caso o comando já está identificado e deverá apenas despachar a conexão.
+	 * Além disso os comandos aqui são esperados que sejam de um servidor de personagem.
+	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param command comando que está sendo solicitado (código do pacote recebido).
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
+
+	public boolean dispatchPlayerAccountPacket(LFileDescriptor fd, short command)
+	{
+		switch (command)
+		{
+			case PACKET_REQ_CHANGE_EMAIL:
+				accountService.requestChangeEmail(fd);
+				return true;
+
+			case PACKET_ACCOUNT_STATE_UPDATE:
+				accountService.updateAccountState(fd);
+				return true;
+
+			case PACKET_ACCOUNT_STATE_NOTIFY:
+				accountService.requestBanAccount(fd);
+				return true;
+
+			case PACKET_UPDATE_REGISTER:
+				accountService.updateRegister(fd);
+				return true;
+
+			case PACKET_REQ_UNBAN_ACCOUNT:
+				accountService.requestUnbanAccount(fd);
+				return true;
+
+			case PACKET_REQ_REGISTER:
+				accountService.requestRegister(fd);
+				return true;
+
+			case PACKET_UPDATE_IP:
+				accountService.updateCharIP(fd);
+				return true;
+
+			case PACKET_NOTIFY_PIN_UPDATE:
+				accountService.updatePinCode(fd);
+				return true;
+
+			case PACKET_NOTIFY_PIN_ERROR:
+				accountService.failPinCode(fd);
+				return true;
+
+			case PACKET_REQ_VIP_DATA:
+				accountService.requestVipData(fd);
+				return true;
+		}
+
+		logWarning("pacote inesperado recebido (%s).\n", HexUtil.parseShort(command, 4));
+		return false;
 	}
 }

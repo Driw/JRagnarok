@@ -62,7 +62,7 @@ public class LoginServer extends Server
 
 	public LoginServer()
 	{
-		setListener(listener);
+		setListener(LISTENER);
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class LoginServer extends Server
 	 * Listener que implementa os métodos para alteração de estado do servidor.
 	 */
 
-	private final ServerListener listener = new ServerListener()
+	private final ServerListener LISTENER = new ServerListener()
 	{
 		@Override
 		public void onCreate() throws RagnarokException
@@ -149,7 +149,7 @@ public class LoginServer extends Server
 			facade = new LoginServerFacade();
 			facade.create(LoginServer.this);
 
-			setDefaultParser(facade.getClientService().parse);
+			setDefaultParser(facade.PARSE_CLIENT);
 		}
 
 		@Override

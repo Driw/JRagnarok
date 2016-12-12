@@ -9,7 +9,7 @@ import org.diverproject.jragnarok.server.common.LoginSeed;
 import org.diverproject.jragnarok.server.common.SessionData;
 import org.diverproject.jragnarok.server.login.entities.Group;
 import org.diverproject.jragnarok.server.login.entities.Login;
-import org.diverproject.util.BitWise;
+import org.diverproject.util.BitWise8;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
 
@@ -28,7 +28,7 @@ import org.diverproject.util.Time;
  * @see Login
  * @see Time
  * @see Group
- * @see BitWise
+ * @see BitWise8
  * @see LoginSeed
  * @see ClientHash
  *
@@ -84,7 +84,7 @@ public class LoginSessionData extends SessionData implements Login
 	/**
 	 * Tipo de criptografia que será usada na senha.
 	 */
-	private BitWise passDencrypt;
+	private BitWise8 passDencrypt;
 
 	/**
 	 * Seed para validação das informações dessa sessão.
@@ -115,7 +115,7 @@ public class LoginSessionData extends SessionData implements Login
 	{
 		this.lastLogin = new Time(System.currentTimeMillis());
 		this.registered = new Time(System.currentTimeMillis());
-		this.passDencrypt = new BitWise(DENCRYPT_STRING);
+		this.passDencrypt = new BitWise8(DENCRYPT_STRING);
 		this.seed = new LoginSeed();
 	}
 
@@ -134,7 +134,10 @@ public class LoginSessionData extends SessionData implements Login
 		this.username = strcap(username, USERNAME_LENGTH);
 	}
 
-	@Override
+	/**
+	 * @return aquisição da senha referente ao nome de usuário.
+	 */
+
 	public String getPassword()
 	{
 		return password;
@@ -149,13 +152,19 @@ public class LoginSessionData extends SessionData implements Login
 		this.password = strcap(password, PASSWORD_LENGTH);
 	}
 
-	@Override
+	/**
+	 * @return aquisição do horário em que foi feito o último acesso.
+	 */
+
 	public Time getLastLogin()
 	{
 		return lastLogin;
 	}
 
-	@Override
+	/**
+	 * @return aquisição do horário em que a conta foi criada.
+	 */
+
 	public Time getRegistered()
 	{
 		return registered;
@@ -183,7 +192,7 @@ public class LoginSessionData extends SessionData implements Login
 	 * @return aquisição das configurações de criptografia de senha.
 	 */
 
-	public BitWise getPassDencrypt()
+	public BitWise8 getPassDencrypt()
 	{
 		return passDencrypt;
 	}

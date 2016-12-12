@@ -1,6 +1,13 @@
 package org.diverproject.jragnarok.server.login.structures;
 
 import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.util.ObjectDescription;
+
+/**
+ * TODO
+ *
+ * @author Andrew
+ */
 
 public class OnlineLogin
 {
@@ -39,5 +46,17 @@ public class OnlineLogin
 	public void setCharServer(int charServerID)
 	{
 		this.charServerID = charServerID;
+	}
+
+	@Override
+	public String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("accountID", accountID);
+		description.append("charServerID", charServerID);
+		description.append("waitingDisconnect", waitingDisconnect.getID());
+
+		return super.toString();
 	}
 }

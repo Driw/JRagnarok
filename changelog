@@ -1,3 +1,12 @@
+12.12.2016 - 1.4.141
+- O sistema agora irá usar o padrão de projetos Facade para melhor estruturação dos serviços.
+- AuthAccountControl e OnlineControl não eram controles e sim coleções (renomeados adequadamente).
+- Removendo métodos que não são tem utilidade para a interface Login.
+- AbstractServiceLogin não terá todos os controles/serviços, porém terá um init() e destroy().
+- LoginServerFacade adicionado para possuir os listener que irão reconhecer e despachar as conexões.
+- Todos os serviços atualizados para que funcionem conforme LoginServerFacade.
+	- Alguns métodos foram movidos para seus locais mais adequados (principalmente os dois parse).
+
 12.12.2016 - 1.3.140
 - ServiceCharLogin.sendPacket() não estava enviando os dados para o FD esperado.
 	- Atualizado para a utilização de DisconnectPlayer.
