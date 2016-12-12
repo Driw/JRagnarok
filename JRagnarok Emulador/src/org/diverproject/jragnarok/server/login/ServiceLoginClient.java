@@ -30,10 +30,6 @@ import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.Vip;
-import org.diverproject.jragnarok.server.login.structures.AuthNode;
-import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
-import org.diverproject.jragnarok.server.login.structures.ClientHash;
-import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
 
 /**
  * <h1>Serviço para Comunicação com o Cliente</h1>

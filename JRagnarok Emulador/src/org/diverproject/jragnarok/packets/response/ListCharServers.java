@@ -5,8 +5,8 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LIST_SERV
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.CharServerList;
-import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
-import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
+import org.diverproject.jragnarok.server.login.ClientCharServer;
+import org.diverproject.jragnarok.server.login.LoginSessionData;
 import org.diverproject.util.lang.Bits;
 import org.diverproject.util.stream.Output;
 
@@ -46,7 +46,7 @@ public class ListCharServers extends ResponsePacket
 			output.putString(server.getName(), 20);
 			output.putShort(server.getUsers());
 			output.putShort(server.getType().CODE);
-			output.putShort(server.getNewValue());
+			output.putShort(s(server.isNewDisplay() ? 1 : 0));
 		}
 	}
 

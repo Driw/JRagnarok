@@ -1,3 +1,8 @@
+12.12.2016 - 1.4.144
+- Agora a configuração char.new_display passa a ser do tipo booleano já que não há outras opções.
+- Todas as classes contidas em login.structures foram movidos para login, não há necessidade de separar.
+	- Além de serem movidas foram todas completamente documentadas.
+
 12.12.2016 - 1.4.143
 - AuthAccountMap e OnlineMap movidos de login.control para login, são coleções e não controles.
 - IpBanList foi movido de login.control para login.entities já que é uma entidade.

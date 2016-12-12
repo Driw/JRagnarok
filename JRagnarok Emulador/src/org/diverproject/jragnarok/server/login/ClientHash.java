@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.structures;
+package org.diverproject.jragnarok.server.login;
 
 import org.diverproject.util.ObjectDescription;
 

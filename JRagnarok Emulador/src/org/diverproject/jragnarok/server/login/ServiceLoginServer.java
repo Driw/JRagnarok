@@ -16,9 +16,6 @@ import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
-import org.diverproject.jragnarok.server.login.structures.ClientHash;
-import org.diverproject.jragnarok.server.login.structures.ClientHashNode;
-import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
 import org.diverproject.util.collection.Node;
 
 /**
@@ -318,7 +315,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 				{
 					ClientHashNode chn = (ClientHashNode) node;
 
-					if (account.getGroup().getID() < chn.getGroupID())
+					if (account.getGroup().getID() < chn.getGroupLevel())
 						continue;
 
 					if (chn.get().getHashString().isEmpty() || chn.get().equals(sd.getClientHash()))

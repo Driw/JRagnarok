@@ -18,7 +18,6 @@ import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.login.entities.Account;
-import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 
 /**
  * <h1>Servidor de Acesso</h1>

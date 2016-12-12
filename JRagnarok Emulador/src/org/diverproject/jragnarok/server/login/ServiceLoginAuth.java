@@ -43,10 +43,6 @@ import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.CharServerType;
 import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.login.entities.Account;
-import org.diverproject.jragnarok.server.login.structures.AuthNode;
-import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
-import org.diverproject.jragnarok.server.login.structures.LoginSessionData;
-import org.diverproject.jragnarok.server.login.structures.OnlineLogin;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.Time;
 import org.diverproject.util.lang.IntUtil;
@@ -369,7 +365,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		AuthNode node = new AuthNode();
 		node.setAccountID(sd.getID());
-		node.setSeed(sd.getSeed());
+		node.getSeed().copyFrom(sd.getSeed());
 		node.getIP().set(fd.getAddress());
 		node.setVersion(sd.getVersion());
 		node.setClientType(sd.getClientType());
@@ -585,7 +581,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		int serverIP = ccPacket.getServerIP();
 		short serverPort = ccPacket.getServerPort();
 		short type = ccPacket.getType();
-		short newDisplay = ccPacket.getNewDisplay();
+		boolean newDisplay = ccPacket.getNewDisplay();
 
 		logInfo("conexão solicitada do servidor de personagens %s@%s (account: %s, pass: %s).\n", serverName, fd.getAddressString(), sd.getUsername(), sd.getPassword());
 
@@ -598,10 +594,10 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		{
 			log("conexão do servidor de personagens '%s' aceita.\n", serverName);
 
-			ClientCharServer server = new ClientCharServer(fd);
+			ClientCharServer server = new ClientCharServer();
 			server.setFileDecriptor(fd);
 			server.setName(serverName);
-			server.setIP(new InternetProtocol(serverIP));
+			server.getIP().set(serverIP);
 			server.setPort(serverPort);
 			server.setUsers((short) 0);
 			server.setType(CharServerType.parse(type));

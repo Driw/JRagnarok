@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.packets.request;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHAR_SERVER_CONNECT;
 
@@ -16,7 +17,7 @@ public class CharServerConnectRequest extends RequestPacket
 	private short serverPort;
 	private String serverName;
 	private short type;
-	private short newDisplay;
+	private boolean newDisplay;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -29,7 +30,7 @@ public class CharServerConnectRequest extends RequestPacket
 		output.putString(serverName, 20);
 		output.skipe(2);
 		output.putShort(type);
-		output.putShort(newDisplay);
+		output.putShort(s(newDisplay ? 1 : 0));
 	}
 
 	@Override
@@ -43,7 +44,7 @@ public class CharServerConnectRequest extends RequestPacket
 		serverName = strclr(input.getString(20));
 		input.skipe(2);
 		type = input.getShort();
-		newDisplay = input.getShort();
+		newDisplay = input.getShort() == 1;
 	}
 
 	public String getUsername()
@@ -106,12 +107,12 @@ public class CharServerConnectRequest extends RequestPacket
 		this.type = type;
 	}
 
-	public short getNewDisplay()
+	public boolean getNewDisplay()
 	{
 		return newDisplay;
 	}
 
-	public void setNewDisplay(short newDisplay)
+	public void setNewDisplay(boolean newDisplay)
 	{
 		this.newDisplay = newDisplay;
 	}

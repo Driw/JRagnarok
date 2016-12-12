@@ -211,7 +211,7 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigString(CHAR_PASSWORD, "passwd"));
 		configurations.add(new ConfigString(CHAR_SERVER_NAME, "Char Server"));
 		configurations.add(new ConfigInt(CHAR_MAINTANCE, 0));
-		configurations.add(new ConfigInt(CHAR_NEW_DISPLAY, 0));
+		configurations.add(new ConfigBoolean(CHAR_NEW_DISPLAY, false));
 		configurations.add(new ConfigInt(CHAR_MAX_USERS, -1));
 		configurations.add(new ConfigInt(CHAR_OVERLOAD_BYPASS, 99));
 		configurations.add(new ConfigBoolean(CHAR_MOVE_ENABLED, true));

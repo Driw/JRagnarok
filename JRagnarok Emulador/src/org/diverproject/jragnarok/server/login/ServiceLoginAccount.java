@@ -15,7 +15,6 @@ import org.diverproject.jragnarok.packets.request.UpdateAccountState;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
-import org.diverproject.jragnarok.server.login.structures.AuthNode;
 
 /**
  * <h1>Serviço para Gerenciamento de Contas</h1>

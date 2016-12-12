@@ -11,7 +11,6 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.login.structures.ClientCharServer;
 
 public class ServiceLoginChar extends AbstractServiceLogin
 {

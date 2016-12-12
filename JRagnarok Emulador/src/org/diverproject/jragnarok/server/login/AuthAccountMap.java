@@ -1,6 +1,5 @@
 package org.diverproject.jragnarok.server.login;
 
-import org.diverproject.jragnarok.server.login.structures.AuthNode;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;

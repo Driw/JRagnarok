@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.structures;
+package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.PASSWORD_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.USERNAME_LENGTH;

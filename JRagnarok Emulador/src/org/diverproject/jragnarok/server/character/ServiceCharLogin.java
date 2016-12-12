@@ -252,7 +252,7 @@ public class ServiceCharLogin extends AbstractCharService
 					short serverPort = s(getConfigs().getInt(CHAR_PORT));
 					String serverName = getConfigs().getString(CHAR_SERVER_NAME);
 					short type = s(getConfigs().getInt(CHAR_MAINTANCE));
-					short newDisplay = s(getConfigs().getInt(CHAR_NEW_DISPLAY));
+					boolean newDisplay = getConfigs().getBool(CHAR_NEW_DISPLAY);
 
 					CharServerConnectRequest packet = new CharServerConnectRequest();
 					packet.setUsername(username);
