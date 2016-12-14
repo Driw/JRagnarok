@@ -23,6 +23,7 @@ import static org.diverproject.jragnarok.server.common.NotifyAuthResult.SERVER_C
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
+import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnarok.packets.receive.LoginDefault;
 import org.diverproject.jragnarok.packets.receive.LoginHan;
@@ -42,6 +43,7 @@ import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.CharServerType;
 import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.Time;
@@ -79,6 +81,11 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * Serviço para comunicação entre o servidor e o cliente.
 	 */
 	private ServiceLoginClient client;
+
+	/**
+	 * Controle para persistência das contas de jogadores.
+	 */
+	private AccountControl accounts;
 
 	/**
 	 * Serviço para banimento de acessos por endereço de IP.
@@ -120,6 +127,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	public void init()
 	{
 		client = getServer().getFacade().getClientService();
+		accounts = getServer().getFacade().getAccountControl();
 		ipban = getServer().getFacade().getIpBanService();
 		log = getServer().getFacade().getLogService();
 		login = getServer().getFacade().getLoginService();
@@ -131,6 +139,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	public void destroy()
 	{
 		client = null;
+		accounts = null;
 		ipban = null;
 		log = null;
 		login = null;
@@ -567,11 +576,25 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		CharServerConnectRequest ccPacket = new CharServerConnectRequest();
 		ccPacket.receive(fd, false);
 
-		// TODO confirmar usuário e senha e obter o ID
+		Account account = accounts.get(ccPacket.getUsername());
+
+		if (account == null)
+		{
+			logWarning("char-server com usuário não encontrado (name: %s, username: %s).\n", ccPacket.getServerName(), ccPacket.getUsername());
+			return false;
+		}
+
+		if (!account.getPassword().equals(ccPacket.getPassword()))
+		{
+			logWarning("char-server com senha incompatível (name: %s, username: %s).\n", ccPacket.getServerName(), ccPacket.getUsername());
+			return false;
+		}
+		
 		LoginSessionData sd = fd.getSessionData();
-		sd.setID(1);
+		sd.setID(account.getID());
 		sd.setUsername(ccPacket.getUsername());
 		sd.setPassword(ccPacket.getPassword());
+		sd.setGroup(account.getGroup().getCurrentGroup());
 
 		if (getConfigs().getBool("login.user_md5_password"))
 			sd.setPassword(md5Encrypt(sd.getPassword()));

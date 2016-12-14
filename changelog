@@ -1,3 +1,6 @@
+14.12.2016 - 1.4.148
+- Nome de usuário e senha usados pelo servidor de acesso e de personagem agora são validados.
+
 14.12.2016 - 1.4.147
 - Excluindo todas as tabelas do banco de dados anterior devido a problemas com foreign key.
 - Entidades e controles atualizados conforme as mudanças nas tabelas.

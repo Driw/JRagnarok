@@ -156,11 +156,16 @@ public class LoginServer extends Server
 		{
 			logInfo("o servidor de acesso está pronto (porta: %d).\n", getPort());
 
-			// TODO confirmar usuário e senha e obter o ID
-			Account account = new Account();
-			account.setID(1);
-			account.setUsername(getConfigs().getString(LOGIN_USERNAME));
-			account.setPassword(getConfigs().getString(LOGIN_PASSWORD));
+			String username = getConfigs().getString(LOGIN_USERNAME);
+			String password = getConfigs().getString(LOGIN_PASSWORD);
+
+			Account account = getFacade().getAccountControl().get(username);
+
+			if (account == null)
+				throw new RagnarokException("%s usando '%s' e não foi encontrado", LOGIN_USERNAME, username);
+
+			if (!account.getPassword().equals(password))
+				throw new RagnarokException("%s uasndo '%s' e não combinou", LOGIN_PASSWORD, password);
 
 			facade.getLogService().add(getAddress(), account, 100, "login server started");
 		}
