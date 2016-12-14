@@ -5,7 +5,7 @@ import org.diverproject.util.ObjectDescription;
 public class Group
 {
 	private int id;
-	private int level;
+	private int accessLevel;
 	private String name;
 	private Group parent;
 	private GroupCommands commands;
@@ -28,14 +28,14 @@ public class Group
 		this.id = id;
 	}
 
-	public int getLevel()
+	public int getAccessLevel()
 	{
-		return level;
+		return accessLevel;
 	}
 
-	public void setLevel(int level)
+	public void setAccessLevel(int accessLevel)
 	{
-		this.level = level;
+		this.accessLevel = accessLevel;
 	}
 
 	public String getName()
@@ -97,7 +97,7 @@ public class Group
 		ObjectDescription description = new ObjectDescription(getClass());
 
 		description.append("id", id);
-		description.append("level", level);
+		description.append("level", accessLevel);
 		description.append("name", name);
 		description.append("commands", commands.size());
 		description.append("permissions", permissions.size());

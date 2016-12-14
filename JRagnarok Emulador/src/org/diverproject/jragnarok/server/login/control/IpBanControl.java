@@ -69,6 +69,7 @@ public class IpBanControl extends AbstractControl
 	private IpBanList newIpBanList(ResultSet rs) throws SQLException
 	{
 		IpBanList list = new IpBanList();
+		list.setID(rs.getInt("id"));
 		list.setAddressList(rs.getString("address_list"));
 		list.getBanTime().set(rs.getLong("ban_time"));
 		list.getResumeTime().set(rs.getLong("resume_time"));
@@ -88,7 +89,7 @@ public class IpBanControl extends AbstractControl
 	public List<IpBanList> get(int ip) throws RagnarokException
 	{
 		String table = Tables.getInstance().getIpBan();
-		String sql = format("SELECT address_list, ban_time, resume_time, reason"
+		String sql = format("SELECT id, address_list, ban_time, resume_time, reason"
 						+ " FROM %s WHERE resume_time > NOW()"
 						+ " AND (address_list = ? OR address_list = ? OR"
 						+ " address_list = ? OR address_list = ?)", table);
@@ -177,13 +178,45 @@ public class IpBanControl extends AbstractControl
 			ps.setTimestamp(3, list.getResumeTime().toTimestamp());
 			ps.setString(4, list.getReason());
 
+			list.setID(getID(list.getAdressList()));
+
 			return ps.executeUpdate() == 1;
 
 		} catch (SQLException e) {
 
 			if (e.getErrorCode() == DUPLICATED_KEY)
-				return update(list);
+				return false;
 
+			throw new RagnarokException(e);
+		}
+	}
+
+	/**
+	 * Procedimento interno usado após a adição de uma lista de endereços de IP para serem banidos.
+	 * Deve solicitar ao banco de dados o código de identificação gerado pelo próprio banco de dados.
+	 * @param adressList lista contento os endereços de IP que foram banidos (único na tabela).
+	 * @return código de identificação da lista contendo os endereços de IP banidos do sistema.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	private int getID(String adressList) throws RagnarokException
+	{
+		String table = Tables.getInstance().getIpBan();
+		String sql = format("SELECT id FROM %s WHERE address_list = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setString(1, adressList);
+
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next())
+				return rs.getInt("id");
+
+			throw new RagnarokException("falha ao identificar lista de enderesços de IP banidos");
+
+		} catch (SQLException e) {
 			throw new RagnarokException(e);
 		}
 	}
@@ -195,18 +228,19 @@ public class IpBanControl extends AbstractControl
 	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
 	 */
 
-	private boolean update(IpBanList list) throws RagnarokException
+	public boolean update(IpBanList list) throws RagnarokException
 	{
 		String table = Tables.getInstance().getIpBan();
-		String sql = format("UPDATE %s SET ban_time = ?, resume_time = ?, reason = ? WHERE address_list = ?", table);
+		String sql = format("UPDATE %s SET address_list = ?, ban_time = ?, resume_time = ?, reason = ? WHERE id = ?", table);
 
 		try {
 
 			PreparedStatement ps = prepare(sql);
-			ps.setTimestamp(1, list.getBanTime().toTimestamp());
-			ps.setTimestamp(2, list.getResumeTime().toTimestamp());
-			ps.setString(3, list.getReason());
-			ps.setString(4, list.getAdressList());
+			ps.setString(1, list.getAdressList());
+			ps.setTimestamp(2, list.getBanTime().toTimestamp());
+			ps.setTimestamp(3, list.getResumeTime().toTimestamp());
+			ps.setString(4, list.getReason());
+			ps.setInt(5, list.getID());
 
 			return ps.executeUpdate() == 1;
 

@@ -701,10 +701,10 @@ public class ServiceCharLogin extends AbstractCharService
 
 			if (server != null && server.getFileDecriptor().isConnected())
 			{
-				if (maxUsers == 0 && sd.getGroup().getLevel() >= overloadBypass)
+				if (maxUsers == 0 && sd.getGroup().getAccessLevel() >= overloadBypass)
 					enabled = true;
 
-				else if (maxUsers > 0 && character.getCountUsers() >= maxUsers && sd.getGroup().getLevel() >= overloadBypass)
+				else if (maxUsers > 0 && character.getCountUsers() >= maxUsers && sd.getGroup().getAccessLevel() >= overloadBypass)
 					enabled = true;
 			}
 		}

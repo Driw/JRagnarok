@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
+import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountGroup;
 import org.diverproject.jragnarok.server.login.entities.Group;
 import org.diverproject.jragnarok.server.login.entities.GroupCommands;
@@ -70,7 +71,7 @@ public class GroupControl extends AbstractControl
 	{
 		Group group = new Group();
 		group.setID(rs.getInt("id"));
-		group.setLevel(rs.getInt("level"));
+		group.setAccessLevel(rs.getInt("access_level"));
 		group.setName(rs.getString("name"));
 		group.setLogCommands(rs.getBoolean("log_commands"));
 
@@ -102,7 +103,6 @@ public class GroupControl extends AbstractControl
 		vip.setID(rs.getInt("id"));
 		vip.setCharSlotCount(rs.getByte("char_slot_count"));
 		vip.setMaxStorage(rs.getShort("max_storage"));
-		vip.setGroup(getGroup(rs.getInt("groupid")));
 
 		return vip;
 	}
@@ -110,25 +110,26 @@ public class GroupControl extends AbstractControl
 	/**
 	 * Carrega todas as informações necessários do grupo de uma determinada conta.
 	 * Necessário ter definido o código de identificação do grupo com a conta.
-	 * @param accountGroup referência do grupo vinculado a uma conta carregada.
+	 * @param account conta do qual deseja carregar as informações do grupo.
 	 * @throws RagnarokException se houver falha com a conexão.
 	 */
 
-	public void load(AccountGroup accountGroup) throws RagnarokException
+	public void load(Account account) throws RagnarokException
 	{
 		String table = Tables.getInstance().getAccountsGroup();
-		String sql = format("SELECT current_group, old_group, vip, timeout FROM %s WHERE id = ?", table);
+		String sql = format("SELECT current_group, old_group, vip, timeout FROM %s WHERE accountid = ?", table);
 
 		try {
 
 			PreparedStatement ps = prepare(sql);
-			ps.setInt(1, accountGroup.getID());
+			ps.setInt(1, account.getID());
 
 			ResultSet rs = ps.executeQuery();
 
 			if (!rs.next())
-				throw new RagnarokException("grupo de conta '%d' não encontrado", accountGroup.getID());
+				throw new RagnarokException("grupo de conta '%d' não encontrado", account.getID());
 
+			AccountGroup accountGroup = account.getGroup();
 			accountGroup.getTime().set(rs.getDate("timeout").getTime());
 
 			int currentGroupID = rs.getInt("current_group");
@@ -165,7 +166,7 @@ public class GroupControl extends AbstractControl
 				accountGroup.setVip(vip);
 			}
 
-			logDebug("dados do grupo de uma conta recarregados (aid: %d).\n", accountGroup.getID());
+			logDebug("dados do grupo de uma conta recarregados (aid: %d).\n", account.getID());
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e);
@@ -186,7 +187,7 @@ public class GroupControl extends AbstractControl
 			return group;
 
 		String table = Tables.getInstance().getGroups();
-		String sql = format("SELECT id, level, name, parent, log_commands FROM %s WHERE id = ?", table);
+		String sql = format("SELECT id, access_level, name, parent, log_commands FROM %s WHERE id = ?", table);
 
 		try {
 

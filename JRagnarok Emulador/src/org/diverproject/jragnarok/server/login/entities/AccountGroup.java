@@ -5,7 +5,6 @@ import org.diverproject.util.Time;
 
 public class AccountGroup
 {
-	private int id;
 	private Time timeout;
 	private Group currentGroup;
 	private Group oldGroup;
@@ -14,16 +13,6 @@ public class AccountGroup
 	public AccountGroup()
 	{
 		timeout = new Time();
-	}
-
-	public int getID()
-	{
-		return id;
-	}
-
-	public void setID(int id)
-	{
-		this.id = id;
 	}
 
 	public Time getTime()
@@ -78,7 +67,10 @@ public class AccountGroup
 		if (oldGroup != null)
 			description.append("old", oldGroup.getName());
 
-		description.append("time", timeout);
+		if (vip != null)
+			description.append("vip", vip.getName());
+
+		description.append("timeout", timeout);
 
 		return description.toString();
 	}

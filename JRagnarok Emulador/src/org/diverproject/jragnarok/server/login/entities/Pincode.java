@@ -8,7 +8,6 @@ import org.diverproject.util.Time;
 
 public class Pincode
 {
-	private int id;
 	private boolean enabled;
 	private String code;
 	private Time changed;
@@ -17,17 +16,6 @@ public class Pincode
 	public Pincode()
 	{
 		changed = new Time();
-	}
-
-	public int getID()
-	{
-		return id;
-	}
-
-	public void setID(int id)
-	{
-		if (id > 0)
-			this.id = id;
 	}
 
 	public boolean isEnabled()
@@ -76,7 +64,6 @@ public class Pincode
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("id", id);
 		description.append("enabled", enabled);
 		description.append("code", code);
 		description.append("changed", changed);

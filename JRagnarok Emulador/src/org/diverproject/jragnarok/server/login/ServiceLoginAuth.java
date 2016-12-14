@@ -567,7 +567,9 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		CharServerConnectRequest ccPacket = new CharServerConnectRequest();
 		ccPacket.receive(fd, false);
 
+		// TODO confirmar usuário e senha e obter o ID
 		LoginSessionData sd = fd.getSessionData();
+		sd.setID(1);
 		sd.setUsername(ccPacket.getUsername());
 		sd.setPassword(ccPacket.getPassword());
 

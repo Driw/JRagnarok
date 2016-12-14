@@ -315,7 +315,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 				{
 					ClientHashNode chn = (ClientHashNode) node;
 
-					if (account.getGroup().getID() < chn.getGroupLevel())
+					if (account.getGroup().getCurrentGroup().getAccessLevel() < chn.getGroupLevel())
 						continue;
 
 					if (chn.get().getHashString().isEmpty() || chn.get().equals(sd.getClientHash()))

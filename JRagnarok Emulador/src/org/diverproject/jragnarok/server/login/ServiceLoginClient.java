@@ -342,7 +342,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setAccountID(account.getID());
 		packet.setEmail(account.getEmail());
 		packet.setExpirationTime(i(account.getExpiration().get()));
-		packet.setGroupID(b(account.getGroup().getID()));
+		packet.setGroupID(b(account.getGroup().getCurrentGroup().getID()));
 		packet.setCharSlots(account.getCharSlots());
 		packet.setBirthdate(account.getBirthDate());
 
@@ -398,7 +398,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		{
 			logDebug("enviando informações de uma conta (server-fd: %d, username: %s).\n", fd.getID(), account.getUsername());
 
-			packet.setGroupID(account.getGroup().getID());
+			packet.setGroupID(account.getGroup().getCurrentGroup().getID());
 			packet.setLoginCount(account.getLoginCount());
 			packet.setState(account.getState().CODE);
 			packet.setEmail(account.getEmail());

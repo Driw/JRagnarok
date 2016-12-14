@@ -62,7 +62,7 @@ public class LoginLogControl extends AbstractControl
 		String table = Tables.getInstance().getLoginLog();
 		String sql = format("SELECT COUNT(*) AS count"
 						+ " FROM %s"
-						+ " WHERE ip = ? AND (rcode = 0 OR rcode = 1) AND time > (NOW() - INTERVAL ? MINUTE)",
+						+ " WHERE ip = ? AND (rcode = 0 OR rcode = 1) AND log_time > (NOW() - INTERVAL ? MINUTE)",
 						table);
 
 		try {
@@ -99,7 +99,7 @@ public class LoginLogControl extends AbstractControl
 			throw new RagnarokException("registro sem acesso");
 
 		String table = Tables.getInstance().getLoginLog();
-		String sql = format("INSERT INTO %s (time, ip, account, rcode, message) VALUES (?, ?, ?, ?, ?)", table);
+		String sql = format("INSERT INTO %s (log_time, ip, accountid, rcode, message) VALUES (?, ?, ?, ?, ?)", table);
 
 		try {
 

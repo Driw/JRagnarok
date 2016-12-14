@@ -91,15 +91,13 @@ public class AccountControl extends AbstractControl
 		account.setEmail(rs.getString("email"));
 		account.setBirthDate(rs.getString("birth_date"));
 		account.setLoginCount(rs.getInt("login_count"));
-		account.getUnban().set(rs.getTimestamp("unban").getTime());
+		account.getUnban().set(rs.getTimestamp("unban_time").getTime());
 		account.getExpiration().set(rs.getTimestamp("expiration").getTime());
-		account.setState(AccountState.parse(rs.getInt("state")));
+		account.setState(AccountState.parse(rs.getInt("account_state")));
 		account.getLastIP().set(rs.getInt("last_ip"));
-		account.getPincode().setID(rs.getInt("pincode"));
-		account.getGroup().setID(rs.getInt("groupid"));
 
-		pincodes.load(account.getPincode());
-		groups.load(account.getGroup());
+		pincodes.load(account);
+		groups.load(account);
 
 		return account;
 	}
@@ -114,7 +112,7 @@ public class AccountControl extends AbstractControl
 	{
 		String table = Tables.getInstance().getAccounts();
 		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date,"
-						+ " login_count, unban, expiration, pincode, groupid, state, last_ip"
+						+ " login_count, unban_time, expiration, account_state, last_ip"
 						+ " FROM %s WHERE username = ?",
 						table);
 
@@ -148,7 +146,7 @@ public class AccountControl extends AbstractControl
 	{
 		String table = Tables.getInstance().getAccounts();
 		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date,"
-						+ " login_count, unban, expiration, pincode, groupid, state, last_ip"
+						+ " login_count, unban_time, expiration, account_state, last_ip"
 						+ " FROM %s WHERE id = ?",
 						table);
 
@@ -220,7 +218,7 @@ public class AccountControl extends AbstractControl
 	public boolean setAccount(Account account)
 	{
 		String table = Tables.getInstance().getAccounts();
-		String sql = format("UPDATE %s SET login_count = ?, unban = ?, expiration = ?, state = ?, last_ip = ? WHERE id = ?", table);
+		String sql = format("UPDATE %s SET login_count = ?, unban_time = ?, expiration = ?, account_state = ?, last_ip = ? WHERE id = ?", table);
 
 		try {
 

@@ -1,3 +1,9 @@
+14.12.2016 - 1.4.147
+- Excluindo todas as tabelas do banco de dados anterior devido a problemas com foreign key.
+- Entidades e controles atualizados conforme as mudanças nas tabelas.
+- Alterando a forma como será listado os comandos e permissões de um grupo de contas.
+- Agora IpBanList irá funcionar com um código de identificação mas address_list será único.
+
 12.12.2016 - 1.4.146b
 - GrouControl agora deverá carregar os grupos de conta e vip quando inicializado por init().
 	- Pequenos aprimoramentos para facilitar possíveis manutenções futuras.

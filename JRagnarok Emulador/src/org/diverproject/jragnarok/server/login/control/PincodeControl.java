@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
+import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.Pincode;
 
 
@@ -41,32 +42,31 @@ public class PincodeControl extends AbstractControl
 
 	/**
 	 * Permite obter todas as informações referentes a um determinado código PIN.
-	 * @param id código de identificação dos dados referente ao código PIN desejado.
+	 * @param accountID código de identificação dos dados referente ao código PIN desejado.
 	 * @return aquisição do código PIN desejado ou null se não encontrar.
 	 * @throws RagnarokException falha de conexão durante o procedimento.
 	 */
 
-	public Pincode get(int id) throws RagnarokException
+	public Pincode get(int accountID) throws RagnarokException
 	{
 		String table = Tables.getInstance().getPincodes();
-		String sql = format("SELECT enabled, code, changed FROM %s WHERE id = ?", table);
+		String sql = format("SELECT enabled, code_number, change_time FROM %s WHERE accountid = ?", table);
 
 		try {
 
 			Pincode pincode = null;
 
 			PreparedStatement ps = prepare(sql);
-			ps.setInt(1, id);
+			ps.setInt(1, accountID);
 
 			ResultSet rs = ps.executeQuery();
 
 			if (!rs.next())
 			{
 				pincode = new Pincode();
-				pincode.setID(id);
 				pincode.setEnabled(rs.getBoolean("enabled"));
-				pincode.setCode(rs.getString("code"));
-				pincode.getChanged().set(rs.getDate("changed").getTime());
+				pincode.setCode(rs.getString("code_number"));
+				pincode.getChanged().set(rs.getDate("change_time").getTime());
 			}
 
 			return pincode;
@@ -80,31 +80,32 @@ public class PincodeControl extends AbstractControl
 	 * Atualiza as informações de um determinado objeto de código PIN do sistema.
 	 * Usado para garantir que os dados do mesmo considerem os valores corretos.
 	 * Será necessário no mínimo a definição do seu código de identificação.
-	 * @param pincode código PIN do qual deseja obter carregar os dados.
+	 * @param account conta do qual deseja carregar os dados de código PIN.
 	 * @throws RagnarokException falha de conexão ou id inválido.
 	 */
 
-	public void load(Pincode pincode) throws RagnarokException
+	public void load(Account account) throws RagnarokException
 	{
-		if (pincode == null)
-			throw new RagnarokException("código PIN nulo inesperado");
+		if (account == null)
+			throw new RagnarokException("conta nulo inesperado");
 
 		String table = Tables.getInstance().getPincodes();
-		String sql = format("SELECT enabled, code, changed FROM %s WHERE id = ?", table);
+		String sql = format("SELECT enabled, code_number, change_time FROM %s WHERE accountid = ?", table);
 
 		try {
 
 			PreparedStatement ps = prepare(sql);
-			ps.setInt(1, pincode.getID());
+			ps.setInt(1, account.getID());
 
 			ResultSet rs = ps.executeQuery();
 
 			if (!rs.next())
-				throw new RagnarokException("pincode '%d' não encontrado", pincode.getID());
+				throw new RagnarokException("pincode '%d' não encontrado", account.getID());
 
+			Pincode pincode = account.getPincode();
 			pincode.setEnabled(rs.getBoolean("enabled"));
-			pincode.setCode(rs.getString("code"));
-			pincode.getChanged().set(rs.getDate("changed").getTime());
+			pincode.setCode(rs.getString("code_number"));
+			pincode.getChanged().set(rs.getDate("change_time").getTime());
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e);
@@ -114,26 +115,28 @@ public class PincodeControl extends AbstractControl
 	/**
 	 * Permite atualizar as informações contidas no banco de dados de um determinado código PIN.
 	 * Para que as atualizações possam ocorrer de fato um id válido será necessário.
-	 * @param pincode código pin do qual terá as informações atualizadas no banco de dados.
+	 * @param account conta do qual deseja atualizar as informações relacionadas ao código PIN.
 	 * @return true se conseguir atualizar ou fase caso o id seja inválido.
 	 * @throws RagnarokException falha de conexão ou id inválido.
 	 */
 
-	public boolean update(Pincode pincode) throws RagnarokException
+	public boolean update(Account account) throws RagnarokException
 	{
-		if (pincode == null)
-			throw new RagnarokException("código PIN nulo inesperado");
+		if (account == null)
+			throw new RagnarokException("conta nulo inesperado");
 
 		String table = Tables.getInstance().getPincodes();
-		String sql = format("UPDATE pincode SET enabled = ?, code = ?, changed = ? WHERE id = ?", table);
+		String sql = format("UPDATE pincode SET enabled = ?, code_number = ?, change_time = ? WHERE accountid = ?", table);
 
 		try {
+
+			Pincode pincode = account.getPincode();
 
 			PreparedStatement ps = prepare(sql);
 			ps.setBoolean(1, pincode.isEnabled());
 			ps.setString(2, pincode.getCode());
 			ps.setTimestamp(3, pincode.getChanged().toTimestamp());
-			ps.setInt(4, pincode.getID());
+			ps.setInt(4, account.getID());
 
 			return ps.executeUpdate() == 1;
 

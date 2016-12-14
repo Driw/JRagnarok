@@ -1,5 +1,5 @@
 
-INSERT INTO groups (id, level, name, parent, log_commands) VALUES
+INSERT INTO groups (id, access_level, name, parent, log_commands) VALUES
 (1, 0, 'Servidores', NULL, 1),
 (2, 0, 'Jogadores Comuns', NULL, 0),
 (3, 0, 'Jogador Avançado', 2, 0),
@@ -117,7 +117,7 @@ INSERT INTO groups_commands (groupid, command, enabled) VALUES
 -- Administrador
 (9, 'all_commands', 1);
 
-INSERT INTO groups_permissions (groupid, command, enabled) VALUES
+INSERT INTO groups_permissions (groupid, permission, enabled) VALUES
 -- Jogador Comum
 (2, 'can_trade', 1),
 (2, 'can_party', 1),
@@ -156,7 +156,6 @@ INSERT INTO groups_permissions (groupid, command, enabled) VALUES
 (9, 'bypass_max_stat', 1),
 (9, 'all_permission', 1);
 
-INSERT INTO pincodes (id, enabled, code, changed) VALUES (1, 0, '1001', '1970-01-01 00:00:00');
-
-INSERT INTO accounts (id, username, password, groupid, pincode) VALUES (1, 'server', 'jragnarok', 1, 1);
-
+INSERT INTO accounts (id, username, password) VALUES (1, 'server', 'jragnarok');
+INSERT INTO accounts_groups (accountid, current_group) VALUES (1, 1);
+INSERT INTO pincodes (accountid, enabled, code_number) VALUES (1, 0, '1001');

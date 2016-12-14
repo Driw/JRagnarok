@@ -8,7 +8,6 @@ import org.diverproject.util.ObjectDescription;
 public class Vip
 {
 	private int id;
-	private Group group;
 	private String name;
 	private byte charSlotCount;
 	private byte charBilling;
@@ -23,15 +22,6 @@ public class Vip
 	{
 		if (id > 0)
 			this.id = id;
-	}
-
-	public Group getGroup()
-	{
-		return group;
-	}
-	public void setGroup(Group group)
-	{
-		this.group = group;
 	}
 
 	public String getName()

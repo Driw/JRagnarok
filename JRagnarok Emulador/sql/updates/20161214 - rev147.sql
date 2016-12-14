@@ -1,8 +1,26 @@
 
+DROP TABLE accounts;
+DROP TABLE accounts_char_list;
+DROP TABLE accounts_groups;
+DROP TABLE characters;
+DROP TABLE characters_experience;
+DROP TABLE characters_family;
+DROP TABLE characters_locations;
+DROP TABLE characters_look;
+DROP TABLE characters_mercenary_rank;
+DROP TABLE characters_stats;
+DROP TABLE groups;
+DROP TABLE groups_commands;
+DROP TABLE groups_permissions;
+DROP TABLE ipban_list;
+DROP TABLE login_log;
+DROP TABLE pincodes;
+DROP TABLE vips;
+
 CREATE TABLE IF NOT EXISTS groups
 (
 	id INT AUTO_INCREMENT,
-	access_level INT NOT NULL,
+	level_access INT NOT NULL,
 	name VARCHAR(24) NOT NULL,
 	parent INT,
 	log_commands TINYINT(1) NOT NULL DEFAULT 0,

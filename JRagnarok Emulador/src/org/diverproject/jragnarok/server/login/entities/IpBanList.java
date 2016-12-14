@@ -20,6 +20,11 @@ import org.diverproject.util.lang.IntUtil;
 public class IpBanList
 {
 	/**
+	 * Código de identificação da lista de endereços de IP banidos.
+	 */
+	private int id;
+
+	/**
 	 * Lista contendo o endereço de IP ou conjunto de IPs banidos.
 	 */
 	private String addressList;
@@ -38,6 +43,24 @@ public class IpBanList
 	 * Razão do qual o banimento foi realizado.
 	 */
 	private String reason;
+
+	/**
+	 * @return aquisição do código de identificação da lista de endereços de IP banidos.
+	 */
+
+	public int getID()
+	{
+		return id;
+	}
+
+	/**
+	 * @param id código de identificação da lista de endereços de IP banidos.
+	 */
+
+	public void setID(int id)
+	{
+		this.id = id;
+	}
 
 	/**
 	 * @return aquisição do endereços de IP a ser banidos.

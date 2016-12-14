@@ -156,11 +156,11 @@ public class LoginServer extends Server
 		{
 			logInfo("o servidor de acesso está pronto (porta: %d).\n", getPort());
 
+			// TODO confirmar usuário e senha e obter o ID
 			Account account = new Account();
+			account.setID(1);
 			account.setUsername(getConfigs().getString(LOGIN_USERNAME));
 			account.setPassword(getConfigs().getString(LOGIN_PASSWORD));
-
-			// TODO confirmar usuário e senha
 
 			facade.getLogService().add(getAddress(), account, 100, "login server started");
 		}
