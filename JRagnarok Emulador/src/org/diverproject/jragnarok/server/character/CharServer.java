@@ -8,7 +8,6 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
-import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.character.control.AuthControl;
@@ -190,10 +189,10 @@ public class CharServer extends Server
 	}
 
 	@Override
-	protected CFileDescriptor acceptSocket(Socket socket, FileDescriptorListener listener)
+	protected CFileDescriptor acceptSocket(Socket socket)
 	{
 		CFileDescriptor fd = new CFileDescriptor(socket);
-		fd.setParseListener(listener);
+		fd.setParseListener(charClient.parse);
 
 		return fd;
 	}
@@ -247,8 +246,6 @@ public class CharServer extends Server
 			charMap.init();
 			charClient.init();
 			charServerAuth.init();
-
-			setDefaultParser(charClient.parse);
 		};
 
 		@Override

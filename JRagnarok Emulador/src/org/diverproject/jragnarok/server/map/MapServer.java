@@ -9,7 +9,6 @@ import java.net.Socket;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 
@@ -33,10 +32,10 @@ public class MapServer extends Server
 	}
 
 	@Override
-	protected FileDescriptor acceptSocket(Socket socket, FileDescriptorListener listener)
+	protected FileDescriptor acceptSocket(Socket socket)
 	{
 		MFileDescriptor fd = new MFileDescriptor(socket);
-		fd.setParseListener(listener);
+		fd.setParseListener(null/* TODO */);
 
 		return fd;
 	}

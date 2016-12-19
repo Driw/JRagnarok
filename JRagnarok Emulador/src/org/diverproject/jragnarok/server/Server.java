@@ -121,11 +121,6 @@ public abstract class Server
 	private Configurations configs;
 
 	/**
-	 * Listener para despachar os Arquivos Descritores.
-	 */
-	private FileDescriptorListener defaultParser;
-
-	/**
 	 * Conexão com o banco de dados MySQL.
 	 */
 	private MySQL sql;
@@ -168,7 +163,7 @@ public abstract class Server
 	 * O código de identificação é individual para cada tipo de servidor.
 	 * Acesso por pacote e utilizado por ServerControl quando listado.
 	 * @param id código de identificação do servidor.
-	 * @see ServerController
+	 * @see ServerControl
 	 */
 
 	public final void setID(int id)
@@ -181,7 +176,7 @@ public abstract class Server
 	 * @return aquisição do nome que será dado a thread do servidor.
 	 */
 
-	protected final String getThreadName()
+	public final String getThreadName()
 	{
 		return format("%s#%d@%s:%d", nameOf(this), id, getHost(), getPort());
 	}
@@ -198,6 +193,18 @@ public abstract class Server
 	}
 
 	/**
+	 * @return aquisição do endereço de IP em que o servidor está conectado.
+	 */
+
+	public int getAddress()
+	{
+		if (serverSocket == null || serverSocket.isClosed())
+			return Bits.makeInt(b(127), b(0), b(0), b(1));
+
+		return SocketUtil.socketIPInt(serverSocket.getInetAddress().getHostAddress());
+	}
+
+	/**
 	 * Nome do host permite definir a interface para recebimento das conexões.
 	 * @return aquisição do host para realizar a conexão socket (ip ou domínio).
 	 */
@@ -210,18 +217,6 @@ public abstract class Server
 	 */
 
 	public abstract int getPort();
-
-	/**
-	 * @return aquisição do endereço de IP em que o servidor está conectado.
-	 */
-
-	public int getAddress()
-	{
-		if (serverSocket == null || serverSocket.isClosed())
-			return Bits.makeInt(b(127), b(0), b(0), b(1));
-
-		return SocketUtil.socketIPInt(serverSocket.getInetAddress().getHostAddress());
-	}
 
 	/**
 	 * O estado do servidor pode ser útil para realizar determinadas operações.
@@ -246,16 +241,6 @@ public abstract class Server
 	}
 
 	/**
-	 * Permite definir qual será o listener usado para executar as operações nas trocas de estado.
-	 * @param listener referência do objeto que implementou a interface desse listener.
-	 */
-
-	protected void setListener(ServerListener listener)
-	{
-		this.listener = listener;
-	}
-
-	/**
 	 * Permite obter a referência do objeto com as configurações do servidor.
 	 * @return aquisição do objeto com as configurações do servidor.
 	 */
@@ -275,17 +260,6 @@ public abstract class Server
 	{
 		if (this.configs == null && configs != null)
 			this.configs = configs;
-	}
-
-	/**
-	 * O analisador padrão é usado para determinar o despache dos novos clientes.
-	 * Toda nova conexão recebida será despachada para esse listener.
-	 * @param defaultParser procedimento a ser executado pelas novas conexões.
-	 */
-
-	protected void setDefaultParser(FileDescriptorListener defaultParser)
-	{
-		this.defaultParser = defaultParser;
 	}
 
 	/**
@@ -319,42 +293,6 @@ public abstract class Server
 	public FileDescriptorSystem getFileDescriptorSystem()
 	{
 		return fileDescriptorSystem;
-	}
-
-	/**
-	 * Procedimento interno que permite alterar o estado em que o servidor se encontra.
-	 * Para que um estado seja alterado pode ser necessário encontrar-se em outro.
-	 * Por exemplo, para entrar no estado de CREATED precisa estar em CREATE.
-	 */
-
-	protected void setNextState()
-	{
-		ServerState old = state;
-
-		switch (state)
-		{
-			case NONE:
-				state = CREATED;
-				break;
-
-			case CREATED:
-				state = RUNNING;
-				break;
-
-			case RUNNING:
-				state = STOPED;
-				break;
-
-			case STOPED:
-				state = DESTROYED;
-				break;
-
-			case DESTROYED:
-				state = NONE;
-				break;
-		}
-
-		logNotice("alterando estado de %s para %s.\n", old, state);
 	}
 
 	/**
@@ -460,7 +398,6 @@ public abstract class Server
 				threadServer.interrupt();
 				threadSocket = null;
 				threadServer = null;
-				defaultParser = null;
 
 				sql.closeConnection();
 				configs.clear();
@@ -577,7 +514,7 @@ public abstract class Server
 					try {
 
 						Socket socket = serverSocket.accept();
-						FileDescriptor fd = Server.this.acceptSocket(socket, defaultParser);
+						FileDescriptor fd = Server.this.acceptSocket(socket);
 
 						if (fileDescriptorSystem.addFileDecriptor(fd))
 							logDebug("nova conexão em '%s' (id: %d, ip: %s).\n", getThreadName(), fd.getID(), fd.getAddressString());
@@ -644,16 +581,6 @@ public abstract class Server
 
 		logInfo("thread do servidor criada.\n");
 	}
-
-	/**
-	 * Procedimento chamado no momento em que uma conexão socket for recebida.
-	 * Deverá criar um descritor de arquivo conforme as necessidades do servidor.
-	 * @param socket nova conexão socket recebida pelo servidor.
-	 * @param listener procedimento a ser executado pelas novas conexões.
-	 * @return aquisição do descritor de arquivo referente a conexão socket.
-	 */
-
-	protected abstract FileDescriptor acceptSocket(Socket socket, FileDescriptorListener listener);
 
 	/**
 	 * Inicialização do servidor socket para receber as conexões dos clientes.
@@ -780,6 +707,61 @@ public abstract class Server
 		while (!exceptions.isEmpty())
 			logWarning(exceptions.poll().getMessage()+ "\n");
 	}
+
+	/**
+	 * Permite definir qual será o listener usado para executar as operações nas trocas de estado.
+	 * @param listener referência do objeto que implementou a interface desse listener.
+	 */
+
+	protected void setListener(ServerListener listener)
+	{
+		this.listener = listener;
+	}
+
+	/**
+	 * Procedimento interno que permite alterar o estado em que o servidor se encontra.
+	 * Para que um estado seja alterado pode ser necessário encontrar-se em outro.
+	 * Por exemplo, para entrar no estado de CREATED precisa estar em CREATE.
+	 */
+
+	protected void setNextState()
+	{
+		ServerState old = state;
+
+		switch (state)
+		{
+			case NONE:
+				state = CREATED;
+				break;
+
+			case CREATED:
+				state = RUNNING;
+				break;
+
+			case RUNNING:
+				state = STOPED;
+				break;
+
+			case STOPED:
+				state = DESTROYED;
+				break;
+
+			case DESTROYED:
+				state = NONE;
+				break;
+		}
+
+		logNotice("alterando estado de %s para %s.\n", old, state);
+	}
+
+	/**
+	 * Procedimento chamado no momento em que uma conexão socket for recebida.
+	 * Deverá criar um descritor de arquivo conforme as necessidades do servidor.
+	 * @param socket nova conexão socket recebida pelo servidor.
+	 * @return aquisição do descritor de arquivo referente a conexão socket.
+	 */
+
+	protected abstract FileDescriptor acceptSocket(Socket socket);
 
 	@Override
 	public String toString()

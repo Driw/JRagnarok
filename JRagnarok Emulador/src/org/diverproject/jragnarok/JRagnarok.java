@@ -36,7 +36,7 @@ import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.ConfigString;
 import org.diverproject.jragnaork.configuration.ConfigSystem;
 import org.diverproject.jragnaork.configuration.Configurations;
-import org.diverproject.jragnarok.server.ServerController;
+import org.diverproject.jragnarok.server.ServerControl;
 import org.diverproject.jragnarok.server.character.CharServer;
 import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.map.MapServer;
@@ -84,7 +84,7 @@ public class JRagnarok
 	/**
 	 * Controlador de servidores.
 	 */
-	private static final ServerController SERVERS = ServerController.getInstance();
+	private static final ServerControl SERVERS = ServerControl.getInstance();
 
 	private JRagnarok()
 	{

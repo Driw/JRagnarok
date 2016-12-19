@@ -148,12 +148,6 @@ public class Account implements Login
 		return pincode;
 	}
 
-	public void setPincode(Pincode pincode)
-	{
-		if (pincode != null)
-			this.pincode = pincode;
-	}
-
 	public AccountState getState()
 	{
 		return state;
@@ -170,15 +164,19 @@ public class Account implements Login
 		return group;
 	}
 
-	public void setGroup(AccountGroup group)
-	{
-		if (group != null)
-			this.group = group;
-	}
-
 	public InternetProtocol getLastIP()
 	{
 		return lastIP;
+	}
+
+	public int getGroupID()
+	{
+		return getGroup().getCurrentGroup().getID();
+	}
+
+	public int getAccessLevel()
+	{
+		return getGroup().getCurrentGroup().getAccessLevel();
 	}
 
 	@Override

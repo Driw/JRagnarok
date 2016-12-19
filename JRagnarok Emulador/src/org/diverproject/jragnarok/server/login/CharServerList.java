@@ -50,6 +50,13 @@ public class CharServerList implements Iterable<ClientCharServer>
 	{
 		if (!servers.contains(server))
 			servers.add(server);
+
+		for (int i = 0; i < servers.size(); i++)
+			if (server.equals(servers.get(i)))
+			{
+				server.setID(i);
+				return;
+			}
 	}
 
 	/**

@@ -28,6 +28,11 @@ import org.diverproject.util.ObjectDescription;
 public class ClientCharServer
 {
 	/**
+	 * Código de identificação único do servidor de personagem no sistema.
+	 */
+	private int id;
+
+	/**
 	 * Descritor de arquivo referente a conexão no servidor de acesso.
 	 */
 	private FileDescriptor fd;
@@ -68,7 +73,25 @@ public class ClientCharServer
 
 	public ClientCharServer()
 	{
-		ip = new InternetProtocol();
+		this.ip = new InternetProtocol();
+	}
+
+	/**
+	 * @return aquisição do código de identificação único do servidor de personagem no sistema.
+	 */
+
+	public int getID()
+	{
+		return id;
+	}
+
+	/**
+	 * @param id código de identificação único do servidor de personagem no sistema.
+	 */
+
+	void setID(int id)
+	{
+		this.id = id;
 	}
 
 	/**

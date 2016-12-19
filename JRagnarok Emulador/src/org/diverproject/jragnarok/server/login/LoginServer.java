@@ -14,7 +14,6 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
-import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.login.entities.Account;
@@ -95,10 +94,10 @@ public class LoginServer extends Server
 	}
 
 	@Override
-	protected LFileDescriptor acceptSocket(Socket socket, FileDescriptorListener listener)
+	protected LFileDescriptor acceptSocket(Socket socket)
 	{
 		LFileDescriptor fd = new LFileDescriptor(socket);
-		fd.setParseListener(listener);
+		fd.setParseListener(facade.PARSE_CLIENT);
 
 		return fd;
 	}
@@ -147,8 +146,6 @@ public class LoginServer extends Server
 
 			facade = new LoginServerFacade();
 			facade.create(LoginServer.this);
-
-			setDefaultParser(facade.PARSE_CLIENT);
 		}
 
 		@Override

@@ -33,15 +33,15 @@ import org.diverproject.util.collection.abstraction.StaticArray;
  * @author Andrew Mello
  */
 
-public class ServerController
+public class ServerControl
 {
-	private static final ServerController INSTANCE = new ServerController();
+	private static final ServerControl INSTANCE = new ServerControl();
 
 	private final Index<LoginServer> loginServers;
 	private final Index<CharServer> charServers;
 	private final Index<MapServer> mapServers;
 
-	private ServerController()
+	private ServerControl()
 	{
 		loginServers = new StaticArray<>(MAX_SERVERS);
 		charServers = new StaticArray<>(MAX_SERVERS);
@@ -216,7 +216,7 @@ public class ServerController
 		return description.toString();
 	}
 
-	public static ServerController getInstance()
+	public static ServerControl getInstance()
 	{
 		return INSTANCE;
 	}

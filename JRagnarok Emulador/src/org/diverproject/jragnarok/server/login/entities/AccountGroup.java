@@ -20,7 +20,7 @@ public class AccountGroup
 		return timeout;
 	}
 
-	public boolean isOver()
+	public boolean isVipTimeOver()
 	{
 		return timeout.get() < System.currentTimeMillis();
 	}
@@ -54,6 +54,18 @@ public class AccountGroup
 	public void setVip(Vip vip)
 	{
 		this.vip = vip;
+	}
+
+	public void changeCurrentGroup(Group group)
+	{
+		oldGroup = currentGroup;
+		currentGroup = group;
+	}
+
+	public void useOldGroup()
+	{
+		currentGroup = oldGroup;
+		oldGroup = null;
 	}
 
 	@Override

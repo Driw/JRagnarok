@@ -1,3 +1,10 @@
+19.12.2016 - 1.4.150
+- Novos métodos para facilitar a codificação e obtenção de informações em Account e AccountGroup.
+- Server não tem mais um atributo para defaultParser, será aplicado direto dos servidores.
+- O ID do servidor de personagem como cliente no servidor de acesso deve ser feito por CharServerList.
+	- ClientCharServer agora deverá possuir um ID para que seja identificado.
+- Renomeando ServerController para ServerControl.
+
 19.12.2016 - 1.4.149
 - FileDescriptor não precisará ter conhecimento de FileDescriptorSystem.
 - FileDescriptorSystem não precisará ter conhecimento de TimerSystem.
