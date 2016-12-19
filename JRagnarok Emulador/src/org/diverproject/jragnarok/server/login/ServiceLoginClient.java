@@ -18,6 +18,7 @@ import org.diverproject.jragnarok.packets.request.AccountStateNotify;
 import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
 import org.diverproject.jragnarok.packets.request.AuthAccountResult;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
+import org.diverproject.jragnarok.packets.request.VipDataResult;
 import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
 import org.diverproject.jragnarok.packets.response.ListCharServers;
 import org.diverproject.jragnarok.packets.response.NotifyAuth;
@@ -428,5 +429,25 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		notify.setType(banned ? AccountStateNotify.BAN : AccountStateNotify.CHANGE_STATE);
 
 		sendAllWithoutOurSelf(null, notify);		
+	}
+
+	/**
+	 * Envia os dados da conta atualizada conforme a solicitação dos dados vip de uma conta.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param account conta contendo as informações que devem ser enviadas.
+	 * @param flag tipo de vip que foi concedido a informações da conta.
+	 * @param mapFD código da conexão do servidor de personagem com o servidor de mapa.
+	 */
+
+	public void sendVipData(LFileDescriptor fd, Account account, byte flag, int mapFD)
+	{
+		VipDataResult packet = new VipDataResult();
+		packet.setVipTimeout(account.getGroup().getTime().get());
+		packet.setAccountID(account.getID());
+		packet.setGroupID(account.getGroupID());
+		packet.setMapFD(mapFD);
+		packet.setFlag(flag);
+		// TODO colocar os dados restantes da conta
+		packet.send(fd);
 	}
 }

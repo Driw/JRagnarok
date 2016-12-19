@@ -325,7 +325,7 @@ class LoginServerFacade
 		if (loginServer.getConfigs().getBool(IPBAN_ENABLED))
 			ipBanService.destroy();
 
-		onlineControl.clear(loginServer.getTimerSystem().getTimers());
+		onlineControl.clear();
 		authControl.clear();
 		ipbanControl.clear();
 	}
@@ -493,6 +493,22 @@ class LoginServerFacade
 				charService.updateUserCount(fd);
 				return true;
 
+			case PACKET_SET_ACCOUNT_ONLINE:
+				charService.setAccountOnline(fd);
+				return true;
+
+			case PACKET_SET_ACCOUNT_OFFLINE:
+				charService.setAccountOffline(fd);
+				return true;
+
+			case PACKET_SET_ALL_ACC_OFFLINE:
+				charService.setAllOffline(fd);
+				return true;
+
+			case PACKET_SEND_ACCOUNTS:
+				charService.receiveSentAccounts(fd);
+				return true;
+
 			default:
 				return dispatchAccountPacket(fd, command);
 		}
@@ -512,33 +528,24 @@ class LoginServerFacade
 		switch (command)
 		{
 			case PACKET_REQ_AUTH_ACCOUNT:
-				accountService.requestAuthAccount(fd);
+				charService.requestAuthAccount(fd);
 				return true;
 
 			case PACKET_REQ_ACCOUNT_DATA:
-				accountService.requestAccountData(fd);
+				charService.requestAccountData(fd);
 				return true;
 
 			case PACKET_REQ_ACCOUNT_INFO:
-				accountService.requestAccountInfo(fd);
+				charService.requestAccountInfo(fd);
 				return true;
 
-			case PACKET_SET_ACCOUNT_ONLINE:
-				accountService.setAccountOnline(fd);
+			case PACKET_UPDATE_IP:
+				charService.updateCharIP(fd);
 				return true;
 
-			case PACKET_SET_ACCOUNT_OFFLINE:
-				accountService.setAccountOffline(fd);
+			case PACKET_REQ_VIP_DATA:
+				charService.requestVipData(fd);
 				return true;
-
-			case PACKET_SEND_ACCOUNTS:
-				accountService.updateOnlineDB(fd);
-				return true;
-
-			case PACKET_SET_ALL_ACC_OFFLINE:
-				accountService.setAllOffline(fd);
-				return true;
-
 
 			default:
 				return dispatchPlayerAccountPacket(fd, command);
@@ -582,20 +589,12 @@ class LoginServerFacade
 				accountService.requestRegister(fd);
 				return true;
 
-			case PACKET_UPDATE_IP:
-				accountService.updateCharIP(fd);
-				return true;
-
 			case PACKET_NOTIFY_PIN_UPDATE:
 				accountService.updatePinCode(fd);
 				return true;
 
 			case PACKET_NOTIFY_PIN_ERROR:
 				accountService.failPinCode(fd);
-				return true;
-
-			case PACKET_REQ_VIP_DATA:
-				accountService.requestVipData(fd);
 				return true;
 
 			default:

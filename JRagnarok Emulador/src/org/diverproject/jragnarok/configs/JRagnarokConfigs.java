@@ -123,6 +123,10 @@ public class JRagnarokConfigs
 	public static final String PINCODE_ALLOW_REPEATED = PINCODE_CONFIGS+ ".allow_repeated";
 	public static final String PINCODE_ALLOW_SEQUENTIAL = PINCODE_CONFIGS+ ".allow_sequential";
 
+	public static final String VIP_CONFIGS = "vip";
+	public static final String VIP_GROUPID = VIP_CONFIGS+ ".groupid";
+	public static final String VIP_CHAR_INCREASE = VIP_CONFIGS+ ".char_increase";
+
 	public static final String SERVER_THREAD_PRIORITY = SERVER_CONFIGS+ ".thread_priority";
 
 	public static final Configurations newSystemConfigs()
@@ -198,6 +202,8 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigInt(LOGIN_MIN_GROUP_TO_CONNECT, 0));
 		configurations.add(new ConfigInt(LOGIN_ALLOWED_REGS, 1));
 		configurations.add(new ConfigInt(LOGIN_TIME_ALLOWED, 10));
+		configurations.add(new ConfigInt(VIP_GROUPID, 4));
+		configurations.add(new ConfigInt(VIP_CHAR_INCREASE, MAX_CHAR_VIP));
 
 		return configurations;
 	}

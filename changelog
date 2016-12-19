@@ -1,3 +1,13 @@
+19.12.2016 - 1.4.151
+- LoginServerFacade atualizado para redirecionar os pacotes aos serviços corretos.
+- Renomeando as constantes em OnlineLogin para que fique mais explícito o seu significado.
+- OnlineMap não terá acesso a TimerMap, será apenas uma coleção implementada usada no sistema.
+- Movendo diversos métodos de ServiceLoginAccount para ServiceLoginChar conforme deve ser.
+- ServiceLoginAuth precisará falar com ServiceLoginServer para manter usuários online.
+- ServiceLoginChar implementado para tratar dos chamados disponíveis de um servidor de personagem.
+- ServiceLoginClient atualizado conforme os pacotes que foram utilizados nas mudanças acima.
+- ServiceLoginServer deverá cuidar de quais usuários estão online ou não no sistema.
+
 19.12.2016 - 1.4.150
 - Novos métodos para facilitar a codificação e obtenção de informações em Account e AccountGroup.
 - Server não tem mais um atributo para defaultParser, será aplicado direto dos servidores.

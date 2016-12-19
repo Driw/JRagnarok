@@ -20,12 +20,12 @@ public class OnlineLogin
 	/**
 	 * Código para servidor de personagem que ficou offline.
 	 */
-	public static final int OFFLINE = -2;
+	public static final int CHAR_SERVER_OFFLINE = -2;
 
 	/**
 	 * Código para servidor de personagem que não foi definido.
 	 */
-	public static final int NONE = -1;
+	public static final int NO_CHAR_SERVER = -1;
 
 
 	/**

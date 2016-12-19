@@ -2,13 +2,9 @@ package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.emailCheck;
 import static org.diverproject.jragnarok.JRagnarokUtil.time;
-import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
-import org.diverproject.jragnarok.packets.request.AccountDataRequest;
-import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
-import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
 import org.diverproject.jragnarok.packets.request.BanAccountRequest;
 import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
 import org.diverproject.jragnarok.packets.request.UpdateAccountState;
@@ -49,11 +45,6 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	private AccountControl accounts;
 
 	/**
-	 * Controlador para identificar jogadores autenticados.
-	 */
-	private AuthAccountMap auths;
-
-	/**
 	 * Cria uma nova instância do serviço para gerenciamento de contas.
 	 * @param server referência do servidor de acesso que irá usá-lo.
 	 */
@@ -68,7 +59,6 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	{
 		client = getServer().getFacade().getClientService();
 		accounts = getServer().getFacade().getAccountControl();
-		auths = getServer().getFacade().getAuthControl();		
 	}
 
 	@Override
@@ -76,71 +66,6 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	{
 		client = null;
 		accounts = null;
-		auths = null;		
-	}
-
-	/**
-	 * Solicitação para concluir a autenticação de uma determinada conta já acessada.
-	 * Cada autenticação pode ser usada uma única vez por cada acesso autorizado.
-	 * @param fd referência da sessão da conexão com o cliente da solicitação.
-	 */
-
-	public void requestAuthAccount(LFileDescriptor fd)
-	{
-		AuthAccountRequest packet = new AuthAccountRequest();
-		packet.receive(fd);
-
-		AuthNode node = auths.get(packet.getAccountID());
-
-		if (node != null &&
-			node.getAccountID() == packet.getAccountID() &&
-			node.getSeed().getFirst() == packet.getFirstSeed() &&
-			node.getSeed().getSecond() == packet.getSecondSeed())
-		{
-			client.sendAuthAccount(fd, packet, node);
-			auths.remove(node); // cada autenticação é usada uma só vez
-		}
-
-		else
-		{
-			logInfo("autenticação de conta RECUSADA (server-fd: %d, ufd: %d).\n", fd.getID(), packet.getFileDescriptorID());
-			client.sendAuthAccount(fd, packet);
-		}
-	}
-
-	/**
-	 * Solicitação para obter dados básicos de uma conta especificado pelo seu ID.
-	 * Recebe um pacote que terá alguns dados básicos recebidos do servidor.
-	 * @param fd referência da sessão da conexão com o cliente da solicitação.
-	 */
-
-	public void requestAccountData(LFileDescriptor fd)
-	{
-		AccountDataRequest packet = new AccountDataRequest();
-		packet.receive(fd);
-
-		int id = packet.getAccountID();
-		Account account = accounts.get(id);
-
-		if (account == null)
-			logNotice("conta #%d não encontrada (ip: %s).\n", id, fd.getAddressString());
-		else
-			client.sendAccountData(fd, account);
-	}
-
-	/**
-	 * Solicitação para obter informações de uma conta especificada pelo seu ID.
-	 * Recebe um pacote que terá alguns dados básicos recebidos do servidor.
-	 * @param fd referência da sessão da conexão com o cliente da solicitação.
-	 */
-
-	public void requestAccountInfo(LFileDescriptor fd)
-	{
-		AccountInfoRequest packet = new AccountInfoRequest();
-
-		int id = packet.getAccountID();
-		Account account = accounts.get(id);
-		client.sendAccountInfo(fd, packet, account);
 	}
 
 	/**
@@ -316,17 +241,6 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	/**
 	 * TODO
 	 * @param fd
-	 */
-
-	public void updateCharIP(LFileDescriptor fd)
-	{
-		// TODO logchrif_parse_updcharip
-		
-	}
-
-	/**
-	 * TODO
-	 * @param fd
 	 * @return
 	 */
 
@@ -345,63 +259,6 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	public void failPinCode(LFileDescriptor fd)
 	{
 		// TODO logchrif_parse_pincode_authfail
-		
-	}
-
-	/**
-	 * TODO
-	 * @param fd
-	 * @return
-	 */
-
-	public void requestVipData(LFileDescriptor fd)
-	{
-		// TODO logchrif_parse_reqvipdata
-		
-	}
-
-	/**
-	 * TODO
-	 * @param fd
-	 * @return
-	 */
-
-	public void setAccountOnline(LFileDescriptor fd)
-	{
-		// TODO logchrif_parse_setacconline
-		
-	}
-
-	/**
-	 * TODO
-	 * @param fd
-	 */
-
-	public void setAccountOffline(LFileDescriptor fd)
-	{
-		// TODO logchrif_parse_setaccoffline
-		
-	}
-
-	/**
-	 * TODO
-	 * @param fd
-	 */
-
-	public void setAllOffline(LFileDescriptor fd)
-	{
-		// TODO logchrif_parse_setalloffline
-		
-	}
-
-	/**
-	 * TODO
-	 * @param fd
-	 */
-
-	public void updateOnlineDB(LFileDescriptor fd)
-	{
-		// TODO logchrif_parse_updonlinedb
 		
 	}
 

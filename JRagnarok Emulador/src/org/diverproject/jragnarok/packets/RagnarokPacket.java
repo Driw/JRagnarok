@@ -53,7 +53,6 @@ public class RagnarokPacket
 	public static final short PACKET_SET_ACCOUNT_ONLINE = 0x272B;
 	public static final short PACKET_SET_ACCOUNT_OFFLINE = 0x272C;
 	public static final short PACKET_SEND_ACCOUNTS = 0x272D;
-	public static final short PACKET_REQ_ACCOUNT_REG2 = 0x272D;
 	public static final short PACKET_REQ_REGISTER = 0x272E;
 	// 0x272F
 	// 0x2730

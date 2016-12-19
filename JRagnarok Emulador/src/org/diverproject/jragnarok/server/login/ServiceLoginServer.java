@@ -11,6 +11,7 @@ import static org.diverproject.jragnarok.server.login.entities.AccountState.NONE
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logNotice;
 
+import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.common.AuthResult;
@@ -25,12 +26,14 @@ import org.diverproject.util.collection.Node;
  * Essa solicitação deverá ser autenticada conforme os dados da conta passados pelo cliente.
  * Os dados da conta serão obtidas dentro desse serviço durante a autenticação.</p>
  *
- * <p>Consistindo de autenticar o nome de usuário com a palavra chave (senha),
+ * <p>Consistindo em realizar as seguintes autenticações: nome de usuário com a palavra chave (senha),
  * tempo de para expiração da conta, tempo restante de banimento, versão do cliente e client hash.
  * Para a autenticação de tempo de banimento será considerado independente de configurações</p>
  *
  * @see AbstractServiceLogin
  * @see AccountControl
+ * @see OnlineMap
+ * @see FileDescriptor
  *
  * @author Andrew Mello
  */
@@ -72,27 +75,23 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	}
 
 	/**
-	 * Função para temporizadores executarem a remoção de uma conta como acesso online.
+	 * Função para remover informações de jogadores online que não estão em um servidor de personagem válido.
 	 */
 
-	public final TimerListener WAITING_DISCONNECT_TIMER = new TimerListener()
+	public final TimerListener ONLINE_DATA_CLEANUP = new  TimerListener()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
 		{
-			onlines.remove(timer.getObjectID(), ServiceLoginServer.this.getTimerSystem().getTimers());
+			for (OnlineLogin online : onlines)
+				if (online.getCharServerID() == OnlineLogin.CHAR_SERVER_OFFLINE)
+					removeOnlineUser(online.getAccountID());
 		}
-
+		
 		@Override
 		public String getName()
 		{
-			return "waitingDisconnectTimer";
-		}
-
-		@Override
-		public String toString()
-		{
-			return getName();
+			return "onlineDataCleanup";
 		}
 	};
 
@@ -333,6 +332,88 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		}
 
 		return OK;
+	}
+
+	/**
+	 * Adiciona um determinado usuário (conta de jogador) online do sistema através da sua identificação.
+	 * Caso já haja um temporizador definido irá substituí-lo por um novo e excluindo o antigo.
+	 * Caso não seja encontrado informações desta conta como online, o método não terá nenhum efeito.
+	 * @param charServerID código de identificação do servidor de personagem no sistema.
+	 * @param accountID código de identificação da conta que será definida como online.
+	 * @return aquisição do objeto contendo as informações referentes a conta online.
+	 */
+
+	public OnlineLogin addOnlineUser(int charServerID, int accountID)
+	{
+		OnlineLogin online = onlines.get(accountID);
+
+		if (online == null)
+		{
+			online = new OnlineLogin();
+			online.setAccountID(accountID);
+			onlines.add(online);
+		}
+
+		if (online.getWaitingDisconnect() != null)
+		{
+			getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+			online.setWaitingDisconnect(null);
+		}
+
+		online.setCharServer(charServerID);
+
+		return online;
+	}
+
+	/**
+	 * Remove um determinado usuário (conta de jogador) online do sistema através da sua identificação.
+	 * Além da remoção de suas informações do sistema remove as informações do seu temporizador.
+	 * Caso não seja encontrado informações desta conta como online, o método não terá nenhum efeito.
+	 * @param accountID código de identificação da conta do qual deseja tornar online.
+	 */
+
+	public void removeOnlineUser(int accountID)
+	{
+		OnlineLogin online = onlines.get(accountID);
+
+		if (online != null)
+		{
+			onlines.remove(accountID);
+
+			getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+			online.setWaitingDisconnect(null);
+		}
+	}
+
+	/**
+	 * Define todos os usuários (conta de jogadores) como offline no sistema através do servidor de personagem.
+	 * Caso seja passado <code>NO_CHAR_SERVER</code> irá aplicar a todos os jogadores online ou não.
+	 * @param charServerID código de identificação do servidor de personagem ou <code>NO_CHAR_SERVER</code>.
+	 * @return aquisição da quantidade de jogadores que foram afetados e ficaram como offline.
+	 */
+
+	public int setOfflineUser(int charServerID)
+	{
+		int offlines = 0;
+
+		for (OnlineLogin online : onlines)
+		{
+			if (charServerID == OnlineLogin.NO_CHAR_SERVER)
+			{
+				getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+				online.setWaitingDisconnect(null);
+				online.setCharServer(charServerID);
+				offlines++;
+			}
+
+			else if (charServerID == online.getCharServerID())
+			{
+				online.setCharServer(OnlineLogin.CHAR_SERVER_OFFLINE);
+				offlines++;
+			}
+		}
+
+		return offlines;
 	}
 
 	/**

@@ -15,7 +15,6 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_HAN
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_PCBANG;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_SSO;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
-import static org.diverproject.jragnarok.server.TimerType.TIMER_INVALID;
 import static org.diverproject.jragnarok.server.common.AuthResult.OK;
 import static org.diverproject.jragnarok.server.common.AuthResult.REJECTED_FROM_SERVER;
 import static org.diverproject.jragnarok.server.common.NotifyAuthResult.RECOGNIZES_LAST_LOGIN;
@@ -88,6 +87,11 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	private AccountControl accounts;
 
 	/**
+	 * Serviço para acesso de contas (serviço principal)
+	 */
+	private ServiceLoginServer login;
+
+	/**
 	 * Serviço para banimento de acessos por endereço de IP.
 	 */
 	private ServiceLoginIpBan ipban;
@@ -96,11 +100,6 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * Serviço para registro de acessos.
 	 */
 	private ServiceLoginLog log;
-
-	/**
-	 * Serviço para acesso de contas (serviço principal)
-	 */
-	private ServiceLoginServer login;
 
 	/**
 	 * Controlador para identificar jogadores online.
@@ -370,8 +369,6 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		logNotice("conexão da conta '%s' aceita.\n", sd.getUsername());
 
-		client.sendCharServerList(fd);
-
 		AuthNode node = new AuthNode();
 		node.setAccountID(sd.getID());
 		node.getSeed().copyFrom(sd.getSeed());
@@ -380,19 +377,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		node.setClientType(sd.getClientType());
 		auths.add(node);
 
-		TimerSystem ts = getTimerSystem();
-		TimerMap timers = ts.getTimers();
-
-		Timer waitingDisconnect = timers.acquireTimer();
-		waitingDisconnect.setObjectID(sd.getID());
-		waitingDisconnect.setTick(ts.getCurrentTime() + AUTH_TIMEOUT);
-		waitingDisconnect.setListener(this.login.WAITING_DISCONNECT_TIMER);
-
-		OnlineLogin online = new OnlineLogin();
-		online.setAccountID(sd.getID());
-		online.setWaitingDisconnect(waitingDisconnect);
-		online.setCharServer(OnlineLogin.NONE);
-		onlines.add(online, getTimerSystem().getTimers());
+		client.sendCharServerList(fd);
+		login.addOnlineUser(OnlineLogin.NO_CHAR_SERVER, sd.getID());
 	}
 
 	/**
@@ -526,7 +512,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			}
 
 			auths.remove(sd.getID());
-			onlines.remove(online, getTimerSystem().getTimers());
+			login.removeOnlineUser(online.getAccountID());
 		}
 
 		return true;
@@ -550,15 +536,16 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		client.sendAllWithoutOurSelf(fd, packet);
 
-		if (online.getWaitingDisconnect().getType() == TIMER_INVALID)
+		if (online.getWaitingDisconnect() == null)
 		{
 			TimerSystem ts = getTimerSystem();
+			TimerMap timers = ts.getTimers();
 
-			Timer timer = online.getWaitingDisconnect();
+			Timer timer = timers.acquireTimer();
 			timer.setObjectID(fd.getID());
-			timer.setListener(login.WAITING_DISCONNECT_TIMER);
+			timer.setListener(getServer().getFacade().getCharService().WAITING_DISCONNECT_TIMER);
 			timer.setTick(ts.getCurrentTime());
-			ts.getTimers().add(timer);
+			timers.addInterval(timer, AUTH_TIMEOUT);
 
 			client.sendNotifyResult(fd, RECOGNIZES_LAST_LOGIN);
 		}		
