@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.log.LogSystem.logExeception;
 
 import java.io.IOException;
@@ -58,18 +59,18 @@ public abstract class FileDescriptor
 	/**
 	 * Tempo limite em milissegundos aceito por ociosidade.
 	 */
-	public static final int DEFAULT_TIMEOUT = 30000;
+	public static final int DEFAULT_TIMEOUT = seconds(30);
 
-
-	/**
-	 * Sistema que criou esse Descritor de Arquivo.
-	 */
-	FileDescriptorSystem system;
 
 	/**
 	 * Código de identificação do descritor no sistema.
 	 */
 	int id;
+
+	/**
+	 * Tick da última vez em que o descritor de arquivo foi atualizado.
+	 */
+	int lastTickUpdate;
 
 	/**
 	 * Flag que determina o tipo de descritor.
@@ -204,7 +205,7 @@ public abstract class FileDescriptor
 
 	public PacketBuilder getPacketBuilder()
 	{
-		timeout = system.getTimerSystem().getCurrentTime() + DEFAULT_TIMEOUT;
+		timeout = lastTickUpdate + DEFAULT_TIMEOUT;
 
 		return packetBuilder;
 	}

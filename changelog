@@ -1,3 +1,8 @@
+19.12.2016 - 1.4.149
+- FileDescriptor não precisará ter conhecimento de FileDescriptorSystem.
+- FileDescriptorSystem não precisará ter conhecimento de TimerSystem.
+- Corrigindo a forma como temporizadores em TIMER_INTERVAL deverão ser ativados.
+
 14.12.2016 - 1.4.148
 - Nome de usuário e senha usados pelo servidor de acesso e de personagem agora são validados.
 

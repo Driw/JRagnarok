@@ -179,7 +179,7 @@ public class TimerMap implements Iterable<Timer>
 					break;
 
 				case TIMER_INTERVAL:
-					if (timer.getTick() >= now)
+					if (now >= timer.getTick() + timer.getInterval())
 					{
 						timer.getListener().onCall(timer, now, tick);
 						timer.setType(TIMER_REMOVE);

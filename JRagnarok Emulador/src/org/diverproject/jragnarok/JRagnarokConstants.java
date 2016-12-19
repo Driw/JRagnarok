@@ -13,11 +13,6 @@ public class JRagnarokConstants
 	public static final String LOCALHOST = "127.0.0.1";
 
 	/**
-	 * Quantidade limite de conexões por servidor.
-	 */
-	public static final int FD_SIZE = 4096;
-
-	/**
 	 * Limite de servidores criados por tipo de servidor.
 	 */
 	public static final int MAX_SERVERS = 30;

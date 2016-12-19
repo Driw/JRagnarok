@@ -1,7 +1,6 @@
 
 package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.FD_SIZE;
 import static org.diverproject.jragnarok.JRagnarokUtil.indexOn;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_EOF;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_PING;
@@ -41,6 +40,12 @@ import org.diverproject.util.collection.abstraction.LoopList;
 public class FileDescriptorSystem implements Iterable<FileDescriptor>
 {
 	/**
+	 * Quantidade limite de conexões por servidor.
+	 */
+	public static final int FD_SIZE = 4096;
+
+
+	/**
 	 * Lista contendo todas as conexões sockets.
 	 */
 	private final List<FileDescriptor> sessions = new LoopList<>(FD_SIZE);
@@ -51,11 +56,6 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 	private final Queue<FileDescriptorAction> actions = new DynamicQueue<>();
 
 	/**
-	 * Sitema de temporização do servidor.
-	 */
-	private TimerSystem timerSystem;
-
-	/**
 	 * Cria um novo sistema para criação de Descritores de Arquivos a partir de sockets. Deve ser definido um sistema de temporização para que ele possa ser atualizado.
 	 * @param timerSystem  referência do sistema de temporização que será usado.
 	 */
@@ -64,8 +64,6 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 	{
 		if (timerSystem == null)
 			throw new RagnarokRuntimeException("sistema de temporização nulo");
-
-		this.timerSystem = timerSystem;
 	}
 
 	/**
@@ -85,19 +83,9 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 			}
 
 			fd.id = indexOn(sessions, fd) + 1;
-			fd.system = this;
 
 			return true;
 		}
-	}
-
-	/**
-	 * @return aquisição do sistema para temporização dos descritores de arquivo.
-	 */
-
-	TimerSystem getTimerSystem()
-	{
-		return timerSystem;
 	}
 
 	/**
@@ -113,6 +101,7 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 		for (int i = 0; i < sessions.size(); i++)
 		{
 			FileDescriptor fd = sessions.get(i);
+			fd.lastTickUpdate = now;
 
 			if (fd.getFlag().is(FLAG_EOF))
 			{
@@ -194,16 +183,6 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 	}
 
 	/**
-	 * Define o fim dos dados para um descritor de arquivo, assim ele será fechado forçadamente.
-	 * @param fd referência do arquivo descritor do qual será terminado.
-	 */
-
-	public static void setEndOfFile(FileDescriptor fd)
-	{
-		fd.getFlag().set(FLAG_EOF);
-	}
-
-	/**
 	 * Executa uma ação para ser processada por todos os descritores de arquivos. A ação será executada no primeiro update que for executado pós adição.
 	 * @param action referência do objeto que contém a ação a ser executada.
 	 */
@@ -252,6 +231,16 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 	{
 		sessions.clear();
 		actions.clear();
+	}
+
+	/**
+	 * Define o fim dos dados para um descritor de arquivo, assim ele será fechado forçadamente.
+	 * @param fd referência do arquivo descritor do qual será terminado.
+	 */
+
+	public static void setEndOfFile(FileDescriptor fd)
+	{
+		fd.getFlag().set(FLAG_EOF);
 	}
 
 	@Override
