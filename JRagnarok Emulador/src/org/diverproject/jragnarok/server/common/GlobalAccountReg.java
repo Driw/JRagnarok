@@ -4,19 +4,9 @@ import org.diverproject.util.ObjectDescription;
 
 public class GlobalAccountReg
 {
-	private int index;
 	private String key;
 	private int operation;
-
-	public int getIndex()
-	{
-		return index;
-	}
-
-	public void setIndex(int index)
-	{
-		this.index = index;
-	}
+	private Object value;
 
 	public String getKey()
 	{
@@ -38,12 +28,21 @@ public class GlobalAccountReg
 		this.operation = operation;
 	}
 
+	public Object getValue()
+	{
+		return value;
+	}
+
+	public void setValue(Object value)
+	{
+		this.value = value;
+	}
+
 	@Override
 	public String toString()
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("index", index);
 		description.append("key", key);
 		description.append("operation", operation);
 

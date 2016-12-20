@@ -44,7 +44,7 @@ public class RagnarokPacket
 	public static final short PACKET_REQ_CHANGE_SEX = 0x2723;
 	public static final short PACKET_ACCOUNT_STATE_UPDATE = 0x2724;
 	public static final short PACKET_ACCOUNT_STATE_NOTIFY = 0x2725;
-	public static final short PACKET_REQ_GLOBAL_ACCREG = 0x2726;
+	public static final short PACKET_RES_GLOBAL_REGISTERS = 0x2726;
 	// 0x2727
 	public static final short PACKET_UPDATE_REGISTER = 0x2728;
 	// 0x2729
@@ -53,7 +53,7 @@ public class RagnarokPacket
 	public static final short PACKET_SET_ACCOUNT_ONLINE = 0x272B;
 	public static final short PACKET_SET_ACCOUNT_OFFLINE = 0x272C;
 	public static final short PACKET_SEND_ACCOUNTS = 0x272D;
-	public static final short PACKET_REQ_REGISTER = 0x272E;
+	public static final short PACKET_REQ_GLOBAL_REGISTER = 0x272E;
 	// 0x272F
 	// 0x2730
 	public static final short PACKET_REQ_BAN_NOTIFICATION = 0x2731;
@@ -88,6 +88,4 @@ public class RagnarokPacket
 	public static final short PACKET_CHANGE_SEX_NOTIFY = 0x2B0D;
 	public static final short PACKET_RES_BAN_NOTIFICATION = 0x2B14;
 	public static final short PACKET_BROADCAST_UPDATE_IP = 0x2B1E;
-
-	public static final short PACKET_RES_GLOBAL_ACCREG = 0x3804;
 }

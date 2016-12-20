@@ -25,7 +25,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_FORCE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_BAN_NOTIFICATION;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ALREADY_ONLINE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHANGE_SEX;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_GLOBAL_ACCREG;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_GLOBAL_REGISTERS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_KEEP_ALIVE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_ACCOUNT_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_ACCOUNT_INFO;
@@ -62,8 +62,6 @@ import org.diverproject.jragnarok.packets.request.ChangeSexRequest;
 import org.diverproject.jragnarok.packets.request.CharMapUserCountRequest;
 import org.diverproject.jragnarok.packets.request.CharServerConnectRequest;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
-import org.diverproject.jragnarok.packets.request.GlobalAccountRegRequest;
-import org.diverproject.jragnarok.packets.request.GlobalAccountRegResult;
 import org.diverproject.jragnarok.packets.request.NotifyPinError;
 import org.diverproject.jragnarok.packets.request.NotifyPinUpdate;
 import org.diverproject.jragnarok.packets.request.SendAccountRequest;
@@ -426,7 +424,7 @@ public class ServiceCharLogin extends AbstractCharService
 			case PACKET_REQ_CHANGE_SEX:
 				return reqChangeSex(fd);
 
-			case PACKET_REQ_GLOBAL_ACCREG:
+			case PACKET_RES_GLOBAL_REGISTERS:
 				reqGlobalAccountReg(fd);
 				return true;
 		}
@@ -864,13 +862,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public void reqGlobalAccountReg(CFileDescriptor fd)
 	{
-		GlobalAccountRegRequest packet = new GlobalAccountRegRequest();
-		packet.receive(fd);
-
-		GlobalAccountRegResult result = new GlobalAccountRegResult();
-		result.setRegisters(packet.getRegisters());
-
-		map.sendAll(result);
+		
 	}
 
 	/**

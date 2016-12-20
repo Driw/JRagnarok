@@ -116,6 +116,36 @@ public class Tables
 	private String charMercenaryRank;
 
 	/**
+	 * Tabela que armazena os registros de variáveis numéricas das contas.
+	 */
+	private String accountIntRegister;
+
+	/**
+	 * Tabela que armazena os registros de variáveis com caracteres das contas.
+	 */
+	private String accountStrRegister;
+
+	/**
+	 * Tabela que armazena os registros de variáveis numéricas dos personagens.
+	 */
+	private String characterIntRegister;
+
+	/**
+	 * Tabela que armazena os registros de variáveis com caracteres dos personagens.
+	 */
+	private String characterStrRegister;
+
+	/**
+	 * Tabela que armazena os registros de variáveis global numéricas das contas.
+	 */
+	private String globalIntRegister;
+
+	/**
+	 * Tabela que armazena os registros de variáveis global com caracteres das contas.
+	 */
+	private String globalStrRegister;
+
+	/**
 	 * Construtor privado para aderir ao Padrão de Projetos: Singleton.
 	 * Define o nome padrão de todas as tabelas do banco de dados.
 	 */
@@ -144,6 +174,13 @@ public class Tables
 		charFamily = "characters_family";
 		charLocations = "characters_locations";
 		charMercenaryRank = "characters_mercenary_rank";
+
+		accountIntRegister = "register_account_int";
+		accountStrRegister = "register_account_str";
+		characterIntRegister = "register_character_int";
+		characterStrRegister = "register_character_str";
+		globalIntRegister = "register_global_int";
+		globalStrRegister = "register_global_str";
 	}
 
 	/**
@@ -384,7 +421,7 @@ public class Tables
 	 * @return aquisição do nome da tabela contendo a experiências obtidas pelos personagens.
 	 */
 
-	public String getCharExperience()
+	public String getCharExperiences()
 	{
 		return charExperiences;
 	}
@@ -450,5 +487,113 @@ public class Tables
 	public void setCharMercenaryRank(String charMercenaryRank)
 	{
 		this.charMercenaryRank = charMercenaryRank;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela dos registros das variáveis numéricas das contas.
+	 */
+
+	public String getAccountIntRegister()
+	{
+		return accountIntRegister;
+	}
+
+	/**
+	 * @param accountIntRegister nome da tabela dos registros das variáveis numéricas das contas.
+	 */
+
+	public void setAccountIntRegister(String accountIntRegister)
+	{
+		this.accountIntRegister = accountIntRegister;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela dos registros das variáveis com caracteres das contas.
+	 */
+
+	public String getAccountStrRegister()
+	{
+		return accountStrRegister;
+	}
+
+	/**
+	 * @param accountStrRegister nome da tabela dos registros das variáveis com caracteres das contas.
+	 */
+
+	public void setAccountStrRegister(String accountStrRegister)
+	{
+		this.accountStrRegister = accountStrRegister;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela dos registros das variáveis numéricas dos personagens.
+	 */
+
+	public String getCharacterIntRegister()
+	{
+		return characterIntRegister;
+	}
+
+	/**
+	 * @param characterIntRegister nome da tabela dos registros das variáveis numéricas dos personagens.
+	 */
+
+	public void setCharacterIntRegister(String characterIntRegister)
+	{
+		this.characterIntRegister = characterIntRegister;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela dos registros das variáveis com caracteres dos personagens.
+	 */
+
+	public String getCharacterStrRegister()
+	{
+		return characterStrRegister;
+	}
+
+	/**
+	 * @param characterStrRegister nome da tabela dos registros das variáveis com caracteres dos personagens.
+	 */
+
+	public void setCharacterStrRegister(String characterStrRegister)
+	{
+		this.characterStrRegister = characterStrRegister;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela dos registros das variáveis global numérica das contas.
+	 */
+
+	public String getGlobalIntRegister()
+	{
+		return globalIntRegister;
+	}
+
+	/**
+	 * @param globalIntRegister nome da tabela dos registros das variáveis global numérica das contas.
+	 */
+
+	public void setGlobalIntRegister(String globalIntRegister)
+	{
+		this.globalIntRegister = globalIntRegister;
+	}
+
+	/**
+	 * @return aquisição do nome da tabela dos registros das variáveis global com caracteres das contas.
+	 */
+
+	public String getGlobalStrRegister()
+	{
+		return globalStrRegister;
+	}
+
+	/**
+	 * @param globalStrRegister nome da tabela dos registros das variáveis global com caracteres das contas.
+	 */
+
+	public void setGlobalStrRegister(String globalStrRegister)
+	{
+		this.globalStrRegister = globalStrRegister;
 	}
 }

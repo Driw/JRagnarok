@@ -1,3 +1,8 @@
+20.12.2016 - 1.4.152
+- Implementando o controle para registro de variáveis globais e request/result packet para este.
+	- Apenas o lado do servidor de acesso foi implementado, o de personagem entra em outras partes.
+- IpBanControl agora irá usar REPLACE ao invés de INSERT para se tornar mais útil.
+
 19.12.2016 - 1.4.151
 - LoginServerFacade atualizado para redirecionar os pacotes aos serviços corretos.
 - Renomeando as constantes em OnlineLogin para que fique mais explícito o seu significado.

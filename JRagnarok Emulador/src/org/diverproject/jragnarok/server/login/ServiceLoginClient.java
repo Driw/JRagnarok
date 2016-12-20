@@ -18,6 +18,7 @@ import org.diverproject.jragnarok.packets.request.AccountStateNotify;
 import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
 import org.diverproject.jragnarok.packets.request.AuthAccountResult;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
+import org.diverproject.jragnarok.packets.request.GlobalRegistersResult;
 import org.diverproject.jragnarok.packets.request.VipDataResult;
 import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
 import org.diverproject.jragnarok.packets.response.ListCharServers;
@@ -28,9 +29,11 @@ import org.diverproject.jragnarok.packets.response.RefuseLoginByte;
 import org.diverproject.jragnarok.packets.response.RefuseLoginInt;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.jragnarok.server.common.GlobalRegister;
 import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.Vip;
+import org.diverproject.util.collection.Queue;
 
 /**
  * <h1>Serviço para Comunicação com o Cliente</h1>
@@ -433,7 +436,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	/**
 	 * Envia os dados da conta atualizada conforme a solicitação dos dados vip de uma conta.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 * @param account conta contendo as informações que devem ser enviadas.
 	 * @param flag tipo de vip que foi concedido a informações da conta.
 	 * @param mapFD código da conexão do servidor de personagem com o servidor de mapa.
@@ -448,6 +451,24 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setMapFD(mapFD);
 		packet.setFlag(flag);
 		// TODO colocar os dados restantes da conta
+		packet.send(fd);
+	}
+
+	/**
+	 * Envia a um servidor de personagem o resultado da solicitação dos registros de variáveis de uma conta.
+	 * Os registros são alocados em uma fila que ordena os elementos através de nós para agilizar.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param accountID código de identificação da conta do qual as variáveis pertencem.
+	 * @param charID código de identificação do personagem que irá receber as variáveis.
+	 * @param registers fila contendo todos os registros encontrados no sistema.
+	 */
+
+	public void sendGlobalRegisters(LFileDescriptor fd, int accountID, int charID, Queue<GlobalRegister<?>> registers)
+	{
+		GlobalRegistersResult packet = new GlobalRegistersResult();
+		packet.setAccountID(accountID);
+		packet.setCharID(charID);
+		packet.setRegisters(registers);
 		packet.send(fd);
 	}
 }

@@ -20,7 +20,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_AUTH_
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHANGE_EMAIL;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHAR_SERVER_CONNECT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_HASH;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_REGISTER;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_GLOBAL_REGISTER;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_UNBAN_ACCOUNT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_VIP_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_KEEP_ALIVE;
@@ -40,6 +40,7 @@ import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
+import org.diverproject.jragnarok.server.login.control.GlobalRegisterControl;
 import org.diverproject.jragnarok.server.login.control.GroupControl;
 import org.diverproject.jragnarok.server.login.control.IpBanControl;
 import org.diverproject.jragnarok.server.login.control.LoginLogControl;
@@ -127,14 +128,19 @@ class LoginServerFacade
 	private IpBanControl ipbanControl;
 
 	/**
+	 * Controle para registros de variáveis global.
+	 */
+	private GlobalRegisterControl globalRegistersControl;
+
+	/**
 	 * Controlador para identificar jogadores online.
 	 */
-	private OnlineMap onlineControl;
+	private OnlineMap onlineMap;
 
 	/**
 	 * Controlador para identificar jogadores autenticados.
 	 */
-	private AuthAccountMap authControl;
+	private AuthAccountMap authAccountMap;
 
 	/**
 	 * @return aquisição do serviço para comunicação com o servidor de personagens.
@@ -245,12 +251,21 @@ class LoginServerFacade
 	}
 
 	/**
+	 * @return aquisição do controle para registro de variáveis globais.
+	 */
+
+	public GlobalRegisterControl getGlobalRegistersControl()
+	{
+		return globalRegistersControl;
+	}
+
+	/**
 	 * @return aquisição do controle para identificar jogadores online.
 	 */
 
 	public OnlineMap getOnlineControl()
 	{
-		return onlineControl;
+		return onlineMap;
 	}
 
 	/**
@@ -259,7 +274,7 @@ class LoginServerFacade
 
 	public AuthAccountMap getAuthControl()
 	{
-		return authControl;
+		return authAccountMap;
 	}
 
 	/**
@@ -274,8 +289,9 @@ class LoginServerFacade
 		pincodeControl = new PincodeControl(loginServer.getMySQL().getConnection());
 		logControl = new LoginLogControl(loginServer.getMySQL().getConnection());
 		ipbanControl = new IpBanControl(loginServer.getMySQL().getConnection());
-		onlineControl = new OnlineMap();
-		authControl = new AuthAccountMap();
+		globalRegistersControl = new GlobalRegisterControl(loginServer.getMySQL().getConnection());
+		onlineMap = new OnlineMap();
+		authAccountMap = new AuthAccountMap();
 
 		accountControl.setGroupControl(groupControl);
 		accountControl.setPincodeControl(pincodeControl);
@@ -325,8 +341,8 @@ class LoginServerFacade
 		if (loginServer.getConfigs().getBool(IPBAN_ENABLED))
 			ipBanService.destroy();
 
-		onlineControl.clear();
-		authControl.clear();
+		onlineMap.clear();
+		authAccountMap.clear();
 		ipbanControl.clear();
 	}
 
@@ -336,10 +352,14 @@ class LoginServerFacade
 
 	public void destroyed()
 	{
+		accountControl = null;
 		groupControl = null;
-		onlineControl = null;
-		authControl = null;
+		pincodeControl = null;
+		logControl = null;
 		ipbanControl = null;
+		globalRegistersControl = null;
+		onlineMap = null;
+		authAccountMap = null;
 
 		logService = null;
 		ipBanService = null;
@@ -510,7 +530,7 @@ class LoginServerFacade
 				return true;
 
 			default:
-				return dispatchAccountPacket(fd, command);
+				return dispatchAccountManagerPacket(fd, command);
 		}
 	}
 
@@ -523,7 +543,7 @@ class LoginServerFacade
 	 * @return true se o pacote recebido for de um tipo válido para análise.
 	 */
 
-	public boolean dispatchAccountPacket(LFileDescriptor fd, short command)
+	public boolean dispatchAccountManagerPacket(LFileDescriptor fd, short command)
 	{
 		switch (command)
 		{
@@ -578,14 +598,14 @@ class LoginServerFacade
 				return true;
 
 			case PACKET_UPDATE_REGISTER:
-				accountService.updateRegister(fd);
+				accountService.updateGlobalRegister(fd);
 				return true;
 
 			case PACKET_REQ_UNBAN_ACCOUNT:
 				accountService.requestUnbanAccount(fd);
 				return true;
 
-			case PACKET_REQ_REGISTER:
+			case PACKET_REQ_GLOBAL_REGISTER:
 				accountService.requestRegister(fd);
 				return true;
 

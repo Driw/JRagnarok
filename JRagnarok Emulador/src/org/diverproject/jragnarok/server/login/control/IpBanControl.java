@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logWarning;
+import static org.diverproject.util.lang.IntUtil.interval;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -168,7 +169,7 @@ public class IpBanControl extends AbstractControl
 		cache.add(list);
 
 		String table = Tables.getInstance().getIpBan();
-		String sql = format("INSERT INTO %s (address_list, ban_time, resume_time, reason) VALUES (?, ?, ?, ?)", table);
+		String sql = format("REPLACE INTO %s (address_list, ban_time, resume_time, reason) VALUES (?, ?, ?, ?)", table);
 
 		try {
 
@@ -180,7 +181,7 @@ public class IpBanControl extends AbstractControl
 
 			list.setID(getID(list.getAdressList()));
 
-			return ps.executeUpdate() == 1;
+			return interval(ps.executeUpdate(), 1, 2);
 
 		} catch (SQLException e) {
 

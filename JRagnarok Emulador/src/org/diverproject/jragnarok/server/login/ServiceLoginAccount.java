@@ -2,15 +2,24 @@ package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.emailCheck;
 import static org.diverproject.jragnarok.JRagnarokUtil.time;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
+import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.request.BanAccountRequest;
 import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
+import org.diverproject.jragnarok.packets.request.GlobalRegistersRequest;
 import org.diverproject.jragnarok.packets.request.UpdateAccountState;
+import org.diverproject.jragnarok.packets.request.UpdateGlobalRegisters;
+import org.diverproject.jragnarok.server.common.GlobalAccountReg;
+import org.diverproject.jragnarok.server.common.GlobalRegister;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
+import org.diverproject.jragnarok.server.login.control.GlobalRegisterControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
+import org.diverproject.util.collection.Queue;
 
 /**
  * <h1>Serviço para Gerenciamento de Contas</h1>
@@ -45,6 +54,11 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	private AccountControl accounts;
 
 	/**
+	 * Controle para registros de variáveis global.
+	 */
+	private GlobalRegisterControl globalRegisters;
+
+	/**
 	 * Cria uma nova instância do serviço para gerenciamento de contas.
 	 * @param server referência do servidor de acesso que irá usá-lo.
 	 */
@@ -59,6 +73,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	{
 		client = getServer().getFacade().getClientService();
 		accounts = getServer().getFacade().getAccountControl();
+		globalRegisters = getServer().getFacade().getGlobalRegistersControl();
 	}
 
 	@Override
@@ -66,6 +81,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	{
 		client = null;
 		accounts = null;
+		globalRegisters = null;
 	}
 
 	/**
@@ -180,51 +196,83 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	}
 
 	/**
-	 * TODO
-	 * @param fd
-	 * @param accountID
-	 * @param charID
+	 * Recebe de um servidor de personagem uma fila de registros com variáveis globais para serem atualizados.
+	 * Cada registro será composto por uma chave de identificação seguido da operação e o seu valor.
+	 * Os registros recebidos serão respectivos uma única conta de jogador identificado pelo seu código.
+	 * @param fd referência da sessão da conexão com o servidor de personagem.
 	 */
 
-	public void sendRegister(LFileDescriptor fd)
+	public void updateGlobalRegister(LFileDescriptor fd)
 	{
-		// TODO mmo_send_global_accreg
-		
+		UpdateGlobalRegisters packet = new UpdateGlobalRegisters();
+		packet.receive(fd);
+
+		int accountID = packet.getAccountID();
+		Queue<GlobalAccountReg> registers = packet.getRegisters();
+
+		while (!registers.isEmpty())
+		{
+			GlobalAccountReg globalRegister = registers.poll();
+
+			try {
+
+				switch (globalRegister.getOperation())
+				{
+					case UpdateGlobalRegisters.OPERATION_INT_REPLACE:
+						GlobalRegister<Integer> registerIntReplace = new GlobalRegister<Integer>(accountID, globalRegister.getKey());
+						registerIntReplace.setValue((Integer) globalRegister.getValue());
+						globalRegisters.replace(accountID, registerIntReplace);
+						break;
+
+					case UpdateGlobalRegisters.OPERATION_INT_DELETE:
+						GlobalRegister<Integer> registerIntDelete = new GlobalRegister<Integer>(accountID, globalRegister.getKey());
+						registerIntDelete.setValue((Integer) globalRegister.getValue());
+						globalRegisters.delete(accountID, registerIntDelete);
+						break;
+
+					case UpdateGlobalRegisters.OPERATION_STR_REPLACE:
+						GlobalRegister<String> registerStrReplace = new GlobalRegister<String>(accountID, globalRegister.getKey());
+						registerStrReplace.setValue((String) globalRegister.getValue());
+						globalRegisters.replace(accountID, registerStrReplace);
+						break;
+
+					case UpdateGlobalRegisters.OPERATION_STR_DELETE:
+						GlobalRegister<String> registerStrDelete = new GlobalRegister<String>(accountID, globalRegister.getKey());
+						registerStrDelete.setValue((String) globalRegister.getValue());
+						globalRegisters.delete(accountID, registerStrDelete);
+						break;
+				}
+
+			} catch (RagnarokException e) {
+				logError("falha ao atualizar registro global (aid: %d, key: %s)", accountID, globalRegister.getKey());
+				logExeception(e);
+			}
+		}
 	}
 
 	/**
-	 * TODO
-	 * @param fd
-	 * @param accountID
-	 * @param charID
-	 */
-
-	public void saveRegister(LFileDescriptor fd)
-	{
-		// TODO mmo_save_global_accreg
-		
-	}
-
-	/**
-	 * TODO
-	 * @param fd
-	 */
-
-	public void updateRegister(LFileDescriptor fd)
-	{
-		// TODO logchrif_parse_upd_global_accreg
-		
-	}
-
-	/**
-	 * TODO
-	 * @param fd
+	 * Chamado quando um servidor de personagem solicitar a busca das variáveis globais de uma conta.
+	 * Após receber o código da conta que será carregado envia o resultado contendo as variáveis.
+	 * @param fd referência da sessão da conexão com o servidor de personagem.
 	 */
 
 	public void requestRegister(LFileDescriptor fd)
 	{
-		// TODO logchrif_parse_req_global_accreg
-		
+		GlobalRegistersRequest packet = new GlobalRegistersRequest();
+		packet.receive(fd);
+
+		int accountID = packet.getAccountID();
+		int charID = packet.getCharID();
+
+		try {
+
+			Queue<GlobalRegister<?>> registers = globalRegisters.getAll(accountID);
+			client.sendGlobalRegisters(fd, accountID, charID, registers);
+
+		} catch (RagnarokException e) {
+			logError("falha ao obter variáveis globais (aid: %d):", accountID);
+			logExeception(e);
+		}
 	}
 
 	/**

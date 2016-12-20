@@ -129,7 +129,7 @@ public class CharacterControl extends AbstractControl
 		String tableStats = Tables.getInstance().getCharStats();
 		String tableLook = Tables.getInstance().getCharLook();
 		String tableFamily = Tables.getInstance().getCharFamily();
-		String tableExp = Tables.getInstance().getCharExperience();
+		String tableExp = Tables.getInstance().getCharExperiences();
 		String tableRank = Tables.getInstance().getCharMercenaryRank();
 		String sql = format("SELECT id, name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
 						+	"manner, effect_state, karma, base_level, job_level, rename, delete_date, moves, font, "
@@ -830,7 +830,7 @@ public class CharacterControl extends AbstractControl
 		String tableStats = Tables.getInstance().getCharStats();
 		String tableLook = Tables.getInstance().getCharLook();
 		String tableFamily = Tables.getInstance().getCharFamily();
-		String tableExp = Tables.getInstance().getCharExperience();
+		String tableExp = Tables.getInstance().getCharExperiences();
 		String tableRank = Tables.getInstance().getCharMercenaryRank();
 		String sql = format("SELECT id, name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
 						+	"manner, effect_state, karma, base_level, job_level, rename, delete_date, moves, font, "
@@ -1000,7 +1000,7 @@ public class CharacterControl extends AbstractControl
 
 	public boolean reloadExperience(Character character) throws RagnarokException
 	{
-		String table = Tables.getInstance().getCharExperience();
+		String table = Tables.getInstance().getCharExperiences();
 		String sql = format("SELECT base, job, fame FROM %s WHERE charid = ?", table);
 
 		try {
@@ -1075,7 +1075,7 @@ public class CharacterControl extends AbstractControl
 		String table = Tables.getInstance().getCharacters();
 		String tableLook = Tables.getInstance().getCharLook();
 		String tableStats = Tables.getInstance().getCharStats();
-		String tableExperiences = Tables.getInstance().getCharExperience();
+		String tableExperiences = Tables.getInstance().getCharExperiences();
 		String tableFamily = Tables.getInstance().getCharFamily();
 		String tableMercenaryRank = Tables.getInstance().getCharMercenaryRank();
 		String sql = format("DELETE FROM %s WHERE id = ?; "
