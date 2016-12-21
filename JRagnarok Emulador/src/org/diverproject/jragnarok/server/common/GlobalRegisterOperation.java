@@ -2,21 +2,10 @@ package org.diverproject.jragnarok.server.common;
 
 import org.diverproject.util.ObjectDescription;
 
-public class GlobalAccountReg
+public class GlobalRegisterOperation<E>
 {
-	private String key;
 	private int operation;
-	private Object value;
-
-	public String getKey()
-	{
-		return key;
-	}
-
-	public void setKey(String key)
-	{
-		this.key = key;
-	}
+	private GlobalRegister<E> register;
 
 	public int getOperation()
 	{
@@ -28,14 +17,14 @@ public class GlobalAccountReg
 		this.operation = operation;
 	}
 
-	public Object getValue()
+	public GlobalRegister<E> getRegister()
 	{
-		return value;
+		return register;
 	}
 
-	public void setValue(Object value)
+	public void setRegister(GlobalRegister<E> register)
 	{
-		this.value = value;
+		this.register = register;
 	}
 
 	@Override
@@ -43,7 +32,9 @@ public class GlobalAccountReg
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("key", key);
+		if (register != null)
+			register.toString(description);
+
 		description.append("operation", operation);
 
 		return description.toString();

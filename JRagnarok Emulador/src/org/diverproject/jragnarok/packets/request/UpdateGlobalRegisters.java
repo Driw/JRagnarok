@@ -4,7 +4,8 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_RE
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.RequestPacket;
-import org.diverproject.jragnarok.server.common.GlobalAccountReg;
+import org.diverproject.jragnarok.server.common.GlobalRegister;
+import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicQueue;
 import org.diverproject.util.stream.Input;
@@ -22,35 +23,39 @@ public class UpdateGlobalRegisters extends RequestPacket
 	public static final int OPERATION_STR_DELETE = 3;
 
 	private int accountID;
-	private Queue<GlobalAccountReg> registers;
+	private Queue<GlobalRegisterOperation<?>> operations;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
 		output.putInt(accountID);
-		output.putInt(registers.size());
+		output.putInt(operations.size());
 
-		for (GlobalAccountReg register = registers.poll(); registers != null; register = registers.poll())
+		while (!operations.isEmpty())
 		{
-			output.putString(register.getKey());
-			output.putInt(register.getOperation());
+			GlobalRegisterOperation<?> operation = operations.poll();
 
-			Object value = register.getValue();
-
-			if (value instanceof String)
+			if (operation.getRegister() != null)
 			{
-				output.putByte(VALUE_STRING);
-				output.putString((String) value);
+				output.putInt(operation.getOperation());
+				output.putString(operation.getRegister().getKey());
+
+				Object value = operation.getRegister().getValue();
+
+				if (value instanceof String)
+				{
+					output.putByte(VALUE_STRING);
+					output.putString((String) value);
+				}
+
+				else if (value instanceof Integer)
+				{
+					output.putByte(VALUE_INTEGER);
+					output.putInt((Integer) value);
+				}
 			}
 
-			else if (value instanceof Integer)
-			{
-				output.putByte(VALUE_INTEGER);
-				output.putInt((Integer) value);
-			}
-
-			else
-				output.putByte(VALUE_NONE);
+			output.putByte(VALUE_NONE);
 		}
 	}
 
@@ -58,30 +63,35 @@ public class UpdateGlobalRegisters extends RequestPacket
 	protected void receiveInput(Input input)
 	{
 		accountID = input.getInt();
-		registers = new DynamicQueue<>();
+		operations = new DynamicQueue<>();
 
 		int size = input.getInt();
 
 		for (int i = 0; i < size; i++)
 		{
-			GlobalAccountReg register = new GlobalAccountReg();
-			register.setKey(input.getString());
-			register.setOperation(input.getInt());
+			@SuppressWarnings("rawtypes")
+			GlobalRegisterOperation<?> operation = new GlobalRegisterOperation();
+			operation.setOperation(input.getInt());
+			operations.offer(operation);
 
+			String key = input.getString();
 			byte type = input.getByte();
 
 			switch (type)
 			{
 				case VALUE_NONE:
-					register.setValue(null);
-					break;
+					continue;
 
 				case VALUE_INTEGER:
-					register.setValue(input.getInt());
+					GlobalRegister<Integer> integerRegister = new GlobalRegister<>(accountID, key);
+					integerRegister.setValue(input.getInt());
+					integerRegister.setUpdatable(false);
 					break;
 
 				case VALUE_STRING:
-					register.setValue(input.getString());
+					GlobalRegister<String> stringRegister = new GlobalRegister<>(accountID, key);
+					stringRegister.setValue(input.getString());
+					stringRegister.setUpdatable(false);
 					break;
 
 				default:
@@ -100,14 +110,14 @@ public class UpdateGlobalRegisters extends RequestPacket
 		this.accountID = accountID;
 	}
 
-	public Queue<GlobalAccountReg> getRegisters()
+	public Queue<GlobalRegisterOperation<?>> getRegisters()
 	{
-		return registers;
+		return operations;
 	}
 
-	public void setRegisters(Queue<GlobalAccountReg> registers)
+	public void setRegisters(Queue<GlobalRegisterOperation<?>> operations)
 	{
-		this.registers = registers;
+		this.operations = operations;
 	}
 
 	@Override

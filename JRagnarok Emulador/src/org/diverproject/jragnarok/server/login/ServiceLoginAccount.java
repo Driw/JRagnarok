@@ -13,8 +13,8 @@ import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
 import org.diverproject.jragnarok.packets.request.GlobalRegistersRequest;
 import org.diverproject.jragnarok.packets.request.UpdateAccountState;
 import org.diverproject.jragnarok.packets.request.UpdateGlobalRegisters;
-import org.diverproject.jragnarok.server.common.GlobalAccountReg;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
+import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.control.GlobalRegisterControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
@@ -202,49 +202,56 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o servidor de personagem.
 	 */
 
+	@SuppressWarnings("unchecked")
 	public void updateGlobalRegister(LFileDescriptor fd)
 	{
 		UpdateGlobalRegisters packet = new UpdateGlobalRegisters();
 		packet.receive(fd);
 
 		int accountID = packet.getAccountID();
-		Queue<GlobalAccountReg> registers = packet.getRegisters();
+		Queue<GlobalRegisterOperation<?>> registers = packet.getRegisters();
 
 		while (!registers.isEmpty())
 		{
-			GlobalAccountReg globalRegister = registers.poll();
+			GlobalRegisterOperation<?> operation = registers.poll();
+
+			if (operation.getRegister() == null)
+				continue;
 
 			try {
 
-				switch (globalRegister.getOperation())
+				switch (operation.getOperation())
 				{
 					case UpdateGlobalRegisters.OPERATION_INT_REPLACE:
-						GlobalRegister<Integer> registerIntReplace = new GlobalRegister<Integer>(accountID, globalRegister.getKey());
-						registerIntReplace.setValue((Integer) globalRegister.getValue());
+						GlobalRegister<Integer> registerIntReplace = (GlobalRegister<Integer>) operation.getRegister();
+						registerIntReplace.setValue((Integer) registerIntReplace.getValue());
 						globalRegisters.replace(accountID, registerIntReplace);
 						break;
 
 					case UpdateGlobalRegisters.OPERATION_INT_DELETE:
-						GlobalRegister<Integer> registerIntDelete = new GlobalRegister<Integer>(accountID, globalRegister.getKey());
-						registerIntDelete.setValue((Integer) globalRegister.getValue());
+						GlobalRegister<Integer> registerIntDelete = (GlobalRegister<Integer>) operation.getRegister();
+						registerIntDelete.setValue((Integer) registerIntDelete.getValue());
 						globalRegisters.delete(accountID, registerIntDelete);
 						break;
 
 					case UpdateGlobalRegisters.OPERATION_STR_REPLACE:
-						GlobalRegister<String> registerStrReplace = new GlobalRegister<String>(accountID, globalRegister.getKey());
-						registerStrReplace.setValue((String) globalRegister.getValue());
+						GlobalRegister<String> registerStrReplace = (GlobalRegister<String>) operation.getRegister();
+						registerStrReplace.setValue((String) registerStrReplace.getValue());
 						globalRegisters.replace(accountID, registerStrReplace);
 						break;
 
 					case UpdateGlobalRegisters.OPERATION_STR_DELETE:
-						GlobalRegister<String> registerStrDelete = new GlobalRegister<String>(accountID, globalRegister.getKey());
-						registerStrDelete.setValue((String) globalRegister.getValue());
+						GlobalRegister<String> registerStrDelete = (GlobalRegister<String>) operation.getRegister();
+						registerStrDelete.setValue((String) registerStrDelete.getValue());
 						globalRegisters.delete(accountID, registerStrDelete);
 						break;
+
+					default:
+						logWarning("operação '%d' não encontrada.\n", operation.getOperation());
 				}
 
 			} catch (RagnarokException e) {
-				logError("falha ao atualizar registro global (aid: %d, key: %s)", accountID, globalRegister.getKey());
+				logError("falha ao atualizar registro global (aid: %d, key: %s)", accountID, operation.getRegister().getKey());
 				logExeception(e);
 			}
 		}

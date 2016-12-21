@@ -1,3 +1,7 @@
+20.12.2016 - 1.4.153
+- Excluindo GlobalAccReg para que seja utilizado uma nova classe que corresponda de melhor forma.
+- Agora GlobalRegisterOperation terá a finalidade de GlobalAccReg e já está sendo usado.
+
 20.12.2016 - 1.4.152
 - Implementando o controle para registro de variáveis globais e request/result packet para este.
 	- Apenas o lado do servidor de acesso foi implementado, o de personagem entra em outras partes.

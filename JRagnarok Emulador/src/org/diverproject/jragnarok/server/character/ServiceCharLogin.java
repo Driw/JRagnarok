@@ -83,7 +83,7 @@ import org.diverproject.jragnarok.server.character.structures.ChangeSex;
 import org.diverproject.jragnarok.server.character.structures.CharSessionData;
 import org.diverproject.jragnarok.server.character.structures.ClientMapServer;
 import org.diverproject.jragnarok.server.character.structures.OnlineCharData;
-import org.diverproject.jragnarok.server.common.GlobalAccountReg;
+import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
 import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.util.BitWise8;
 import org.diverproject.util.SocketUtil;
@@ -870,7 +870,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * @param register
 	 */
 
-	public void sendGlobalAccountReg(GlobalAccountReg register)
+	public void sendGlobalAccountReg(GlobalRegisterOperation<?> register)
 	{
 		// TODO chlogif_send_global_accreg
 		
