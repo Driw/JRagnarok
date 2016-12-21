@@ -11,14 +11,20 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.request.BanAccountRequest;
 import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
 import org.diverproject.jragnarok.packets.request.GlobalRegistersRequest;
+import org.diverproject.jragnarok.packets.request.NotifyPinError;
+import org.diverproject.jragnarok.packets.request.NotifyPinUpdate;
+import org.diverproject.jragnarok.packets.request.UnbanAccount;
 import org.diverproject.jragnarok.packets.request.UpdateAccountState;
 import org.diverproject.jragnarok.packets.request.UpdateGlobalRegisters;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
 import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
+import org.diverproject.jragnarok.server.common.LoginAdapt;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.control.GlobalRegisterControl;
+import org.diverproject.jragnarok.server.login.control.LoginLogControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
+import org.diverproject.jragnarok.server.login.entities.LoginLog;
 import org.diverproject.util.collection.Queue;
 
 /**
@@ -49,14 +55,29 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	private ServiceLoginClient client;
 
 	/**
+	 * Serviço para acesso de contas (serviço principal)
+	 */
+	private ServiceLoginServer login;
+
+	/**
 	 * Controle para persistência das contas de jogadores.
 	 */
 	private AccountControl accounts;
 
 	/**
+	 * Controle para registrar acesso ao banco de dados.
+	 */
+	private LoginLogControl logs;
+
+	/**
 	 * Controle para registros de variáveis global.
 	 */
 	private GlobalRegisterControl globalRegisters;
+
+	/**
+	 * Controlador para identificar jogadores online.
+	 */
+	private OnlineMap onlines;
 
 	/**
 	 * Cria uma nova instância do serviço para gerenciamento de contas.
@@ -72,16 +93,22 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	public void init()
 	{
 		client = getServer().getFacade().getClientService();
+		login = getServer().getFacade().getLoginService();
 		accounts = getServer().getFacade().getAccountControl();
+		logs = getServer().getFacade().getLoginLogControl();
 		globalRegisters = getServer().getFacade().getGlobalRegistersControl();
+		onlines = getServer().getFacade().getOnlineMap();
 	}
 
 	@Override
 	public void destroy()
 	{
 		client = null;
+		login = null;
 		accounts = null;
+		logs = null;
 		globalRegisters = null;
+		onlines = null;
 	}
 
 	/**
@@ -208,7 +235,6 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		UpdateGlobalRegisters packet = new UpdateGlobalRegisters();
 		packet.receive(fd);
 
-		int accountID = packet.getAccountID();
 		Queue<GlobalRegisterOperation<?>> registers = packet.getRegisters();
 
 		while (!registers.isEmpty())
@@ -225,25 +251,25 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 					case UpdateGlobalRegisters.OPERATION_INT_REPLACE:
 						GlobalRegister<Integer> registerIntReplace = (GlobalRegister<Integer>) operation.getRegister();
 						registerIntReplace.setValue((Integer) registerIntReplace.getValue());
-						globalRegisters.replace(accountID, registerIntReplace);
+						globalRegisters.replace(registerIntReplace);
 						break;
 
 					case UpdateGlobalRegisters.OPERATION_INT_DELETE:
 						GlobalRegister<Integer> registerIntDelete = (GlobalRegister<Integer>) operation.getRegister();
 						registerIntDelete.setValue((Integer) registerIntDelete.getValue());
-						globalRegisters.delete(accountID, registerIntDelete);
+						globalRegisters.delete(registerIntDelete);
 						break;
 
 					case UpdateGlobalRegisters.OPERATION_STR_REPLACE:
 						GlobalRegister<String> registerStrReplace = (GlobalRegister<String>) operation.getRegister();
 						registerStrReplace.setValue((String) registerStrReplace.getValue());
-						globalRegisters.replace(accountID, registerStrReplace);
+						globalRegisters.replace(registerStrReplace);
 						break;
 
 					case UpdateGlobalRegisters.OPERATION_STR_DELETE:
 						GlobalRegister<String> registerStrDelete = (GlobalRegister<String>) operation.getRegister();
 						registerStrDelete.setValue((String) registerStrDelete.getValue());
-						globalRegisters.delete(accountID, registerStrDelete);
+						globalRegisters.delete(registerStrDelete);
 						break;
 
 					default:
@@ -251,7 +277,8 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 				}
 
 			} catch (RagnarokException e) {
-				logError("falha ao atualizar registro global (aid: %d, key: %s)", accountID, operation.getRegister().getKey());
+
+				logError("falha ao atualizar registro global (aid: %d, key: %s)", operation.getRegister().getAccountID(), operation.getRegister().getKey());
 				logExeception(e);
 			}
 		}
@@ -283,49 +310,88 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	}
 
 	/**
-	 * TODO
-	 * @param fd
+	 * Recebe uma solicitação de um servidor de personagem para cancelar o banimento de uma determinada conta.
+	 * O procedimento é feito recebendo o código de identificação da conta e restabelecendo o ban para null.
+	 * @param fd referência da sessão da conexão com o servidor de personagem.
 	 */
 
 	public void requestUnbanAccount(LFileDescriptor fd)
 	{
-		// TODO logchrif_parse_requnbanacc
-		
+		UnbanAccount packet = new UnbanAccount();
+		packet.receive(fd);
+
+		Account account = accounts.get(packet.getAccountID());
+
+		if (account == null)
+			logWarning("conta não encontrada para cancelar banimento (aid: %d).\n", packet.getAccountID());
+
+		else if (account.getUnban().get() == 0)
+			logNotice("conta não possui banimento para ser cancelado (aid: %d).\n", packet.getAccountID());
+
+		else
+		{
+			account.getUnban().set(0);
+			accounts.set(account);
+
+			logNotice("banimento de conta cancelado (aid: %d).\n", packet.getAccountID());
+		}
 	}
 
 	/**
-	 * TODO
-	 * @param fd
-	 * @return
+	 * Recebe uma solicitação de um servidor de personagem para realizar uma atualização no código pin.
+	 * O procedimento é feito recebendo o código de identificação da conta alvo e o novo código pin.
+	 * @param fd referência da sessão da conexão com o servidor de personagem.
 	 */
 
 	public void updatePinCode(LFileDescriptor fd)
 	{
-		// TODO logchrif_parse_updpincode
-		
+		NotifyPinUpdate packet = new NotifyPinUpdate();
+		packet.receive(fd);
+
+		Account account = accounts.get(packet.getAccountID());
+
+		if (account == null)
+			logWarning("conta não encontrada para atualizar código pin (aid: %d).\n", packet.getAccountID());
+
+		else
+		{
+			account.getPincode().setCode(packet.getPincode());
+			accounts.set(account);
+
+			logNotice("código pin de conta atualizado (aid: %d, pincode: %s).\n", packet.getAccountID(), packet.getPincode());
+		}
 	}
 
 	/**
-	 * TODO
-	 * @param fd
-	 * @return
+	 * Recebe uma solicitação de um servidor de personagem para registrar uma autenticação de código pin falho.
+	 * O procedimento é feito recebendo somente o código de identificação da conta que falhou no mesmo.
+	 * @param fd referência da sessão da conexão com o servidor de personagem.
 	 */
 
 	public void failPinCode(LFileDescriptor fd)
 	{
-		// TODO logchrif_parse_pincode_authfail
-		
-	}
+		NotifyPinError packet = new NotifyPinError();
+		packet.receive(fd);
 
-	/**
-	 * TODO
-	 * @param account
-	 * @return
-	 */
+		if (accounts.exist(packet.getAccountID()))
+		{
+			if (onlines.get(packet.getAccountID()) != null)
+			{
+				try {
 
-	public boolean newAccount(Account account)
-	{
-		// TODO login_mmo_auth_new
-		return false;
+					LoginLog log = new LoginLog();
+					log.setLogin(new LoginAdapt(packet.getAccountID()));
+					log.setMessage("Falha na verificação do código PIN");
+					log.setRCode(100);
+					logs.add(log);
+
+				} catch (RagnarokException e) {
+					logError("falha durante o registro da falha no código pin (aid: %d).\n", packet.getAccountID());
+					logExeception(e);
+				}
+			}
+		}
+
+		login.removeOnlineUser(packet.getAccountID());
 	}
 }

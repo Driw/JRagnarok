@@ -144,7 +144,7 @@ public class LoginLog
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("login", login != null ? login.getUsername() : null);
+		description.append("login", login != null ? login.getID() : null);
 		description.append("time", time);
 		description.append("ip", ip.getString());
 		description.append("rCode", rCode);

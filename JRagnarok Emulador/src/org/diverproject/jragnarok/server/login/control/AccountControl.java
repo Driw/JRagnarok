@@ -238,4 +238,29 @@ public class AccountControl extends AbstractControl
 
 		return false;
 	}
+
+	/**
+	 * Verifica no banco de dados se existe alguma conta que possua o código de identificação passado.
+	 * @param accountID código de identificação da conta do qual deseja verificar a existência.
+	 * @return true se existir alguma conta com o código passado ou false caso contrário.
+	 */
+
+	public boolean exist(int accountID)
+	{
+		String table = Tables.getInstance().getAccounts();
+		String sql = format("SELECT username FROM %s WHERE id = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, accountID);
+
+			return ps.executeQuery().next();
+
+		} catch (Exception e) {
+			logExeceptionSource(e);
+		}
+
+		return false;
+	}
 }

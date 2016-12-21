@@ -130,8 +130,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		ipban = getServer().getFacade().getIpBanService();
 		log = getServer().getFacade().getLogService();
 		login = getServer().getFacade().getLoginService();
-		onlines = getServer().getFacade().getOnlineControl();
-		auths = getServer().getFacade().getAuthControl();
+		onlines = getServer().getFacade().getOnlineMap();
+		auths = getServer().getFacade().getAuthAccountMap();
 	}
 
 	@Override

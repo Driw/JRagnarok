@@ -18,7 +18,7 @@ public class NotifyPinUpdate extends RequestPacket
 	protected void sendOutput(Output output)
 	{
 		output.putInt(accountID);
-		output.putString(pincode);
+		output.putString(pincode, PINCODE_LENGTH);
 	}
 
 	@Override

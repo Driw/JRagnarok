@@ -50,7 +50,7 @@ public class GlobalRegisterControl extends AbstractControl
 	 */
 
 	@SuppressWarnings("unchecked")
-	public boolean replace(int accountID, GlobalRegister<?> register) throws RagnarokException
+	public boolean replace(GlobalRegister<?> register) throws RagnarokException
 	{
 		if (register.getValue() != null)
 		{
@@ -72,7 +72,7 @@ public class GlobalRegisterControl extends AbstractControl
 	 */
 
 	@SuppressWarnings("unchecked")
-	public boolean delete(int accountID, GlobalRegister<?> register) throws RagnarokException
+	public boolean delete(GlobalRegister<?> register) throws RagnarokException
 	{
 		if (register.getValue() != null)
 		{

@@ -119,7 +119,10 @@ public class LoginSessionData extends SessionData implements Login
 		this.seed = new LoginSeed();
 	}
 
-	@Override
+	/**
+	 * @return aquisição do nome de usuário da conta do jogador.
+	 */
+
 	public String getUsername()
 	{
 		return username;

@@ -1,3 +1,9 @@
+21.12.2016 - 1.4.154
+- Nome dos getters para OnlineMap e AuthAccountMap atualizados, LoginServerFacade.
+- Novas dependências em ServiceLoginAccount para realizar os novos métodos implementados.
+- AccountControl agora permite verificar se uma determinada conta existe pelo seu ID.
+- Parâmetros desnecessários removidos de GlobalRegisterControl, GlobalRegister já o faz.
+
 20.12.2016 - 1.4.153
 - Excluindo GlobalAccReg para que seja utilizado uma nova classe que corresponda de melhor forma.
 - Agora GlobalRegisterOperation terá a finalidade de GlobalAccReg e já está sendo usado.

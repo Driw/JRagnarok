@@ -64,7 +64,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	public void init()
 	{
 		accounts = getServer().getFacade().getAccountControl();
-		onlines = getServer().getFacade().getOnlineControl();
+		onlines = getServer().getFacade().getOnlineMap();
 	}
 
 	@Override

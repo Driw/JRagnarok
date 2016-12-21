@@ -263,7 +263,7 @@ class LoginServerFacade
 	 * @return aquisição do controle para identificar jogadores online.
 	 */
 
-	public OnlineMap getOnlineControl()
+	public OnlineMap getOnlineMap()
 	{
 		return onlineMap;
 	}
@@ -272,7 +272,7 @@ class LoginServerFacade
 	 * @return aquisição do controle para autenticação dos jogadores.
 	 */
 
-	public AuthAccountMap getAuthControl()
+	public AuthAccountMap getAuthAccountMap()
 	{
 		return authAccountMap;
 	}

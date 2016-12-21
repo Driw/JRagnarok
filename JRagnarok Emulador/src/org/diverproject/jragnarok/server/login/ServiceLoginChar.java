@@ -105,9 +105,9 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		client = getServer().getFacade().getClientService();
 		login = getServer().getFacade().getLoginService();
 		accounts = getServer().getFacade().getAccountControl();
-		onlines = getServer().getFacade().getOnlineControl();
+		onlines = getServer().getFacade().getOnlineMap();
 		groups = getServer().getFacade().getGroupControl();
-		auths = getServer().getFacade().getAuthControl();		
+		auths = getServer().getFacade().getAuthAccountMap();		
 
 		int interval = getConfigs().getInt(LOGIN_IP_SYNC_INTERVAL);
 
