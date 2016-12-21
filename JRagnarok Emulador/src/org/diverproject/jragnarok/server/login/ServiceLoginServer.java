@@ -380,8 +380,11 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		{
 			onlines.remove(accountID);
 
-			getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
-			online.setWaitingDisconnect(null);
+			if (online.getWaitingDisconnect() != null)
+			{
+				getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+				online.setWaitingDisconnect(null);
+			}
 		}
 	}
 

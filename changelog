@@ -1,3 +1,8 @@
+21.12.2016 - 1.4.155
+- Relações de dependências da tabela accounts_groups corrigidas.
+- AuthNode não estava inicializando seed que causava NullPointerException.
+- ServiceLoginServer.removeOnlineUser() poderia causar NullPointerException.
+
 21.12.2016 - 1.4.154
 - Nome dos getters para OnlineMap e AuthAccountMap atualizados, LoginServerFacade.
 - Novas dependências em ServiceLoginAccount para realizar os novos métodos implementados.

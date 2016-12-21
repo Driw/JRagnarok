@@ -62,6 +62,7 @@ public class AuthNode
 	public AuthNode()
 	{
 		ip = new InternetProtocol();
+		seed = new LoginSeed();
 	}
 
 	/**
