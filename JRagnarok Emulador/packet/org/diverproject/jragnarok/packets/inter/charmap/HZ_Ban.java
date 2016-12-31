@@ -1,39 +1,14 @@
-package org.diverproject.jragnarok.packets.request;
+package org.diverproject.jragnarok.packets.inter.charmap;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_BAN_NOTIFICATION;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HZ_BAN;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_BanNotification.BanNotificationType;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
-public class BanNotificationRequest extends RequestPacket
+public class HZ_Ban extends RequestPacket
 {
-	public enum BanNotificationType
-	{
-		CHANGE_OF_STATUS(0),
-		BAN(1);
-
-		public final byte CODE;
-
-		private BanNotificationType(int code)
-		{
-			CODE = b(code);
-		}
-
-		public static BanNotificationType parse(byte b)
-		{
-			switch (b)
-			{
-				case 0: return CHANGE_OF_STATUS;
-				case 1: return BAN;
-			}
-
-			throw new RagnarokRuntimeException("BanNotificationType#%d não encontrado", b);
-		}
-	}
-
 	private int accountID;
 	private int unbanTime;
 	private BanNotificationType type;
@@ -87,13 +62,13 @@ public class BanNotificationRequest extends RequestPacket
 	@Override
 	public String getName()
 	{
-		return "REQ_BAN_NOTIFICATION";
+		return "HZ_BAN";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_REQ_BAN_NOTIFICATION;
+		return PACKET_HZ_BAN;
 	}
 
 	@Override

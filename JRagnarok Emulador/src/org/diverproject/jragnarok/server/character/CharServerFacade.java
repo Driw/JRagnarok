@@ -1,17 +1,17 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ALREADY_ONLINE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_ENTER;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_BAN_NOTIFICATION;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CHARLIST_REQ;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_INFO;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_AUTH_ACCOUNT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_CHANGE_SEX;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_KEEP_ALIVE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACK_CONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ALREADY_ONLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_AUTH_ACCOUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_BAN_NOTIFICATION;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_CHANGE_SEX;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_GLOBAL_REGISTERS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_KEEP_ALIVE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_SYNCRONIZE_IPADDRESS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CHARLIST_REQ;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_ENTER;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -204,7 +204,7 @@ public class CharServerFacade
 		}
 	};
 
-	public boolean ackClientPacket(CFileDescriptor fd)
+	private boolean ackClientPacket(CFileDescriptor fd)
 	{
 		AcknowledgePacket packetReceivePacketID = new AcknowledgePacket();
 		packetReceivePacketID.receive(fd, false);
@@ -216,8 +216,54 @@ public class CharServerFacade
 			case PACKET_CH_ENTER:
 				return authService.parse(fd);
 
+			/*
+			case PACKET_CH_PING:
+			case PACKET_CH_REQ_IS_VALID_CHARNAME:
+			case PACKET_CH_ENTER_CHECKBOT:
+			case PACKET_CH_CHECKBOT:
+			case PACKET_CH_PARSE_MAP_LOGIN:
+			*/
+		}
+
+		return ackCharactersPacket(fd, command);
+	}
+
+	private boolean ackCharactersPacket(CFileDescriptor fd, short command)
+	{
+		switch (command)
+		{
+			/*
+			case PACKET_CH_SELECT_CHAR:
+			case PACKET_CH_MAKE_CHAR:
+			case PACKET_CH_DELETE_CHAR2:
+			case PACKET_CH_DELETE_CHAR3_RESERVED:
+			case PACKET_CH_DELETE_CHAR3:
+			case PACKET_CH_DELETE_CHAR3_CANCEL:
+			case PACKET_CH_REQ_CHANGE_CHARACTER_SLOT:
+			case PACKET_CH_MAKE_CHAR_NOT_STATS:
+			*/
+
 			case PACKET_CH_CHARLIST_REQ:
 				return clientService.sendCharsPerPage(fd);
+
+			/*
+			case PACKET_CH_CREATE_NEW_CHAR:
+			*/
+		}
+
+		return ackPincodePacket(fd, command);
+	}
+
+	private boolean ackPincodePacket(CFileDescriptor fd, short command)
+	{
+		switch (command)
+		{
+			/*
+			case PACKET_CH_SECOND_PASSWD_ACK:
+			case PACKET_CH_MAKE_SECOND_PASSWD:
+			case PACKET_CH_EDIT_SECOND_PASSWD:
+			case PACKET_CH_AVAILABLE_SECOND_PASSWD:
+			*/
 
 			default:
 				String packet = HexUtil.parseInt(command, 4);
@@ -255,6 +301,9 @@ public class CharServerFacade
 
 		switch (command)
 		{
+			case PACKET_AH_ACK_CONNECT:
+				return loginService.parseLoginResult(fd);
+
 			case PACKET_AH_KEEP_ALIVE:
 				return loginService.keepAlive(fd);
 
@@ -275,10 +324,10 @@ public class CharServerFacade
 				}
 		}
 
-		return ackPlayerRequestPacket(fd, command);
+		return ackAccountPacket(fd, command);
 	}
 
-	private boolean ackPlayerRequestPacket(CFileDescriptor fd, short command)
+	private boolean ackAccountPacket(CFileDescriptor fd, short command)
 	{
 		switch (command)
 		{
@@ -288,17 +337,6 @@ public class CharServerFacade
 			case PACKET_AH_BAN_NOTIFICATION:
 				loginService.banNofitication(fd);
 				return true;
-		}
-
-		return ackPlayerResultPacket(fd, command);
-	}
-
-	private boolean ackPlayerResultPacket(CFileDescriptor fd, short command)
-	{
-		switch (command)
-		{
-			case PACKET_AH_ACK_CONNECT:
-				return loginService.parseLoginResult(fd);
 
 			case PACKET_AH_AUTH_ACCOUNT:
 				return loginService.parseAuthAccount(fd);

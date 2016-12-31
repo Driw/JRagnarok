@@ -762,9 +762,10 @@ public class ServiceCharLogin extends AbstractCharService
 				return false;
 
 			characters.setSex(charID, sex);
-			ChangeSex change = characters.getChangeSex(charID);
 
+			ChangeSex change = characters.getChangeSex(charID);
 			setCharSex(change, sex);
+
 			character.disconnectPlayer(change.getAccountID());
 
 			HZ_ChangedSex packet = new HZ_ChangedSex();

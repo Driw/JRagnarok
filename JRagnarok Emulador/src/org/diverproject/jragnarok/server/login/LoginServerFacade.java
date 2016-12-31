@@ -2,8 +2,6 @@ package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOG_LOGIN;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_STATE_NOTIFY;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_STATE_UPDATE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CHARSERVERCONNECT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CONNECT_INFO_CHANGED;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_EXE_HASHCHECK;
@@ -15,6 +13,8 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_PCBANG;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_REQ_HASH;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_SSO_LOGIN_REQ;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_STATE_NOTIFY;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_STATE_UPDATE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_NOTIFY_PIN_ERROR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_NOTIFY_PIN_UPDATE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_DATA;
@@ -521,12 +521,12 @@ class LoginServerFacade
 				charService.setAccountOffline(fd);
 				return true;
 
-			case PACKET_HA_SET_ALL_ACC_OFFLINE:
-				charService.setAllOffline(fd);
-				return true;
-
 			case PACKET_HA_SEND_ACCOUNTS:
 				charService.receiveSentAccounts(fd);
+				return true;
+
+			case PACKET_HA_SET_ALL_ACC_OFFLINE:
+				charService.setAllOffline(fd);
 				return true;
 
 			default:

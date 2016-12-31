@@ -1,3 +1,8 @@
+31.12.2016 - 1.5.160
+- Movendo os pacotes para outra pasta de código fonte, separando o servidor dos pacotes.
+- RagnarokPacket atualizado conforme deveria ter sido feito na rev159.
+- Melhor divisão dos pacotes recebidos através de CharServerFacade.CLIENT_PARSE.
+
 31.12.2016 - 1.5.159
 - Adicionando todos os identificadores dos pacotes existentes entre servidores ou cliente/servidor.
 	- Os que não estiverem sendo utilizados ficarão comentados até que sejam implementados.
