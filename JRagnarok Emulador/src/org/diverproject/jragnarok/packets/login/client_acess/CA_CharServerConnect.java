@@ -24,11 +24,9 @@ public class CA_CharServerConnect extends RequestPacket
 	{
 		output.putString(username, 24);
 		output.putString(password, 24);
-		output.skipe(4);
 		output.putInt(serverIP);
 		output.putShort(serverPort);
 		output.putString(serverName, 20);
-		output.skipe(2);
 		output.putShort(type);
 		output.putShort(s(newDisplay ? 1 : 0));
 	}
@@ -38,11 +36,9 @@ public class CA_CharServerConnect extends RequestPacket
 	{
 		username = strclr(input.getString(24));
 		password = strclr(input.getString(24));
-		input.skipe(4);
 		serverIP = input.getInt();
 		serverPort = input.getShort();
 		serverName = strclr(input.getString(20));
-		input.skipe(2);
 		type = input.getShort();
 		newDisplay = input.getShort() == 1;
 	}
@@ -132,7 +128,7 @@ public class CA_CharServerConnect extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 84;
+		return 78;
 	}
 
 	@Override

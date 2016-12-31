@@ -7,6 +7,7 @@ public class RagnarokPacket
 
 	// -- RAGNAROK PACKET ID : CLIENT TO LOGIN (CA) --
 	public static final short PACKET_CA_LOGIN                = 0x0064;
+	public static final short PACKET_CA_REQ_HASH             = 0x01DB;
 	public static final short PACKET_CA_LOGIN2               = 0x01DD;
 	public static final short PACKET_CA_LOGIN3               = 0x01FA;
 	public static final short PACKET_CA_CONNECT_INFO_CHANGED = 0x0200;
@@ -15,7 +16,6 @@ public class RagnarokPacket
 	public static final short PACKET_CA_LOGIN4               = 0x027C;
 	public static final short PACKET_CA_LOGIN_HAN            = 0x02B0;
 	public static final short PACKET_CA_SSO_LOGIN_REQ        = 0x0825;
-	public static final short PACKET_CA_REQ_HASH             = 0x01DB;
 	public static final short PACKET_CA_CHARSERVERCONNECT    = 0x2710;
 
 	// -- RAGNAROK PACKET ID : LOGIN TO CLIENT (AC) --

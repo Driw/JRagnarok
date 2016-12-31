@@ -1,0 +1,60 @@
+
+//==============================================================================
+// 0x0069 [PACKET_AC_ACCEPT_LOGIN] - Listar Servidores de Personagem
+//==============================================================================
+
+byte	length	type	name
+
+00		02		short	tamanho do pacote (incluindo o packet id)
+02		04		int		primeira seed do acesso
+06		04		int		código de identificação da conta
+10		04		int		segunda seed do acesso
+14		04		int		endereço de ip
+18		26		string	horário do último acesso (?)
+44		01		byte	sexo da conta (ainda é usado?)
+
+char-servers
+[
+	offset	length	type	name
+	00		04		int		endereço de ip
+	04		02		short	porta de acesso
+	06		20		string	nome do servidor
+	26		02		short	jogadores online
+	28		02		short	tipo do servidor
+	30		02		short	exibir como novo (boolean)
+]
+
+size: 45 + (37 * server_count) bytes
+
+//==============================================================================
+// 0x006A [PACKET_AC_REFUSE_LOGIN] - Rejeitar Acesso
+//==============================================================================
+
+byte	length	type	name
+
+00		01		byte	resultado
+01		20		string	horário para desbloquear
+
+size: 21 bytes
+
+//==============================================================================
+// 0x01DC [PACKET_AC_ACK_HASH] - Reconhecer Hash
+//==============================================================================
+
+byte	length	type	name
+
+00		02		short	comprimento da chave md5
+02		20		string	valor da chave md5
+
+size: 22 bytes
+
+//==============================================================================
+// 0x083E [PACKET_AC_REFUSE_LOGIN_R2] - Rejeitar Acesso R2
+//==============================================================================
+
+byte	length	type	name
+
+00		04		int		resultado
+04		20		string	horário para desbloquear
+
+size: 24 bytes
