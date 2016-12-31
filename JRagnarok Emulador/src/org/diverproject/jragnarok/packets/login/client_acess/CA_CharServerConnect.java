@@ -1,15 +1,15 @@
-package org.diverproject.jragnarok.packets.request;
+package org.diverproject.jragnarok.packets.login.client_acess;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHAR_SERVER_CONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CHARSERVERCONNECT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
-public class CharServerConnectRequest extends RequestPacket
+public class CA_CharServerConnect extends RequestPacket
 {
 	private String username;
 	private String password;
@@ -120,13 +120,13 @@ public class CharServerConnectRequest extends RequestPacket
 	@Override
 	public String getName()
 	{
-		return "REQ_CHAR_SERVER_CONNECT";
+		return "CA_CHARSERVERCONNECT";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_REQ_CHAR_SERVER_CONNECT;
+		return PACKET_CA_CHARSERVERCONNECT;
 	}
 
 	@Override

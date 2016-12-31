@@ -1,12 +1,12 @@
-package org.diverproject.jragnarok.packets.response;
+package org.diverproject.jragnarok.packets.login.acess_client;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACKNOWLEDGE_HASH;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AC_ACK_HASH;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
-public class AcknowledgeHash extends ResponsePacket
+public class AC_AckHash extends ResponsePacket
 {
 	private short md5KeyLength;
 	private String md5Key;
@@ -31,13 +31,13 @@ public class AcknowledgeHash extends ResponsePacket
 	@Override
 	public String getName()
 	{
-		return "PACKET_AC_ACK_HASH";
+		return "AC_ACK_HASH";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_ACKNOWLEDGE_HASH;
+		return PACKET_AC_ACK_HASH;
 	}
 
 	@Override

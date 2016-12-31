@@ -18,6 +18,7 @@ import org.diverproject.jragnarok.server.character.structures.CharData;
 import org.diverproject.jragnarok.server.character.structures.Character;
 import org.diverproject.jragnarok.server.character.structures.Experience;
 import org.diverproject.jragnarok.server.character.structures.MercenaryRank;
+import org.diverproject.jragnarok.util.MapPoint;
 import org.diverproject.util.collection.Index;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.DynamicList;
@@ -132,21 +133,20 @@ public class CharacterControl extends AbstractControl
 		String tableExp = Tables.getInstance().getCharExperiences();
 		String tableRank = Tables.getInstance().getCharMercenaryRank();
 		String sql = format("SELECT id, name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
-						+	"manner, effect_state, karma, base_level, job_level, rename, delete_date, moves, font, "
-						+	"unique_item_counter, "
+						+	"manner, effect_state, karma, base_level, job_level, rename_count, delete_date, moves, font, unique_item_counter, "
 						+	"strength, agility, vitality, intelligence, dexterity, luck, "
 						+	"hair, hair_color, clothes_color, body, weapon, shield, head_top, head_mid, head_bottom, robe, "
 						+	"partner, father, mother, child, "
 						+	"base, job, fame, "
-						+	"archer_faith, archer_faith, spear_faith, spear_calls, sword_faith, sword_faith "
+						+	"archer_faith, archer_calls, spear_faith, spear_calls, sword_faith, sword_calls "
 						+	"FROM %s "
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"WHERE id = ?", table, tableStats, tableStats, tableLook, tableLook,
-						tableFamily, tableFamily, tableRank, tableRank, tableExp, tableExp);
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"WHERE id = ?", table, tableStats, tableStats, table, tableLook, tableLook, table,
+						tableFamily, tableFamily, table, tableRank, tableRank, table, tableExp, tableExp, table);
 
 		try {
 
@@ -166,6 +166,7 @@ public class CharacterControl extends AbstractControl
 				setCharacterFamily(character, rs);
 				setCharacterExperience(character, rs);
 				setCharacterMercenaryRank(character, rs);
+				reloadLocations(character);
 			}
 
 			if (character != null)
@@ -193,9 +194,6 @@ public class CharacterControl extends AbstractControl
 		character.setStatusPoint(rs.getShort("status_point"));
 		character.setSkillPoint(rs.getShort("skill_point"));
 		character.setJobID(rs.getShort("jobid"));
-		character.setManner(rs.getShort("manner"));
-		character.setBaseLevel(rs.getInt("base_level"));
-		character.setJobLevel(rs.getInt("job_level"));
 		character.setHP(rs.getInt("hp"));
 		character.setMaxHP(rs.getInt("max_hp"));
 		character.setSP(rs.getShort("sp"));
@@ -204,8 +202,8 @@ public class CharacterControl extends AbstractControl
 		character.getEffectState().setValue(rs.getInt("effect_state"));
 		character.setKarma(rs.getShort("karma"));
 		character.setBaseLevel(rs.getInt("base_level"));
-		character.setJobLevel(rs.getShort("job_id"));
-		character.setRename(rs.getShort("rename"));
+		character.setJobLevel(rs.getInt("job_level"));
+		character.setRename(rs.getShort("rename_count"));
 		character.getDeleteDate().set(rs.getInt("delete_date"));
 		character.setMoves(rs.getShort("moves"));
 		character.setFont(rs.getByte("font"));
@@ -297,6 +295,23 @@ public class CharacterControl extends AbstractControl
 	}
 
 	/**
+	 * Atualiza as informações de um personagem respectivo as localizações em mapas conforme um resultado.
+	 * @param mapPoint objeto que representa uma localização em mapa que será atualizado.
+	 * @param rs resultado da consulta efetuada no banco de dados contendo as classificações.
+	 * @throws SQLException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public void setLocation(MapPoint mapPoint, ResultSet rs) throws SQLException
+	{
+		if (mapPoint == null)
+			return;
+
+		mapPoint.setMap(rs.getString("mapname"));
+		mapPoint.setX(rs.getInt("coord_x"));
+		mapPoint.setY(rs.getInt("coord_Y"));
+	}
+
+	/**
 	 * Adiciona um novo personagem ao banco de dados inserindo novas informações relacionadas a ele.
 	 * Caso alguma das dependências já existam por algum motivo, elas serão atualizadas com base neste.
 	 * @param character personagem contendo todas as informações básicas e suas dependências.
@@ -309,7 +324,7 @@ public class CharacterControl extends AbstractControl
 		validate(character);
 
 		String table = Tables.getInstance().getCharacters();
-		String sql = format("INSERT INTO %s (name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
+		String sql = format("REPLACE INTO %s (name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
 						+	"manner, effect_state, karma, base_level, job_level, rename, delete_date, moves, font"
 						+	"unique_item_counter)"
 						+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", table);
@@ -380,7 +395,7 @@ public class CharacterControl extends AbstractControl
 	public boolean addStats(Character character) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharStats();
-		String sql = format("INSERT INTO %s (charid, strength, agility, vitality, intelligence, dexterity, luck) "
+		String sql = format("REPLACE INTO %s (charid, strength, agility, vitality, intelligence, dexterity, luck) "
 						+	"VALUES (?, ?, ?, ?, ?, ?, ?)", table);
 
 		try {
@@ -417,7 +432,7 @@ public class CharacterControl extends AbstractControl
 	public boolean addLook(Character character) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharLook();
-		String sql = format("INSERT INTO %s (charid, hair, hair_color, clothes_color, body, weapon, shield, "
+		String sql = format("REPLACE INTO %s (charid, hair, hair_color, clothes_color, body, weapon, shield, "
 						+	"head_top, head_mid, head_bottom, robe) "
 						+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", table);
 
@@ -459,7 +474,7 @@ public class CharacterControl extends AbstractControl
 	public boolean addFamily(Character character) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharFamily();
-		String sql = format("INSERT INTO %s (charid, partner, father, mother, child) VALUES (?, ?, ?, ?, ?)", table);
+		String sql = format("REPLACE INTO %s (charid, partner, father, mother, child) VALUES (?, ?, ?, ?, ?)", table);
 
 		try {
 
@@ -493,7 +508,7 @@ public class CharacterControl extends AbstractControl
 	public boolean addExperience(Character character) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharFamily();
-		String sql = format("INSERT INTO %s (charid, base, job, fame) VALUES (?, ?, ?, ?)", table);
+		String sql = format("REPLACE INTO %s (charid, base, job, fame) VALUES (?, ?, ?, ?)", table);
 
 		try {
 
@@ -526,7 +541,7 @@ public class CharacterControl extends AbstractControl
 	public boolean addMercenaryRank(Character character) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharMercenaryRank();
-		String sql = format("INSERT INTO %s (charid, archer_faith, archer_calls, spear_faith, spear_calls, sword_faith, sword_calls) "
+		String sql = format("REPLACE INTO %s (charid, archer_faith, archer_calls, spear_faith, spear_calls, sword_faith, sword_calls) "
 						+	"VALUES (?, ?, ?, ?, ?, ?, ?)", table);
 
 		try {
@@ -554,6 +569,58 @@ public class CharacterControl extends AbstractControl
 	}
 
 	/**
+	 * Adiciona uma nova dependência de um personagem referente as localizações salvas do mesmo.
+	 * @param character personagem contendo todas as informações necessárias dessa dependência.
+	 * @return true se conseguir adicionar ou false caso contrário (não esperado).
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean addLocations(Character character) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharMercenaryRank();
+		String sql = format("REPLACE INTO %s (chaird, num, mapname, coord_x, coord_y) VALUES (?, ?, ?, ?, ?)", table);
+
+		try {
+
+			addLocations_Sub(character.getID(), 0, character.getLocations().getLastPoint(), sql);
+			addLocations_Sub(character.getID(), 1, character.getLocations().getSavePoint(), sql);
+
+			for (int i = 0; i < character.getLocations().getMemoPoints().length; i++)
+				addLocations_Sub(character.getID(), 2+i, character.getLocations().getMemoPoint(i), sql);
+
+			logDebug("Location#%d adicionado à '%s'.\n", character.getID(), table);
+
+			return true;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}		
+	}
+
+	/**
+	 * Procedimento interno usado para executar uma query que deverá garantir as informações de um ponto em mapa.
+	 * @param charID código de identificação do personagem do qual será associado ao ponto especificado.
+	 * @param num número do índice da localização onde - 0: last_point, 1: save_point, 2+: memo_point.
+	 * @param mapPoint informações referente ao nome do mapa e coordenadas do mesmo para serem salvos.
+	 * @param sql string contendo a query que será executada no banco de dados para realizar a atualização.
+	 * @return true se conseguir adicionar ou false caso contrário (charID/num não encontrados).
+	 * @throws SQLException apenas se houver problema de conexão com o banco de dados.
+	 * @throws RagnarokException apenas se houver problema de conexão com o banco de dados.
+	 */
+
+	private boolean addLocations_Sub(int charID, int num, MapPoint mapPoint, String sql) throws SQLException, RagnarokException
+	{
+		PreparedStatement ps = prepare(sql);
+		ps.setInt(1, charID);
+		ps.setInt(2, num);
+		ps.setString(3, mapPoint.getMap());
+		ps.setInt(4, mapPoint.getX());
+		ps.setInt(5, mapPoint.getY());
+
+		return interval(ps.executeUpdate(), 1, 2);
+	}
+
+	/**
 	 * Atualiza todas as informações básicas e de dependências de um determinado personagem.
 	 * @param character personagem contendo todas as informações necessárias dessa dependência.
 	 * @return true se conseguir atualizar ou false caso a dependência não seja encontrada.
@@ -569,7 +636,8 @@ public class CharacterControl extends AbstractControl
 				setLook(character) ||
 				setFamily(character) ||
 				setExperience(character) ||
-				setMercenaryRank(character);
+				setMercenaryRank(character) ||
+				setLocations(character);
 	}
 
 	/**
@@ -814,6 +882,62 @@ public class CharacterControl extends AbstractControl
 	}
 
 	/**
+	 * Atualiza as localizações em mapas salvos existentes de um personagem no banco de dados conforme abaixo:
+	 * @param character personagem contendo todas as informações necessárias dessa dependência.
+	 * @return true se conseguir atualizar ou false caso a dependência não seja encontrada.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean setLocations(Character character) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharMercenaryRank();
+		String sql = format("UPDATE %s SET mpaname = ?, coord_x = ?, coord_y = ? WHERE charid = ? AND num = ?", table);
+
+		try {
+
+			boolean updated = false;
+
+			if (setLocations_Sub(character.getID(), 0, character.getLocations().getLastPoint(), sql) &&
+				setLocations_Sub(character.getID(), 0, character.getLocations().getSavePoint(), sql))
+				updated = true;
+
+			for (int i = 0; i < character.getLocations().getMemoPoints().length; i++)
+				setLocations_Sub(character.getID(), 2+i, character.getLocations().getMemoPoint(i), sql);
+
+			if (updated)
+				logDebug("MercenaryRank#%d atualizado em '%s'.\n", character.getID(), table);
+
+			return updated;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Procedimento interno usado para executar uma query que deverá atualizar as informações de um ponto em mapa.
+	 * @param charID código de identificação do personagem do qual será associado ao ponto especificado.
+	 * @param num número do índice da localização onde - 0: last_point, 1: save_point, 2+: memo_point.
+	 * @param mapPoint informações referente ao nome do mapa e coordenadas do mesmo para serem salvos.
+	 * @param sql string contendo a query que será executada no banco de dados para realizar a atualização.
+	 * @return true se conseguir atualizar ou false caso contrário (charID/num não encontrados).
+	 * @throws SQLException apenas se houver problema de conexão com o banco de dados.
+	 * @throws RagnarokException apenas se houver problema de conexão com o banco de dados.
+	 */
+
+	private boolean setLocations_Sub(int charID, int num, MapPoint mapPoint, String sql) throws SQLException, RagnarokException
+	{
+		PreparedStatement ps = prepare(sql);
+		ps.setString(1, mapPoint.getMap());
+		ps.setInt(2, mapPoint.getX());
+		ps.setInt(3, mapPoint.getY());
+		ps.setInt(4, charID);
+		ps.setInt(5, num);
+
+		return ps.executeUpdate() == 1;
+	}
+
+	/**
 	 * Recarrega todas as informações básicas do banco de dados de um personagem e suas dependências.
 	 * Recarregar as informações pode ser necessário para garantir que alterações realizadas de fora do
 	 * sistema possam ser aplicadas sobre o personagem sem que seja necessário efetuar um logout.
@@ -833,21 +957,20 @@ public class CharacterControl extends AbstractControl
 		String tableExp = Tables.getInstance().getCharExperiences();
 		String tableRank = Tables.getInstance().getCharMercenaryRank();
 		String sql = format("SELECT id, name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
-						+	"manner, effect_state, karma, base_level, job_level, rename, delete_date, moves, font, "
-						+	"unique_item_counter, "
+						+	"manner, effect_state, karma, base_level, job_level, rename_count, delete_date, moves, font, unique_item_counter, "
 						+	"strength, agility, vitality, intelligence, dexterity, luck, "
 						+	"hair, hair_color, clothes_color, body, weapon, shield, head_top, head_mid, head_bottom, robe, "
 						+	"partner, father, mother, child, "
 						+	"base, job, fame, "
-						+	"archer_faith, archer_faith, spear_faith, spear_calls, sword_faith, sword_faith "
+						+	"archer_faith, archer_calls, spear_faith, spear_calls, sword_faith, sword_calls "
 						+	"FROM %s "
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"INNER JOIN %s ON %s.charid = id"
-						+	"WHERE id = ?", table, tableStats, tableStats, tableLook, tableLook,
-						tableFamily, tableFamily, tableRank, tableRank, tableExp, tableExp);
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"INNER JOIN %s ON %s.charid = %s.id "
+						+	"WHERE id = ?", table, tableStats, tableStats, table, tableLook, tableLook, table,
+						tableFamily, tableFamily, table, tableRank, tableRank, table, tableExp, tableExp, table);
 
 		try {
 
@@ -864,6 +987,7 @@ public class CharacterControl extends AbstractControl
 				setCharacterFamily(character, rs);
 				setCharacterExperience(character, rs);
 				setCharacterMercenaryRank(character, rs);
+				reloadLocations(character);
 
 				logDebug("Character#%d com dados recarregados de '%s'.\n", character.getID(), table);
 
@@ -871,6 +995,54 @@ public class CharacterControl extends AbstractControl
 			}
 
 			return false;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Recarrega todas as localizações em mapas do banco de dados de um personagem e suas dependências.
+	 * Recarregar as informações pode ser necessário para garantir que alterações realizadas de fora do
+	 * sistema possam ser aplicadas sobre o personagem sem que seja necessário efetuar um logout.
+	 * @param character personagem do qual deverá ter suas informações recarregadas.
+	 * @return true se conseguir atualizar ou false caso os dados do personagem não sejam encontrados.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean reloadLocations(Character character) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharLocations();
+		String sql = format("SELECT num, mapname, coord_x, coord_y FROM %s WHERE charid = ? ORDER BY num", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, character.getID());
+
+			ResultSet rs = ps.executeQuery();
+
+			if (!rs.next())
+			{
+				logDebug("Locations#%d não encontrado em '%s'.\n", character.getID(), table);
+				return false;
+			}
+
+			do
+			{
+				int num = rs.getInt("num");
+
+				switch (num)
+				{
+					case 0: setLocation(character.getLocations().getLastPoint(), rs); break;
+					case 1: setLocation(character.getLocations().getSavePoint(), rs); break;
+					default: setLocation(character.getLocations().getMemoPoint(num), rs); break;
+				}
+
+			} while (rs.next());
+
+			logDebug("Locations#%d recarregado de '%s'.\n", character.getID(), table);
+			return true;
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e.getMessage());
@@ -1114,7 +1286,7 @@ public class CharacterControl extends AbstractControl
 	public int[] listCharID(int accountID) throws RagnarokException
 	{
 		String table = Tables.getInstance().getAccountsCharacters();
-		String sql = format("slot, charid WHERE account = ?", table);
+		String sql = format("SELECT slot, charid FROM %s WHERE accountid = ?", table);
 
 		try {
 
@@ -1127,9 +1299,10 @@ public class CharacterControl extends AbstractControl
 			while (rs.next())
 			{
 				int slot = rs.getInt("slot");
+				int charid = rs.getInt("charid");
 
 				if (interval(slot, 0, ids.length - 1))
-					ids[slot] = rs.getInt(rs.getInt("charid"));
+					ids[slot] = charid;
 			}
 
 			return ids;
@@ -1153,7 +1326,7 @@ public class CharacterControl extends AbstractControl
 		Index<Character> characters = new StaticArray<>(MAX_CHARS);
 		int ids[] = listCharID(accountID);
 
-		for (int i = 0; i < characters.size(); i++)
+		for (int i = 0; i < ids.length; i++)
 			if (ids[i] != 0)
 				characters.add(i, get(ids[i]));
 
@@ -1181,11 +1354,11 @@ public class CharacterControl extends AbstractControl
 
 			if (ps.executeUpdate() == 1)
 			{
-				logDebug("character#%d agora é do sexo '%s'.\n", Character.sexOf(sex));
+				logDebug("character#%d agora é do sexo '%s'.\n", Character.strSexOf(sex));
 				return true;
 			}
 
-			logDebug("character#%d não se tornou '%s'.\n", Character.sexOf(sex));
+			logDebug("character#%d não se tornou '%s'.\n", Character.strSexOf(sex));
 			return false;
 
 		} catch (SQLException e) {

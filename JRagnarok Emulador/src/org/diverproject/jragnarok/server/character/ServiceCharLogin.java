@@ -22,23 +22,12 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_CHANGE_TIME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_FORCE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_BAN_NOTIFICATION;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ALREADY_ONLINE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHANGE_SEX;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_GLOBAL_REGISTERS;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_ACCOUNT_DATA;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_ACCOUNT_INFO;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_ACCOUNT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_CHAR_SERVER_CONNECT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.jragnarok.server.common.AuthResult.OK;
 import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONLINE;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
-import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.lang.IntUtil.diff;
 
@@ -47,7 +36,7 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.IResponsePacket;
-import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_CharServerConnect;
 import org.diverproject.jragnarok.packets.request.AccountDataRequest;
 import org.diverproject.jragnarok.packets.request.AccountDataResult;
 import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
@@ -60,7 +49,6 @@ import org.diverproject.jragnarok.packets.request.BanNotificationResult;
 import org.diverproject.jragnarok.packets.request.ChangeSexNotify;
 import org.diverproject.jragnarok.packets.request.ChangeSexRequest;
 import org.diverproject.jragnarok.packets.request.CharMapUserCountRequest;
-import org.diverproject.jragnarok.packets.request.CharServerConnectRequest;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
 import org.diverproject.jragnarok.packets.request.NotifyPinError;
 import org.diverproject.jragnarok.packets.request.NotifyPinUpdate;
@@ -73,12 +61,12 @@ import org.diverproject.jragnarok.packets.response.KeepAliveRequest;
 import org.diverproject.jragnarok.packets.response.RefuseEnter;
 import org.diverproject.jragnarok.packets.response.PincodeSendState.PincodeState;
 import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.FileDescriptorSystem;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
+import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.character.structures.ChangeSex;
 import org.diverproject.jragnarok.server.character.structures.CharSessionData;
 import org.diverproject.jragnarok.server.character.structures.ClientMapServer;
@@ -90,7 +78,6 @@ import org.diverproject.util.SocketUtil;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.DynamicList;
 import org.diverproject.util.lang.ByteUtil;
-import org.diverproject.util.lang.HexUtil;
 
 /**
  * <h1>Serviço de Comunicação do Servidor de Acesso</h1>
@@ -114,12 +101,48 @@ public class ServiceCharLogin extends AbstractCharService
 	/**
 	 * Tempo em milissegundos de espera máxima para manter uma conexão viva.
 	 */
-	protected static final int STALL_TIME = seconds(60);
+	public static final int STALL_TIME = seconds(60);
+
 
 	/**
 	 * Descritor de Arquivo para com o servidor de acesso.
 	 */
 	private CFileDescriptor fd;
+
+	/**
+	 * Serviço para comunicação inicial com o cliente.
+	 */
+	private ServiceCharClient client;
+
+	/**
+	 * Serviço principal do servidor de personagem.
+	 */
+	private ServiceCharServer character;
+
+	/**
+	 * Serviço para comunicação com o servidor de mapa.
+	 */
+	private ServiceCharMap map;
+
+	/**
+	 * Serviço para autenticação dos jogadores no servidor.
+	 */
+	private ServiceCharServerAuth auth;
+
+	/**
+	 * Controle para autenticação de jogadores online.
+	 */
+	private AuthMap auths;
+
+	/**
+	 * Controle para dados de personagens online.
+	 */
+	private OnlineMap onlines;
+
+	/**
+	 * Controle para gerenciar dados dos personagens.
+	 */
+	private CharacterControl characters;
 
 	/**
 	 * Instancia um novo serviço de comunicação do servidor de personagem com o de acesso.
@@ -144,24 +167,30 @@ public class ServiceCharLogin extends AbstractCharService
 	@Override
 	public void init()
 	{
-		super.init();
+		client = getServer().getFacade().getCharClient();
+		character = getServer().getFacade().getCharService();
+		map = getServer().getFacade().getMapService();
+		auth = getServer().getFacade().getAuthService();
+		auths = getServer().getFacade().getAuthMap();
+		onlines = getServer().getFacade().getOnlineMap();
+		characters = getServer().getFacade().getCharacterControl();
 
 		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
 
 		Timer connectionTimer = timers.acquireTimer();
-		connectionTimer.setListener(checkLoginConnection);
+		connectionTimer.setListener(CHECK_LOGIN_CONNECTION);
 		connectionTimer.setTick(ts.getCurrentTime() + seconds(1));
 		timers.addLoop(connectionTimer, seconds(10));
 
 		Timer sendAccountsTimer = timers.acquireTimer();
-		sendAccountsTimer.setListener(sendAccounts);
+		sendAccountsTimer.setListener(SEND_ACCOUNTS);
 		sendAccountsTimer.setTick(ts.getCurrentTime() + seconds(1));
 		timers.addLoop(sendAccountsTimer, hours(1));
 
 		Timer timer = timers.acquireTimer();
 		timer.setTick(ts.getCurrentTime() + seconds(1));
-		timer.setListener(broadcastUserCount);
+		timer.setListener(BROADCAST_USER_COUNT);
 		timers.addLoop(timer, seconds(5));
 	}
 
@@ -174,6 +203,12 @@ public class ServiceCharLogin extends AbstractCharService
 	public void destroy()
 	{
 		client = null;
+		character = null;
+		map = null;
+		auth = null;
+		auths = null;
+		onlines = null;
+		characters = null;
 
 		if (fd != null)
 		{
@@ -222,7 +257,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * Caso já exista uma conexão, esse procedimento não terá qualquer efeito.
 	 */
 
-	private final TimerListener checkLoginConnection = new TimerListener()
+	private final TimerListener CHECK_LOGIN_CONNECTION = new TimerListener()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -252,7 +287,7 @@ public class ServiceCharLogin extends AbstractCharService
 					short type = s(getConfigs().getInt(CHAR_MAINTANCE));
 					boolean newDisplay = getConfigs().getBool(CHAR_NEW_DISPLAY);
 
-					CharServerConnectRequest packet = new CharServerConnectRequest();
+					CA_CharServerConnect packet = new CA_CharServerConnect();
 					packet.setUsername(username);
 					packet.setPassword(password);
 					packet.setServerIP(serverIP);
@@ -262,7 +297,7 @@ public class ServiceCharLogin extends AbstractCharService
 					packet.setNewDisplay(newDisplay);
 					packet.send(fd);
 				}
-				fd.setParseListener(parse);
+				fd.setParseListener(getServer().getFacade().PARSE_LOGIN_SERVER);
 
 			} catch (IOException e) {
 				logInfo("falha ao conectar-se com %s:%d", host, port);
@@ -287,7 +322,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * Irá listar o código de identificação de todas as contas que estiverem online.
 	 */
 
-	private final TimerListener sendAccounts = new TimerListener()
+	private final TimerListener SEND_ACCOUNTS = new TimerListener()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -324,7 +359,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * como também para todos os servidores de mapa do mesmo (apenas se tiver alterado).
 	 */
 
-	private final TimerListener broadcastUserCount = new TimerListener()
+	private final TimerListener BROADCAST_USER_COUNT = new TimerListener()
 	{
 		private int previous;
 
@@ -355,35 +390,11 @@ public class ServiceCharLogin extends AbstractCharService
 	};
 
 	/**
-	 * Listener que será definido para a conexão estabelecida com o servidor de acesso.
-	 * Ele deverá receber todos os comandos ou resultados de solicitações do mesmo.
-	 * Após receber o comando deverá despachar para o procedimento correto.
-	 */
-
-	private final FileDescriptorListener parse = new FileDescriptorListener()
-	{
-		@Override
-		public boolean onCall(FileDescriptor fd) throws RagnarokException
-		{
-			if (!fd.isConnected())
-			{
-				logWarning("conexão com o servidor de personagens perdida.\n");
-				return false;
-			}
-
-			CFileDescriptor cfd = (CFileDescriptor) fd;
-			parsePing(cfd);
-
-			return acknowledgePacket(cfd);
-		}
-	};
-
-	/**
 	 * Verifica se a conexão está em estado para solicitação de um ping.
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
-	private void parsePing(CFileDescriptor fd)
+	public void parsePing(CFileDescriptor fd)
 	{
 		if (fd.getFlag().is(FileDescriptor.FLAG_PING))
 		{
@@ -400,78 +411,6 @@ public class ServiceCharLogin extends AbstractCharService
 				fd.getFlag().set(FileDescriptor.FLAG_PING_SENT);
 			}
 		}		
-	}
-
-	/**
-	 * Procedimento que verifica qual o código do comando passado pelo servidor de acesso.
-	 * A partir deste comando deverá repassar a conexão para o procedimento correto.
-	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor.
-	 * @return true para manter a conexão aberta ou false para fechar.
-	 */
-
-	protected boolean acknowledgePacket(CFileDescriptor fd)
-	{
-		AcknowledgePacket ack = new AcknowledgePacket();
-		ack.receive(fd, false);
-
-		short command = ack.getPacketID();
-
-		switch (command)
-		{
-			case PACKET_REQ_KEEP_ALIVE:
-				return keepAlive(fd);
-
-			case PACKET_REQ_CHANGE_SEX:
-				return reqChangeSex(fd);
-
-			case PACKET_RES_GLOBAL_REGISTERS:
-				reqGlobalAccountReg(fd);
-				return true;
-		}
-
-		return acknowledgeResultPackets(fd, command);
-	}
-
-	/**
-	 * Análise de pacotes contento a resposta de uma solicitação feita ao servidor de acesso.
-	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor.
-	 * @param command código do comando identificado no reconhecimento de pacote.
-	 * @return true para manter a conexão aberta ou false para fechar.
-	 */
-
-	public boolean acknowledgeResultPackets(CFileDescriptor fd, short command)
-	{
-		switch (command)
-		{
-			case PACKET_RES_CHAR_SERVER_CONNECT:
-				return parseLoginResult(fd);
-
-			case PACKET_RES_AUTH_ACCOUNT:
-				return parseAuthAccount(fd);
-
-			case PACKET_RES_ACCOUNT_DATA:
-				return parseAccountData(fd);
-
-			case PACKET_RES_ACCOUNT_INFO:
-				parseAccountInfo(fd);
-				return true;
-
-			case PACKET_REQ_BAN_NOTIFICATION:
-				banNofitication(fd);
-				return true;
-
-			case PACKET_ALREADY_ONLINE:
-				alreadyOnline(fd);
-				return true;
-
-			case PACKET_SYNCRONIZE_IPADDRESS:
-			default:
-				String packet = HexUtil.parseInt(command, 4);
-				String address = fd.getAddressString();
-				logNotice("fim de conexão inesperado (pacote: 0x%s, ip: %s)\n", packet, address);
-				fd.close();
-				return false;
-		}
 	}
 
 	/**
@@ -522,7 +461,7 @@ public class ServiceCharLogin extends AbstractCharService
 				Timer waitingDisconnect = timers.acquireTimer();
 				waitingDisconnect.setTick(ts.getCurrentTime());
 				waitingDisconnect.setObjectID(online.getAccountID());
-				waitingDisconnect.setListener(character.waitinDisconnect);
+				waitingDisconnect.setListener(character.WAITING_DISCONNECT);
 				timers.addInterval(waitingDisconnect, ServiceCharServer.AUTH_TIMEOUT);
 			}
 
@@ -582,9 +521,9 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public boolean reqAuthAccount(CFileDescriptor fd)
 	{
-		logDebug("solicitando autenticação de conta (fd: %d).\n", fd.getID());
-
 		CharSessionData sd = fd.getSessionData();
+
+		logDebug("solicitando autenticação de conta (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
 
 		AuthAccountRequest packet = new AuthAccountRequest();
 		packet.setFileDescriptorID(fd.getID());
@@ -604,10 +543,10 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public boolean parseAuthAccount(CFileDescriptor lfd)
 	{
-		logDebug("recebendo resultado da autenticação de conta.\n");
-
 		AuthAccountResult packet = new AuthAccountResult();
 		packet.receive(lfd);
+
+		logDebug("recebendo resultado da autenticação de conta (aid: %d).\n", packet.getAccountID());
 
 		int fdID = packet.getFileDescriptorID();
 
@@ -616,7 +555,7 @@ public class ServiceCharLogin extends AbstractCharService
 			CFileDescriptor fd = (CFileDescriptor) getFileDescriptorSystem().get(fdID);
 			CharSessionData sd = fd.getSessionData();
 
-			if (sd.isAuth() && sd.getID() == packet.getAccountID() &&
+			if (!sd.isAuth() && sd.getID() == packet.getAccountID() &&
 				sd.getSeed().equals(packet.getFirstSeed(), packet.getSecondSeed()))
 			{
 				sd.setVersion(packet.getVersion());
@@ -628,13 +567,13 @@ public class ServiceCharLogin extends AbstractCharService
 					logWarning("account#%d com versão %d e o servidor foi compilado para %d.\n", sd.getID(), sd.getVersion(), serverVersion);
 
 				if (packet.isResult())
-					return character.authOk(fd);
-			}
+					return auth.authOk(fd);
 
-			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
+				client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
+			}
 		}
 
-		return false;
+		return true;
 	}
 
 	/**
@@ -671,7 +610,7 @@ public class ServiceCharLogin extends AbstractCharService
 		CFileDescriptor fd = (CFileDescriptor) getFileDescriptorSystem().get(packet.getFdID());
 		CharSessionData sd = fd.getSessionData();
 
-		if (!sd.isAuth() || sd.getID() == packet.getAccountID())
+		if (!sd.isAuth() || sd.getID() != packet.getAccountID())
 			return false;
 
 		sd.setEmail(packet.getEmail());
@@ -706,6 +645,8 @@ public class ServiceCharLogin extends AbstractCharService
 					enabled = true;
 			}
 		}
+
+		enabled = true; // Remover depois de identificar o servidor de mapa.
 
 		if (enabled)
 		{

@@ -1,19 +1,19 @@
-package org.diverproject.jragnarok.packets.response;
+package org.diverproject.jragnarok.packets.login.acess_client;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REFUSE_LOGIN_R2;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AC_REFUSE_LOGIN_R2;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
-public class RefuseLoginInt extends ResponsePacket
+public class AC_RefuseLoginR2 extends ResponsePacket
 {
 	private AuthResult result;
 	private String blockDate;
 
-	public RefuseLoginInt()
+	public AC_RefuseLoginR2()
 	{
 		blockDate = "";
 	}
@@ -25,26 +25,9 @@ public class RefuseLoginInt extends ResponsePacket
 		output.putString(blockDate, 20);
 	}
 
-	@Override
-	public String getName()
-	{
-		return "REFUSE_LOGIN_R2";
-	}
-
-	@Override
-	public short getIdentify()
-	{
-		return PACKET_REFUSE_LOGIN_R2;
-	}
-
 	public void setResult(AuthResult result)
 	{
 		this.result = result;
-	}
-
-	public String getBlockDate()
-	{
-		return blockDate;
 	}
 
 	public void setBlockDate(String blockDate)
@@ -54,9 +37,21 @@ public class RefuseLoginInt extends ResponsePacket
 	}
 
 	@Override
+	public String getName()
+	{
+		return "AC_REFUSE_LOGIN_R2";
+	}
+
+	@Override
+	public short getIdentify()
+	{
+		return PACKET_AC_REFUSE_LOGIN_R2;
+	}
+
+	@Override
 	protected int length()
 	{
-		return 24;
+		return 21;
 	}
 
 	@Override
@@ -64,7 +59,7 @@ public class RefuseLoginInt extends ResponsePacket
 	{
 		super.toString(description);
 
-		description.append(result);
-		description.append(blockDate);
+		description.append("code", result);
+		description.append("blockDate", blockDate);
 	}
 }

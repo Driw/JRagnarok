@@ -7,13 +7,13 @@ import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.loginMessage;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Encrypt;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5MAC;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5INFO;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_HAN;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_PCBANG;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_SSO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN2;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN3;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN4;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_HAN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_PCBANG;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_SSO_LOGIN_REQ;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.common.AuthResult.OK;
 import static org.diverproject.jragnarok.server.common.AuthResult.REJECTED_FROM_SERVER;
@@ -24,15 +24,15 @@ import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
-import org.diverproject.jragnarok.packets.receive.LoginDefault;
-import org.diverproject.jragnarok.packets.receive.LoginHan;
-import org.diverproject.jragnarok.packets.receive.LoginMD5;
-import org.diverproject.jragnarok.packets.receive.LoginMD5Info;
-import org.diverproject.jragnarok.packets.receive.LoginMD5Mac;
-import org.diverproject.jragnarok.packets.receive.LoginPCBang;
-import org.diverproject.jragnarok.packets.receive.LoginSingleSignOn;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_CharServerConnect;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_Login;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_Login2;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_Login3;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_Login4;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_LoginHan;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_LoginPCBang;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_LoginSingleSignOn;
 import org.diverproject.jragnarok.packets.request.AlreadyOnline;
-import org.diverproject.jragnarok.packets.request.CharServerConnectRequest;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.ServerState;
@@ -41,7 +41,6 @@ import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.CharServerType;
-import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.util.SocketUtil;
@@ -162,69 +161,69 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		switch (command)
 		{
-			case PACKET_LOGIN:
-				LoginDefault loginPacket = new LoginDefault();
+			case PACKET_CA_LOGIN:
+				CA_Login loginPacket = new CA_Login();
 				loginPacket.receive(fd, false);
 				sd.setVersion(loginPacket.getVersion());
-				sd.setClientType(ClientType.parse(loginPacket.getClientType()));
+				sd.setClientType(loginPacket.getClientType());
 				sd.setUsername(loginPacket.getUsername());
 				sd.setPassword(loginPacket.getPassword());
 				break;
 
-			case PACKET_LOGIN_PCBANG:
-				LoginPCBang loginPCBang = new LoginPCBang();
+			case PACKET_CA_LOGIN_PCBANG:
+				CA_LoginPCBang loginPCBang = new CA_LoginPCBang();
 				loginPCBang.receive(fd, false);
 				sd.setVersion(loginPCBang.getVersion());
-				sd.setClientType(ClientType.parse(loginPCBang.getClientType()));
+				sd.setClientType(loginPCBang.getClientType());
 				sd.setUsername(loginPCBang.getUsername());
 				sd.setPassword(loginPCBang.getPassword());
 				break;
 
-			case PACKET_LOGIN_HAN:
-				LoginHan loginHan = new LoginHan();
+			case PACKET_CA_LOGIN_HAN:
+				CA_LoginHan loginHan = new CA_LoginHan();
 				loginHan.receive(fd, false);
 				sd.setVersion(loginHan.getVersion());
-				sd.setClientType(ClientType.parse(loginHan.getClientType()));
+				sd.setClientType(loginHan.getClientType());
 				sd.setUsername(loginHan.getUsername());
 				sd.setPassword(loginHan.getPassword());
 				break;
 
-			case PACKET_LOGIN_SSO:
-				LoginSingleSignOn loginSingleSignOn = new LoginSingleSignOn();
+			case PACKET_CA_SSO_LOGIN_REQ:
+				CA_LoginSingleSignOn loginSingleSignOn = new CA_LoginSingleSignOn();
 				loginSingleSignOn.receive(fd, false);
 				sd.setVersion(loginSingleSignOn.getVersion());
-				sd.setClientType(ClientType.parse(loginSingleSignOn.getClientType()));
+				sd.setClientType(loginSingleSignOn.getClientType());
 				sd.setUsername(loginSingleSignOn.getUsername());
 				sd.setPassword(loginSingleSignOn.getToken());
 				break;
 
-			case PACKET_LOGIN_MD5:
-				LoginMD5 loginMD5 = new LoginMD5();
+			case PACKET_CA_LOGIN2:
+				CA_Login2 loginMD5 = new CA_Login2();
 				loginMD5.receive(fd, false);
 				sd.setVersion(loginMD5.getVersion());
 				sd.setUsername(loginMD5.getUsername());
 				sd.setPassword(loginMD5.getPassword());
-				sd.setClientType(ClientType.parse(loginMD5.getClientType()));
+				sd.setClientType(loginMD5.getClientType());
 				usingRawPassword = false;
 				break;
 
-			case PACKET_LOGIN_MD5INFO:
-				LoginMD5Info loginMD5Info = new LoginMD5Info();
+			case PACKET_CA_LOGIN3:
+				CA_Login3 loginMD5Info = new CA_Login3();
 				loginMD5Info.receive(fd, false);
 				sd.setVersion(loginMD5Info.getVersion());
 				sd.setUsername(loginMD5Info.getUsername());
 				sd.setPassword(loginMD5Info.getPassword());
-				sd.setClientType(ClientType.parse(loginMD5Info.getClientType()));
+				sd.setClientType(loginMD5Info.getClientType());
 				usingRawPassword = false;
 				break;
 
-			case PACKET_LOGIN_MD5MAC:
-				LoginMD5Mac loginMD5Mac = new LoginMD5Mac();
+			case PACKET_CA_LOGIN4:
+				CA_Login4 loginMD5Mac = new CA_Login4();
 				loginMD5Mac.receive(fd, false);
 				sd.setVersion(loginMD5Mac.getVersion());
 				sd.setUsername(loginMD5Mac.getUsername());
 				sd.setPassword(loginMD5Mac.getPassword());
-				sd.setClientType(ClientType.parse(loginMD5Mac.getClientType()));
+				sd.setClientType(loginMD5Mac.getClientType());
 				usingRawPassword = false;
 				break;
 		}
@@ -560,27 +559,27 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 	public boolean requestCharConnect(LFileDescriptor fd)
 	{
-		CharServerConnectRequest ccPacket = new CharServerConnectRequest();
-		ccPacket.receive(fd, false);
+		CA_CharServerConnect packet = new CA_CharServerConnect();
+		packet.receive(fd, false);
 
-		Account account = accounts.get(ccPacket.getUsername());
+		Account account = accounts.get(packet.getUsername());
 
 		if (account == null)
 		{
-			logWarning("char-server com usuário não encontrado (name: %s, username: %s).\n", ccPacket.getServerName(), ccPacket.getUsername());
+			logWarning("char-server com usuário não encontrado (name: %s, username: %s).\n", packet.getServerName(), packet.getUsername());
 			return false;
 		}
 
-		if (!account.getPassword().equals(ccPacket.getPassword()))
+		if (!account.getPassword().equals(packet.getPassword()))
 		{
-			logWarning("char-server com senha incompatível (name: %s, username: %s).\n", ccPacket.getServerName(), ccPacket.getUsername());
+			logWarning("char-server com senha incompatível (name: %s, username: %s).\n", packet.getServerName(), packet.getUsername());
 			return false;
 		}
 		
 		LoginSessionData sd = fd.getSessionData();
 		sd.setID(account.getID());
-		sd.setUsername(ccPacket.getUsername());
-		sd.setPassword(ccPacket.getPassword());
+		sd.setUsername(packet.getUsername());
+		sd.setPassword(packet.getPassword());
 		sd.setGroup(account.getGroup().getCurrentGroup());
 
 		if (getConfigs().getBool("login.user_md5_password"))
@@ -589,11 +588,11 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		sd.getPassDencrypt().setValue(b(0));
 		sd.setVersion(getConfigs().getInt("client.version"));
 
-		String serverName = ccPacket.getServerName();
-		int serverIP = ccPacket.getServerIP();
-		short serverPort = ccPacket.getServerPort();
-		short type = ccPacket.getType();
-		boolean newDisplay = ccPacket.getNewDisplay();
+		String serverName = packet.getServerName();
+		int serverIP = packet.getServerIP();
+		short serverPort = packet.getServerPort();
+		short type = packet.getType();
+		boolean newDisplay = packet.getNewDisplay();
 
 		logInfo("conexão solicitada do servidor de personagens %s@%s (account: %s, pass: %s).\n", serverName, fd.getAddressString(), sd.getUsername(), sd.getPassword());
 

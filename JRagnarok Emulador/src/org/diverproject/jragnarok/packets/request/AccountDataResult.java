@@ -203,6 +203,6 @@ public class AccountDataResult extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 27 + EMAIL_LENGTH + PINCODE_LENGTH;
+		return 31 + EMAIL_LENGTH + PINCODE_LENGTH;
 	}
 }

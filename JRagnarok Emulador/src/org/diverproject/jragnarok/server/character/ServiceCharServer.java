@@ -15,6 +15,21 @@ public class ServiceCharServer extends AbstractCharService
 {
 	public static final int AUTH_TIMEOUT = seconds(30);
 
+	/**
+	 * Serviço para comunicação com o servidor de acesso.
+	 */
+	private ServiceCharLogin login;
+
+	/**
+	 * Controle para dados de personagens online.
+	 */
+	private OnlineMap onlines;
+
+	/**
+	 * Cria uma nova instância do principal serviço para um servidor de personagem.
+	 * @param server referência do servidor de personagem que irá usar o serviço.
+	 */
+
 	public ServiceCharServer(CharServer server)
 	{
 		super(server);
@@ -23,18 +38,26 @@ public class ServiceCharServer extends AbstractCharService
 	@Override
 	public void init()
 	{
-		super.init();
+		login = getServer().getFacade().getLoginService();
+		onlines = getServer().getFacade().getOnlineMap();
 
 		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
 
 		Timer odcTimer = timers.acquireTimer();
-		odcTimer.setListener(onlineDataCleanup);
+		odcTimer.setListener(ONLINE_DATA_CLEANUP);
 		odcTimer.setTick(ts.getCurrentTime() + seconds(1));
 		timers.addLoop(odcTimer, seconds(10));
 	}
 
-	private final TimerListener onlineDataCleanup = new TimerListener()
+	@Override
+	public void destroy()
+	{
+		login = null;
+		onlines = null;
+	}
+
+	private final TimerListener ONLINE_DATA_CLEANUP = new TimerListener()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -55,7 +78,7 @@ public class ServiceCharServer extends AbstractCharService
 		}
 	};
 
-	public final TimerListener waitinDisconnect = new TimerListener()
+	public final TimerListener WAITING_DISCONNECT = new TimerListener()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -67,7 +90,7 @@ public class ServiceCharServer extends AbstractCharService
 		@Override
 		public String getName()
 		{
-			return "waitinDisconnect";
+			return "waitingDisconnect";
 		}
 	};
 
@@ -119,13 +142,6 @@ public class ServiceCharServer extends AbstractCharService
 	public int getCountUsers()
 	{
 		return 0;
-	}
-
-	public boolean authOk(CFileDescriptor fd)
-	{
-		// TODO char.c:1884 (char_auth_ok)
-
-		return false;
 	}
 
 	public void disconnectPlayer(int accountID)

@@ -1,3 +1,15 @@
+31.12.2016 - 1.4.157
+- Alterando o formado de organização e nomeação (classes) dos pacotes, também foram documentados.
+- Agora sendAccountData poderá receber o fdID corretamente sem causar problemas no servidor de personagem.
+- AuthControl renomeado para AuthMap e OnlineCharControl renomeado para OnlineMap.
+- CharSessionData estava causando problemas por não inicializar algumas dependências.
+- AbstractCharService não deverá mais possuir as dependências do servidor de personagem (serviços/controles).
+- CharServer será responsável apenas por instanciar CharServerFacade e não os seus serviços.
+- CharServerFacade adicionado para guardar os serviços/controles/coleções do servidor de personagem.
+	- Alguns listeners também são movidos para cá, principalmente os de reconhecimento de pacotes.
+- ServiceCharLogin.parseAuthAccount não estava funcionando como era esperado.
+- ServiceCharLogin.parseAccountData pedia para que aid fosse diferente e não igual.
+
 31.12.2016 - 1.4.156
 - Problema onde characters_locations não permitia duas localizações de um mesmo personagem.
 - As operações de get() e isAlive() não estavam funcionando adequadamente, FileDescriptorSystem.

@@ -1,16 +1,17 @@
-package org.diverproject.jragnarok.packets.response;
+package org.diverproject.jragnarok.packets.login.acess_client;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LIST_SERVERS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AC_ACCEPT_LOGIN;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.CharServerList;
 import org.diverproject.jragnarok.server.login.ClientCharServer;
 import org.diverproject.jragnarok.server.login.LoginSessionData;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.lang.Bits;
 import org.diverproject.util.stream.Output;
 
-public class ListCharServers extends ResponsePacket
+public class AC_AccepLogin extends ResponsePacket
 {
 	private CharServerList servers;
 	private LoginSessionData sd;
@@ -18,7 +19,7 @@ public class ListCharServers extends ResponsePacket
 	@Override
 	protected void sendOutput(Output output)
 	{
-		int length = 47 + (32 * servers.size());
+		int length = length() + 2;
 
 		output.putShort(s(length));
 		output.putInt(sd.getSeed().getFirst());
@@ -27,21 +28,19 @@ public class ListCharServers extends ResponsePacket
 
 		/* Era usado em versões antigas
 		 * output.putInt(sd.getAddress());
-		 * output.putInt(sd.getLastLogin().get());
+		 * output.putString(sd.getLastLogin().toString(), 26);
 		 */
 
 		output.skipe(4);
-		output.skipe(24);
-		output.skipe(3);
+		output.skipe(26);
+		output.skipe(1);
 
 		for (ClientCharServer server : servers)
 		{
 			if (!server.getFileDecriptor().isConnected())
 				continue;
 
-			// TODO IP de LAN ou WAN : loginclif.c:128
-
-			output.putInt(Bits.swap(server.getIP().get()));
+			output.putInt(Bits.swap(server.getIP().get())); // TODO IP de LAN ou WAN : loginclif.c:128
 			output.putShort(s(server.getPort()));
 			output.putString(server.getName(), 20);
 			output.putShort(server.getUsers());
@@ -61,20 +60,33 @@ public class ListCharServers extends ResponsePacket
 	}
 
 	@Override
-	protected int length()
-	{
-		return 0;
-	}
-
-	@Override
 	public String getName()
 	{
-		return "LIST_SERVERS";
+		return "AC_ACCEPT_LOGIN";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_LIST_SERVERS;
+		return PACKET_AC_ACCEPT_LOGIN;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 45 + (32 * servers.size());
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		if (sd != null)
+			description.append("aid", sd.getID());
+
+		if (servers != null)
+			for (ClientCharServer server : servers)
+				description.append(server.getName(), server.getUsers()+ " onlines");
 	}
 }

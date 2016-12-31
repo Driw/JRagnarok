@@ -10,9 +10,6 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
-import org.diverproject.jragnarok.server.character.control.AuthControl;
-import org.diverproject.jragnarok.server.character.control.CharacterControl;
-import org.diverproject.jragnarok.server.character.control.OnlineCharControl;
 
 /**
  * <h1>Servidor de Personagem</h1>
@@ -32,7 +29,6 @@ import org.diverproject.jragnarok.server.character.control.OnlineCharControl;
  * @see ServiceCharClient
  * @see ServiceCharServer
  * @see ServiceCharLogin
- * @see CharacterControl
  *
  * @author Andrew
  */
@@ -45,45 +41,9 @@ public class CharServer extends Server
 	private MapServerList mapServers;
 
 	/**
-	 * Serviço para comunicação inicial com o cliente.
+	 * Façade contento os serviços e controles disponíveis.
 	 */
-	private ServiceCharClient charClient;
-
-	/**
-	 * Serviço principal do servidor de personagem.
-	 */
-	private ServiceCharServer charServer;
-
-	/**
-	 * Serviço para comunicação com o servidor de acesso.
-	 */
-	private ServiceCharLogin charLogin;
-
-	/**
-	 * Serviço para comunicação com o servidor de mapa.
-	 */
-	private ServiceCharMap charMap;
-
-	/**
-	 * Serviço para autenticação dos jogadores no servidor.
-	 */
-	private ServiceCharServerAuth charServerAuth;
-
-
-	/**
-	 * Controle para autenticação de jogadores online.
-	 */
-	private AuthControl authControl;
-
-	/**
-	 * Controle para dados de personagens online.
-	 */
-	private OnlineCharControl onlineCharControl;
-
-	/**
-	 * Controle para gerenciar dados dos personagens.
-	 */
-	private CharacterControl characterControl;
+	private CharServerFacade facade;
 
 	/**
 	 * Cria uma nova instância de um servidor de personagem inicialização o seu listener.
@@ -104,76 +64,12 @@ public class CharServer extends Server
 	}
 
 	/**
-	 * @return aquisição do serviço para comunicação inicial com clientes.
+	 * @return aquisição do façade que possui os serviços e controles do servidor de personagem.
 	 */
 
-	public ServiceCharClient getCharClient()
+	public CharServerFacade getFacade()
 	{
-		return charClient;
-	}
-
-	/**
-	 * @return aquisição do serviço principal do servidor de personagem.
-	 */
-
-	public ServiceCharServer getCharServer()
-	{
-		return charServer;
-	}
-
-	/**
-	 * @return aquisição do serviço para comunicação com o servidor de acesso.
-	 */
-
-	public ServiceCharLogin getCharLogin()
-	{
-		return charLogin;
-	}
-
-	/**
-	 * @return aquisição do serviço para comunicação com o servidor de mapa.
-	 */
-
-	public ServiceCharMap getCharMap()
-	{
-		return charMap;
-	}
-
-	/**
-	 * @return aquisição do serviço para autenticação dos jogadores no servidor.
-	 */
-
-	public ServiceCharServerAuth getCharServerAuth()
-	{
-		return charServerAuth;
-	}
-
-
-	/**
-	 * @return aquisição do controle para autenticação dos jogadores online.
-	 */
-
-	public AuthControl getAuthControl()
-	{
-		return authControl;
-	}
-
-	/**
-	 * @return aquisição do controle para dados de personagens online.
-	 */
-
-	public OnlineCharControl getOnlineCharControl()
-	{
-		return onlineCharControl;
-	}
-
-	/**
-	 * @return aquisição do controle dos dados básicos dos personagens.
-	 */
-
-	public CharacterControl getCharacterControl()
-	{
-		return characterControl;
+		return facade;
 	}
 
 	@Override
@@ -192,7 +88,7 @@ public class CharServer extends Server
 	protected CFileDescriptor acceptSocket(Socket socket)
 	{
 		CFileDescriptor fd = new CFileDescriptor(socket);
-		fd.setParseListener(charClient.parse);
+		fd.setParseListener(facade.CLIENT_PARSE);
 
 		return fd;
 	}
@@ -231,21 +127,9 @@ public class CharServer extends Server
 		@Override
 		public void onCreated() throws RagnarokException
 		{
-			authControl = new AuthControl();
-			onlineCharControl = new OnlineCharControl(getMySQL().getConnection());
-			characterControl = new CharacterControl(getMySQL().getConnection());
-
-			charServer = new ServiceCharServer(CharServer.this);
-			charLogin = new ServiceCharLogin(CharServer.this);
-			charMap = new ServiceCharMap(CharServer.this);
-			charClient = new ServiceCharClient(CharServer.this);
-			charServerAuth = new ServiceCharServerAuth(CharServer.this);
-
-			charServer.init();
-			charLogin.init();
-			charMap.init();
-			charClient.init();
-			charServerAuth.init();
+			mapServers = new MapServerList();
+			facade = new CharServerFacade();
+			facade.create(CharServer.this);
 		};
 
 		@Override
@@ -272,28 +156,16 @@ public class CharServer extends Server
 		@Override
 		public void onDestroy() throws RagnarokException
 		{
-			charServer.destroy();
-			charLogin.destroy();
-			charMap.destroy();
-			charClient.destroy();
-			charServerAuth.destroy();
-
-			authControl.clear();
-			onlineCharControl.clear();
+			facade.destroy();
 		}
 
 		@Override
 		public void onDestroyed() throws RagnarokException
 		{
-			characterControl = null;
-			authControl = null;
-			onlineCharControl = null;
+			facade.destroyed();
 
-			charServer = null;
-			charLogin = null;
-			charMap = null;
-			charClient = null;
-			charServerAuth = null;
+			facade = null;
+			mapServers = null;
 		}
 	};
 }

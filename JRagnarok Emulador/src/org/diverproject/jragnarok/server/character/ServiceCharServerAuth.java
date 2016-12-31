@@ -20,6 +20,36 @@ import org.diverproject.util.stream.StreamException;
 public class ServiceCharServerAuth extends AbstractCharService
 {
 	/**
+	 * Serviço para comunicação inicial com o cliente.
+	 */
+	private ServiceCharClient client;
+
+	/**
+	 * Serviço principal do servidor de personagem.
+	 */
+	private ServiceCharServer character;
+
+	/**
+	 * Serviço para comunicação com o servidor de acesso.
+	 */
+	private ServiceCharLogin login;
+
+	/**
+	 * Serviço para comunicação com o servidor de mapa.
+	 */
+	private ServiceCharMap map;
+
+	/**
+	 * Controle para autenticação de jogadores online.
+	 */
+	private AuthMap auths;
+
+	/**
+	 * Controle para dados de personagens online.
+	 */
+	private OnlineMap onlines;
+
+	/**
 	 * Cria uma nova instância de um serviço para autenticação de clientes no servidor de personagem.
 	 * @param server referência do servidor de personagem que irá utilizar este serviço.
 	 */
@@ -29,12 +59,36 @@ public class ServiceCharServerAuth extends AbstractCharService
 		super(server);
 	}
 
+	@Override
+	public void init()
+	{
+		client = getServer().getFacade().getCharClient();
+		character = getServer().getFacade().getCharService();
+		login = getServer().getFacade().getLoginService();
+		map = getServer().getFacade().getMapService();
+
+		auths = getServer().getFacade().getAuthMap();
+		onlines = getServer().getFacade().getOnlineMap();
+	}
+
+	@Override
+	public void destroy()
+	{
+		client = null;
+		character = null;
+		login = null;
+		map = null;
+
+		auths = null;
+		onlines = null;
+	}
+
 	/**
 	 * Procedimento de chamada em um temporizador para remover um jogador online do sistema.
 	 * Isso não irá notificar o jogador de que ficou online, apenas remover do sistema.
 	 */
 
-	private final TimerListener waitingDisconnect = new TimerListener()
+	private final TimerListener WAITING_DISCONNECT = new TimerListener()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -123,7 +177,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 	 * @param fd código de identificação do descritor de arquivo do cliente com o servidor.
 	 */
 
-	private void authOk(CFileDescriptor fd)
+	public boolean authOk(CFileDescriptor fd)
 	{
 		CharSessionData sd = fd.getSessionData();
 		OnlineCharData online = onlines.get(sd.getID());
@@ -140,7 +194,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 					TimerMap timers = getTimerSystem().getTimers();
 
 					Timer timer = timers.acquireTimer();
-					timer.setListener(waitingDisconnect);
+					timer.setListener(WAITING_DISCONNECT);
 					timer.setObjectID(online.getAccountID());
 					timers.addInterval(timer, seconds(20));
 
@@ -148,14 +202,14 @@ public class ServiceCharServerAuth extends AbstractCharService
 				}
 
 				client.sendNotifyResult(fd, NotifyAuthResult.RECOGNIZES_LAST_LOGIN);
-				return;
+				return false;
 			}
 
 			// Já está conectado mas não selecionou um personagem
 			if (online.getFileDescriptor() != null && online.getFileDescriptor().getID() != fd.getID())
 			{
 				client.sendNotifyResult(fd, NotifyAuthResult.RECOGNIZES_LAST_LOGIN);
-				return;
+				return false;
 			}
 
 			online.setFileDescriptor(fd);
@@ -166,5 +220,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 		character.setCharSelect(fd);
 
 		logDebug("atualizando autenticação encontrada (aid: %d).\n", sd.getID());
+
+		return true;
 	}
 }

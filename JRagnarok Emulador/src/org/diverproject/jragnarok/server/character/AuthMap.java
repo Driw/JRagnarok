@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.character.control;
+package org.diverproject.jragnarok.server.character;
 
 import org.diverproject.jragnarok.server.character.entities.AuthNode;
 import org.diverproject.util.ObjectDescription;
@@ -18,7 +18,7 @@ import org.diverproject.util.collection.abstraction.IntegerLittleMap;
  * @author Andrew
  */
 
-public class AuthControl
+public class AuthMap
 {
 	/**
 	 * Mapeamento dos jogadores autenticados.
@@ -29,7 +29,7 @@ public class AuthControl
 	 * Cria um novo controle para gerenciar jogadores autenticados no sistema.
 	 */
 
-	public AuthControl()
+	public AuthMap()
 	{
 		cache = new IntegerLittleMap<>();
 	}

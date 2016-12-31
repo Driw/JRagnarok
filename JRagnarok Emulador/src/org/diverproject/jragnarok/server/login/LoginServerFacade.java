@@ -4,22 +4,23 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOG_LOGIN;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACCOUNT_STATE_NOTIFY;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACCOUNT_STATE_UPDATE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_HAN;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5INFO;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_MD5MAC;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_PCBANG;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_LOGIN_SSO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CHARSERVERCONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CONNECT_INFO_CHANGED;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_EXE_HASHCHECK;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN2;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN3;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN4;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_HAN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_PCBANG;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_REQ_HASH;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_SSO_LOGIN_REQ;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_NOTIFY_PIN_ERROR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_NOTIFY_PIN_UPDATE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_INFO;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_AUTH_ACCOUNT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHANGE_EMAIL;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHAR_SERVER_CONNECT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_HASH;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_GLOBAL_REGISTER;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_UNBAN_ACCOUNT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_VIP_DATA;
@@ -28,7 +29,6 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SEND_ACCO
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SET_ACCOUNT_OFFLINE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SET_ACCOUNT_ONLINE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SET_ALL_ACC_OFFLINE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_CLIENT_HASH;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_IP;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_REGISTER;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_USER_COUNT;
@@ -36,7 +36,7 @@ import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.receive.AcknowledgePacket;
+import org.diverproject.jragnarok.packets.AcknowledgePacket;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
@@ -413,15 +413,15 @@ class LoginServerFacade
 
 		switch (command)
 		{
-			case PACKET_KEEP_ALIVE:
+			case PACKET_CA_CONNECT_INFO_CHANGED:
 				clientService.keepAlive(fd);
 				return true;
 
-			case PACKET_UPDATE_CLIENT_HASH:
+			case PACKET_CA_EXE_HASHCHECK:
 				clientService.updateClientHash(fd);
 				return true;
 
-			case PACKET_REQ_HASH:
+			case PACKET_CA_REQ_HASH:
 				clientService.parseRequestKey(fd);
 				return true;
 		}
@@ -443,17 +443,17 @@ class LoginServerFacade
 		switch (command)
 		{
 			// Solicitação de acesso com senha direta
-			case PACKET_LOGIN:
-			case PACKET_LOGIN_PCBANG:
-			case PACKET_LOGIN_HAN:
-			case PACKET_LOGIN_SSO:
+			case PACKET_CA_LOGIN:
+			case PACKET_CA_LOGIN_PCBANG:
+			case PACKET_CA_LOGIN_HAN:
+			case PACKET_CA_SSO_LOGIN_REQ:
 			// Solicitação de acesso com senha MD5
-			case PACKET_LOGIN_MD5:
-			case PACKET_LOGIN_MD5MAC:
-			case PACKET_LOGIN_MD5INFO:
+			case PACKET_CA_LOGIN2:
+			case PACKET_CA_LOGIN3:
+			case PACKET_CA_LOGIN4:
 				return authService.requestAuth(fd, command);
 
-			case PACKET_REQ_CHAR_SERVER_CONNECT:
+			case PACKET_CA_CHARSERVERCONNECT:
 				return authService.requestCharConnect(fd);
 
 			default:

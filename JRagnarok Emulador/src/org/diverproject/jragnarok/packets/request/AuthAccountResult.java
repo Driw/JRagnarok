@@ -39,7 +39,7 @@ public class AuthAccountResult extends RequestPacket
 		accountID = input.getInt();
 		firstSeed = input.getInt();
 		secondSeed = input.getInt();
-		result = input.getByte() == 1 ? true : false;
+		result = input.getByte() == 1;
 		version = input.getInt();
 		clientType = ClientType.parse(input.getByte());
 	}

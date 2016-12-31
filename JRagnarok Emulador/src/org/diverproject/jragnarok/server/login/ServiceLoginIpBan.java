@@ -12,7 +12,7 @@ import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.response.RefuseLoginByte;
+import org.diverproject.jragnarok.packets.login.acess_client.AC_RefuseLogin;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
@@ -187,7 +187,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 			log.add(fd.getAddress(), null, -3, "ip banned");
 			skip(fd, false, 23);
 
-			RefuseLoginByte refuseLoginPacket = new RefuseLoginByte();
+			AC_RefuseLogin refuseLoginPacket = new AC_RefuseLogin();
 			refuseLoginPacket.setResult(AuthResult.REJECTED_FROM_SERVER);
 			refuseLoginPacket.setBlockDate("");
 			refuseLoginPacket.send(fd);

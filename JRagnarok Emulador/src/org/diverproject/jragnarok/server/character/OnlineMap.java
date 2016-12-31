@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.character.control;
+package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.log.LogSystem.logDebug;
@@ -28,7 +28,7 @@ import org.diverproject.util.collection.abstraction.IntegerLittleMap;
  * @author Andrew
  */
 
-public class OnlineCharControl extends AbstractControl implements Iterable<OnlineCharData>
+public class OnlineMap extends AbstractControl implements Iterable<OnlineCharData>
 {
 	/**
 	 * Mapeamento dos jogadores que se encontram online no sistema.
@@ -41,7 +41,7 @@ public class OnlineCharControl extends AbstractControl implements Iterable<Onlin
 	 * que mantém jogadores como online utilizam temporizadores para tal.
 	 */
 
-	public OnlineCharControl(Connection connection)
+	public OnlineMap(Connection connection)
 	{
 		super(connection);
 

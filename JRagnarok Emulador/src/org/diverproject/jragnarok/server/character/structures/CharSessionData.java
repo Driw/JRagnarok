@@ -46,6 +46,9 @@ public class CharSessionData extends SessionData
 		this.flag = new BitWise();
 		this.chars = new CharData[MAX_CHARS];
 		this.seed = new LoginSeed();
+		this.pincode = new Pincode();
+		this.group = new Group();
+		this.vip = new Vip();
 	}
 
 	public boolean isAuth()

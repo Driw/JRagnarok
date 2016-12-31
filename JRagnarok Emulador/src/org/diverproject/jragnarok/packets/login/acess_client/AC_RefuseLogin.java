@@ -1,19 +1,19 @@
-package org.diverproject.jragnarok.packets.response;
+package org.diverproject.jragnarok.packets.login.acess_client;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REFUSE_LOGIN;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AC_REFUSE_LOGIN;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
-public class RefuseLoginByte extends ResponsePacket
+public class AC_RefuseLogin extends ResponsePacket
 {
 	private AuthResult result;
 	private String blockDate;
 
-	public RefuseLoginByte()
+	public AC_RefuseLogin()
 	{
 		blockDate = "";
 	}
@@ -39,13 +39,13 @@ public class RefuseLoginByte extends ResponsePacket
 	@Override
 	public String getName()
 	{
-		return "REFUSE_LOGIN";
+		return "AC_REFUSE_LOGIN";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_REFUSE_LOGIN;
+		return PACKET_AC_REFUSE_LOGIN;
 	}
 
 	@Override

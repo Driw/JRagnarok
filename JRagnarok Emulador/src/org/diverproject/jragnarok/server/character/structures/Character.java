@@ -45,7 +45,7 @@ public class Character
 	/**
 	 * Tamanho em bytes dos dados enviados de um personagem por pacote.
 	 */
-	public static final int PACKET_BYTES = 144;
+	public static final int PACKET_BYTES = 145;
 
 
 	/**
@@ -233,6 +233,7 @@ public class Character
 		mercenaryRank = new MercenaryRank();
 		locations = new Locations();
 		effectState = new BitWise(/* TODO: properties name */);
+		deleteDate = new Time();
 
 		sex = 'M';
 		name = UNKNOWN;
@@ -870,15 +871,26 @@ public class Character
 		return description.toString();
 	}
 
-	public static String sexOf(char sex)
+	public static String strSexOf(char sex)
 	{
 		switch (sex)
 		{
-			case 'm': case 'M': return "masculino";
 			case 'f': case 'F': return "feminino";
+			case 'm': case 'M': return "masculino";
 			case 's': case 'S': return "servidor";
 		}
 
 		return null;
+	}
+
+	public static byte intSexOf(char sex)
+	{
+		switch (sex)
+		{
+			case 'f': case 'F': return 0x00;
+			case 'm': case 'M': return 0x01;
+		}
+
+		return 0x63;
 	}
 }

@@ -255,7 +255,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		if (account == null)
 			logNotice("conta #%d não encontrada (ip: %s).\n", id, fd.getAddressString());
 		else
-			client.sendAccountData(fd, account);
+			client.sendAccountData(fd, packet.getFdID(), account);
 	}
 
 	/**

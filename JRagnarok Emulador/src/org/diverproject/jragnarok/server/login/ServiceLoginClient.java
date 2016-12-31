@@ -9,8 +9,12 @@ import static org.diverproject.jragnarok.JRagnarokUtil.random;
 import static org.diverproject.log.LogSystem.logDebug;
 
 import org.diverproject.jragnarok.packets.IResponsePacket;
-import org.diverproject.jragnarok.packets.receive.KeepAlive;
-import org.diverproject.jragnarok.packets.receive.UpdateClientHash;
+import org.diverproject.jragnarok.packets.login.acess_client.AC_AckHash;
+import org.diverproject.jragnarok.packets.login.acess_client.AC_AccepLogin;
+import org.diverproject.jragnarok.packets.login.acess_client.AC_RefuseLogin;
+import org.diverproject.jragnarok.packets.login.acess_client.AC_RefuseLoginR2;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_ConnectInfoChanged;
+import org.diverproject.jragnarok.packets.login.client_acess.CA_ExeHashCheck;
 import org.diverproject.jragnarok.packets.request.AccountDataResult;
 import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
 import org.diverproject.jragnarok.packets.request.AccountInfoResult;
@@ -20,13 +24,9 @@ import org.diverproject.jragnarok.packets.request.AuthAccountResult;
 import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
 import org.diverproject.jragnarok.packets.request.GlobalRegistersResult;
 import org.diverproject.jragnarok.packets.request.VipDataResult;
-import org.diverproject.jragnarok.packets.response.AcknowledgeHash;
-import org.diverproject.jragnarok.packets.response.ListCharServers;
-import org.diverproject.jragnarok.packets.response.NotifyAuth;
 import org.diverproject.jragnarok.packets.response.KeepAliveResult;
 import org.diverproject.jragnarok.packets.response.RefuseEnter;
-import org.diverproject.jragnarok.packets.response.RefuseLoginByte;
-import org.diverproject.jragnarok.packets.response.RefuseLoginInt;
+import org.diverproject.jragnarok.packets.server_client.SC_NotifyBan;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
@@ -92,7 +92,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		logDebug("recebendo ping (fd: %d).\n", fd.getID());
 
-		KeepAlive packet = new KeepAlive();
+		CA_ConnectInfoChanged packet = new CA_ConnectInfoChanged();
 		packet.receive(fd);
 	}
 
@@ -105,7 +105,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		logDebug("recebendo atualização para o cliente hash (fd: %d).\n", fd.getID());
 
-		UpdateClientHash packet = new UpdateClientHash();
+		CA_ExeHashCheck packet = new CA_ExeHashCheck();
 		packet.receive(fd);
 
 		LoginSessionData sd = fd.getSessionData();
@@ -123,7 +123,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		logDebug("enviando resultado de autenticação (fd: %d, result: %s).\n", fd.getID(), result);
 
-		RefuseLoginByte refuseLoginPacket = new RefuseLoginByte();
+		AC_RefuseLogin refuseLoginPacket = new AC_RefuseLogin();
 		refuseLoginPacket.setResult(result);
 		refuseLoginPacket.send(fd);
 	}
@@ -139,7 +139,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		logDebug("notificando autenticação (fd: %d, result: %s).\n", fd.getID(), result);
 
-		NotifyAuth packet = new NotifyAuth();
+		SC_NotifyBan packet = new SC_NotifyBan();
 		packet.setResult(result);
 		packet.send(fd);
 	}
@@ -185,7 +185,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		sd.setMd5Key(md5Key);
 		sd.setMd5KeyLenght(md5KeyLength);
 
-		AcknowledgeHash packet = new AcknowledgeHash();
+		AC_AckHash packet = new AC_AckHash();
 		packet.setMD5KeyLength(md5KeyLength);
 		packet.setMD5Key(md5Key);
 		packet.send(fd);
@@ -203,7 +203,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		LoginSessionData sd = fd.getSessionData();
 		CharServerList servers = getServer().getCharServerList();
 
-		ListCharServers packet = new ListCharServers();
+		AC_AccepLogin packet = new AC_AccepLogin();
 		packet.setServers(servers);
 		packet.setSessionData(sd);
 		packet.send(fd);
@@ -225,7 +225,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		if (sd.getVersion() >= dateToVersion(20120000))
 		{
-			RefuseLoginInt packet = new RefuseLoginInt();
+			AC_RefuseLoginR2 packet = new AC_RefuseLoginR2();
 			packet.setBlockDate(blockDate);
 			packet.setResult(result);
 			packet.send(fd);
@@ -233,7 +233,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		else
 		{
-			RefuseLoginByte packet = new RefuseLoginByte();
+			AC_RefuseLogin packet = new AC_RefuseLogin();
 			packet.setBlockDate(blockDate);
 			packet.setResult(result);
 			packet.send(fd);
@@ -311,6 +311,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		response.setClientType(node.getClientType());
 		response.setVersion(node.getVersion());
 		response.setClientType(node.getClientType());
+		response.setResult(true);
 		response.send(fd);
 	}
 
@@ -331,18 +332,23 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		response.setSecondSeed(packet.getSecondSeed());
 		response.setVersion(0);
 		response.setClientType(ClientType.CT_NONE);
+		response.setResult(false);
 		response.send(fd);
 	}
 
 	/**
 	 * Envia os dados de uma conta solicitada por um determinado servidor de personagem.
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fdID código do descritor de arquivo que solicitou os dados da conta.
 	 * @param account conta do qual terá os dados enviados ao servidor acima.
 	 */
 
-	public void sendAccountData(LFileDescriptor fd, Account account)
+	public void sendAccountData(LFileDescriptor fd, int fdID, Account account)
 	{
+		logDebug("enviando dados de uma conta (server-fd: %d, username: %s).\n", fd.getID(), account.getUsername());
+
 		AccountDataResult packet = new AccountDataResult();
+		packet.setFdID(fdID);
 		packet.setAccountID(account.getID());
 		packet.setEmail(account.getEmail());
 		packet.setExpirationTime(i(account.getExpiration().get()));
@@ -350,19 +356,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setCharSlots(account.getCharSlots());
 		packet.setBirthdate(account.getBirthDate());
 
-		logDebug("enviando dados de uma conta (server-fd: %d, username: %s).\n", fd.getID(), account.getUsername());
-
-		if (account.getPincode() != null)
-		{
-			packet.setPincode(account.getPincode().getCode());
-			packet.setPincodeChage(i(account.getPincode().getChanged().get()));
-		}
-
-		else
-		{
-			packet.setPincode("0000");
-			packet.setPincodeChage(0);
-		}
+		packet.setPincode(account.getPincode().getCode());
+		packet.setPincodeChage(i(account.getPincode().getChanged().get()));
 
 		Vip vip = account.getGroup().getVip();
 

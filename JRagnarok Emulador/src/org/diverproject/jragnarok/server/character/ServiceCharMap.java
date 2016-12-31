@@ -12,6 +12,20 @@ public class ServiceCharMap extends AbstractCharService
 		super(server);
 	}
 
+	@Override
+	public void init()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void destroy()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * Envia os dados de um mesmo pacote para todos os servidores de mapa conectados.
 	 * Apenas aqueles servidores que não estejam conectados não irão receber os dados.

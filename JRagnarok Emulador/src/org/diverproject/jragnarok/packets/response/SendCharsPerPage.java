@@ -2,50 +2,30 @@ package org.diverproject.jragnarok.packets.response;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.DEFAULT_WALK_SPEED;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAP_NAME_LENGTH_EXT;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.i;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SEND_ACCOUNT_CHARS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SEND_CHARS_PER_PAGE;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.character.structures.Character;
 import org.diverproject.util.collection.Index;
 import org.diverproject.util.stream.Output;
 
-public class SendAccountChars extends ResponsePacket
+public class SendCharsPerPage extends ResponsePacket
 {
+	private Index<Character> characters;
 	private boolean charMoveEnabled;
 	private boolean charMoveUnlimited;
 	private int charMoveCount;
 
-	private byte totalSlots;
-	private byte premiumStartSlot;
-	private byte premiumEndSlot;
-	private byte dummyBeginBilling;
-	private int code;
-	private int firstTime;
-	private int secondTime;
-	private String dummyEndBilling;
-	private Index<Character> characters;
-
 	@Override
 	protected void sendOutput(Output output)
 	{
-		short length = s(calcLength());
+		output.putShort(s(length() - 2));
 
-		output.putShort(length);
-		output.putByte(totalSlots);
-		output.putByte(premiumStartSlot);
-		output.putByte(premiumEndSlot);
-		output.putByte(dummyBeginBilling);
-		output.putInt(code);
-		output.putInt(firstTime);
-		output.putInt(secondTime);
-		output.putString(dummyEndBilling, 7);
-
-		for (int slot = 0; slot < MAX_CHARS; slot++)
+		for (int slot = 0; slot < characters.size(); slot++)
 		{
 			Character character = characters.get(slot);
 
@@ -116,74 +96,26 @@ public class SendAccountChars extends ResponsePacket
 		this.charMoveCount = charMoveCount;
 	}
 
-	public void setTotalSlots(byte totalSlots)
-	{
-		this.totalSlots = totalSlots;
-	}
-
-	public void setPremiumStartSlot(byte premiumStartSlot)
-	{
-		this.premiumStartSlot = premiumStartSlot;
-	}
-
-	public void setPremiumEndSlot(byte premiumEndSlot)
-	{
-		this.premiumEndSlot = premiumEndSlot;
-	}
-
-	public void setDummyBeginBilling(byte dummyBeginBilling)
-	{
-		this.dummyBeginBilling = dummyBeginBilling;
-	}
-
-	public void setCode(int code)
-	{
-		this.code = code;
-	}
-
-	public void setFirstTime(int firstTime)
-	{
-		this.firstTime = firstTime;
-	}
-
-	public void setSecondTime(int secondTime)
-	{
-		this.secondTime = secondTime;
-	}
-
-	public void setDummyEndBilling(String dummyEndBilling)
-	{
-		if (dummyEndBilling == null)
-			dummyEndBilling = "";
-
-		this.dummyEndBilling = dummyEndBilling;
-	}
-
 	public void setCharacters(Index<Character> characters)
 	{
 		this.characters = characters;
 	}
 
-	private int calcLength()
-	{
-		return 27 + (Character.PACKET_BYTES * characters.size());
-	}
-
 	@Override
 	public String getName()
 	{
-		return "SEND_ACCOUNT_CHARS";
+		return "PACKET_SEND_CHARS_PER_PAGE";
 	}
 
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_SEND_ACCOUNT_CHARS;
+		return PACKET_SEND_CHARS_PER_PAGE;
 	}
 
 	@Override
 	protected int length()
 	{
-		return calcLength();
+		return (Character.PACKET_BYTES * characters.size()) + 2;
 	}
 }
