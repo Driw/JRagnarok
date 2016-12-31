@@ -200,7 +200,7 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 
 	public FileDescriptor get(int id)
 	{
-		return sessions.get(id);
+		return sessions.get(id - 1);
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 
 	public boolean isAlive(int id)
 	{
-		return sessions.get(id) != null && sessions.get(id).isConnected();
+		return sessions.get(id - 1) != null && sessions.get(id - 1).isConnected();
 	}
 
 	/**

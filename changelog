@@ -1,3 +1,7 @@
+31.12.2016 - 1.4.156
+- Problema onde characters_locations não permitia duas localizações de um mesmo personagem.
+- As operações de get() e isAlive() não estavam funcionando adequadamente, FileDescriptorSystem.
+
 21.12.2016 - 1.4.155
 - Relações de dependências da tabela accounts_groups corrigidas.
 - AuthNode não estava inicializando seed que causava NullPointerException.

@@ -245,10 +245,11 @@ CREATE TABLE characters_locations
 	coord_x INT NOT NULL,
 	coord_y INT NOT NULL,
 
-	CONSTRAINT pk_char_loc PRIMARY KEY (charid),
-	CONSTRAINT fk_char_loc FOREIGN KEY (charid) REFERENCES characters(id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT pk_char_loc PRIMARY KEY (charid, num)
 
 ) ENGINE=InnoDB;
+
+ALTER TABLE characters_locations ADD CONSTRAINT fk_char_loc FOREIGN KEY (charid) REFERENCES characters(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 CREATE TABLE register_account_int
 (

@@ -170,7 +170,7 @@ public class Tables
 		characters = "characters";
 		charStats = "characters_stats";
 		charLook = "characters_look";
-		charExperiences = "characters_exp";
+		charExperiences = "characters_experience";
 		charFamily = "characters_family";
 		charLocations = "characters_locations";
 		charMercenaryRank = "characters_mercenary_rank";
