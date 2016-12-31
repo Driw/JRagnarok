@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server.character;
 
 import org.diverproject.jragnarok.packets.IResponsePacket;
-import org.diverproject.jragnarok.packets.request.AccountInfoResult;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AccountInfo;
 import org.diverproject.jragnarok.server.character.structures.ClientMapServer;
 import org.diverproject.jragnarok.server.common.DisconnectPlayer;
 
@@ -39,7 +39,7 @@ public class ServiceCharMap extends AbstractCharService
 				packet.send(server.getFileDecriptor());
 	}
 
-	public boolean receiveAccountInfo(AccountInfoResult packet)
+	public boolean receiveAccountInfo(AH_AccountInfo packet)
 	{
 		// TODO mapif_accinfo_ack
 

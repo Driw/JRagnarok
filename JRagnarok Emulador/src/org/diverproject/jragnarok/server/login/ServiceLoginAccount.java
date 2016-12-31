@@ -8,14 +8,14 @@ import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.request.BanAccountRequest;
-import org.diverproject.jragnarok.packets.request.ChangeEmailRequest;
-import org.diverproject.jragnarok.packets.request.GlobalRegistersRequest;
-import org.diverproject.jragnarok.packets.request.NotifyPinError;
-import org.diverproject.jragnarok.packets.request.NotifyPinUpdate;
-import org.diverproject.jragnarok.packets.request.UnbanAccount;
-import org.diverproject.jragnarok.packets.request.UpdateAccountState;
-import org.diverproject.jragnarok.packets.request.UpdateGlobalRegisters;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountStateUpdate;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_BanAccount;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_ChangeEmail;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_GlobalRegisters;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_NotifyPinError;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_NotifyPinUpdate;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_UnbanAccount;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_UpdateRegisters;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
 import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
 import org.diverproject.jragnarok.server.common.LoginAdapt;
@@ -119,7 +119,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 	public void requestChangeEmail(LFileDescriptor fd)
 	{
-		ChangeEmailRequest packet = new ChangeEmailRequest();
+		HA_ChangeEmail packet = new HA_ChangeEmail();
 		packet.receive(fd);
 
 		if (!emailCheck(packet.getActualEmail()))
@@ -159,7 +159,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 	public void updateAccountState(LFileDescriptor fd)
 	{
-		UpdateAccountState packet = new UpdateAccountState();
+		HA_AccountStateUpdate packet = new HA_AccountStateUpdate();
 		packet.receive(fd);
 
 		Account account = accounts.get(packet.getAccountID());
@@ -195,7 +195,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 	public void requestBanAccount(LFileDescriptor fd)
 	{
-		BanAccountRequest packet = new BanAccountRequest();
+		HA_BanAccount packet = new HA_BanAccount();
 		packet.receive(fd);
 
 		Account account = accounts.get(packet.getAccountID());
@@ -232,7 +232,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	@SuppressWarnings("unchecked")
 	public void updateGlobalRegister(LFileDescriptor fd)
 	{
-		UpdateGlobalRegisters packet = new UpdateGlobalRegisters();
+		HA_UpdateRegisters packet = new HA_UpdateRegisters();
 		packet.receive(fd);
 
 		Queue<GlobalRegisterOperation<?>> registers = packet.getRegisters();
@@ -248,25 +248,25 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 				switch (operation.getOperation())
 				{
-					case UpdateGlobalRegisters.OPERATION_INT_REPLACE:
+					case HA_UpdateRegisters.OPERATION_INT_REPLACE:
 						GlobalRegister<Integer> registerIntReplace = (GlobalRegister<Integer>) operation.getRegister();
 						registerIntReplace.setValue((Integer) registerIntReplace.getValue());
 						globalRegisters.replace(registerIntReplace);
 						break;
 
-					case UpdateGlobalRegisters.OPERATION_INT_DELETE:
+					case HA_UpdateRegisters.OPERATION_INT_DELETE:
 						GlobalRegister<Integer> registerIntDelete = (GlobalRegister<Integer>) operation.getRegister();
 						registerIntDelete.setValue((Integer) registerIntDelete.getValue());
 						globalRegisters.delete(registerIntDelete);
 						break;
 
-					case UpdateGlobalRegisters.OPERATION_STR_REPLACE:
+					case HA_UpdateRegisters.OPERATION_STR_REPLACE:
 						GlobalRegister<String> registerStrReplace = (GlobalRegister<String>) operation.getRegister();
 						registerStrReplace.setValue((String) registerStrReplace.getValue());
 						globalRegisters.replace(registerStrReplace);
 						break;
 
-					case UpdateGlobalRegisters.OPERATION_STR_DELETE:
+					case HA_UpdateRegisters.OPERATION_STR_DELETE:
 						GlobalRegister<String> registerStrDelete = (GlobalRegister<String>) operation.getRegister();
 						registerStrDelete.setValue((String) registerStrDelete.getValue());
 						globalRegisters.delete(registerStrDelete);
@@ -292,7 +292,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 	public void requestRegister(LFileDescriptor fd)
 	{
-		GlobalRegistersRequest packet = new GlobalRegistersRequest();
+		HA_GlobalRegisters packet = new HA_GlobalRegisters();
 		packet.receive(fd);
 
 		int accountID = packet.getAccountID();
@@ -317,7 +317,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 	public void requestUnbanAccount(LFileDescriptor fd)
 	{
-		UnbanAccount packet = new UnbanAccount();
+		HA_UnbanAccount packet = new HA_UnbanAccount();
 		packet.receive(fd);
 
 		Account account = accounts.get(packet.getAccountID());
@@ -345,7 +345,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 	public void updatePinCode(LFileDescriptor fd)
 	{
-		NotifyPinUpdate packet = new NotifyPinUpdate();
+		HA_NotifyPinUpdate packet = new HA_NotifyPinUpdate();
 		packet.receive(fd);
 
 		Account account = accounts.get(packet.getAccountID());
@@ -370,7 +370,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 	public void failPinCode(LFileDescriptor fd)
 	{
-		NotifyPinError packet = new NotifyPinError();
+		HA_NotifyPinError packet = new HA_NotifyPinError();
 		packet.receive(fd);
 
 		if (accounts.exist(packet.getAccountID()))

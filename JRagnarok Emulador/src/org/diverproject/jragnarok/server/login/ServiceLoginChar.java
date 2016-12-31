@@ -8,26 +8,28 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CLIENT_CHAR_PE
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP_SYNC_INTERVAL;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.VIP_CHAR_INCREASE;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.VIP_GROUPID;
-import static org.diverproject.jragnarok.packets.request.VipDataRequest.VIP_DATA_VIP;
-import static org.diverproject.jragnarok.packets.request.VipDataRequest.VIP_DATA_GM;
-import static org.diverproject.jragnarok.packets.request.VipDataRequest.VIP_DATA_FORCE;
-import static org.diverproject.jragnarok.packets.request.VipDataRequest.VIP_DATA_NONE;
-import static org.diverproject.jragnarok.packets.request.VipDataRequest.VIP_DATA_SHOW_RATES;
+import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_FORCE;
+import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_GM;
+import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_NONE;
+import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_SHOW_RATES;
+import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_VIP;
+import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.request.AccountDataRequest;
-import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
-import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
-import org.diverproject.jragnarok.packets.request.SendAccountRequest;
-import org.diverproject.jragnarok.packets.request.SetAccountOffline;
-import org.diverproject.jragnarok.packets.request.SetAccountOnline;
-import org.diverproject.jragnarok.packets.request.UpdateUserCount;
-import org.diverproject.jragnarok.packets.request.VipDataRequest;
-import org.diverproject.jragnarok.packets.response.SyncronizeAddress;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_KeepAlive;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_SendAccount;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_SetAccountOffline;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_SetAccountOnline;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_UpdateUserCount;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_SyncronizeAddress;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
@@ -141,7 +143,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		{
 			logInfo("Sincronização de IP em progresso...\n");
 
-			SyncronizeAddress packet = new SyncronizeAddress();
+			AH_SyncronizeAddress packet = new AH_SyncronizeAddress();
 			client.sendAllWithoutOurSelf(null, packet);
 		}
 
@@ -197,7 +199,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 	public void updateUserCount(LFileDescriptor fd)
 	{
-		UpdateUserCount packet = new UpdateUserCount();
+		HA_UpdateUserCount packet = new HA_UpdateUserCount();
 		packet.receive(fd);
 
 		ClientCharServer server = getServer().getCharServerList().get(fd);
@@ -210,6 +212,22 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	}
 
 	/**
+	 * Envia um pacote para uma conexão afim de mantê-la viva no sistema.
+	 * Esse pacote é enviado a um servidor de personagem quando este solicita um ping.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void pingCharRequest(LFileDescriptor fd)
+	{
+		LoginSessionData sd = fd.getSessionData();
+
+		logDebug("pingar servidor de personagem (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
+
+		HA_KeepAlive packet = new HA_KeepAlive();
+		packet.send(fd);
+	}
+
+	/**
 	 * Solicitação para concluir a autenticação de uma determinada conta já acessada.
 	 * Cada autenticação pode ser usada uma única vez por cada acesso autorizado.
 	 * @param fd referência da sessão da conexão com o servidor de personagem.
@@ -217,7 +235,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 	public void requestAuthAccount(LFileDescriptor fd)
 	{
-		AuthAccountRequest packet = new AuthAccountRequest();
+		HA_AuthAccount packet = new HA_AuthAccount();
 		packet.receive(fd);
 
 		AuthNode node = auths.get(packet.getAccountID());
@@ -246,7 +264,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 	public void requestAccountData(LFileDescriptor fd)
 	{
-		AccountDataRequest packet = new AccountDataRequest();
+		HA_AccountData packet = new HA_AccountData();
 		packet.receive(fd);
 
 		int id = packet.getAccountID();
@@ -266,7 +284,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 	public void requestAccountInfo(LFileDescriptor fd)
 	{
-		AccountInfoRequest packet = new AccountInfoRequest();
+		HA_AccountInfo packet = new HA_AccountInfo();
 
 		int id = packet.getAccountID();
 		Account account = accounts.get(id);
@@ -281,11 +299,11 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 	public boolean requestVipData(LFileDescriptor fd)
 	{
-		VipDataRequest packet = new VipDataRequest();
+		HA_VipData packet = new HA_VipData();
 		packet.receive(fd);
 
 		Account account = accounts.get(packet.getAccountID());
-		BitWise8 flag = new BitWise8(VipDataRequest.VIP_DATA_STRINGS);
+		BitWise8 flag = new BitWise8(HA_VipData.VIP_DATA_STRINGS);
 		flag.set(packet.getFlag());
 
 		if (account != null)
@@ -366,7 +384,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 	public void receiveSentAccounts(LFileDescriptor fd)
 	{
-		SendAccountRequest packet = new SendAccountRequest();
+		HA_SendAccount packet = new HA_SendAccount();
 		packet.receive(fd);
 
 		ClientCharServer server = getServer().getCharServerList().get(fd);
@@ -396,7 +414,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 	public void setAccountOffline(LFileDescriptor fd)
 	{
-		SetAccountOffline packet = new SetAccountOffline();
+		HA_SetAccountOffline packet = new HA_SetAccountOffline();
 		packet.receive(fd);
 
 		login.removeOnlineUser(packet.getAccountID());
@@ -409,7 +427,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 	public void setAccountOnline(LFileDescriptor fd)
 	{
-		SetAccountOnline packet = new SetAccountOnline();
+		HA_SetAccountOnline packet = new HA_SetAccountOnline();
 		packet.receive(fd);
 
 		ClientCharServer server = getServer().getCharServerList().get(fd);

@@ -9,24 +9,24 @@ import static org.diverproject.jragnarok.JRagnarokUtil.random;
 import static org.diverproject.log.LogSystem.logDebug;
 
 import org.diverproject.jragnarok.packets.IResponsePacket;
-import org.diverproject.jragnarok.packets.login.acess_client.AC_AckHash;
-import org.diverproject.jragnarok.packets.login.acess_client.AC_AccepLogin;
-import org.diverproject.jragnarok.packets.login.acess_client.AC_RefuseLogin;
-import org.diverproject.jragnarok.packets.login.acess_client.AC_RefuseLoginR2;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_ConnectInfoChanged;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_ExeHashCheck;
-import org.diverproject.jragnarok.packets.request.AccountDataResult;
-import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
-import org.diverproject.jragnarok.packets.request.AccountInfoResult;
-import org.diverproject.jragnarok.packets.request.AccountStateNotify;
-import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
-import org.diverproject.jragnarok.packets.request.AuthAccountResult;
-import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
-import org.diverproject.jragnarok.packets.request.GlobalRegistersResult;
-import org.diverproject.jragnarok.packets.request.VipDataResult;
-import org.diverproject.jragnarok.packets.response.KeepAliveResult;
-import org.diverproject.jragnarok.packets.response.RefuseEnter;
-import org.diverproject.jragnarok.packets.server_client.SC_NotifyBan;
+import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountStateNotify;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_KeepAlive;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AccountData;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AccountInfo;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AckConnect;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AuthAccount;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_GlobalRegisters;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_VipData;
+import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_ConnectInfoChanged;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_ExeHashCheck;
+import org.diverproject.jragnarok.packets.login.toclient.AC_AccepLogin;
+import org.diverproject.jragnarok.packets.login.toclient.AC_AckHash;
+import org.diverproject.jragnarok.packets.login.toclient.AC_RefuseLogin;
+import org.diverproject.jragnarok.packets.login.toclient.AC_RefuseLoginR2;
 import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
@@ -252,7 +252,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		logDebug("entrada recusada (fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
 
-		RefuseEnter packet = new RefuseEnter();
+		HC_RefuseEnter packet = new HC_RefuseEnter();
 		packet.setResult(result);
 		packet.send(fd);
 	}
@@ -269,7 +269,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		logDebug("servidor de personagem conectado (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
 
-		CharServerConnectResult packet = new CharServerConnectResult();
+		AH_AckConnect packet = new AH_AckConnect();
 		packet.setResult(result);
 		packet.send(fd);
 	}
@@ -286,7 +286,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 		logDebug("pingar servidor de personagem (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
 
-		KeepAliveResult packet = new KeepAliveResult();
+		HA_KeepAlive packet = new HA_KeepAlive();
 		packet.send(fd);
 	}
 
@@ -298,11 +298,11 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param node nó contendo as informações para autenticação do cliente no servidor de personagem.
 	 */
 
-	public void sendAuthAccount(LFileDescriptor fd, AuthAccountRequest packet, AuthNode node)
+	public void sendAuthAccount(LFileDescriptor fd, HA_AuthAccount packet, AuthNode node)
 	{
 		logDebug("enviando autenticação de conta (server-fd: %d, aid: %s).\n", fd.getID(), node.getAccountID());
 
-		AuthAccountResult response = new AuthAccountResult();
+		AH_AuthAccount response = new AH_AuthAccount();
 		response.setFileDescriptorID(packet.getFileDescriptorID());
 		response.setAccountID(node.getAccountID());
 		response.setFirstSeed(node.getSeed().getFirst());
@@ -321,11 +321,11 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param packet pacote contendo as informações para serem retornadas já que não autenticação.
 	 */
 
-	public void sendAuthAccount(LFileDescriptor fd, AuthAccountRequest packet)
+	public void sendAuthAccount(LFileDescriptor fd, HA_AuthAccount packet)
 	{
 		logDebug("enviando autenticação de conta não encontrada (server-fd: %d).\n", fd.getID());
 
-		AuthAccountResult response = new AuthAccountResult();
+		AH_AuthAccount response = new AH_AuthAccount();
 		response.setFileDescriptorID(packet.getFileDescriptorID());
 		response.setAccountID(packet.getAccountID());
 		response.setFirstSeed(packet.getFirstSeed());
@@ -347,7 +347,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		logDebug("enviando dados de uma conta (server-fd: %d, username: %s).\n", fd.getID(), account.getUsername());
 
-		AccountDataResult packet = new AccountDataResult();
+		AH_AccountData packet = new AH_AccountData();
 		packet.setFdID(fdID);
 		packet.setAccountID(account.getID());
 		packet.setEmail(account.getEmail());
@@ -385,9 +385,9 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param account conta respectiva a solicitação desejada.
 	 */
 
-	public void sendAccountInfo(LFileDescriptor fd, AccountInfoRequest ack, Account account)
+	public void sendAccountInfo(LFileDescriptor fd, HA_AccountInfo ack, Account account)
 	{
-		AccountInfoResult packet = new AccountInfoResult();
+		AH_AccountInfo packet = new AH_AccountInfo();
 		packet.setMapFD(ack.getServerFD());
 		packet.setUFD(packet.getUFD());
 		packet.setAccountID(account.getID());
@@ -421,10 +421,10 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		logDebug("notificando alteração de estado (fd: %d, username: %s).\n", fd.getID(), account.getUsername());
 
-		AccountStateNotify notify = new AccountStateNotify();
+		HA_AccountStateNotify notify = new HA_AccountStateNotify();
 		notify.setAccountID(account.getID());
 		notify.setValue(banned ? i(account.getUnban().get()) : account.getState().CODE);
-		notify.setType(banned ? AccountStateNotify.BAN : AccountStateNotify.CHANGE_STATE);
+		notify.setType(banned ? HA_AccountStateNotify.BAN : HA_AccountStateNotify.CHANGE_STATE);
 
 		sendAllWithoutOurSelf(null, notify);		
 	}
@@ -439,7 +439,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void sendVipData(LFileDescriptor fd, Account account, byte flag, int mapFD)
 	{
-		VipDataResult packet = new VipDataResult();
+		AH_VipData packet = new AH_VipData();
 		packet.setVipTimeout(account.getGroup().getTime().get());
 		packet.setAccountID(account.getID());
 		packet.setGroupID(account.getGroupID());
@@ -460,7 +460,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void sendGlobalRegisters(LFileDescriptor fd, int accountID, int charID, Queue<GlobalRegister<?>> registers)
 	{
-		GlobalRegistersResult packet = new GlobalRegistersResult();
+		AH_GlobalRegisters packet = new AH_GlobalRegisters();
 		packet.setAccountID(accountID);
 		packet.setCharID(charID);
 		packet.setRegisters(registers);

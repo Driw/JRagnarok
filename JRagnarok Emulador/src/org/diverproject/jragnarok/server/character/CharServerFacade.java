@@ -1,17 +1,17 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ALREADY_ONLINE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CHAR_SERVER_SELECTED;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_BAN_NOTIFICATION;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHANGE_SEX;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHARLIST;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_ACCOUNT_DATA;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_ACCOUNT_INFO;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_AUTH_ACCOUNT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_CHAR_SERVER_CONNECT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_GLOBAL_REGISTERS;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SYNCRONIZE_IPADDRESS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ALREADY_ONLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_ENTER;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_BAN_NOTIFICATION;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CHARLIST_REQ;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_INFO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_AUTH_ACCOUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_CHANGE_SEX;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACK_CONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_GLOBAL_REGISTERS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -213,10 +213,10 @@ public class CharServerFacade
 
 		switch (command)
 		{
-			case PACKET_CHAR_SERVER_SELECTED:
+			case PACKET_CH_ENTER:
 				return authService.parse(fd);
 
-			case PACKET_REQ_CHARLIST:
+			case PACKET_CH_CHARLIST_REQ:
 				return clientService.sendCharsPerPage(fd);
 
 			default:
@@ -255,18 +255,18 @@ public class CharServerFacade
 
 		switch (command)
 		{
-			case PACKET_REQ_KEEP_ALIVE:
+			case PACKET_AH_KEEP_ALIVE:
 				return loginService.keepAlive(fd);
 
-			case PACKET_RES_GLOBAL_REGISTERS:
+			case PACKET_AH_GLOBAL_REGISTERS:
 				loginService.reqGlobalAccountReg(fd);
 				return true;
 
-			case PACKET_ALREADY_ONLINE:
+			case PACKET_AH_ALREADY_ONLINE:
 				loginService.alreadyOnline(fd);
 				return true;
 
-			case PACKET_SYNCRONIZE_IPADDRESS:
+			case PACKET_AH_SYNCRONIZE_IPADDRESS:
 				try {
 					fd.getPacketBuilder().newOutputPacket("SYNCRONIZE_IPADDRESS").skipe(4);
 					return true;
@@ -282,10 +282,10 @@ public class CharServerFacade
 	{
 		switch (command)
 		{
-			case PACKET_REQ_CHANGE_SEX:
+			case PACKET_AH_CHANGE_SEX:
 				return loginService.reqChangeSex(fd);
 
-			case PACKET_REQ_BAN_NOTIFICATION:
+			case PACKET_AH_BAN_NOTIFICATION:
 				loginService.banNofitication(fd);
 				return true;
 		}
@@ -297,16 +297,16 @@ public class CharServerFacade
 	{
 		switch (command)
 		{
-			case PACKET_RES_CHAR_SERVER_CONNECT:
+			case PACKET_AH_ACK_CONNECT:
 				return loginService.parseLoginResult(fd);
 
-			case PACKET_RES_AUTH_ACCOUNT:
+			case PACKET_AH_AUTH_ACCOUNT:
 				return loginService.parseAuthAccount(fd);
 
-			case PACKET_RES_ACCOUNT_DATA:
+			case PACKET_AH_ACCOUNT_DATA:
 				return loginService.parseAccountData(fd);
 
-			case PACKET_RES_ACCOUNT_INFO:
+			case PACKET_AH_ACCOUNT_INFO:
 				loginService.parseAccountInfo(fd);
 				return true;
 

@@ -12,14 +12,14 @@ import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeception;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.response.PincodeSendState;
-import org.diverproject.jragnarok.packets.response.PincodeSendState.PincodeState;
-import org.diverproject.jragnarok.packets.response.RefuseEnter;
-import org.diverproject.jragnarok.packets.response.SendAccountChars;
-import org.diverproject.jragnarok.packets.response.SendAccountSlot;
-import org.diverproject.jragnarok.packets.response.SendCharPageCount;
-import org.diverproject.jragnarok.packets.response.SendCharsPerPage;
-import org.diverproject.jragnarok.packets.server_client.SC_NotifyBan;
+import org.diverproject.jragnarok.packets.character.toclient.HC_Accept2;
+import org.diverproject.jragnarok.packets.character.toclient.HC_AcceptEnterNeoUnion;
+import org.diverproject.jragnarok.packets.character.toclient.HC_AckCharInfoPerPage;
+import org.diverproject.jragnarok.packets.character.toclient.HC_CharListNotify;
+import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
+import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin;
+import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin.PincodeState;
+import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.character.structures.Character;
 import org.diverproject.jragnarok.server.character.structures.CharSessionData;
@@ -138,7 +138,7 @@ public class ServiceCharClient extends AbstractCharService
 	{
 		logDebug("entrada rejeitada em (fd: %d).\n", fd.getID());
 
-		RefuseEnter packet = new RefuseEnter();
+		HC_RefuseEnter packet = new HC_RefuseEnter();
 		packet.setResult(result);
 		packet.send(fd);
 	}
@@ -157,7 +157,7 @@ public class ServiceCharClient extends AbstractCharService
 		CharSessionData sd = fd.getSessionData();
 		sd.getPincode().genSeed();
 
-		PincodeSendState packet = new PincodeSendState();
+		HC_SecondPasswordLogin packet = new HC_SecondPasswordLogin();
 		packet.setPincodeSeed(sd.getPincode().getSeed());
 		packet.setAccountID(sd.getID());
 		packet.setState(state.CODE);
@@ -200,7 +200,7 @@ public class ServiceCharClient extends AbstractCharService
 
 		logDebug("enviando dados de slot de account#%d (fd: %d).\n", sd.getID(), fd.getID());
 
-		SendAccountSlot packet = new SendAccountSlot();
+		HC_Accept2 packet = new HC_Accept2();
 		packet.setMinChars(b(MIN_CHARS));
 		packet.setCharsVip(sd.getVip().getCharSlotCount());
 		packet.setCharsBilling(sd.getVip().getCharBilling());
@@ -229,7 +229,7 @@ public class ServiceCharClient extends AbstractCharService
 
 				Index<Character> characters = this.characters.list(sd.getID());
 
-				SendAccountChars packet = new SendAccountChars();
+				HC_AcceptEnterNeoUnion packet = new HC_AcceptEnterNeoUnion();
 				packet.setTotalSlots(MAX_CHARS);
 				packet.setPremiumStartSlot(MIN_CHARS);
 				packet.setPremiumEndSlot(b(MIN_CHARS + sd.getVip().getCharSlotCount()));
@@ -265,7 +265,7 @@ public class ServiceCharClient extends AbstractCharService
 
 			Index<Character> characters = this.characters.list(sd.getID());
 
-			SendCharsPerPage packet = new SendCharsPerPage();
+			HC_AckCharInfoPerPage packet = new HC_AckCharInfoPerPage();
 			packet.setCharMoveCount(sd.getCharactersMove());
 			packet.setCharMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
 			packet.setCharMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));
@@ -292,7 +292,7 @@ public class ServiceCharClient extends AbstractCharService
 	{
 		CharSessionData sd = fd.getSessionData();
 
-		SendCharPageCount packet = new SendCharPageCount();
+		HC_CharListNotify packet = new HC_CharListNotify();
 		packet.setCharSlots(sd.getCharSlots());
 		packet.setPageCount(sd.getCharSlots() / 3);
 		packet.send(fd);

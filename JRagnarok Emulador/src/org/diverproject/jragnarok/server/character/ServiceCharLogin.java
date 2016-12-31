@@ -36,30 +36,30 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.IResponsePacket;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_CharServerConnect;
-import org.diverproject.jragnarok.packets.request.AccountDataRequest;
-import org.diverproject.jragnarok.packets.request.AccountDataResult;
-import org.diverproject.jragnarok.packets.request.AccountInfoRequest;
-import org.diverproject.jragnarok.packets.request.AccountInfoResult;
-import org.diverproject.jragnarok.packets.request.AlreadyOnline;
-import org.diverproject.jragnarok.packets.request.AuthAccountRequest;
-import org.diverproject.jragnarok.packets.request.AuthAccountResult;
-import org.diverproject.jragnarok.packets.request.BanNotificationRequest;
-import org.diverproject.jragnarok.packets.request.BanNotificationResult;
-import org.diverproject.jragnarok.packets.request.ChangeSexNotify;
-import org.diverproject.jragnarok.packets.request.ChangeSexRequest;
-import org.diverproject.jragnarok.packets.request.CharMapUserCountRequest;
-import org.diverproject.jragnarok.packets.request.CharServerConnectResult;
-import org.diverproject.jragnarok.packets.request.NotifyPinError;
-import org.diverproject.jragnarok.packets.request.NotifyPinUpdate;
-import org.diverproject.jragnarok.packets.request.SendAccountRequest;
-import org.diverproject.jragnarok.packets.request.SetAccountOffline;
-import org.diverproject.jragnarok.packets.request.SetAccountOnline;
-import org.diverproject.jragnarok.packets.request.SetAllAccountOffline;
-import org.diverproject.jragnarok.packets.request.UpdateUserCount;
-import org.diverproject.jragnarok.packets.response.KeepAliveRequest;
-import org.diverproject.jragnarok.packets.response.RefuseEnter;
-import org.diverproject.jragnarok.packets.response.PincodeSendState.PincodeState;
+import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
+import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin.PincodeState;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_NotifyPinError;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_NotifyPinUpdate;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_SendAccount;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_SetAccountOffline;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_SetAccountOnline;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_SetAllAccountOffline;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_UpdateUserCount;
+import org.diverproject.jragnarok.packets.inter.charmap.HZ_Ban;
+import org.diverproject.jragnarok.packets.inter.charmap.HZ_ChangedSex;
+import org.diverproject.jragnarok.packets.inter.charmap.HZ_SetUsersCount;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AccountData;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AccountInfo;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AckConnect;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AlreadyOnline;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AuthAccount;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_BanNotification;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_ChangeSex;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_KeepAlive;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_CharServerConnect;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorSystem;
 import org.diverproject.jragnarok.server.Timer;
@@ -242,7 +242,7 @@ public class ServiceCharLogin extends AbstractCharService
 	{
 		if (!isConnected())
 		{
-			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
+			client.refuseEnter(fd, HC_RefuseEnter.REJECTED_FROM_SERVER);
 			return false;
 		}
 
@@ -335,7 +335,7 @@ public class ServiceCharLogin extends AbstractCharService
 			for (OnlineCharData online : onlines)
 				accounts.add(online.getAccountID());
 
-			SendAccountRequest packet = new SendAccountRequest();
+			HA_SendAccount packet = new HA_SendAccount();
 			packet.setAccounts(accounts);
 			packet.send(getFileDescriptor());
 		}
@@ -376,7 +376,7 @@ public class ServiceCharLogin extends AbstractCharService
 			if (isConnected())
 				updateUserCount(users);
 
-			CharMapUserCountRequest packet = new CharMapUserCountRequest();
+			HZ_SetUsersCount packet = new HZ_SetUsersCount();
 			packet.setUsers(users);
 
 			map.sendAll(packet);
@@ -405,7 +405,7 @@ public class ServiceCharLogin extends AbstractCharService
 			// Ping ainda não foi enviado - enviar
 			else if (!fd.getFlag().is(FileDescriptor.FLAG_PING_SENT))
 			{
-				KeepAliveRequest packet = new KeepAliveRequest();
+				AH_KeepAlive packet = new AH_KeepAlive();
 				packet.send(fd);
 
 				fd.getFlag().set(FileDescriptor.FLAG_PING_SENT);
@@ -421,10 +421,10 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public void banNofitication(CFileDescriptor fd)
 	{
-		BanNotificationRequest packet = new BanNotificationRequest();
+		AH_BanNotification packet = new AH_BanNotification();
 		packet.receive(fd);
 
-		BanNotificationResult result = new BanNotificationResult();
+		HZ_Ban result = new HZ_Ban();
 		result.setAccountID(packet.getAccountID());
 		result.setType(packet.getType());
 		result.setUnbanTime(packet.getUnbanTime());
@@ -441,7 +441,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public void alreadyOnline(CFileDescriptor sfd)
 	{
-		AlreadyOnline packet = new AlreadyOnline();
+		AH_AlreadyOnline packet = new AH_AlreadyOnline();
 		packet.receive(sfd);
 
 		OnlineCharData online = onlines.get(packet.getAccountID());
@@ -502,7 +502,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public boolean parseLoginResult(CFileDescriptor fd)
 	{
-		CharServerConnectResult packet = new CharServerConnectResult();
+		AH_AckConnect packet = new AH_AckConnect();
 		packet.receive(fd, false);
 
 		if (packet.getResult() == OK)
@@ -525,7 +525,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 		logDebug("solicitando autenticação de conta (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
 
-		AuthAccountRequest packet = new AuthAccountRequest();
+		HA_AuthAccount packet = new HA_AuthAccount();
 		packet.setFileDescriptorID(fd.getID());
 		packet.setAccountID(sd.getID());
 		packet.setFirstSeed(sd.getSeed().getFirst());
@@ -543,7 +543,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public boolean parseAuthAccount(CFileDescriptor lfd)
 	{
-		AuthAccountResult packet = new AuthAccountResult();
+		AH_AuthAccount packet = new AH_AuthAccount();
 		packet.receive(lfd);
 
 		logDebug("recebendo resultado da autenticação de conta (aid: %d).\n", packet.getAccountID());
@@ -569,7 +569,7 @@ public class ServiceCharLogin extends AbstractCharService
 				if (packet.isResult())
 					return auth.authOk(fd);
 
-				client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
+				client.refuseEnter(fd, HC_RefuseEnter.REJECTED_FROM_SERVER);
 			}
 		}
 
@@ -587,7 +587,7 @@ public class ServiceCharLogin extends AbstractCharService
 		logDebug("solicitando dados de conta (fd: %d).\n", fd.getID());
 
 		CharSessionData sd = fd.getSessionData();
-		AccountDataRequest packet = new AccountDataRequest();
+		HA_AccountData packet = new HA_AccountData();
 		packet.setFdID(fd.getID());
 		packet.setAccountID(sd.getID());
 
@@ -604,7 +604,7 @@ public class ServiceCharLogin extends AbstractCharService
 	{
 		logDebug("recebendo resultado dos dados de conta.\n");
 
-		AccountDataResult packet = new AccountDataResult();
+		AH_AccountData packet = new AH_AccountData();
 		packet.receive(lfd);
 
 		CFileDescriptor fd = (CFileDescriptor) getFileDescriptorSystem().get(packet.getFdID());
@@ -657,7 +657,7 @@ public class ServiceCharLogin extends AbstractCharService
 		}
 
 		else
-			client.refuseEnter(fd, RefuseEnter.REJECTED_FROM_SERVER);
+			client.refuseEnter(fd, HC_RefuseEnter.REJECTED_FROM_SERVER);
 
 		return enabled;
 	}
@@ -675,7 +675,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 		logDebug("solicitando informações de conta (fd: %d, aid: %d).\n", sd.getID());
 
-		AccountInfoRequest packet = new AccountInfoRequest();
+		HA_AccountInfo packet = new HA_AccountInfo();
 		packet.setServerFD(getFileDescriptor().getID());
 		packet.setUserFD(sd.getID());
 		packet.setAccountID(sd.getID());
@@ -690,7 +690,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public void parseAccountInfo(CFileDescriptor lfd)
 	{
-		AccountInfoResult packet = new AccountInfoResult();
+		AH_AccountInfo packet = new AH_AccountInfo();
 		packet.receive(lfd);
 
 		logDebug("recebendo informações da conta do servidor de acesso (aid: %d).\n", packet.getAccountID());
@@ -721,7 +721,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public boolean reqChangeSex(CFileDescriptor fd)
 	{
-		ChangeSexRequest packet = new ChangeSexRequest();
+		AH_ChangeSex packet = new AH_ChangeSex();
 		packet.receive(fd);
 
 		logDebug("solicitado alterar sexo dos personagens (fd: %d, aid: %d).\n", fd.getID(), packet.getAccountID());
@@ -767,7 +767,7 @@ public class ServiceCharLogin extends AbstractCharService
 			setCharSex(change, sex);
 			character.disconnectPlayer(change.getAccountID());
 
-			ChangeSexNotify packet = new ChangeSexNotify();
+			HZ_ChangedSex packet = new HZ_ChangedSex();
 			packet.setAccountID(change.getAccountID());
 			packet.setSex(sex);
 
@@ -914,7 +914,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 		logDebug("notificar código pin incorreto (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
 
-		NotifyPinError packet = new NotifyPinError();
+		HA_NotifyPinError packet = new HA_NotifyPinError();
 		packet.setAccountID(sd.getID());
 		packet.send(getFileDescriptor());
 
@@ -934,7 +934,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 		logDebug("notificar atualização de código pin (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
 
-		NotifyPinUpdate packet = new NotifyPinUpdate();
+		HA_NotifyPinUpdate packet = new HA_NotifyPinUpdate();
 		packet.setAccountID(sd.getID());
 		packet.setPincode(pincode);
 
@@ -951,7 +951,7 @@ public class ServiceCharLogin extends AbstractCharService
 	{
 		logDebug("atualizar contagem de jogadores online.\n", fd.getID());
 
-		UpdateUserCount packet = new UpdateUserCount();
+		HA_UpdateUserCount packet = new HA_UpdateUserCount();
 		packet.setCount(users);
 
 		return sendPacket(fd, packet);
@@ -967,7 +967,7 @@ public class ServiceCharLogin extends AbstractCharService
 		{
 			logDebug("solicitado ao servidor de acesso para todas as contas ficarem offline.\n");
 
-			SetAllAccountOffline packet = new SetAllAccountOffline();
+			HA_SetAllAccountOffline packet = new HA_SetAllAccountOffline();
 			packet.send(getFileDescriptor());
 		}
 	}
@@ -983,7 +983,7 @@ public class ServiceCharLogin extends AbstractCharService
 		{
 			logDebug("solicitado ao servidor de acesso para account#%d ficar offline.\n", accountID);
 
-			SetAccountOffline packet = new SetAccountOffline();
+			HA_SetAccountOffline packet = new HA_SetAccountOffline();
 			packet.setAccountID(accountID);
 			packet.send(getFileDescriptor());
 		}
@@ -1000,7 +1000,7 @@ public class ServiceCharLogin extends AbstractCharService
 		{
 			logDebug("solicitado ao servidor de acesso para account#%d ficar online.\n", accountID);
 
-			SetAccountOnline packet = new SetAccountOnline();
+			HA_SetAccountOnline packet = new HA_SetAccountOnline();
 			packet.setAccountID(accountID);
 			packet.send(getFileDescriptor());
 		}

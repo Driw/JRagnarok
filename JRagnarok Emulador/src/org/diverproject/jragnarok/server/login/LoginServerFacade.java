@@ -2,8 +2,8 @@ package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOG_LOGIN;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACCOUNT_STATE_NOTIFY;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ACCOUNT_STATE_UPDATE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_STATE_NOTIFY;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_STATE_UPDATE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CHARSERVERCONNECT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CONNECT_INFO_CHANGED;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_EXE_HASHCHECK;
@@ -15,23 +15,23 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_PCBANG;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_REQ_HASH;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_SSO_LOGIN_REQ;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_NOTIFY_PIN_ERROR;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_NOTIFY_PIN_UPDATE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_DATA;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_ACCOUNT_INFO;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_AUTH_ACCOUNT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_CHANGE_EMAIL;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_GLOBAL_REGISTER;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_UNBAN_ACCOUNT;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_REQ_VIP_DATA;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_RES_KEEP_ALIVE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SEND_ACCOUNTS;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SET_ACCOUNT_OFFLINE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SET_ACCOUNT_ONLINE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SET_ALL_ACC_OFFLINE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_IP;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_REGISTER;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_UPDATE_USER_COUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_NOTIFY_PIN_ERROR;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_NOTIFY_PIN_UPDATE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_INFO;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_AUTH_ACCOUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_CHANGE_EMAIL;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_GLOBAL_REGISTERS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UNBAN_ACCOUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_VIP_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_SEND_ACCOUNTS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_SET_ACCOUNT_OFFLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_SET_ACCOUNT_ONLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_SET_ALL_ACC_OFFLINE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_IP;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_REGISTERS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_USER_COUNT;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logWarning;
 
@@ -505,27 +505,27 @@ class LoginServerFacade
 
 		switch (command)
 		{
-			case PACKET_RES_KEEP_ALIVE:
-				clientService.pingCharRequest(fd);
-				return true;
-
-			case PACKET_UPDATE_USER_COUNT:
+			case PACKET_HA_UPDATE_USER_COUNT:
 				charService.updateUserCount(fd);
 				return true;
 
-			case PACKET_SET_ACCOUNT_ONLINE:
+			case PACKET_HA_KEEP_ALIVE:
+				clientService.pingCharRequest(fd);
+				return true;
+
+			case PACKET_HA_SET_ACCOUNT_ONLINE:
 				charService.setAccountOnline(fd);
 				return true;
 
-			case PACKET_SET_ACCOUNT_OFFLINE:
+			case PACKET_HA_SET_ACCOUNT_OFFLINE:
 				charService.setAccountOffline(fd);
 				return true;
 
-			case PACKET_SET_ALL_ACC_OFFLINE:
+			case PACKET_HA_SET_ALL_ACC_OFFLINE:
 				charService.setAllOffline(fd);
 				return true;
 
-			case PACKET_SEND_ACCOUNTS:
+			case PACKET_HA_SEND_ACCOUNTS:
 				charService.receiveSentAccounts(fd);
 				return true;
 
@@ -547,23 +547,23 @@ class LoginServerFacade
 	{
 		switch (command)
 		{
-			case PACKET_REQ_AUTH_ACCOUNT:
+			case PACKET_HA_AUTH_ACCOUNT:
 				charService.requestAuthAccount(fd);
 				return true;
 
-			case PACKET_REQ_ACCOUNT_DATA:
+			case PACKET_HA_ACCOUNT_DATA:
 				charService.requestAccountData(fd);
 				return true;
 
-			case PACKET_REQ_ACCOUNT_INFO:
+			case PACKET_HA_ACCOUNT_INFO:
 				charService.requestAccountInfo(fd);
 				return true;
 
-			case PACKET_UPDATE_IP:
+			case PACKET_HA_UPDATE_IP:
 				charService.updateCharIP(fd);
 				return true;
 
-			case PACKET_REQ_VIP_DATA:
+			case PACKET_HA_VIP_DATA:
 				charService.requestVipData(fd);
 				return true;
 
@@ -585,35 +585,35 @@ class LoginServerFacade
 	{
 		switch (command)
 		{
-			case PACKET_REQ_CHANGE_EMAIL:
+			case PACKET_HA_CHANGE_EMAIL:
 				accountService.requestChangeEmail(fd);
 				return true;
 
-			case PACKET_ACCOUNT_STATE_UPDATE:
+			case PACKET_HA_ACCOUNT_STATE_UPDATE:
 				accountService.updateAccountState(fd);
 				return true;
 
-			case PACKET_ACCOUNT_STATE_NOTIFY:
+			case PACKET_HA_ACCOUNT_STATE_NOTIFY:
 				accountService.requestBanAccount(fd);
 				return true;
 
-			case PACKET_UPDATE_REGISTER:
+			case PACKET_HA_UPDATE_REGISTERS:
 				accountService.updateGlobalRegister(fd);
 				return true;
 
-			case PACKET_REQ_UNBAN_ACCOUNT:
+			case PACKET_HA_UNBAN_ACCOUNT:
 				accountService.requestUnbanAccount(fd);
 				return true;
 
-			case PACKET_REQ_GLOBAL_REGISTER:
+			case PACKET_HA_GLOBAL_REGISTERS:
 				accountService.requestRegister(fd);
 				return true;
 
-			case PACKET_NOTIFY_PIN_UPDATE:
+			case PACKET_HA_NOTIFY_PIN_UPDATE:
 				accountService.updatePinCode(fd);
 				return true;
 
-			case PACKET_NOTIFY_PIN_ERROR:
+			case PACKET_HA_NOTIFY_PIN_ERROR:
 				accountService.failPinCode(fd);
 				return true;
 

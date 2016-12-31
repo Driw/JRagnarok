@@ -6,7 +6,7 @@ import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
-import org.diverproject.jragnarok.packets.receive.CharServerSelected;
+import org.diverproject.jragnarok.packets.character.fromclient.CH_Enter;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
@@ -114,7 +114,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 
 	public boolean parse(CFileDescriptor fd)
 	{
-		CharServerSelected packet = new CharServerSelected();
+		CH_Enter packet = new CH_Enter();
 		packet.receive(fd);
 
 		logNotice("conexão solicitada (aid: %d, seed: %d|%d).\n", packet.getAccountID(), packet.getFirstSeed(), packet.getSecondSeed());

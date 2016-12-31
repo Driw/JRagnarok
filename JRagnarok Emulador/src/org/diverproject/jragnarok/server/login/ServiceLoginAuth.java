@@ -24,15 +24,15 @@ import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
-import org.diverproject.jragnarok.packets.login.client_acess.CA_CharServerConnect;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_Login;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_Login2;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_Login3;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_Login4;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_LoginHan;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_LoginPCBang;
-import org.diverproject.jragnarok.packets.login.client_acess.CA_LoginSingleSignOn;
-import org.diverproject.jragnarok.packets.request.AlreadyOnline;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_AlreadyOnline;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_CharServerConnect;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_Login;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_Login2;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_Login3;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_Login4;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_LoginHan;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_LoginPCBang;
+import org.diverproject.jragnarok.packets.login.fromclient.CA_LoginSingleSignOn;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.ServerState;
@@ -530,7 +530,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	{
 		logNotice("usuário '%s' já está online em '%s'.\n", account.getUsername(), server.getName());
 
-		AlreadyOnline packet = new AlreadyOnline();
+		AH_AlreadyOnline packet = new AH_AlreadyOnline();
 		packet.setAccountID(account.getID());
 
 		client.sendAllWithoutOurSelf(fd, packet);
