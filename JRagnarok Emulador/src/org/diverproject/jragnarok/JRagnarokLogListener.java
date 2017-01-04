@@ -1,5 +1,9 @@
 package org.diverproject.jragnarok;
 
+import org.diverproject.jragnarok.console.MessageType;
+import org.diverproject.jragnarok.console.Show;
+import org.diverproject.jragnarok.console.ShowThread;
+import org.diverproject.jragnarok.server.ServerThreaed;
 import org.diverproject.log.Log;
 import org.diverproject.log.LogListener;
 
@@ -36,6 +40,26 @@ public class JRagnarokLogListener implements LogListener
 	public void onMessage(Log log)
 	{
 		System.out.print(log.toString());
+		printMessage(ShowThread.getInstance(), log);;
+
+		if (Thread.currentThread() instanceof ServerThreaed)
+			printMessage(((ServerThreaed) Thread.currentThread()).getShowThread(), log);
+	}
+
+	private void printMessage(Show show, Log log)
+	{
+		if (show != null)
+			switch (log.getType())
+			{
+				case "Log":			show.log(log.getThrowable(), null, log.getMessage()); break;
+				case "Debug":		show.log(log.getThrowable(), MessageType.DEBUG, log.getMessage()); break;
+				case "Info":		show.log(log.getThrowable(), MessageType.INFO, log.getMessage()); break;
+				case "Notice":		show.log(log.getThrowable(), MessageType.NOTICE, log.getMessage()); break;
+				case "Warning":		show.log(log.getThrowable(), MessageType.WARNING, log.getMessage()); break;
+				case "Error":		show.log(log.getThrowable(), MessageType.ERROR, log.getMessage()); break;
+				case "Fatal":		show.log(log.getThrowable(), MessageType.FATAL, log.getMessage()); break;
+				case "Exception":	show.log(log.getThrowable(), MessageType.EXCEPTION, log.getMessage()); break;
+			}
 	}
 
 	/**

@@ -6,7 +6,7 @@ import static org.diverproject.jragnarok.server.ServerState.CREATED;
 import static org.diverproject.jragnarok.server.ServerState.NONE;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.ServerState.STOPED;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.character.CharServer;
@@ -37,9 +37,9 @@ public class ServerControl
 {
 	private static final ServerControl INSTANCE = new ServerControl();
 
-	private final Index<LoginServer> loginServers;
-	private final Index<CharServer> charServers;
-	private final Index<MapServer> mapServers;
+	private Index<LoginServer> loginServers;
+	private Index<CharServer> charServers;
+	private Index<MapServer> mapServers;
 
 	private ServerControl()
 	{
@@ -103,7 +103,7 @@ public class ServerControl
 				if (force || server.isState(NONE))
 					server.create();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 
 		for (Server server : charServers)
@@ -111,7 +111,7 @@ public class ServerControl
 				if (force || server.isState(NONE))
 					server.create();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 
 		for (Server server : mapServers)
@@ -119,7 +119,7 @@ public class ServerControl
 				if (force || server.isState(NONE))
 					server.create();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 	}
 
@@ -130,7 +130,7 @@ public class ServerControl
 				if (force || server.isState(CREATED))
 					server.run();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 
 		for (Server server : charServers)
@@ -138,7 +138,7 @@ public class ServerControl
 				if (force || server.isState(CREATED))
 					server.run();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 
 		for (Server server : mapServers)
@@ -146,7 +146,7 @@ public class ServerControl
 				if (force || server.isState(CREATED))
 					server.run();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 	}
 
@@ -157,7 +157,7 @@ public class ServerControl
 				if (force || server.isState(RUNNING))
 					server.stop();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 
 		for (Server server : charServers)
@@ -165,7 +165,7 @@ public class ServerControl
 				if (force || server.isState(RUNNING))
 					server.stop();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 
 		for (Server server : mapServers)
@@ -173,7 +173,7 @@ public class ServerControl
 				if (force || server.isState(RUNNING))
 					server.stop();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 	}
 
@@ -184,7 +184,7 @@ public class ServerControl
 				if (force || server.isState(STOPED))
 					server.destroy();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 
 		for (Server server : charServers)
@@ -192,7 +192,7 @@ public class ServerControl
 				if (force || server.isState(STOPED))
 					server.destroy();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 
 		for (Server server : mapServers)
@@ -200,7 +200,7 @@ public class ServerControl
 				if (force || server.isState(STOPED))
 					server.destroy();
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 	}
 

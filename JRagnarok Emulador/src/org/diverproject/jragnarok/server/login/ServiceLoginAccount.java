@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.server.login;
 import static org.diverproject.jragnarok.JRagnarokUtil.emailCheck;
 import static org.diverproject.jragnarok.JRagnarokUtil.time;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
@@ -279,7 +279,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 			} catch (RagnarokException e) {
 
 				logError("falha ao atualizar registro global (aid: %d, key: %s)", operation.getRegister().getAccountID(), operation.getRegister().getKey());
-				logExeception(e);
+				logException(e);
 			}
 		}
 	}
@@ -305,7 +305,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 		} catch (RagnarokException e) {
 			logError("falha ao obter variáveis globais (aid: %d):", accountID);
-			logExeception(e);
+			logException(e);
 		}
 	}
 
@@ -387,7 +387,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 				} catch (RagnarokException e) {
 					logError("falha durante o registro da falha no código pin (aid: %d).\n", packet.getAccountID());
-					logExeception(e);
+					logException(e);
 				}
 			}
 		}

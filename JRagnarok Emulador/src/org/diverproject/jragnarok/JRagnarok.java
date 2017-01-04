@@ -19,7 +19,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_CONFIGS
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logExeceptionSource;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -329,7 +329,7 @@ public class JRagnarok
 			logNotice("lido %d configurações de '%s'.\n", read.read(), filepath);
 		} catch (RagnarokException e) {
 			logError("falha ao ler configurações de '%s'.\n", filepath);
-			logExeception(e);
+			logException(e);
 		}
 
 		prepareMicroServers(serverConfigs);

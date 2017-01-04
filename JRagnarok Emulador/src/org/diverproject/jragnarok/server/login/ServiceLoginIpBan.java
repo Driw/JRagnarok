@@ -8,7 +8,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_PASS_FAI
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_PASS_FAILURE_LIMIT;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokException;
@@ -108,7 +108,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 
 			} catch (RagnarokException e) {
 				logError("falha durante a limpeza de endereços de IP banidos expirados:\n");
-				logExeception(e);
+				logException(e);
 			}
 		}
 		

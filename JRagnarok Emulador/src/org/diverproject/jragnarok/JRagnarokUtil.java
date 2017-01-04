@@ -3,7 +3,7 @@ package org.diverproject.jragnarok;
 import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.log.LogSystem.setUpSource;
 import static org.diverproject.util.lang.IntUtil.interval;
@@ -81,7 +81,7 @@ public class JRagnarokUtil
 			Thread.sleep(mileseconds);
 		} catch (InterruptedException e) {
 			setUpSource(1);
-			logExeception(e);
+			logException(e);
 		}
 	}
 
@@ -202,7 +202,7 @@ public class JRagnarokUtil
 		} catch (NoSuchAlgorithmException e) {
 
 			setUpSource(1);
-			logExeception(e);
+			logException(e);
 
 			throw new RagnarokRuntimeException(e.getMessage());
 		}
@@ -367,7 +367,7 @@ public class JRagnarokUtil
 		if (message == null)
 		{
 			setUpSource(1);
-			logExeception(new RagnarokException("mensagem '%d' não existe no LoginServer", number));
+			logException(new RagnarokException("mensagem '%d' não existe no LoginServer", number));
 		}
 
 		return message == null ? "null" : message;

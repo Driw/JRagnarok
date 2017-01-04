@@ -26,7 +26,7 @@ import static org.diverproject.jragnarok.server.common.AuthResult.OK;
 import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONLINE;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.lang.IntUtil.diff;
@@ -740,7 +740,7 @@ public class ServiceCharLogin extends AbstractCharService
 			} catch (RagnarokException e) {
 
 				logError("falha ao tentar alterar o sexo dos personagens (fd: %d, aid: %d):.\n", fd.getID(), packet.getAccountID());
-				logExeception(e);
+				logException(e);
 			}
 		}
 
@@ -779,7 +779,7 @@ public class ServiceCharLogin extends AbstractCharService
 		} catch (RagnarokException e) {
 
 			logError("falha ao tentar alterar o sexo do personagem (charid: %d);\n", charID);
-			logExeception(e);
+			logException(e);
 
 			return false;
 		}

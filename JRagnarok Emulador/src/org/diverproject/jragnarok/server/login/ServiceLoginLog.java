@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
@@ -90,7 +90,7 @@ public class ServiceLoginLog extends AbstractServiceLogin
 				logWarning("falha ao registrar log (ip: %s, aid: %s)", ip, login.getID());
 
 		} catch (RagnarokException e) {
-			logExeception(e);
+			logException(e);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class ServiceLoginLog extends AbstractServiceLogin
 		try {
 			failures = logs.getFailedAttempts(ip, minutes);
 		} catch (RagnarokException e) {
-			logExeception(e);
+			logException(e);
 		}
 
 		return failures;

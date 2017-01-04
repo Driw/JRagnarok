@@ -1,3 +1,6 @@
+04.01.2017 - 1.5.161
+- Correção no nome do método que registra as exceções (log).
+
 31.12.2016 - 1.5.160
 - Movendo os pacotes para outra pasta de código fonte, separando o servidor dos pacotes.
 - RagnarokPacket atualizado conforme deveria ter sido feito na rev159.

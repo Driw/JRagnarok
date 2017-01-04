@@ -31,7 +31,7 @@ import static org.diverproject.jragnarok.server.ServerState.STOPED;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -523,7 +523,7 @@ public abstract class Server
 							log("servidor está cheio, %s recusado.\n", SocketUtil.socketIP(socket));
 
 					} catch (IOException e) {
-						logExeception(e);
+						logException(e);
 					}
 				}
 
@@ -569,7 +569,7 @@ public abstract class Server
 						fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
 
 					} catch (Exception e) {
-						logExeception(e);
+						logException(e);
 						e.printStackTrace();
 					}
 				}
@@ -699,7 +699,7 @@ public abstract class Server
 			reader.read();
 		} catch (RagnarokException e) {
 			logError("falha durante a leitura de '%s' (%s:%d).\n", filepath, nameOf(this), getID());
-			logExeception(e);
+			logException(e);
 		}
 
 		Queue<RagnarokException> exceptions = reader.getExceptions();

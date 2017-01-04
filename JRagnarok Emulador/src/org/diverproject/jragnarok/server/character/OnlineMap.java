@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.server.character;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -57,7 +57,7 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 
 		} catch (SQLException | RagnarokException e) {
 			logError("falha ao deixar jogadores como offline:\n");
-			logExeception(e);
+			logException(e);
 		}
 	}
 
@@ -101,7 +101,7 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 			setCharOnline(online.getCharID(), true);
 
 		} catch (RagnarokException e) {
-			logExeception(e);
+			logException(e);
 		}
 	}
 
@@ -120,7 +120,7 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 				setCharOnline(online.getCharID(), false);
 
 		} catch (RagnarokException e) {
-			logExeception(e);
+			logException(e);
 		}
 
 		cache.removeKey(online.getAccountID());
@@ -218,7 +218,7 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 				try {
 					setCharOnline(online.getCharID(), false);
 				} catch (RagnarokException e) {
-					logExeception(e);
+					logException(e);
 				}
 
 			if (online.getServer() < 0)
@@ -239,7 +239,7 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 			try {
 				setCharOnline(online.getCharID(), false);
 			} catch (RagnarokException e) {
-				logExeception(e);
+				logException(e);
 			}
 
 		cache.clear();

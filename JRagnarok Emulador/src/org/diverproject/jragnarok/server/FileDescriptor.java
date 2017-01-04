@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -230,7 +230,7 @@ public abstract class FileDescriptor
 			parseListener = null;
 
 		} catch (IOException e) {
-			logExeception(e);
+			logException(e);
 		}
 	}
 

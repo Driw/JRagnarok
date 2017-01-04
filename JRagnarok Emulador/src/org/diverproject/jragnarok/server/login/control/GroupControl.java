@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.server.login.control;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -325,7 +325,7 @@ public class GroupControl extends AbstractControl
 			initVips();
 		} catch (RagnarokException e) {
 			logError("falha ao tentar iniciar o controle de grupos:\n");
-			logExeception(e);
+			logException(e);
 		}
 	}
 

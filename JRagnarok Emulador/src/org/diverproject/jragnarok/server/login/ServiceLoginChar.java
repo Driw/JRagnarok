@@ -15,7 +15,7 @@ import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_
 import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_VIP;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 
@@ -337,7 +337,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 				} catch (RagnarokException e) {
 					logError("falha ao alterar o grupo vip (aid: %d, vipGID: %d)", account.getID(), vipGID);
-					logExeception(e);
+					logException(e);
 				}
 
 				account.setCharSlots(b(account.getCharSlots() + getConfigs().getInt(VIP_CHAR_INCREASE)));

@@ -9,7 +9,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_UNLI
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
-import static org.diverproject.log.LogSystem.logExeception;
+import static org.diverproject.log.LogSystem.logException;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.character.toclient.HC_Accept2;
@@ -241,7 +241,7 @@ public class ServiceCharClient extends AbstractCharService
 
 			} catch (RagnarokException e) {
 				logError("falha ao carregar dados dos personagens (aid: %d):.\n", sd.getID());
-				logExeception(e);
+				logException(e);
 			}
 		}
 	}
@@ -276,7 +276,7 @@ public class ServiceCharClient extends AbstractCharService
 
 		} catch (RagnarokException e) {
 			logError("falha ao carregar dados dos personagens (aid: %d):.\n", sd.getID());
-			logExeception(e);
+			logException(e);
 		}
 
 		return false;
