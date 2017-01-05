@@ -36,12 +36,14 @@ import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.ConfigString;
 import org.diverproject.jragnaork.configuration.ConfigSystem;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.console.JRagnarokConsole;
 import org.diverproject.jragnarok.server.ServerControl;
 import org.diverproject.jragnarok.server.character.CharServer;
 import org.diverproject.jragnarok.server.login.LoginServer;
 import org.diverproject.jragnarok.server.map.MapServer;
 import org.diverproject.log.LogPreferences;
 import org.diverproject.log.LogSystem;
+import org.diverproject.util.SystemUtil;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;
 import org.diverproject.util.lang.StringUtil;
 
@@ -82,9 +84,15 @@ public class JRagnarok
 	public static final StringSimpleMap<String> ARGUMENTS = new StringSimpleMap<>();
 
 	/**
+	 * Console utilizado para interação do administrador com o servidor.
+	 */
+	public static final JRagnarokConsole CONSOLE = new JRagnarokConsole();
+
+	/**
 	 * Controlador de servidores.
 	 */
 	private static final ServerControl SERVERS = ServerControl.getInstance();
+
 
 	private JRagnarok()
 	{
@@ -100,6 +108,8 @@ public class JRagnarok
 
 	public static void main(String[] args)
 	{
+		SystemUtil.setWindowsInterface();
+
 		prepareSystemConfig();
 		prepareArguments();
 		readArguments(args);
@@ -216,7 +226,8 @@ public class JRagnarok
 	{
 		if (ARGUMENT_CONFIGS.getBool("arg.c"))
 		{
-			// TODO instanciar, configurar e inicializar o console
+			CONSOLE.show();
+			CONSOLE.setDefaultConsole();
 		}
 	}
 
@@ -374,6 +385,7 @@ public class JRagnarok
 		configs.add(SYSTEM_SERVER_DEFAULT_FILES, files, true);
 
 		SERVERS.add(server);
+		CONSOLE.addLoginServer(server);
 	}
 
 	/**
@@ -392,6 +404,7 @@ public class JRagnarok
 		configs.add(SYSTEM_SERVER_DEFAULT_FILES, files, true);
 
 		SERVERS.add(server);
+		CONSOLE.addCharServer(server);
 	}
 
 	/**
@@ -409,7 +422,8 @@ public class JRagnarok
 		String files = configs.getString(SYSTEM_SERVER_DEFAULT_FILES)+ "," +configs.getString(SYSTEM_SERVER_DEFAULT_MAP_FILES);
 		configs.add(SYSTEM_SERVER_DEFAULT_FILES, files, true);
 
-		SERVERS.add(server);		
+		SERVERS.add(server);
+		CONSOLE.addMapServer(server);
 	}
 
 	/**

@@ -46,6 +46,8 @@ import java.sql.SQLException;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.console.Show;
+import org.diverproject.jragnarok.console.ShowThread;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.collection.Queue;
@@ -136,6 +138,11 @@ public abstract class Server
 	private FileDescriptorSystem fileDescriptorSystem;
 
 	/**
+	 * Serviço para exibição de mensagens no console.
+	 */
+	private Show show;
+
+	/**
 	 * Cria um novo servidor definindo o servidor no estado NONE (nenhum/inicial).
 	 * Também define as configurações do servidor por setServerConfig().
 	 * E por fim instancia o objeto para criar a conexão com o banco de dados.
@@ -170,6 +177,15 @@ public abstract class Server
 	{
 		if (this.id == 0)
 			this.id = id;
+	}
+
+	/**
+	 * @return aquisição do serviço para exibição de mensagens no console.
+	 */
+
+	public Show getShow()
+	{
+		return show;
 	}
 
 	/**
@@ -496,91 +512,112 @@ public abstract class Server
 
 	private void initThreads()
 	{
-		Server self = this;
-
-		threadSocket = new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				while (state != DESTROYED)
-				{
-					if (state != RUNNING)
-					{
-						sleep(1000);
-						continue;
-					}
-
-					try {
-
-						Socket socket = serverSocket.accept();
-						FileDescriptor fd = Server.this.acceptSocket(socket);
-
-						if (fileDescriptorSystem.addFileDecriptor(fd))
-							logDebug("nova conexão em '%s' (id: %d, ip: %s).\n", getThreadName(), fd.getID(), fd.getAddressString());
-
-						if (fd == null)
-							log("servidor está cheio, %s recusado.\n", SocketUtil.socketIP(socket));
-
-					} catch (IOException e) {
-						logException(e);
-					}
-				}
-
-				Thread.interrupted();
-			}
-
-			@Override
-			public String toString()
-			{
-				return self.toString();
-			}
-		});
+		threadSocket = new Thread(THREAD_SOCKET_RUNNABLE);
 		threadSocket.setName(getThreadName()+ "|ServerSocket");
 		threadSocket.setPriority(Thread.MIN_PRIORITY);
 		threadSocket.setDaemon(false);
 
-		threadServer = new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				while (state != DESTROYED)
-				{
-					if (state != RUNNING)
-					{
-						sleep(1000);
-						continue;
-					}
-
-					int tick = timerSystem.tick();
-
-					// TODO : Remover mais a frente quando gastar mais processamento?
-					// Esperar ao menos 1ms para o próximo loop garantir ao menos 1 tick.
-					if (tick == 0)
-					{
-						sleep(1);
-						continue;
-					}
-
-					try {
-
-						timerSystem.getTimers().update(timerSystem.getCurrentTime(), tick);
-						fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
-
-					} catch (Exception e) {
-						logException(e);
-						e.printStackTrace();
-					}
-				}
-			}
-		});
+		threadServer = new ServerThreaed(this, THREAD_SERVER_RUNNABLE);
 		threadServer.setName(getThreadName()+ "|Server");
 		threadServer.setPriority(getThreadPriority());
 		threadServer.setDaemon(false);
 
 		logInfo("thread do servidor criada.\n");
 	}
+
+	/**
+	 * Interface que será executada para manter o servidor recebendo novas conexões de clientes.
+	 * Sempre que uma nova conexão for recebida irá registrado no sistema e despachá-lo a um listener.
+	 * Caso o servidor não esteja sobrecarregado no próximo loop a thread do servidor irá processá-lo.
+	 */
+
+	private final Runnable THREAD_SOCKET_RUNNABLE = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			while (state != DESTROYED)
+			{
+				if (state != RUNNING)
+				{
+					sleep(1000);
+					continue;
+				}
+
+				try {
+
+					Socket socket = serverSocket.accept();
+					FileDescriptor fd = Server.this.acceptSocket(socket);
+
+					if (fileDescriptorSystem.addFileDecriptor(fd))
+						logDebug("nova conexão em '%s' (id: %d, ip: %s).\n", getThreadName(), fd.getID(), fd.getAddressString());
+
+					if (fd == null)
+						log("servidor está cheio, %s recusado.\n", SocketUtil.socketIP(socket));
+
+				} catch (IOException e) {
+					logException(e);
+				}
+			}
+
+			Thread.interrupted();
+		}
+
+		@Override
+		public String toString()
+		{
+			return Server.this.toString();
+		}
+	};
+
+	/**
+	 * Interface que será executada no momento em que a thread do servidor for inicializada.
+	 * Essa thread será especifica para manter as informações do servidor e clientes atualizados.
+	 */
+
+	private final Runnable THREAD_SERVER_RUNNABLE = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			Server.this.show = ShowThread.registerThread();
+
+			while (state != DESTROYED)
+			{
+				if (state != RUNNING)
+				{
+					sleep(1000);
+					continue;
+				}
+
+				int tick = timerSystem.tick();
+
+				// TODO : Remover mais a frente quando gastar mais processamento?
+				// Esperar ao menos 1ms para o próximo loop garantir ao menos 1 tick.
+				if (tick == 0)
+				{
+					sleep(1);
+					continue;
+				}
+
+				try {
+
+					timerSystem.getTimers().update(timerSystem.getCurrentTime(), tick);
+					fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
+
+				} catch (Exception e) {
+					logException(e);
+					e.printStackTrace();
+				}
+			}
+		}
+
+		@Override
+		public String toString()
+		{
+			return Server.this.toString();
+		}
+	};
 
 	/**
 	 * Inicialização do servidor socket para receber as conexões dos clientes.

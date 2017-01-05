@@ -1,3 +1,10 @@
+05.01.2017 - 1.5.162
+- Adicionando a utilização de um Console (JFrame) para melhor interação com o servidor.
+	- Mais a frente poderá ser realizado comandos para obter informações do servidor rodando.
+- Server irá possuir um atributo Show que será responsável por exibir as mensagens no console.
+	- Todos os servidores irão utilizar-se a thread ServerThreaed para funcionar com Show.
+	- Interfaces Runnable implementadas ao criar as threads agora virão atributos final.
+
 04.01.2017 - 1.5.161
 - Correção no nome do método que registra as exceções (log).
 

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.console.Show;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.sql.MySQL;
 
@@ -22,7 +23,7 @@ import org.diverproject.util.sql.MySQL;
  * @author Andrew
  */
 
-public class ServerService
+public abstract class ServerService
 {
 	/**
 	 * Referência do servidor que está criando o serviço.
@@ -61,7 +62,7 @@ public class ServerService
 	 * @return aquisição do sistema de temporização do servidor.
 	 */
 
-	public final TimerSystem getTimerSystem()
+	protected final TimerSystem getTimerSystem()
 	{
 		return server.getTimerSystem();
 	}
@@ -70,9 +71,18 @@ public class ServerService
 	 * @return aquisição do sistema controlador de sessões do servidor.
 	 */
 
-	public final FileDescriptorSystem getFileDescriptorSystem()
+	protected final FileDescriptorSystem getFileDescriptorSystem()
 	{
 		return server.getFileDescriptorSystem();
+	}
+
+	/**
+	 * @return aquisição do sistema que exibe as mensagens no console.
+	 */
+
+	protected final Show getShow()
+	{
+		return server.getShow();
 	}
 
 	/**
