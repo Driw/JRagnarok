@@ -1,8 +1,8 @@
-package org.diverproject.jragnarok.server.common;
+package org.diverproject.jragnarok.packets.common;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 
-public enum AuthResult
+public enum RefuseLogin
 {
 	OK(-1),
 	UNREGISTERED_ID(0),
@@ -30,14 +30,14 @@ public enum AuthResult
 
 	public final byte CODE;
 
-	private AuthResult(int code)
+	private RefuseLogin(int code)
 	{
 		CODE = (byte) code;
 	}
 
-	public static AuthResult parse(int code)
+	public static RefuseLogin parse(int code)
 	{
-		for (AuthResult result : values())
+		for (RefuseLogin result : values())
 			if (result.CODE == code)
 				return result;
 

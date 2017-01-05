@@ -6,11 +6,11 @@ import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Enter;
+import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 
 public class ServiceCharServerAuth extends AbstractCharService
 {

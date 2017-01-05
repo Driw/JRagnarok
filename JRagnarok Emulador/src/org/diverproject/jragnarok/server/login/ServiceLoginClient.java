@@ -11,6 +11,9 @@ import static org.diverproject.log.LogSystem.logDebug;
 
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
+import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
+import org.diverproject.jragnarok.packets.common.RefuseEnter;
+import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountStateNotify;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
@@ -28,10 +31,8 @@ import org.diverproject.jragnarok.packets.login.toclient.AC_AccepLogin;
 import org.diverproject.jragnarok.packets.login.toclient.AC_AckHash;
 import org.diverproject.jragnarok.packets.login.toclient.AC_RefuseLogin;
 import org.diverproject.jragnarok.packets.login.toclient.AC_RefuseLoginR2;
-import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
-import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.Vip;
 import org.diverproject.util.collection.Queue;
@@ -120,7 +121,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param result resultado da autenticação solicitada pelo cliente.
 	 */
 
-	public void sendAuthResult(LFileDescriptor fd, AuthResult result)
+	public void sendAuthResult(LFileDescriptor fd, RefuseLogin result)
 	{
 		logDebug("enviando resultado de autenticação (fd: %d, result: %s).\n", fd.getID(), result);
 
@@ -218,7 +219,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param blockDate até quando o jogador está sendo bloqueado (20b).
 	 */
 
-	public void refuseLogin(LFileDescriptor fd, AuthResult result, String blockDate)
+	public void refuseLogin(LFileDescriptor fd, RefuseLogin result, String blockDate)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
@@ -244,17 +245,17 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	/**
 	 * Recusa a entrada de uma determinada sessão no servidor de acesso.
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @param result resultado que será mostrado ao cliente.
+	 * @param error resultado que será mostrado ao cliente.
 	 */
 
-	public void refuseEnter(LFileDescriptor fd, byte result)
+	public void refuseEnter(LFileDescriptor fd, RefuseEnter error)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
 		logDebug("entrada recusada (fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
 
 		HC_RefuseEnter packet = new HC_RefuseEnter();
-		packet.setResult(result);
+		packet.setError(error);
 		packet.send(fd);
 	}
 
@@ -264,7 +265,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param result resultado da solicitação de acesso da conexão acima.
 	 */
 
-	public void sendCharServerResult(LFileDescriptor fd, AuthResult result)
+	public void sendCharServerResult(LFileDescriptor fd, RefuseLogin result)
 	{
 		LoginSessionData sd = fd.getSessionData();
 

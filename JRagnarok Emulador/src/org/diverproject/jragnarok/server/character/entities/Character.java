@@ -111,7 +111,7 @@ public class Character
 	/**
 	 * TODO ?
 	 */
-	private short karma;
+	private short virtue;
 
 	/**
 	 * Nível de base.
@@ -466,21 +466,21 @@ public class Character
 	}
 
 	/**
-	 * @return the karma TODO
+	 * @return aquisição do nível virtude para influência de PK.
 	 */
 
-	public short getKarma()
+	public short getVirtue()
 	{
-		return karma;
+		return virtue;
 	}
 
 	/**
-	 * @param karma the karma to set TODO
+	 * @param virtue nível virtude para influência de PK.
 	 */
 
-	public void setKarma(short karma)
+	public void setVirtue(short virtue)
 	{
-		this.karma = karma;
+		this.virtue = virtue;
 	}
 
 	/**
@@ -860,7 +860,7 @@ public class Character
 		description.append("sp", format("%d/%d", sp, maxSP));
 		description.append("jobID", jobID);
 		description.append("manner", manner);
-		description.append("karma", karma);
+		description.append("karma", virtue);
 		description.append("effectState", effectState);
 		description.append("rename", rename);
 		description.append("deleteDate", deleteDate);

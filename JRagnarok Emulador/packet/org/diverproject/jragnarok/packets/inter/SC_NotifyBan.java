@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.packets.inter;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SC_NOTIFY_BAN;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
-import org.diverproject.jragnarok.server.common.NotifyAuthResult;
+import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 

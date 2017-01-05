@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_ACCEPT2;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
 public class HC_Accept2 extends ResponsePacket
@@ -67,5 +68,17 @@ public class HC_Accept2 extends ResponsePacket
 	protected int length()
 	{
 		return 27;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("normalSlots", normalSlots);
+		description.append("premiumSlots", premiumSlots);
+		description.append("billingSlots", billingSlots);
+		description.append("producibleSlots", producibleSlots);
+		description.append("validSlots", validSlots);
 	}
 }

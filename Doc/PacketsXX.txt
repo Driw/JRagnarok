@@ -1,0 +1,51 @@
+
+//==============================================================================
+// [CHARACTER_INFO_NEO_UNION] - Informações de Personagem
+//==============================================================================
+
+byte	length	type	name
+00		04		uint	código de identificação do personagem
+04		04		int		pontos de experiência para nível de base
+08		04		int		quantidade de dinheiro do jogo (zeny)
+12		04		int		pontos de experiência para nível de classe
+16		04		int		nível de classe
+20		04		int		bodystate ???
+24		04		int		healthstate ???
+28		04		int		efeitos de estado em que se encontra no momento
+32		04		int		nível de influência dentro do sistema PK
+36		04		int		nível de experiência em fama
+40		02		short	pontos diponíveis para atributos
+42		04		int		quantidade atual de hp
+46		04		int		quantidade máxima de hp
+50		02		short	quantidade atual de sp
+52		02		short	quantidade máxima de sp
+54		02		short	velocidade de movimento do personagem
+56		02		short	código de identificação da classe
+58		02		short	estilo da cabelo (sprite)
+60		02		short	estilo da roupa (sprite)
+62		02		short	arma utilizada (sprite/efeitos)
+64		02		short	nível de base
+66		02		short	pontos disponíveis para habilidades
+68		02		short	equipamento para cabeça - baixo (sprite)
+70		02		short	escudo (sprite)
+72		02		short	equipamento para cabeça - cima (sprite)
+74		02		short	equipamento para cabeça - meio (sprite)
+76		02		short	cor do cabelo (palette)
+78		02		short	cor da roupa (palette)
+80		24		uchar	nome do personagem
+104		01		uchar	pontos de atributos distribuídos em força
+105		01		uchar	pontos de atributos distribuídos em agilidade
+106		01		uchar	pontos de atributos distribuídos em vitalidade
+107		01		uchar	pontos de atributos distribuídos em inteligência
+108		01		uchar	pontos de atributos distribuídos em destreza
+109		01		uchar	pontos de atributos distribuídos em sorte
+110		02		short	número de slot do personagem
+112		02		short	quantidade de vezes que foi renomeado
+114		16		uchar	mapa onde se encontra localizado
+130		04		uint	horário em que será excluído
+134		04		uint	capa (sprite)
+138		04		uint	quantas vezes o personagem foi movido
+142		04		uint	nome do personagem já foi renomado
+146		01		uchar	sexo do personagem
+
+size: 147 bytes

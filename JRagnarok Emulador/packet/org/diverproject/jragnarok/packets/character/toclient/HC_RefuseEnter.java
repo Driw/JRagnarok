@@ -3,18 +3,13 @@ package org.diverproject.jragnarok.packets.character.toclient;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_REFUSE_ENTER;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.jragnarok.packets.common.RefuseEnter;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
 public class HC_RefuseEnter extends ResponsePacket
 {
-	public static final byte REJECTED_FROM_SERVER = 0;
-	public static final String CODE_STRINGS[] = new String[]
-	{
-		"REJECTED_FROM_SERVER"
-	};
-
-	private byte result;
+	private RefuseEnter error;
 
 	public HC_RefuseEnter()
 	{
@@ -23,18 +18,18 @@ public class HC_RefuseEnter extends ResponsePacket
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putByte(result);
+		output.putByte(error.CODE);
 	}
 
-	public void setResult(byte result)
+	public void setError(RefuseEnter error)
 	{
-		this.result = result;
+		this.error = error;
 	}
 
 	@Override
 	public String getName()
 	{
-		return "REFUSE_ENTER";
+		return "HC_REFUSE_ENTER";
 	}
 
 	@Override
@@ -46,7 +41,7 @@ public class HC_RefuseEnter extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 21;
+		return 1;
 	}
 
 	@Override
@@ -54,6 +49,6 @@ public class HC_RefuseEnter extends ResponsePacket
 	{
 		super.toString(description);
 
-		description.append("code", result);
+		description.append("error", error);
 	}
 }

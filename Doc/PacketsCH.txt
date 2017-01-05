@@ -1,0 +1,41 @@
+
+//==============================================================================
+// 0x0065 [PACKET_CH_ENTER] - Solicitação de Acesso
+//==============================================================================
+
+byte	length	type	name
+
+00		04		uint	código de identificação da conta
+04		04		uint	valor da segunda seed
+08		04		uint	valor da primeira seed
+12		02		ushort	tipo do cliente
+14		01		uchar	sexo da conta
+
+size: 15 bytes
+
+//==============================================================================
+// 0x0066 [PACKET_CH_SELECT_CHAR] - Selecionar Personagem
+//==============================================================================
+
+byte	length	type	name
+00		01		uchar	char_slot
+
+size: 01 byte
+
+//==============================================================================
+// 0x0066 [PACKET_CH_MAKE_CHAR] - Criar Personagem
+//==============================================================================
+
+byte	length	type	name
+00		24		uchar	nome do personagem
+24		01		uchar	pontos distribuídos em força
+25		01		uchar	pontos distribuídos em agilidade
+26		01		uchar	pontos distribuídos em vitalidade
+27		01		uchar	pontos distribuídos em inteligência
+28		01		uchar	pontos distribuídos em dextreza
+29		01		uchar	pontos distribuídos em sorte
+30		01		uchar	númelo de slot do personagem
+31		02		short	cor do cabelo
+33		02		short	estilo do cabelo
+
+size: 35 bytes

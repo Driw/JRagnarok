@@ -4,14 +4,14 @@ package org.diverproject.jragnarok.packets.inter.loginchar;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACK_CONNECT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
-import org.diverproject.jragnarok.server.common.AuthResult;
+import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
 public class AH_AckConnect extends RequestPacket
 {
-	private AuthResult result;
+	private RefuseLogin result;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -22,15 +22,15 @@ public class AH_AckConnect extends RequestPacket
 	@Override
 	protected void receiveInput(Input input)
 	{
-		result = AuthResult.parse(input.getByte());
+		result = RefuseLogin.parse(input.getByte());
 	}
 
-	public AuthResult getResult()
+	public RefuseLogin getResult()
 	{
 		return result;
 	}
 
-	public void setResult(AuthResult result)
+	public void setResult(RefuseLogin result)
 	{
 		this.result = result;
 	}

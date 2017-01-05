@@ -4,12 +4,13 @@ import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_BLOCK_CHARACTER;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.stream.Output;
 
 public class HC_BlockCharacter extends ResponsePacket
 {
-	private Queue<CharBlock> blocks;
+	private Queue<TAG_CHARACTER_BLOCK_INFO> blocks;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -18,14 +19,14 @@ public class HC_BlockCharacter extends ResponsePacket
 
 		while (!blocks.isEmpty())
 		{
-			CharBlock block = blocks.poll();
+			TAG_CHARACTER_BLOCK_INFO block = blocks.poll();
 
 			output.putInt(block.getCharID());
-			output.putString(block.getUnbanTime(), CharBlock.UNBAN_SIZE);
+			output.putString(block.getUnbanTime(), TAG_CHARACTER_BLOCK_INFO.UNBAN_SIZE);
 		}
 	}
 
-	public void setBlocks(Queue<CharBlock> blocks)
+	public void setBlocks(Queue<TAG_CHARACTER_BLOCK_INFO> blocks)
 	{
 		this.blocks = blocks;
 	}
@@ -45,6 +46,15 @@ public class HC_BlockCharacter extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 2 + (blocks.size() * CharBlock.BYTES);
+		return 2 + (blocks.size() * TAG_CHARACTER_BLOCK_INFO.BYTES);
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		if (blocks != null)
+			description.append("charBlocked", blocks.size());
 	}
 }

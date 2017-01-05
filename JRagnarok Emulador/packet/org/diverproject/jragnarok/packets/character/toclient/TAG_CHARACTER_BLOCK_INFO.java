@@ -2,7 +2,9 @@ package org.diverproject.jragnarok.packets.character.toclient;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 
-public class CharBlock
+import org.diverproject.util.ObjectDescription;
+
+public class TAG_CHARACTER_BLOCK_INFO
 {
 	public static final int BYTES = 24;
 	public static final int UNBAN_SIZE = 20;
@@ -28,5 +30,16 @@ public class CharBlock
 	public void setUnbanTime(String unbanTime)
 	{
 		this.unbanTime = strcap(unbanTime, UNBAN_SIZE);
+	}
+
+	@Override
+	public String toString()
+	{
+		ObjectDescription description = new ObjectDescription(getClass());
+
+		description.append("charID", charID);
+		description.append("unbanTime", unbanTime);
+
+		return description.toString();
 	}
 }

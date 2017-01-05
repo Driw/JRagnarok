@@ -22,7 +22,8 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_CHANGE_TIME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_FORCE;
-import static org.diverproject.jragnarok.server.common.AuthResult.OK;
+import static org.diverproject.jragnarok.packets.common.RefuseEnter.REJECTED_FROM_SERVER;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.OK;
 import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONLINE;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
@@ -36,8 +37,8 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.IResponsePacket;
-import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
 import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin.PincodeState;
+import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
@@ -68,7 +69,6 @@ import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
-import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.util.BitWise8;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.collection.List;
@@ -238,7 +238,7 @@ public class ServiceCharLogin extends AbstractCharService
 	{
 		if (!isConnected())
 		{
-			client.refuseEnter(fd, HC_RefuseEnter.REJECTED_FROM_SERVER);
+			client.refuseEnter(fd, REJECTED_FROM_SERVER);
 			return false;
 		}
 
@@ -565,7 +565,7 @@ public class ServiceCharLogin extends AbstractCharService
 				if (packet.isResult())
 					return auth.authOk(fd);
 
-				client.refuseEnter(fd, HC_RefuseEnter.REJECTED_FROM_SERVER);
+				client.refuseEnter(fd, REJECTED_FROM_SERVER);
 			}
 		}
 
@@ -642,7 +642,7 @@ public class ServiceCharLogin extends AbstractCharService
 			}
 		}
 
-		enabled = true; // Remover depois de identificar o servidor de mapa.
+		enabled = true; // TODO Remover depois de identificar o servidor de mapa.
 
 		if (enabled)
 		{
@@ -653,7 +653,7 @@ public class ServiceCharLogin extends AbstractCharService
 		}
 
 		else
-			client.refuseEnter(fd, HC_RefuseEnter.REJECTED_FROM_SERVER);
+			client.refuseEnter(fd, REJECTED_FROM_SERVER);
 
 		return enabled;
 	}

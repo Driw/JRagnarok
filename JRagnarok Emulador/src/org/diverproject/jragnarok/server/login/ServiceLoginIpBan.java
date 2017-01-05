@@ -12,11 +12,11 @@ import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.login.toclient.AC_RefuseLogin;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
-import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.login.control.IpBanControl;
 import org.diverproject.util.SocketUtil;
 
@@ -188,7 +188,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 			skip(fd, false, 23);
 
 			AC_RefuseLogin refuseLoginPacket = new AC_RefuseLogin();
-			refuseLoginPacket.setResult(AuthResult.REJECTED_FROM_SERVER);
+			refuseLoginPacket.setResult(RefuseLogin.REJECTED_FROM_SERVER);
 			refuseLoginPacket.setBlockDate("");
 			refuseLoginPacket.send(fd);
 

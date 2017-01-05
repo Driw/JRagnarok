@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.common;
+package org.diverproject.jragnarok.packets.common;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 

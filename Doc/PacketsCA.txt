@@ -5,10 +5,10 @@
 
 byte	length	type	name
 
-00		04		int		versão do cliente
-04		24		str		nome de usuário
-28		24		str		senha de acesso
-52		01		byte	tipo de cliente
+00		04		uint	versão do cliente
+04		24		uchar	nome de usuário
+28		24		uchar	senha de acesso
+52		01		ubyte	tipo de cliente
 
 size: 53 bytes
 

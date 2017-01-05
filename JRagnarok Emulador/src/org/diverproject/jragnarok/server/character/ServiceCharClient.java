@@ -15,7 +15,7 @@ import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnarok.packets.character.toclient.CharBlock;
+import org.diverproject.jragnarok.packets.character.toclient.TAG_CHARACTER_BLOCK_INFO;
 import org.diverproject.jragnarok.packets.character.toclient.HC_Accept2;
 import org.diverproject.jragnarok.packets.character.toclient.HC_AcceptEnterNeoUnion;
 import org.diverproject.jragnarok.packets.character.toclient.HC_AckCharInfoPerPage;
@@ -24,6 +24,8 @@ import org.diverproject.jragnarok.packets.character.toclient.HC_CharListNotify;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
 import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin;
 import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin.PincodeState;
+import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
+import org.diverproject.jragnarok.packets.common.RefuseEnter;
 import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.Timer;
@@ -31,7 +33,6 @@ import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.character.entities.Character;
-import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.util.collection.Index;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicQueue;
@@ -140,15 +141,15 @@ public class ServiceCharClient extends AbstractCharService
 	/**
 	 * Recusa a entrada de uma determinada sessão no servidor de acesso.
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @param result resultado que será mostrado ao cliente.
+	 * @param error resultado que será mostrado ao cliente.
 	 */
 
-	public void refuseEnter(CFileDescriptor fd, byte result)
+	public void refuseEnter(CFileDescriptor fd, RefuseEnter error)
 	{
 		logDebug("entrada rejeitada em (fd: %d).\n", fd.getID());
 
 		HC_RefuseEnter packet = new HC_RefuseEnter();
-		packet.setResult(result);
+		packet.setError(error);
 		packet.send(fd);
 	}
 
@@ -259,7 +260,7 @@ public class ServiceCharClient extends AbstractCharService
 	public void sendBlockCharacters(CFileDescriptor fd)
 	{
 		CharSessionData sd = fd.getSessionData();
-		Queue<CharBlock> blocks = new DynamicQueue<>();
+		Queue<TAG_CHARACTER_BLOCK_INFO> blocks = new DynamicQueue<>();
 		CharData data = null;
 
 		for (int slot = 0; slot < MAX_CHARS; slot++)
@@ -269,7 +270,7 @@ public class ServiceCharClient extends AbstractCharService
 
 			if (!data.getUnban().isNull())
 			{
-				CharBlock block = new CharBlock();
+				TAG_CHARACTER_BLOCK_INFO block = new TAG_CHARACTER_BLOCK_INFO();
 				blocks.offer(block);
 
 				if (!data.getUnban().isOver())

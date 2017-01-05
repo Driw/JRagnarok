@@ -133,7 +133,8 @@ public class CharacterControl extends AbstractControl
 		String tableExp = Tables.getInstance().getCharExperiences();
 		String tableRank = Tables.getInstance().getCharMercenaryRank();
 		String sql = format("SELECT id, name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
-						+	"manner, effect_state, karma, base_level, job_level, rename_count, delete_date, moves, font, unique_item_counter, "
+						+	"manner, effect_state, virtue, base_level, job_level, rename_count, delete_date, moves, font, "
+						+	"unique_item_counter, "
 						+	"strength, agility, vitality, intelligence, dexterity, luck, "
 						+	"hair, hair_color, clothes_color, body, weapon, shield, head_top, head_mid, head_bottom, robe, "
 						+	"partner, father, mother, child, "
@@ -200,7 +201,7 @@ public class CharacterControl extends AbstractControl
 		character.setMaxSP(rs.getShort("max_sp"));
 		character.setManner(rs.getShort("manner"));
 		character.getEffectState().setValue(rs.getInt("effect_state"));
-		character.setKarma(rs.getShort("karma"));
+		character.setVirtue(rs.getShort("virtue"));
 		character.setBaseLevel(rs.getInt("base_level"));
 		character.setJobLevel(rs.getInt("job_level"));
 		character.setRename(rs.getShort("rename_count"));
@@ -325,7 +326,7 @@ public class CharacterControl extends AbstractControl
 
 		String table = Tables.getInstance().getCharacters();
 		String sql = format("REPLACE INTO %s (name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
-						+	"manner, effect_state, karma, base_level, job_level, rename, delete_date, moves, font"
+						+	"manner, effect_state, virtue, base_level, job_level, rename, delete_date, moves, font"
 						+	"unique_item_counter)"
 						+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", table);
 
@@ -344,7 +345,7 @@ public class CharacterControl extends AbstractControl
 			ps.setShort(10, character.getMaxSP());
 			ps.setShort(11, character.getManner());
 			ps.setInt(12, character.getEffectState().getValue());
-			ps.setShort(13, character.getKarma());
+			ps.setShort(13, character.getVirtue());
 			ps.setInt(14, character.getBaseLevel());
 			ps.setInt(15, character.getJobLevel());
 			ps.setShort(16, character.getRename());
@@ -651,7 +652,7 @@ public class CharacterControl extends AbstractControl
 	{
 		String table = Tables.getInstance().getCharacters();
 		String sql = format("UPDATE %s SET name = ?, sex = ?, zeny = ?, status_point = ?, skill_point = ?, jobid = ?, "
-						+	"hp = ?, max_hp = ?, sp = ?, max_sp = ?, manner = ?, effect_state = ?, karma = ?, base_level = ?, "
+						+	"hp = ?, max_hp = ?, sp = ?, max_sp = ?, manner = ?, effect_state = ?, virtue = ?, base_level = ?, "
 						+	"job_level = ?, rename = ?, delete_date = ?, moves = ?, font = ?, unique_item_counter = ? "
 						+	"WHERE id = ?", table);
 
@@ -670,7 +671,7 @@ public class CharacterControl extends AbstractControl
 			ps.setShort(10, character.getMaxSP());
 			ps.setShort(11, character.getManner());
 			ps.setInt(12, character.getEffectState().getValue());
-			ps.setShort(13, character.getKarma());
+			ps.setShort(13, character.getVirtue());
 			ps.setInt(14, character.getBaseLevel());
 			ps.setInt(15, character.getJobLevel());
 			ps.setShort(16, character.getRename());
@@ -957,7 +958,8 @@ public class CharacterControl extends AbstractControl
 		String tableExp = Tables.getInstance().getCharExperiences();
 		String tableRank = Tables.getInstance().getCharMercenaryRank();
 		String sql = format("SELECT id, name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
-						+	"manner, effect_state, karma, base_level, job_level, rename_count, delete_date, moves, font, unique_item_counter, "
+						+	"manner, effect_state, virtue, base_level, job_level, rename_count, delete_date, moves, font, "
+						+	"unique_item_counter, "
 						+	"strength, agility, vitality, intelligence, dexterity, luck, "
 						+	"hair, hair_color, clothes_color, body, weapon, shield, head_top, head_mid, head_bottom, robe, "
 						+	"partner, father, mother, child, "

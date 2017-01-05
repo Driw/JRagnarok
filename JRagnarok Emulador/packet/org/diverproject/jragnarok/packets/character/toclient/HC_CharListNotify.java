@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_CHARLI
 import static org.diverproject.util.lang.IntUtil.min;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
 public class HC_CharListNotify extends ResponsePacket
@@ -37,5 +38,13 @@ public class HC_CharListNotify extends ResponsePacket
 	protected int length()
 	{
 		return 4;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("pageCount", pageCount);
 	}
 }

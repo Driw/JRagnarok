@@ -1,20 +1,20 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.now;
-import static org.diverproject.jragnarok.server.common.AuthResult.BANNED_UNTIL;
-import static org.diverproject.jragnarok.server.common.AuthResult.EXE_LASTED_VERSION;
-import static org.diverproject.jragnarok.server.common.AuthResult.EXPIRED;
-import static org.diverproject.jragnarok.server.common.AuthResult.INCORRECT_PASSWORD;
-import static org.diverproject.jragnarok.server.common.AuthResult.OK;
-import static org.diverproject.jragnarok.server.common.AuthResult.UNREGISTERED_ID;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.BANNED_UNTIL;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.EXE_LASTED_VERSION;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.EXPIRED;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.INCORRECT_PASSWORD;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.OK;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.UNREGISTERED_ID;
 import static org.diverproject.jragnarok.server.login.entities.AccountState.NONE;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logNotice;
 
+import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
-import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.util.collection.Node;
@@ -104,9 +104,9 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * @return resultado da autenticação da solicitação para acesso de uma conta.
 	 */
 
-	public AuthResult parseAuthLogin(LFileDescriptor fd, boolean server)
+	public RefuseLogin parseAuthLogin(LFileDescriptor fd, boolean server)
 	{
-		AuthResult result = null;
+		RefuseLogin result = null;
 		LoginSessionData sd = fd.getSessionData();
 
 		if ((result = authClientVersion(sd)) != OK)
@@ -144,7 +144,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * caso os dados tenham sido obtidos com êxito ficaram no cache do FileDescriptor.
 	 */
 
-	private AuthResult makeLoginAccount(LFileDescriptor fd, boolean server)
+	private RefuseLogin makeLoginAccount(LFileDescriptor fd, boolean server)
 	{
 		LoginSessionData sd = fd.getSessionData();
 		Account account = accounts.get(sd.getUsername());
@@ -155,7 +155,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 			return UNREGISTERED_ID;
 		}
 
-		AuthResult result = AuthResult.OK;
+		RefuseLogin result = RefuseLogin.OK;
 
 		if ((result = authPassword(fd, account)) != OK)
 			return result;
@@ -184,7 +184,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * @return resultado da autenticação da versão que o cliente está usando.
 	 */
 
-	private AuthResult authClientVersion(LoginSessionData sd)
+	private RefuseLogin authClientVersion(LoginSessionData sd)
 	{
 		if (getConfigs().getBool("client.check_version"))
 		{
@@ -208,7 +208,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * @return resultado da autenticação da senha passada pelo cliente com a da conta.
 	 */
 
-	private AuthResult authPassword(LFileDescriptor fd, Account account)
+	private RefuseLogin authPassword(LFileDescriptor fd, Account account)
 	{
 		LoginSessionData sd = fd.getSessionData();
 		String password = account.getPassword();
@@ -230,7 +230,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * @return resultado da autenticação sobre o tempo de expiração da conta.
 	 */
 
-	private AuthResult authExpirationTime(LFileDescriptor fd, Account account)
+	private RefuseLogin authExpirationTime(LFileDescriptor fd, Account account)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
@@ -251,7 +251,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * @return resultado da autenticação sobre o tempo de banimento da conta.
 	 */
 
-	private AuthResult authBanTime(LFileDescriptor fd, Account account)
+	private RefuseLogin authBanTime(LFileDescriptor fd, Account account)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
@@ -272,14 +272,14 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * @return resultado da autenticação do estado atual da conta.
 	 */
 
-	private AuthResult authAccountState(LFileDescriptor fd, Account account)
+	private RefuseLogin authAccountState(LFileDescriptor fd, Account account)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
 		if (account.getState() != NONE)
 		{
 			logNotice("conexão recusada (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
-			return AuthResult.parse(account.getState().CODE - 1);
+			return RefuseLogin.parse(account.getState().CODE - 1);
 		}
 
 		return OK;
@@ -293,7 +293,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 	 * @return resultado da autenticação do hash passado pelo cliente para com o servidor.
 	 */
 
-	private AuthResult authClientHash(LFileDescriptor fd, Account account, boolean server)
+	private RefuseLogin authClientHash(LFileDescriptor fd, Account account, boolean server)
 	{
 		LoginSessionData sd = fd.getSessionData();
 

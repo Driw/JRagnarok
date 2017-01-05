@@ -14,16 +14,17 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN4
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_HAN;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_PCBANG;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_SSO_LOGIN_REQ;
+import static org.diverproject.jragnarok.packets.common.NotifyAuthResult.RECOGNIZES_LAST_LOGIN;
+import static org.diverproject.jragnarok.packets.common.NotifyAuthResult.SERVER_CLOSED;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.OK;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.REJECTED_FROM_SERVER;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
-import static org.diverproject.jragnarok.server.common.AuthResult.OK;
-import static org.diverproject.jragnarok.server.common.AuthResult.REJECTED_FROM_SERVER;
-import static org.diverproject.jragnarok.server.common.NotifyAuthResult.RECOGNIZES_LAST_LOGIN;
-import static org.diverproject.jragnarok.server.common.NotifyAuthResult.SERVER_CLOSED;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
+import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AlreadyOnline;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_CharServerConnect;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_Login;
@@ -40,7 +41,6 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.common.AuthResult;
 import org.diverproject.jragnarok.server.common.CharServerType;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
@@ -265,13 +265,13 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		if (sd.getPassDencrypt().getValue() != 0 && getConfigs().getBool("login.use_md5_password"))
 		{
-			client.sendAuthResult(fd, AuthResult.REJECTED_FROM_SERVER);
+			client.sendAuthResult(fd, RefuseLogin.REJECTED_FROM_SERVER);
 			return false;
 		}
 
-		AuthResult result = login.parseAuthLogin(fd, false);
+		RefuseLogin result = login.parseAuthLogin(fd, false);
 
-		if (result != AuthResult.OK)
+		if (result != RefuseLogin.OK)
 		{
 			authFailed(fd, result);
 			return false;
@@ -288,7 +288,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * @param result resultando obtido da autenticação feita com o cliente.
 	 */
 
-	private void authFailed(LFileDescriptor fd, AuthResult result)
+	private void authFailed(LFileDescriptor fd, RefuseLogin result)
 	{
 		authFailedLog(fd, result);
 		authFailedResponse(fd, result);
@@ -301,7 +301,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * @param result resultando obtido da autenticação feita com o cliente.
 	 */
 
-	private void authFailedLog(LFileDescriptor fd, AuthResult result)
+	private void authFailedLog(LFileDescriptor fd, RefuseLogin result)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
@@ -328,12 +328,12 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * @param result resultando obtido da autenticação feita com o cliente.
 	 */
 
-	private void authFailedResponse(LFileDescriptor fd, AuthResult result)
+	private void authFailedResponse(LFileDescriptor fd, RefuseLogin result)
 	{
 		String blockDate = "";
 		LoginSessionData sd = fd.getSessionData();
 
-		if (result == AuthResult.BANNED_UNTIL)
+		if (result == RefuseLogin.BANNED_UNTIL)
 		{
 			Account account = (Account) sd.getCache();
 			Time unbanTime = account.getUnban();
@@ -638,9 +638,9 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		String message = format("charserver - %s@%s:%d", serverName, SocketUtil.socketIP(serverIP), serverPort);
 		log.add(fd.getAddress(), sd, 100, message);
 
-		AuthResult result = login.parseAuthLogin(fd, true);
+		RefuseLogin result = login.parseAuthLogin(fd, true);
 
-		if (getServer().isState(ServerState.RUNNING) && result == AuthResult.OK && fd.isConnected())
+		if (getServer().isState(ServerState.RUNNING) && result == RefuseLogin.OK && fd.isConnected())
 		{
 			log("conexão do servidor de personagens '%s' aceita.\n", serverName);
 

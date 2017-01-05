@@ -4,13 +4,13 @@ import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AC_REFUSE_LOGIN;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
-import org.diverproject.jragnarok.server.common.AuthResult;
+import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
 public class AC_RefuseLogin extends ResponsePacket
 {
-	private AuthResult result;
+	private RefuseLogin result;
 	private String blockDate;
 
 	public AC_RefuseLogin()
@@ -25,7 +25,7 @@ public class AC_RefuseLogin extends ResponsePacket
 		output.putString(blockDate, 20);
 	}
 
-	public void setResult(AuthResult result)
+	public void setResult(RefuseLogin result)
 	{
 		this.result = result;
 	}

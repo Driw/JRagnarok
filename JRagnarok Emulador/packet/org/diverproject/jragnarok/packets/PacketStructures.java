@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.packets.character.toclient;
+package org.diverproject.jragnarok.packets;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.DEFAULT_WALK_SPEED;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAP_NAME_LENGTH_EXT;
@@ -10,9 +10,9 @@ import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.util.stream.Output;
 
-public class CharacterInfo
+public class PacketStructures
 {
-	public static void put(Output output, int slot, Character character, boolean moveEnabled, boolean moveUnlimited, int moveCount)
+	public static final void CHARACTER_INFO_NEO_UNION(Output output, int slot, Character character, boolean moveEnabled, boolean moveUnlimited, int moveCount)
 	{
 		output.putInt(character.getID());
 		output.putInt(character.getExperience().getBase());
@@ -22,8 +22,8 @@ public class CharacterInfo
 		output.putInt(0); // bodystate : probably opt1
 		output.putInt(0); // healthstate : probably opt2
 		output.putInt(character.getEffectState().getValue());
-		output.putInt(character.getManner());
-		output.putInt(character.getKarma());
+		output.putInt(character.getVirtue());
+		output.putInt(character.getExperience().getFame()); // TODO fama ou mudo?
 		output.putShort(character.getStatusPoint());
 		output.putInt(character.getHP());
 		output.putInt(character.getMaxHP());

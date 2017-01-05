@@ -1,3 +1,13 @@
+05.01.2017 - 1.5.170
+- Documentação de alguns dos pacotes já utilizados feitos e alocados/adicionados em doc.
+- Novo pacote para alocar todas as classes enumeradoras dos resultados dos pacotes, packets.common.
+- Renomado karma para virtue em characters conforme está especificado no PEEK.
+- Novo enumerado RefuseEnter para resultados enviados por HC_RefuseEnter.
+- AuthResult renomado para RefuseLogin e movido para packets.common.
+
+05.01.2017 - 1.5.169
+- Atributo de Character karma renomeado para virtue, identifica a influência em sistema PK.
+
 05.01.2017 - 1.5.168
 - TimerMap.delete() modificado para que TIMER_INVALID tenha alguma efetividade no sistema.
 - Movendo authIsntOnline() para outro if já que sua invalidade envia um pacote diferente dos demais.
