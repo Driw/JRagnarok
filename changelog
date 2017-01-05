@@ -1,3 +1,8 @@
+05.01.2017 - 1.5.163
+- Alterando a ordem como algumas operações de criação/inicialização do servidor.
+	- As alterações foram feitas afim de que estas funcionem com o JRagnarokConsole.
+	- Além de que agora alguns dos problemas de são de cada thread do servidor.
+
 05.01.2017 - 1.5.162
 - Adicionando a utilização de um Console (JFrame) para melhor interação com o servidor.
 	- Mais a frente poderá ser realizado comandos para obter informações do servidor rodando.

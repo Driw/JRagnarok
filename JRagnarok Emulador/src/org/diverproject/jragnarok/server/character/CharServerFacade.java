@@ -140,7 +140,7 @@ public class CharServerFacade
 		return characterControl;
 	}
 
-	public void create(CharServer charServer)
+	public void init(CharServer charServer)
 	{
 		authMap = new AuthMap();
 		onlineMap = new OnlineMap(charServer.getMySQL().getConnection());

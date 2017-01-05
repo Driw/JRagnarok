@@ -30,7 +30,7 @@ public interface ServerListener
 	void onCreated() throws RagnarokException;
 
 	/**
-	 * Chamado quando for solicitado a inicialização do servidor.
+	 * Chamado após solicitado a inicialização do servidor.
 	 * Deverá garantir que os servidores sejam interligados.
 	 * @throws RagnarokException falha durante a inicialização.
 	 */

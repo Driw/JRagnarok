@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.server.character;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newCharServerConfigs;
+import static org.diverproject.log.LogSystem.logInfo;
 
 import java.net.Socket;
 
@@ -129,14 +130,14 @@ public class CharServer extends Server
 		{
 			mapServers = new MapServerList();
 			facade = new CharServerFacade();
-			facade.create(CharServer.this);
 		};
 
 		@Override
 		public void onRunning() throws RagnarokException
 		{
-			// TODO Auto-generated method stub
-			
+			facade.init(CharServer.this);
+
+			logInfo("o servidor de personagem está pronto (porta: %d).\n", getPort());
 		}
 
 		@Override

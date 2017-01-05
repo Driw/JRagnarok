@@ -70,8 +70,9 @@ public class MapServer extends Server
 		@Override
 		public void onCreated() throws RagnarokException
 		{
+			// TODO Auto-generated method stub
 			
-		};
+		}
 
 		@Override
 		public void onRunning() throws RagnarokException

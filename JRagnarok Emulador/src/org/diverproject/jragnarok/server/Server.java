@@ -327,10 +327,7 @@ public abstract class Server
 		listener.onCreate();
 		{
 			initConfigs();
-			initSqlConnection();
-			initTimer();
 			initThreads();
-			initSocket();
 		}
 		listener.onCreated();
 		setNextState();
@@ -352,18 +349,15 @@ public abstract class Server
 		if (threadSocket == null || threadServer == null)
 			throw new RagnarokException("thread não criada");
 
-		listener.onRunning();
-		{
-			if (threadSocket.isInterrupted())
-				threadSocket.resume();
-			else
-				threadSocket.start();
+		if (threadSocket.isInterrupted())
+			threadSocket.resume();
+		else
+			threadSocket.start();
 
-			if (threadServer.isInterrupted())
-				threadServer.resume();
-			else
-				threadServer.start();
-		}
+		if (threadServer.isInterrupted())
+			threadServer.resume();
+		else
+			threadServer.start();
 
 		setNextState();
 	}
@@ -430,6 +424,127 @@ public abstract class Server
 	}
 
 	/**
+	 * Interface que será executada para manter o servidor recebendo novas conexões de clientes.
+	 * Sempre que uma nova conexão for recebida irá registrado no sistema e despachá-lo a um listener.
+	 * Caso o servidor não esteja sobrecarregado no próximo loop a thread do servidor irá processá-lo.
+	 */
+
+	private final Runnable THREAD_SOCKET_RUNNABLE = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			try {
+
+				initSocket();
+
+			} catch (RagnarokException e) {
+
+				logError("falha durante a inicialização do server socket:");
+				logException(e);
+
+				return;
+			}
+
+			while (state != DESTROYED)
+			{
+				if (serverSocket.isClosed() || state != RUNNING)
+				{
+					sleep(1000);
+					continue;
+				}
+
+				try {
+
+					Socket socket = serverSocket.accept();
+					FileDescriptor fd = Server.this.acceptSocket(socket);
+
+					if (fileDescriptorSystem.addFileDecriptor(fd))
+						logDebug("nova conexão em '%s' (id: %d, ip: %s).\n", getThreadName(), fd.getID(), fd.getAddressString());
+
+					if (fd == null)
+						log("servidor está cheio, %s recusado.\n", SocketUtil.socketIP(socket));
+
+				} catch (IOException e) {
+					logException(e);
+				}
+			}
+
+			Thread.interrupted();
+		}
+
+		@Override
+		public String toString()
+		{
+			return Server.this.toString();
+		}
+	};
+
+	/**
+	 * Interface que será executada no momento em que a thread do servidor for inicializada.
+	 * Essa thread será especifica para manter as informações do servidor e clientes atualizados.
+	 */
+
+	private final Runnable THREAD_SERVER_RUNNABLE = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			Server.this.show = ShowThread.registerThread();
+
+			try {
+
+				initSqlConnection();
+				initTimer();
+
+				listener.onRunning();
+
+			} catch (RagnarokException e) {
+
+				logError("falha durante a inicialização do servidor:");
+				logException(e);
+
+				return;
+			}
+
+			while (state != DESTROYED)
+			{
+				if (state != RUNNING)
+				{
+					sleep(1000);
+					continue;
+				}
+
+				int tick = timerSystem.tick();
+
+				// TODO : Remover mais a frente quando gastar mais processamento?
+				// Esperar ao menos 1ms para o próximo loop garantir ao menos 1 tick.
+				if (tick == 0)
+				{
+					sleep(1);
+					continue;
+				}
+
+				try {
+
+					timerSystem.getTimers().update(timerSystem.getCurrentTime(), tick);
+					fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
+
+				} catch (Exception e) {
+					logException(e);
+					e.printStackTrace();
+				}
+			}
+		}
+
+		@Override
+		public String toString()
+		{
+			return Server.this.toString();
+		}
+	};
+
+	/**
 	 * A inicialização das configurações deverá carregar as configurações mínimas do servidor.
 	 * Para tal será necessário carregar configurações básicas e de conexão com o banco de dados.
 	 * @throws RagnarokException falha durante o carregamento das configurações.
@@ -448,6 +563,26 @@ public abstract class Server
 		configs.add(logConfigs);
 
 		readConfigFiles();
+	}
+
+	/**
+	 * Inicialização da thread responsáveis por receber conexões socket dos clientes.
+	 * Instancia a thread, define o nome e prioridade tal como a interface Runnable.
+	 */
+
+	private void initThreads()
+	{
+		threadSocket = new Thread(THREAD_SOCKET_RUNNABLE);
+		threadSocket.setName(getThreadName()+ "|ServerSocket");
+		threadSocket.setPriority(Thread.MIN_PRIORITY);
+		threadSocket.setDaemon(false);
+
+		threadServer = new ServerThreaed(this, THREAD_SERVER_RUNNABLE);
+		threadServer.setName(getThreadName()+ "|Server");
+		threadServer.setPriority(getThreadPriority());
+		threadServer.setDaemon(false);
+
+		logInfo("thread do servidor criada.\n");
 	}
 
 	/**
@@ -504,120 +639,6 @@ public abstract class Server
 	{
 		timerSystem.init();
 	}
-
-	/**
-	 * Inicialização da thread responsáveis por receber conexões socket dos clientes.
-	 * Instancia a thread, define o nome e prioridade tal como a interface Runnable.
-	 */
-
-	private void initThreads()
-	{
-		threadSocket = new Thread(THREAD_SOCKET_RUNNABLE);
-		threadSocket.setName(getThreadName()+ "|ServerSocket");
-		threadSocket.setPriority(Thread.MIN_PRIORITY);
-		threadSocket.setDaemon(false);
-
-		threadServer = new ServerThreaed(this, THREAD_SERVER_RUNNABLE);
-		threadServer.setName(getThreadName()+ "|Server");
-		threadServer.setPriority(getThreadPriority());
-		threadServer.setDaemon(false);
-
-		logInfo("thread do servidor criada.\n");
-	}
-
-	/**
-	 * Interface que será executada para manter o servidor recebendo novas conexões de clientes.
-	 * Sempre que uma nova conexão for recebida irá registrado no sistema e despachá-lo a um listener.
-	 * Caso o servidor não esteja sobrecarregado no próximo loop a thread do servidor irá processá-lo.
-	 */
-
-	private final Runnable THREAD_SOCKET_RUNNABLE = new Runnable()
-	{
-		@Override
-		public void run()
-		{
-			while (state != DESTROYED)
-			{
-				if (state != RUNNING)
-				{
-					sleep(1000);
-					continue;
-				}
-
-				try {
-
-					Socket socket = serverSocket.accept();
-					FileDescriptor fd = Server.this.acceptSocket(socket);
-
-					if (fileDescriptorSystem.addFileDecriptor(fd))
-						logDebug("nova conexão em '%s' (id: %d, ip: %s).\n", getThreadName(), fd.getID(), fd.getAddressString());
-
-					if (fd == null)
-						log("servidor está cheio, %s recusado.\n", SocketUtil.socketIP(socket));
-
-				} catch (IOException e) {
-					logException(e);
-				}
-			}
-
-			Thread.interrupted();
-		}
-
-		@Override
-		public String toString()
-		{
-			return Server.this.toString();
-		}
-	};
-
-	/**
-	 * Interface que será executada no momento em que a thread do servidor for inicializada.
-	 * Essa thread será especifica para manter as informações do servidor e clientes atualizados.
-	 */
-
-	private final Runnable THREAD_SERVER_RUNNABLE = new Runnable()
-	{
-		@Override
-		public void run()
-		{
-			Server.this.show = ShowThread.registerThread();
-
-			while (state != DESTROYED)
-			{
-				if (state != RUNNING)
-				{
-					sleep(1000);
-					continue;
-				}
-
-				int tick = timerSystem.tick();
-
-				// TODO : Remover mais a frente quando gastar mais processamento?
-				// Esperar ao menos 1ms para o próximo loop garantir ao menos 1 tick.
-				if (tick == 0)
-				{
-					sleep(1);
-					continue;
-				}
-
-				try {
-
-					timerSystem.getTimers().update(timerSystem.getCurrentTime(), tick);
-					fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
-
-				} catch (Exception e) {
-					logException(e);
-					e.printStackTrace();
-				}
-			}
-		}
-
-		@Override
-		public String toString()
-		{
-			return Server.this.toString();
-		}
-	};
 
 	/**
 	 * Inicialização do servidor socket para receber as conexões dos clientes.

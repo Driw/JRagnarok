@@ -227,7 +227,6 @@ public class JRagnarok
 		if (ARGUMENT_CONFIGS.getBool("arg.c"))
 		{
 			CONSOLE.show();
-			CONSOLE.setDefaultConsole();
 		}
 	}
 
