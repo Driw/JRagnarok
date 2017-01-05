@@ -1,3 +1,7 @@
+05.01.2017 - 1.5.164
+- JRagnarokConsole irá se encarregar de interpretar os comandos digitados em console.
+- Agora os comandos digitados em console são apagados quando confirmados para executar.
+
 05.01.2017 - 1.5.163
 - Alterando a ordem como algumas operações de criação/inicialização do servidor.
 	- As alterações foram feitas afim de que estas funcionem com o JRagnarokConsole.

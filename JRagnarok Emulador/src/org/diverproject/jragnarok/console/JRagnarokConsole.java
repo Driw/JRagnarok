@@ -11,6 +11,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import org.diverproject.console.Console;
+import org.diverproject.console.ConsoleActions;
+import org.diverproject.console.ConsoleListener;
 import org.diverproject.jragnarok.server.ServerControl;
 import org.diverproject.jragnarok.server.character.CharServer;
 import org.diverproject.jragnarok.server.login.LoginServer;
@@ -37,7 +39,7 @@ import org.diverproject.jragnarok.server.map.MapServer;
  */
 
 @SuppressWarnings("serial")
-public class JRagnarokConsole extends Console
+public class JRagnarokConsole extends Console implements ConsoleListener
 {
 	/**
 	 * Barra de menu que irá conter as operações permitidas a serem realizadas.
@@ -78,6 +80,9 @@ public class JRagnarokConsole extends Console
 	protected void initConsole()
 	{
 		super.initConsole();
+
+		setClearInput(true);
+		addListener(this);
 
 		addWindowListener(new WindowAdapter()
 		{
@@ -220,5 +225,17 @@ public class JRagnarokConsole extends Console
 		}
 
 		return false;
+	}
+
+	@Override
+	public void trigger(String text, ConsoleActions actions)
+	{
+		switch (text.toLowerCase())
+		{
+			case "exit":
+				ServerControl.getInstance().destroyAll(false);
+				System.exit(0);
+				break;
+		}
 	}
 }
