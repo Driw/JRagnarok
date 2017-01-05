@@ -104,7 +104,7 @@ public class CharacterControl extends AbstractControl
 				CharData data = new CharData();
 				data.setID(rs.getInt("charid"));
 				data.setCharMove(rs.getInt("moves"));
-				data.getUnban().set(rs.getTimestamp("unban").getTime());
+				data.getUnban().set(rs.getTimestamp("unban_time").getTime());
 				characters.add(rs.getInt("slot"), data);
 			}
 
@@ -1445,6 +1445,31 @@ public class CharacterControl extends AbstractControl
 			}
 
 			return changes;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Anula completamente o tempo de banimento de um jogador definindo-o com TimeStmap 0.
+	 * Todo banimento que venha definido neste valor significa que o mesmo não está banido.
+	 * @param charID código de identificação do personagem que deve ser removido o banimento.
+	 * @return true se conseguir remover ou false caso não encontrado ou não esteja banido.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean unban(int charID) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharacters();
+		String sql = format("UPDATE %s SET unban_time = 0 WHERE id = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, charID);
+
+			return ps.executeUpdate() == 1;
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e.getMessage());

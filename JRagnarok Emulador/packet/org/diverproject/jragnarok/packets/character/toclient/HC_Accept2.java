@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.character.toclient;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
+import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_ACCEPT2;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
@@ -8,47 +8,47 @@ import org.diverproject.util.stream.Output;
 
 public class HC_Accept2 extends ResponsePacket
 {
-	private byte minChars;
-	private byte charsVip;
-	private byte charsBilling;
-	private byte charsSlot;
-	private byte maxChars;
+	private byte normalSlots;
+	private byte premiumSlots;
+	private byte billingSlots;
+	private byte producibleSlots;
+	private byte validSlots;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putByte(b(29)); // TODO what is that?
-		output.putByte(minChars);
-		output.putByte(charsVip);
-		output.putByte(charsBilling);
-		output.putByte(charsSlot);
-		output.putByte(maxChars);
+		output.putShort(s(length() + 2));
+		output.putByte(normalSlots);
+		output.putByte(premiumSlots);
+		output.putByte(billingSlots);
+		output.putByte(producibleSlots);
+		output.putByte(validSlots);
 		output.skipe(20);
 	}
 
-	public void setMinChars(byte minChars)
+	public void setNormalSlots(byte normalSlots)
 	{
-		this.minChars = minChars;
+		this.normalSlots = normalSlots;
 	}
 
-	public void setCharsVip(byte charsVip)
+	public void setPremiumSlots(byte premiumSlots)
 	{
-		this.charsVip = charsVip;
+		this.premiumSlots = premiumSlots;
 	}
 
-	public void setCharsBilling(byte charsBilling)
+	public void setBillingSlots(byte billingSlots)
 	{
-		this.charsBilling = charsBilling;
+		this.billingSlots = billingSlots;
 	}
 
-	public void setCharsSlot(byte charsSlot)
+	public void setProducibleSlots(byte producibleSlots)
 	{
-		this.charsSlot = charsSlot;
+		this.producibleSlots = producibleSlots;
 	}
 
-	public void setMaxChars(byte maxChars)
+	public void setValidSlots(byte validSlots)
 	{
-		this.maxChars = maxChars;
+		this.validSlots = validSlots;
 	}
 
 	@Override

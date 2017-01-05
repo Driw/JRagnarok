@@ -5,14 +5,12 @@ import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONL
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Enter;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
+import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.common.NotifyAuthResult;
-import org.diverproject.util.stream.Output;
-import org.diverproject.util.stream.StreamException;
 
 public class ServiceCharServerAuth extends AbstractCharService
 {
@@ -128,17 +126,6 @@ public class ServiceCharServerAuth extends AbstractCharService
 		sd.getSeed().set(packet.getFirstSeed(), packet.getSecondSeed());
 		sd.setAuth(false);
 
-		try {
-
-			Output output = fd.getPacketBuilder().newOutputPacket("CS_SELECTED_BACK", 4);
-			output.putInt(packet.getAccountID());
-			output.flush();
-			output = null;
-
-		} catch (StreamException e) {
-			throw new RagnarokRuntimeException(e.getMessage());
-		}
-
 		return parseAuthAccount(fd);
 	}
 
@@ -188,11 +175,13 @@ public class ServiceCharServerAuth extends AbstractCharService
 
 				if (online.getWaitingDisconnect() == null)
 				{
+					TimerSystem ts = getTimerSystem();
 					TimerMap timers = getTimerSystem().getTimers();
 
 					Timer timer = timers.acquireTimer();
-					timer.setListener(WAITING_DISCONNECT);
+					timer.setTick(ts.getCurrentTime());
 					timer.setObjectID(online.getAccountID());
+					timer.setListener(WAITING_DISCONNECT);
 					timers.addInterval(timer, seconds(20));
 
 					online.setWaitingDisconnect(timer);

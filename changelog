@@ -1,3 +1,11 @@
+05.01.2017 - 1.5.167
+- Nome de todos os atributos de HC_Accept2 renomeados conforme estão especificados no PEEK.
+- HC_AcceptEnterNeoUnion e HC_AckCharInfoPerPage irão usar CharacterInfo para dados de personagens.
+	- Valor em bytes de alguns atributos corrigidos passando de 145 bytes para 147.
+- Removendo charSlots que não estava sendo utilizado de fato pelo rAthena, HC_CharListNotify.
+- Implementação do pacote final enviado por sendBlockCharacters(), HC_BlockCharacter.
+- Pequenas correções em CharacterControl e CharSessionData e sendCharPageCount().
+
 05.01.2017 - 1.5.166
 - Modificando a forma como characters_locations irá reagir quando um character for excluído.
 - Novo atributo para accounts que irá determinar o número de slots para personagens (extra).

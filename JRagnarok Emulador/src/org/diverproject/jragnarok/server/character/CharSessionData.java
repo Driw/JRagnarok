@@ -7,6 +7,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.util.lang.IntUtil.interval;
 
+import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.common.LoginSeed;
 import org.diverproject.jragnarok.server.common.SessionData;
 import org.diverproject.jragnarok.server.login.entities.Group;
@@ -35,13 +36,12 @@ public class CharSessionData extends SessionData
 	private CharData chars[];
 
 	private BitWise flag;
-	private Time charBlockTime;
+	private Timer charBlockTime;
 
 	private int charactersMove;
 
 	public CharSessionData()
 	{
-		this.charBlockTime = new Time();
 		this.expiration = new Time();
 		this.flag = new BitWise();
 		this.chars = new CharData[MAX_CHARS];
@@ -157,9 +157,14 @@ public class CharSessionData extends SessionData
 		return flag;
 	}
 
-	public Time getCharBlockTime()
+	public Timer getCharBlockTime()
 	{
 		return charBlockTime;
+	}
+
+	public void setCharBlockTime(Timer charBlockTime)
+	{
+		this.charBlockTime = charBlockTime;
 	}
 
 	public int getCharactersMove()

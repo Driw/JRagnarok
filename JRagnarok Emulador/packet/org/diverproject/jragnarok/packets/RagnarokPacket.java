@@ -120,7 +120,7 @@ public class RagnarokPacket
 //	public static final short PACKET_HC_ACCEPT_DELETECHAR						= 0x006F;
 //	public static final short PACKET_HC_REFUSE_DELETECHAR						= 0x0070;
 //	public static final short PACKET_HC_NOTIFY_ZONESVR							= 0x0071;
-//	public static final short PACKET_HC_BLOCK_CHARACTER							= 0x020D;
+	public static final short PACKET_HC_BLOCK_CHARACTER							= 0x020D;
 //	public static final short PACKET_HC_REQUEST_CHARACTER_PASSWORD				= 0x023E;
 //	public static final short PACKET_HC_ACK_IS_VALID_CHARNAME					= 0x028E;
 //	public static final short PACKET_HC_ACK_CHANGE_CHARNAME						= 0x0290;

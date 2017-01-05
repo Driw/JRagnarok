@@ -45,7 +45,7 @@ public class Character
 	/**
 	 * Tamanho em bytes dos dados enviados de um personagem por pacote.
 	 */
-	public static final int PACKET_BYTES = 145;
+	public static final int BYTES = 147;
 
 
 	/**

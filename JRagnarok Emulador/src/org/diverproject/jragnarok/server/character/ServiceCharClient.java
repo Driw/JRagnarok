@@ -1,29 +1,40 @@
 package org.diverproject.jragnarok.server.character;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.MIN_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
+import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_UNLIMITED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
+import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.packets.character.toclient.CharBlock;
 import org.diverproject.jragnarok.packets.character.toclient.HC_Accept2;
 import org.diverproject.jragnarok.packets.character.toclient.HC_AcceptEnterNeoUnion;
 import org.diverproject.jragnarok.packets.character.toclient.HC_AckCharInfoPerPage;
+import org.diverproject.jragnarok.packets.character.toclient.HC_BlockCharacter;
 import org.diverproject.jragnarok.packets.character.toclient.HC_CharListNotify;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
 import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin;
 import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin.PincodeState;
 import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
+import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerListener;
+import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.util.collection.Index;
+import org.diverproject.util.collection.Queue;
+import org.diverproject.util.collection.abstraction.DynamicQueue;
 
 /**
  * <h1>Serviço para Acesso dos Clientes</h1>
@@ -184,7 +195,7 @@ public class ServiceCharClient extends AbstractCharService
 			sendAccountChars(fd);
 
 		if (sd.getVersion() >= dateToVersion(20060819))
-			;
+			sendBlockCharacters(fd);
 	}
 
 	/**
@@ -199,11 +210,12 @@ public class ServiceCharClient extends AbstractCharService
 		logDebug("enviando dados de slot de account#%d (fd: %d).\n", sd.getID(), fd.getID());
 
 		HC_Accept2 packet = new HC_Accept2();
-		packet.setMinChars(b(MIN_CHARS));
-		packet.setCharsVip(sd.getVip().getCharSlotCount());
-		packet.setCharsBilling(sd.getVip().getCharBilling());
-		packet.setCharsSlot(sd.getCharSlots());
-		packet.setMaxChars(b(MAX_CHARS));
+		packet.setNormalSlots(sd.getCharSlots());
+		packet.setPremiumSlots(sd.getVip().getCharSlotCount());
+		packet.setBillingSlots(sd.getVip().getCharBilling());
+		packet.setProducibleSlots(sd.getCharSlots());
+		packet.setValidSlots(b(MAX_CHARS));
+		packet.send(fd);
 	}
 
 	/**
@@ -212,7 +224,7 @@ public class ServiceCharClient extends AbstractCharService
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
-	private void sendAccountChars(CFileDescriptor fd)
+	public void sendAccountChars(CFileDescriptor fd)
 	{
 		CharSessionData sd = fd.getSessionData();
 
@@ -243,6 +255,102 @@ public class ServiceCharClient extends AbstractCharService
 			}
 		}
 	}
+
+	public void sendBlockCharacters(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+		Queue<CharBlock> blocks = new DynamicQueue<>();
+		CharData data = null;
+
+		for (int slot = 0; slot < MAX_CHARS; slot++)
+		{
+			if ((data = sd.getCharData(slot)) == null)
+				continue;
+
+			if (!data.getUnban().isNull())
+			{
+				CharBlock block = new CharBlock();
+				blocks.offer(block);
+
+				if (!data.getUnban().isOver())
+				{
+					block.setCharID(data.getID());
+					block.setUnbanTime(data.getUnban().toStringFormat(DATE_FORMAT));
+				}
+
+				else
+				{
+					block.setCharID(0);
+					block.setUnbanTime("");
+
+					try {
+
+						data.getUnban().set(0);
+						characters.unban(data.getID());
+
+					} catch (RagnarokException e) {
+						logWarning("falha ao remover banimento de personagem (aid: %d, charid: %d)", sd.getID(), data.getID());
+					}
+				}
+			}
+		}
+
+		for (int slot = 0; slot < MAX_CHARS; slot++)
+			if (sd.getCharData(slot) != null && !sd.getCharData(slot).getUnban().isOver())
+			{
+				TimerMap timers = getTimerSystem().getTimers();
+
+				Timer timer = timers.acquireTimer();
+				timer.setTick(getTimerSystem().getCurrentTime() + seconds(10));
+				timer.setListener(CHAR_BLOCK_TIMER);
+				timer.setObjectID(sd.getID());
+				sd.setCharBlockTime(timer);
+
+				break;
+			}
+
+		HC_BlockCharacter packet = new HC_BlockCharacter();
+		packet.setBlocks(blocks);
+		packet.send(fd);
+	}
+
+	private final TimerListener CHAR_BLOCK_TIMER = new TimerListener()
+	{
+		@Override
+		public void onCall(Timer timer, int now, int tick)
+		{
+			CharSessionData sd = null;
+			CFileDescriptor fd = null;
+
+			for (FileDescriptor sfd : getFileDescriptorSystem())
+			{
+				if (sfd == null || !sfd.isConnected())
+					continue;
+
+				fd = (CFileDescriptor) sfd;
+
+				if (fd.getID() == timer.getObjectID())
+				{
+					sd = fd.getSessionData();
+					break;
+				}
+			}
+
+			if (fd == null || sd == null || sd.getCharBlockTime() == null)
+				return;
+
+			if (!sd.getCharBlockTime().equals(timer))
+				sd.setCharBlockTime(null);
+
+			sendBlockCharacters(fd);
+		}
+		
+		@Override
+		public String getName()
+		{
+			return "CHAR_BLOCK_TIMER";
+		}
+	};
 
 	/**
 	 * Envia todos os dados dos personagens da conta respectiva a sessão que foi estabelecida.
@@ -291,8 +399,7 @@ public class ServiceCharClient extends AbstractCharService
 		CharSessionData sd = fd.getSessionData();
 
 		HC_CharListNotify packet = new HC_CharListNotify();
-		packet.setCharSlots(sd.getCharSlots());
-		packet.setPageCount(sd.getCharSlots() / 3);
+		packet.setPageCount(sd.getCharSlots() > 3 ? sd.getCharSlots() / 3 : 1);
 		packet.send(fd);
 	}
 
