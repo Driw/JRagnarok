@@ -1,7 +1,9 @@
 package org.diverproject.jragnarok.server.login.entities;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
+import static org.diverproject.util.lang.IntUtil.interval;
 
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.util.ObjectDescription;
@@ -116,10 +118,10 @@ public class Account implements Login
 		return charSlots;
 	}
 
-	public void setCharSlots(byte charSlots)
+	public void setCharSlots(byte charSlosts)
 	{
-		if (charSlots > 0)
-			this.charSlots = charSlots;
+		if (interval(charSlosts, 0, MAX_CHARS))
+			this.charSlots = charSlosts;
 	}
 
 	public int getLoginCount()

@@ -1,3 +1,10 @@
+05.01.2017 - 1.5.166
+- Modificando a forma como characters_locations irá reagir quando um character for excluído.
+- Novo atributo para accounts que irá determinar o número de slots para personagens (extra).
+- MIN_CHARS deve possuir o mesmo valor de MAX_CHARS (pelo menos por em quanto deve ser 9).
+- OnlineLogin.toString() não estava funcionando através de ObjectDescription.
+- OnlineMap deve eliminar OnlineCharData de jogadores que não estejam mais ativos no servidor.
+
 05.01.2017 - 1.5.165
 - Movendo as classes no servidor de personagens conforme devem estar localizados.
 	- Entidades movidas de character.structures para character.entities.

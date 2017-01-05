@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS accounts
 	expiration DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',
 	account_state TINYINT NOT NULL DEFAULT 0,
 	last_ip VARCHAR(15) NOT NULL DEFAULT '127.0.0.1',
+	char_slots TINYINT NOT NULL DEFAULT 0,
 
 	UNIQUE (email, username),
 	CONSTRAINT pk_accountid PRIMARY KEY (id)
@@ -245,7 +246,8 @@ CREATE TABLE characters_locations
 	coord_x INT NOT NULL,
 	coord_y INT NOT NULL,
 
-	CONSTRAINT pk_char_loc PRIMARY KEY (charid, num)
+	CONSTRAINT pk_char_loc PRIMARY KEY (charid, num),
+	CONSTRAINT fk_char_loc FOREIGN KEY (charid) REFERENCES characters(id) ON DELETE CASCADE ON UPDATE CASCADE
 
 ) ENGINE=InnoDB;
 

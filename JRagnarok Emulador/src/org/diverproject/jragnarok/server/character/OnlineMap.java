@@ -210,10 +210,13 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 	{
 		for (OnlineCharData online : cache)
 		{
-			if (online.getFileDescriptor() != null)
+			if (online.getFileDescriptor() == null)
+			{
+				cache.remove(online);
 				continue;
+			}
 
-			if (online.getServer() == OnlineCharData.UNKNOW_SERVER)
+			if (!online.getFileDescriptor().isConnected() || online.getServer() == OnlineCharData.UNKNOW_SERVER)
 				try {
 					setCharOnline(online.getCharID(), false);
 				} catch (RagnarokException e) {

@@ -95,6 +95,7 @@ public class AccountControl extends AbstractControl
 		account.getExpiration().set(rs.getTimestamp("expiration").getTime());
 		account.setState(AccountState.parse(rs.getInt("account_state")));
 		account.getLastIP().set(rs.getInt("last_ip"));
+		account.setCharSlots(rs.getByte("char_slots"));
 
 		pincodes.load(account);
 		groups.load(account);
@@ -111,9 +112,9 @@ public class AccountControl extends AbstractControl
 	public Account get(String username)
 	{
 		String table = Tables.getInstance().getAccounts();
-		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date,"
-						+ " login_count, unban_time, expiration, account_state, last_ip"
-						+ " FROM %s WHERE username = ?",
+		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date, "
+						+	"login_count, unban_time, expiration, account_state, last_ip, char_slots "
+						+	"FROM %s WHERE username = ?",
 						table);
 
 		Account account = null;
@@ -145,9 +146,9 @@ public class AccountControl extends AbstractControl
 	public Account get(int accountID)
 	{
 		String table = Tables.getInstance().getAccounts();
-		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date,"
-						+ " login_count, unban_time, expiration, account_state, last_ip"
-						+ " FROM %s WHERE id = ?",
+		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date, "
+						+	"login_count, unban_time, expiration, account_state, last_ip, char_slots "
+						+	"FROM %s WHERE id = ?",
 						table);
 
 		Account account = null;
@@ -218,7 +219,8 @@ public class AccountControl extends AbstractControl
 	public boolean setAccount(Account account)
 	{
 		String table = Tables.getInstance().getAccounts();
-		String sql = format("UPDATE %s SET login_count = ?, unban_time = ?, expiration = ?, account_state = ?, last_ip = ? WHERE id = ?", table);
+		String sql = format("UPDATE %s SET login_count = ?, unban_time = ?, expiration = ?, account_state = ?, last_ip = ?, "
+						+	"char_slots = ? WHERE id = ?", table);
 
 		try {
 
@@ -228,7 +230,8 @@ public class AccountControl extends AbstractControl
 			ps.setTimestamp(3, account.getExpiration().toTimestamp());
 			ps.setInt(4, account.getState().CODE);
 			ps.setInt(5, account.getLastIP().get());
-			ps.setInt(6, account.getID());
+			ps.setByte(6, account.getCharSlots());
+			ps.setInt(7, account.getID());
 
 			return ps.executeUpdate() == 1;
 

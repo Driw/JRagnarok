@@ -104,8 +104,10 @@ public class OnlineLogin
 
 		description.append("accountID", accountID);
 		description.append("charServerID", charServerID);
-		description.append("waitingDisconnect", waitingDisconnect.getID());
 
-		return super.toString();
+		if (waitingDisconnect != null)
+			description.append("waitingDisconnect", waitingDisconnect.getID());
+
+		return description.toString();
 	}
 }
