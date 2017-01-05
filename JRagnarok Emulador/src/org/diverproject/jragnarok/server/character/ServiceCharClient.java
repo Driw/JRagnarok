@@ -21,9 +21,7 @@ import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLo
 import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin.PincodeState;
 import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
-import org.diverproject.jragnarok.server.character.structures.Character;
-import org.diverproject.jragnarok.server.character.structures.CharSessionData;
-import org.diverproject.jragnarok.server.character.structures.OnlineCharData;
+import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.jragnarok.server.common.NotifyAuthResult;
 import org.diverproject.util.collection.Index;
 

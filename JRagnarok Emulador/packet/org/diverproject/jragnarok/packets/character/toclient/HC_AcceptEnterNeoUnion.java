@@ -10,7 +10,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_ACCEPT_ENTER_NEO_UNION;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
-import org.diverproject.jragnarok.server.character.structures.Character;
+import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.util.collection.Index;
 import org.diverproject.util.stream.Output;
 

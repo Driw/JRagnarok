@@ -3,7 +3,6 @@ package org.diverproject.jragnarok.server.character;
 import java.net.Socket;
 
 import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.character.structures.CharSessionData;
 
 public class CFileDescriptor extends FileDescriptor
 {

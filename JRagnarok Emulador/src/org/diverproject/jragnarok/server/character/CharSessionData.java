@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.character.structures;
+package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;

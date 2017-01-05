@@ -5,7 +5,6 @@ import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
 import java.util.Iterator;
 
 import org.diverproject.jragnarok.server.FileDescriptor;
-import org.diverproject.jragnarok.server.character.structures.ClientMapServer;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.LoopList;
 

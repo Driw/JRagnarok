@@ -1,9 +1,8 @@
-package org.diverproject.jragnarok.server.character.structures;
+package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_PER_SERVER;
 
 import org.diverproject.jragnarok.server.InternetProtocol;
-import org.diverproject.jragnarok.server.character.CFileDescriptor;
 import org.diverproject.util.ObjectDescription;
 
 public class ClientMapServer

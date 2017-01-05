@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.character.structures;
+package org.diverproject.jragnarok.server.character.entities;
 
 import org.diverproject.util.CanCopy;
 import org.diverproject.util.ObjectDescription;

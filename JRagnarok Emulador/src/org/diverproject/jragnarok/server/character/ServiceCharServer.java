@@ -7,9 +7,6 @@ import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
-import org.diverproject.jragnarok.server.character.structures.CharSessionData;
-import org.diverproject.jragnarok.server.character.structures.ClientMapServer;
-import org.diverproject.jragnarok.server.character.structures.OnlineCharData;
 
 public class ServiceCharServer extends AbstractCharService
 {

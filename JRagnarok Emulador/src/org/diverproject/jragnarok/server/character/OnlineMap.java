@@ -13,7 +13,6 @@ import java.util.Iterator;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
-import org.diverproject.jragnarok.server.character.structures.OnlineCharData;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;

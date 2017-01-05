@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.character.entities;
+package org.diverproject.jragnarok.server.character;
 
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.common.LoginSeed;

@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.character.structures;
+package org.diverproject.jragnarok.server.character.entities;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MEMOPOINTS;
 import static org.diverproject.util.lang.IntUtil.interval;

@@ -1,3 +1,8 @@
+05.01.2017 - 1.5.165
+- Movendo as classes no servidor de personagens conforme devem estar localizados.
+	- Entidades movidas de character.structures para character.entities.
+	- Restantes das classes de character.structures movidas para character.
+
 05.01.2017 - 1.5.164
 - JRagnarokConsole irá se encarregar de interpretar os comandos digitados em console.
 - Agora os comandos digitados em console são apagados quando confirmados para executar.

@@ -2,7 +2,6 @@ package org.diverproject.jragnarok.server.character;
 
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AccountInfo;
-import org.diverproject.jragnarok.server.character.structures.ClientMapServer;
 import org.diverproject.jragnarok.server.common.DisconnectPlayer;
 
 public class ServiceCharMap extends AbstractCharService
