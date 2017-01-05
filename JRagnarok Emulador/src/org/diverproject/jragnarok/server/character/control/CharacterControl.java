@@ -15,6 +15,7 @@ import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
 import org.diverproject.jragnarok.server.character.ChangeSex;
 import org.diverproject.jragnarok.server.character.CharData;
+import org.diverproject.jragnarok.server.character.CharSessionData;
 import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.jragnarok.server.character.entities.Experience;
 import org.diverproject.jragnarok.server.character.entities.MercenaryRank;
@@ -76,46 +77,6 @@ public class CharacterControl extends AbstractControl
 	}
 
 	/**
-	 * Cria uma indexação através do número de slot do personagem de todos os personagens de uma conta.
-	 * @param accountID código de identificação da conta do qual deseja listar os personagens.
-	 * @return aquisição de uma indexação dos personagens referentes a conta especificada.
-	 * @throws RagnarokException apenas se houver falha na conexão com o banco de dados.
-	 */
-
-	public Index<CharData> getCharData(int accountID) throws RagnarokException
-	{
-		Index<CharData> characters = new StaticArray<>(MAX_CHARS);
-
-		String table = Tables.getInstance().getAccountsCharacters();
-		String tableChars = Tables.getInstance().getAccountsCharacters();
-		String sql = format("SELECT slot, charid, moves, uban FROM %s "
-						+	"INNER JOIN %s ON %s.id = charid "
-						+	"WHERE account = ?", table, tableChars, tableChars);
-
-		try {
-
-			PreparedStatement ps = prepare(sql);
-			ps.setInt(1, accountID);
-
-			ResultSet rs = ps.executeQuery();
-
-			while (rs.next())
-			{
-				CharData data = new CharData();
-				data.setID(rs.getInt("charid"));
-				data.setCharMove(rs.getInt("moves"));
-				data.getUnban().set(rs.getTimestamp("unban_time").getTime());
-				characters.add(rs.getInt("slot"), data);
-			}
-
-		} catch (SQLException e) {
-			throw new RagnarokException(e.getMessage());
-		}
-
-		return characters;
-	}
-
-	/**
 	 * Seleciona todas as informações necessárias para a formação do objeto representativo de um personagem.
 	 * @param charID código de identificação do personagem do qual deseja obter as informações.
 	 * @return aquisição do objeto contendo as informações do personagem desejado.
@@ -133,8 +94,8 @@ public class CharacterControl extends AbstractControl
 		String tableExp = Tables.getInstance().getCharExperiences();
 		String tableRank = Tables.getInstance().getCharMercenaryRank();
 		String sql = format("SELECT id, name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
-						+	"manner, effect_state, virtue, base_level, job_level, rename_count, delete_date, moves, font, "
-						+	"unique_item_counter, "
+						+	"manner, effect_state, virtue, base_level, job_level, rename_count, unban_time, delete_date, "
+						+	"moves, font, unique_item_counter, "
 						+	"strength, agility, vitality, intelligence, dexterity, luck, "
 						+	"hair, hair_color, clothes_color, body, weapon, shield, head_top, head_mid, head_bottom, robe, "
 						+	"partner, father, mother, child, "
@@ -205,6 +166,7 @@ public class CharacterControl extends AbstractControl
 		character.setBaseLevel(rs.getInt("base_level"));
 		character.setJobLevel(rs.getInt("job_level"));
 		character.setRename(rs.getShort("rename_count"));
+		character.getUnbanTime().set(rs.getLong("unban_time"));
 		character.getDeleteDate().set(rs.getInt("delete_date"));
 		character.setMoves(rs.getShort("moves"));
 		character.setFont(rs.getByte("font"));
@@ -326,8 +288,8 @@ public class CharacterControl extends AbstractControl
 
 		String table = Tables.getInstance().getCharacters();
 		String sql = format("REPLACE INTO %s (name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
-						+	"manner, effect_state, virtue, base_level, job_level, rename, delete_date, moves, font"
-						+	"unique_item_counter)"
+						+	"manner, effect_state, virtue, base_level, job_level, rename, unban_time, delete_date, "
+						+	"moves, font, unique_item_counter)"
 						+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", table);
 
 		try {
@@ -349,10 +311,11 @@ public class CharacterControl extends AbstractControl
 			ps.setInt(14, character.getBaseLevel());
 			ps.setInt(15, character.getJobLevel());
 			ps.setShort(16, character.getRename());
-			ps.setTimestamp(17, character.getDeleteDate().toTimestamp());
-			ps.setShort(18, character.getMoves());
-			ps.setByte(19, character.getFont());
-			ps.setInt(20, character.getUniqueItemCounter());
+			ps.setTimestamp(17, character.getUnbanTime().toTimestamp());
+			ps.setTimestamp(18, character.getDeleteDate().toTimestamp());
+			ps.setShort(19, character.getMoves());
+			ps.setByte(20, character.getFont());
+			ps.setInt(21, character.getUniqueItemCounter());
 
 			if (ps.execute())
 			{
@@ -653,7 +616,7 @@ public class CharacterControl extends AbstractControl
 		String table = Tables.getInstance().getCharacters();
 		String sql = format("UPDATE %s SET name = ?, sex = ?, zeny = ?, status_point = ?, skill_point = ?, jobid = ?, "
 						+	"hp = ?, max_hp = ?, sp = ?, max_sp = ?, manner = ?, effect_state = ?, virtue = ?, base_level = ?, "
-						+	"job_level = ?, rename = ?, delete_date = ?, moves = ?, font = ?, unique_item_counter = ? "
+						+	"job_level = ?, rename = ?, unban_time = ?, delete_date = ?, moves = ?, font = ?, unique_item_counter = ? "
 						+	"WHERE id = ?", table);
 
 		try {
@@ -675,11 +638,12 @@ public class CharacterControl extends AbstractControl
 			ps.setInt(14, character.getBaseLevel());
 			ps.setInt(15, character.getJobLevel());
 			ps.setShort(16, character.getRename());
-			ps.setTimestamp(17, character.getDeleteDate().toTimestamp());
-			ps.setShort(18, character.getMoves());
-			ps.setByte(19, character.getFont());
-			ps.setInt(20, character.getUniqueItemCounter());
-			ps.setInt(21, character.getID());
+			ps.setTimestamp(17, character.getUnbanTime().toTimestamp());
+			ps.setTimestamp(18, character.getDeleteDate().toTimestamp());
+			ps.setShort(19, character.getMoves());
+			ps.setByte(20, character.getFont());
+			ps.setInt(21, character.getUniqueItemCounter());
+			ps.setInt(22, character.getID());
 
 			if (ps.executeUpdate() == 1)
 			{
@@ -958,8 +922,8 @@ public class CharacterControl extends AbstractControl
 		String tableExp = Tables.getInstance().getCharExperiences();
 		String tableRank = Tables.getInstance().getCharMercenaryRank();
 		String sql = format("SELECT id, name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
-						+	"manner, effect_state, virtue, base_level, job_level, rename_count, delete_date, moves, font, "
-						+	"unique_item_counter, "
+						+	"manner, effect_state, virtue, base_level, job_level, rename_count, unban_time, delete_date, "
+						+	"moves, font, unique_item_counter, "
 						+	"strength, agility, vitality, intelligence, dexterity, luck, "
 						+	"hair, hair_color, clothes_color, body, weapon, shield, head_top, head_mid, head_bottom, robe, "
 						+	"partner, father, mother, child, "
@@ -1476,5 +1440,31 @@ public class CharacterControl extends AbstractControl
 		} catch (SQLException e) {
 			throw new RagnarokException(e.getMessage());
 		}
+	}
+
+	/**
+	 * Procedimento utilizado para atualizar as informações mínimas do personagem conforme abaixo:
+	 * @param sd sessão do qual terá as informações atualizadas de todos os CharData.
+	 * @param characters indexação dos personagens através do seu número de slot.
+	 */
+
+	public void setCharData(CharSessionData sd, Index<Character> characters)
+	{
+		for (int i = 0; i < MAX_CHARS; i++)
+		{
+			if (characters.get(i) == null)
+				sd.setCharData(null, i);
+
+			else
+			{
+				Character character = characters.get(i);
+
+				CharData data = new CharData();
+				data.setID(character.getID());
+				data.setCharMove(character.getMoves());
+				data.getUnban().set(character.getUnbanTime().get());
+			}
+		}
+
 	}
 }

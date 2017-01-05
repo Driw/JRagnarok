@@ -216,6 +216,7 @@ public class ServiceCharClient extends AbstractCharService
 		packet.setBillingSlots(sd.getVip().getCharBilling());
 		packet.setProducibleSlots(sd.getCharSlots());
 		packet.setValidSlots(b(MAX_CHARS));
+		packet.setValidSlots(sd.getCharSlots());
 		packet.send(fd);
 	}
 
@@ -231,14 +232,12 @@ public class ServiceCharClient extends AbstractCharService
 
 		logDebug("enviando dados dos personagens de account#%d (fd: %d).\n", sd.getID(), fd.getID());
 
-		for (int i = 0; i < MAX_CHARS; i++)
-			sd.setCharData(null, i);
-
 		if (sd.getVersion() >= dateToVersion(20100413))
 		{
 			try {
 
 				Index<Character> characters = this.characters.list(sd.getID());
+				this.characters.setCharData(sd, characters);
 
 				HC_AcceptEnterNeoUnion packet = new HC_AcceptEnterNeoUnion();
 				packet.setTotalSlots(MAX_CHARS);
@@ -255,6 +254,57 @@ public class ServiceCharClient extends AbstractCharService
 				logException(e);
 			}
 		}
+	}
+
+	/**
+	 * Envia ao cliente a quantidade de páginas disponíveis para seleção de personagens.
+	 * Cada página é composta por 3 slots para alocação de um único personagem no mesmo.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void sendCharPageCount(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("enviando quantidade de páginas para personagens de account#%d (fd: %d).\n", sd.getID(), fd.getID());
+
+		HC_CharListNotify packet = new HC_CharListNotify();
+		packet.setPageCount(sd.getCharSlots() > 3 ? sd.getCharSlots() / 3 : 1);
+		packet.send(fd);
+	}
+
+	/**
+	 * Envia todos os dados dos personagens da conta respectiva a sessão que foi estabelecida.
+	 * Os dados são enviados ao cliente para que ele possa exibir a seleção do personagem.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public boolean sendCharsPerPage(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("enviando dados dos personagens por página (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		try {
+
+			Index<Character> characters = this.characters.list(sd.getID());
+			this.characters.setCharData(sd, characters);
+
+			HC_AckCharInfoPerPage packet = new HC_AckCharInfoPerPage();
+			packet.setCharMoveCount(sd.getCharactersMove());
+			packet.setCharMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
+			packet.setCharMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));
+			packet.setCharacters(characters);
+			packet.send(fd);
+
+			return true;
+
+		} catch (RagnarokException e) {
+			logError("falha ao carregar dados dos personagens (aid: %d):.\n", sd.getID());
+			logException(e);
+		}
+
+		return false;
 	}
 
 	public void sendBlockCharacters(CFileDescriptor fd)
@@ -352,57 +402,6 @@ public class ServiceCharClient extends AbstractCharService
 			return "CHAR_BLOCK_TIMER";
 		}
 	};
-
-	/**
-	 * Envia todos os dados dos personagens da conta respectiva a sessão que foi estabelecida.
-	 * Os dados são enviados ao cliente para que ele possa exibir a seleção do personagem.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 */
-
-	public boolean sendCharsPerPage(CFileDescriptor fd)
-	{
-		CharSessionData sd = fd.getSessionData();
-
-		logDebug("enviando dados dos personagens por página (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
-
-		for (int i = 0; i < MAX_CHARS; i++)
-			sd.setCharData(null, i);
-
-		try {
-
-			Index<Character> characters = this.characters.list(sd.getID());
-
-			HC_AckCharInfoPerPage packet = new HC_AckCharInfoPerPage();
-			packet.setCharMoveCount(sd.getCharactersMove());
-			packet.setCharMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
-			packet.setCharMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));
-			packet.setCharacters(characters);
-			packet.send(fd);
-
-			return true;
-
-		} catch (RagnarokException e) {
-			logError("falha ao carregar dados dos personagens (aid: %d):.\n", sd.getID());
-			logException(e);
-		}
-
-		return false;
-	}
-
-	/**
-	 * Envia ao cliente a quantidade de páginas disponíveis para seleção de personagens.
-	 * Cada página é composta por 3 slots para alocação de um único personagem no mesmo.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 */
-
-	public void sendCharPageCount(CFileDescriptor fd)
-	{
-		CharSessionData sd = fd.getSessionData();
-
-		HC_CharListNotify packet = new HC_CharListNotify();
-		packet.setPageCount(sd.getCharSlots() > 3 ? sd.getCharSlots() / 3 : 1);
-		packet.send(fd);
-	}
 
 	// TODO chclif_char_delete2_ack
 	// TODO chclif_char_delete2_accept_ack

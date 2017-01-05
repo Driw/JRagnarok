@@ -56,7 +56,7 @@ public class Pincode
 
 	public void genSeed()
 	{
-		seed = random();
+		seed = random() % 0xFFFF;
 	}
 
 	@Override

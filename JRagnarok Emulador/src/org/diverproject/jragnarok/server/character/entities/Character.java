@@ -174,6 +174,11 @@ public class Character
 	private Time deleteDate;
 
 	/**
+	 * Horário em que o personagem será desbloqueado.
+	 */
+	private Time unbanTime;
+
+	/**
 	 * Quantidade de vezes que o personagem foi movido.
 	 */
 	private short moves;
@@ -234,6 +239,7 @@ public class Character
 		locations = new Locations();
 		effectState = new BitWise(/* TODO: properties name */);
 		deleteDate = new Time();
+		unbanTime = new Time();
 
 		sex = 'M';
 		name = UNKNOWN;
@@ -679,6 +685,15 @@ public class Character
 	public Time getDeleteDate()
 	{
 		return deleteDate;
+	}
+
+	/**
+	 * @return aquisição do horário em que o personagem será desbloqueado.
+	 */
+
+	public Time getUnbanTime()
+	{
+		return unbanTime;
 	}
 
 	/**

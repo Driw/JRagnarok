@@ -567,12 +567,17 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			int accountID = timer.getObjectID();
 			OnlineLogin online = onlines.get(accountID);
 
-			onlines.remove(accountID);
-
-			if (online.getWaitingDisconnect() != null)
+			if (online == null)
+				getTimerSystem().getTimers().delete(timer);
+			else
 			{
-				getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
-				online.setWaitingDisconnect(null);
+				onlines.remove(accountID);
+
+				if (online.getWaitingDisconnect() != null)
+				{
+					getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+					online.setWaitingDisconnect(null);
+				}
 			}
 		}
 
