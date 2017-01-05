@@ -62,11 +62,6 @@ import org.diverproject.util.BitWise8;
 public class ServiceLoginChar extends AbstractServiceLogin
 {
 	/**
-	 * Controlador para identificar jogadores online.
-	 */
-	private OnlineMap onlines;
-
-	/**
 	 * Serviço para comunicação entre o servidor e o cliente.
 	 */
 	private ServiceLoginClient client;
@@ -107,7 +102,6 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		client = getServer().getFacade().getClientService();
 		login = getServer().getFacade().getLoginService();
 		accounts = getServer().getFacade().getAccountControl();
-		onlines = getServer().getFacade().getOnlineMap();
 		groups = getServer().getFacade().getGroupControl();
 		auths = getServer().getFacade().getAuthAccountMap();		
 
@@ -131,7 +125,6 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		client = null;
 		login = null;
 		accounts = null;
-		onlines = null;
 		groups = null;
 		auths = null;
 	}
@@ -151,37 +144,6 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		public String getName()
 		{
 			return "syncronizeIpAddress";
-		}
-
-		@Override
-		public String toString()
-		{
-			return getName();
-		}
-	};
-
-	/**
-	 * Função para temporizadores executarem a remoção de uma conta como acesso online.
-	 */
-
-	public final TimerListener WAITING_DISCONNECT_TIMER = new TimerListener()
-	{
-		@Override
-		public void onCall(Timer timer, int now, int tick)
-		{
-			int accountID = timer.getObjectID();
-			OnlineLogin online = onlines.get(accountID);
-
-			onlines.remove(accountID);
-
-			getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
-			online.setWaitingDisconnect(null);
-		}
-
-		@Override
-		public String getName()
-		{
-			return "waitingDisconnectTimer";
 		}
 
 		@Override

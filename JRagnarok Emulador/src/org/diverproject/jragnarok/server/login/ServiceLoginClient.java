@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.login;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.MIN_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.i;
@@ -353,8 +354,8 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setEmail(account.getEmail());
 		packet.setExpirationTime(i(account.getExpiration().get()));
 		packet.setGroupID(b(account.getGroup().getCurrentGroup().getID()));
-		packet.setCharSlots(account.getCharSlots());
 		packet.setBirthdate(account.getBirthDate());
+		packet.setCharSlots(MIN_CHARS);
 
 		packet.setPincode(account.getPincode().getCode());
 		packet.setPincodeChage(i(account.getPincode().getChanged().get()));

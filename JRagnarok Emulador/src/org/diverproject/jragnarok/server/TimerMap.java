@@ -156,9 +156,6 @@ public class TimerMap implements Iterable<Timer>
 	{
 		timer.setListener(null);
 		timer.setType(TimerType.TIMER_INVALID);
-
-		timers.removeKey(timer.getID());
-		indexes.remove(timer);
 	}
 
 	/**
@@ -196,8 +193,13 @@ public class TimerMap implements Iterable<Timer>
 					break;
 
 				case TIMER_REMOVE:
-				default:
 					delete(timer);
+					break;
+
+				default:
+					timers.removeKey(timer.getID());
+					indexes.remove(timer);
+					break;
 			}
 		}
 	}

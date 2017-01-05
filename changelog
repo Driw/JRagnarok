@@ -1,3 +1,9 @@
+05.01.2017 - 1.5.168
+- TimerMap.delete() modificado para que TIMER_INVALID tenha alguma efetividade no sistema.
+- Movendo authIsntOnline() para outro if já que sua invalidade envia um pacote diferente dos demais.
+- Correção no retorno de authIsntOnline() quando um a conta estiver online no servidor de acesso.
+- WAITING_DISCONNECT_TIMER movido de ServiceLoginChar para ServiceLoginAuth que é onde deve estar.
+
 05.01.2017 - 1.5.167
 - Nome de todos os atributos de HC_Accept2 renomeados conforme estão especificados no PEEK.
 - HC_AcceptEnterNeoUnion e HC_AckCharInfoPerPage irão usar CharacterInfo para dados de personagens.

@@ -37,6 +37,7 @@ import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.ServerState;
 import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.common.AuthResult;
@@ -72,7 +73,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * Tempo para que uma autenticação entre em timeout.
 	 */
-	private static final int AUTH_TIMEOUT = seconds(30);
+	private static final int AUTH_TIMEOUT = seconds(10);
 
 
 	/**
@@ -356,9 +357,15 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	{
 		LoginSessionData sd = fd.getSessionData();
 
-		if (!authServerConnected(fd) || !authServerState(sd) || !authGroupAccount(fd) || !authIsntOnline(fd))
+		if (!authServerConnected(fd) || !authServerState(sd) || !authGroupAccount(fd))
 		{
 			client.sendNotifyResult(fd, SERVER_CLOSED);
+			return;
+		}
+
+		if (!authIsntOnline(fd))
+		{
+			client.sendNotifyResult(fd, RECOGNIZES_LAST_LOGIN);
 			return;
 		}
 
@@ -507,7 +514,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			if (server != null)
 			{
 				authIsOnline(fd, account, online, server);
-				return true;
+				return false;
 			}
 
 			auths.remove(sd.getID());
@@ -541,14 +548,46 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			TimerMap timers = ts.getTimers();
 
 			Timer timer = timers.acquireTimer();
-			timer.setObjectID(fd.getID());
-			timer.setListener(getServer().getFacade().getCharService().WAITING_DISCONNECT_TIMER);
 			timer.setTick(ts.getCurrentTime());
+			timer.setObjectID(account.getID());
+			timer.setListener(WAITING_DISCONNECT_TIMER);
 			timers.addInterval(timer, AUTH_TIMEOUT);
-
-			client.sendNotifyResult(fd, RECOGNIZES_LAST_LOGIN);
-		}		
+		}
 	}
+
+	/**
+	 * Função para temporizadores executarem a remoção de uma conta como acesso online.
+	 */
+
+	public final TimerListener WAITING_DISCONNECT_TIMER = new TimerListener()
+	{
+		@Override
+		public void onCall(Timer timer, int now, int tick)
+		{
+			int accountID = timer.getObjectID();
+			OnlineLogin online = onlines.get(accountID);
+
+			onlines.remove(accountID);
+
+			if (online.getWaitingDisconnect() != null)
+			{
+				getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+				online.setWaitingDisconnect(null);
+			}
+		}
+
+		@Override
+		public String getName()
+		{
+			return "waitingDisconnectTimer";
+		}
+
+		@Override
+		public String toString()
+		{
+			return getName();
+		}
+	};
 
 	/**
 	 * Chamado quando um servidor de personagens solicita a conexão com o servidor de acesso.
