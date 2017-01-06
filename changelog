@@ -1,3 +1,8 @@
+06.01.2017 - 1.5.171
+- Alterando a forma como as mensagens de log são repassadas ao console do Java e ao console do JUtil.
+- Implementação da modificação dos valores de CharData quando os personagens forem enviados, ServiceCharClient.
+- Notificar no console que o servidor de personagem conseguiu se conectar com o de acesso, ServiceCharLogin.
+
 05.01.2017 - 1.5.170b
 - Alterando o nome de unban para unban_time na tabela characters conforme usado no controle.
 - Atributo para unban_time adicionado em Character e já está sendo usado no sistema.

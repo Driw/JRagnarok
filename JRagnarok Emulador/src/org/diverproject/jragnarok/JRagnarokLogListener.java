@@ -39,11 +39,17 @@ public class JRagnarokLogListener implements LogListener
 	@Override
 	public void onMessage(Log log)
 	{
-		System.out.print(log.toString());
-		printMessage(ShowThread.getInstance(), log);;
+		if (log.getType() == null || !log.getType().equals("Debug"))
+			System.out.print(log.toString());
 
-		if (Thread.currentThread() instanceof ServerThreaed)
+		if (log.getType().equals("Debug"))
+			printMessage(ShowThread.getInstance(), log);
+
+		else if (Thread.currentThread() instanceof ServerThreaed)
 			printMessage(((ServerThreaed) Thread.currentThread()).getShowThread(), log);
+
+		else
+			printMessage(ShowThread.getInstance(), log);
 	}
 
 	private void printMessage(Show show, Log log)

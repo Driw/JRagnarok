@@ -502,7 +502,10 @@ public class ServiceCharLogin extends AbstractCharService
 		packet.receive(fd, false);
 
 		if (packet.getResult() == OK)
+		{
+			logInfo("conectado ao servidor de acesso (ip: %s).\n", fd.getAddressString());
 			this.fd = fd;
+		}
 
 		return packet.getResult() == OK;
 	}

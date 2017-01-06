@@ -288,7 +288,6 @@ public class ServiceCharClient extends AbstractCharService
 		try {
 
 			Index<Character> characters = this.characters.list(sd.getID());
-			this.characters.setCharData(sd, characters);
 
 			HC_AckCharInfoPerPage packet = new HC_AckCharInfoPerPage();
 			packet.setCharMoveCount(sd.getCharactersMove());

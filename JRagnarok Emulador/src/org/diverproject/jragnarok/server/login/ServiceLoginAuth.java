@@ -647,7 +647,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		if (getServer().isState(ServerState.RUNNING) && result == RefuseLogin.OK && fd.isConnected())
 		{
-			log("conexão do servidor de personagens '%s' aceita.\n", serverName);
+			logNotice("conexão do servidor de personagens '%s' aceita.\n", serverName);
 
 			ClientCharServer server = new ClientCharServer();
 			server.setFileDecriptor(fd);
