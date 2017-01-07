@@ -18,14 +18,13 @@ public class AH_AccountData extends RequestPacket
 	private int accountID;
 	private String email;
 	private int expirationTime;
-	private byte groupID;
+	private int groupID;
+	private int vipID;
 	private byte charSlots;
 	private String birthdate;
+	private boolean pincodeEnabled;
 	private String pincode;
-	private int pincodeChage;
-	private boolean vip;
-	private byte charVip;
-	private byte charBilling;
+	private long pincodeChage;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -34,14 +33,13 @@ public class AH_AccountData extends RequestPacket
 		output.putInt(accountID);
 		output.putString(email, EMAIL_LENGTH);
 		output.putInt(expirationTime);
-		output.putByte(groupID);
+		output.putInt(groupID);
+		output.putInt(vipID);
 		output.putByte(charSlots);
 		output.putString(birthdate, 10);
+		output.putByte(b(pincodeEnabled ? 1 : 0));
 		output.putString(pincode, PINCODE_LENGTH);
-		output.putInt(pincodeChage);
-		output.putByte(b(vip ? 1 : 0));
-		output.putByte(charVip);
-		output.putByte(charBilling);
+		output.putLong(pincodeChage);
 	}
 
 	@Override
@@ -51,14 +49,13 @@ public class AH_AccountData extends RequestPacket
 		accountID = input.getInt();
 		email = strclr(input.getString(EMAIL_LENGTH));
 		expirationTime = input.getInt();
-		groupID = input.getByte();
+		groupID = input.getInt();
+		vipID = input.getInt();
 		charSlots = input.getByte();
 		birthdate = strclr(input.getString(10));
+		pincodeEnabled = input.getByte() == 1;
 		pincode = input.getString(PINCODE_LENGTH);
-		pincodeChage = input.getInt();
-		vip = input.getByte() == 1;
-		charVip = input.getByte();
-		charBilling = input.getByte();
+		pincodeChage = input.getLong();
 	}
 
 	public int getFdID()
@@ -102,15 +99,25 @@ public class AH_AccountData extends RequestPacket
 			this.expirationTime = expirationTime;
 	}
 
-	public byte getGroupID()
+	public int getGroupID()
 	{
 		return groupID;
 	}
 
-	public void setGroupID(byte groupID)
+	public void setGroupID(int groupID)
 	{
 		if (groupID > 0)
 			this.groupID = groupID;
+	}
+
+	public int getVipID()
+	{
+		return vipID;
+	}
+
+	public void setVipID(int vipID)
+	{
+		this.vipID = vipID;
 	}
 
 	public byte getCharSlots()
@@ -135,6 +142,16 @@ public class AH_AccountData extends RequestPacket
 			this.birthdate = birthdate;
 	}
 
+	public boolean isPincodeEnabled()
+	{
+		return pincodeEnabled;
+	}
+
+	public void setPincodeEnabled(boolean pincodeEnabled)
+	{
+		this.pincodeEnabled = pincodeEnabled;
+	}
+
 	public String getPincode()
 	{
 		return pincode;
@@ -146,47 +163,15 @@ public class AH_AccountData extends RequestPacket
 			this.pincode = pincode;
 	}
 
-	public int getPincodeChage()
+	public long getPincodeChage()
 	{
 		return pincodeChage;
 	}
 
-	public void setPincodeChage(int pincodeChage)
+	public void setPincodeChage(long pincodeChage)
 	{
 		if (pincodeChage > 0)
 			this.pincodeChage = pincodeChage;
-	}
-
-	public boolean isVip()
-	{
-		return vip;
-	}
-
-	public void setVip(boolean vip)
-	{
-		this.vip = vip;
-	}
-
-	public byte getCharVip()
-	{
-		return charVip;
-	}
-
-	public void setCharVip(byte charVip)
-	{
-		if (charVip > 0)
-			this.charVip = charVip;
-	}
-
-	public byte getCharBilling()
-	{
-		return charBilling;
-	}
-
-	public void setCharBilling(byte charBilling)
-	{
-		if (charBilling > 0)
-			this.charBilling = charBilling;
 	}
 
 	@Override
@@ -204,7 +189,7 @@ public class AH_AccountData extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 33 + EMAIL_LENGTH + PINCODE_LENGTH;
+		return 42 + EMAIL_LENGTH + PINCODE_LENGTH;
 	}
 
 	@Override
@@ -217,12 +202,14 @@ public class AH_AccountData extends RequestPacket
 		description.append("email", email);
 		description.append("expirationTime", expirationTime);
 		description.append("groupID", groupID);
+		description.append("vipID", vipID);
 		description.append("charSlots", charSlots);
 		description.append("birthdate", birthdate);
-		description.append("pincode", pincode);
-		description.append("pincodeChage", pincodeChage);
-		description.append("vip", vip);
-		description.append("charVip", charVip);
-		description.append("charBilling", charBilling);
+
+		if (pincodeEnabled)
+		{
+			description.append("pincode", pincode);
+			description.append("pincodeChage", pincodeChage);
+		}
 	}
 }

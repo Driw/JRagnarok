@@ -2,7 +2,7 @@ package org.diverproject.jragnarok.server.character;
 
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.common.LoginSeed;
-import org.diverproject.jragnarok.server.login.entities.Group;
+import org.diverproject.jragnarok.server.common.entities.Group;
 import org.diverproject.util.Time;
 
 public class AuthNode

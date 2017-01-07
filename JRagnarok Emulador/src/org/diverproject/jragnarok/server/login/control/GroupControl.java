@@ -13,13 +13,16 @@ import java.sql.SQLException;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
+import org.diverproject.jragnarok.server.common.GroupMap;
+import org.diverproject.jragnarok.server.common.VipMap;
+import org.diverproject.jragnarok.server.common.entities.Group;
+import org.diverproject.jragnarok.server.common.entities.GroupCommands;
+import org.diverproject.jragnarok.server.common.entities.GroupPermissions;
+import org.diverproject.jragnarok.server.common.entities.Vip;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountGroup;
-import org.diverproject.jragnarok.server.login.entities.Group;
-import org.diverproject.jragnarok.server.login.entities.GroupCommands;
-import org.diverproject.jragnarok.server.login.entities.GroupPermissions;
-import org.diverproject.jragnarok.server.login.entities.Vip;
-import org.diverproject.util.collection.abstraction.IntegerLittleMap;
+import org.diverproject.util.collection.Queue;
+import org.diverproject.util.collection.abstraction.DynamicQueue;
 
 /**
  * <h1>Controle para Grupo de Jogadores</h1>
@@ -42,12 +45,12 @@ public class GroupControl extends AbstractControl
 	/**
 	 * Mapeamento dos grupos de jogadores já carregados.
 	 */
-	private IntegerLittleMap<Group> groups;
+	private GroupMap groups;
 
 	/**
 	 * Mapeamento dos tipos de acesso vip já carregados.
 	 */
-	private IntegerLittleMap<Vip> vips;
+	private VipMap vips;
 
 	/**
 	 * Cria uma nova DAO para trabalhar com grupo de jogadores do banco de dados.
@@ -201,7 +204,7 @@ public class GroupControl extends AbstractControl
 
 			group = newGroup(rs);
 
-			if (groups.add(group.getID(), group))
+			if (groups.add(group))
 			{
 				int csize = group.getCommands().size();
 				int psize = group.getPermissions().size();
@@ -300,7 +303,7 @@ public class GroupControl extends AbstractControl
 
 			vip = newVip(rs);
 
-			if (vips.add(vipID, vip))
+			if (vips.add(vip))
 				logDebug("novo vip carregado do banco de dados (vid: %d).\n", vip.getID());
 
 			return vip;
@@ -317,8 +320,8 @@ public class GroupControl extends AbstractControl
 
 	public void init()
 	{
-		groups = new IntegerLittleMap<>();
-		vips = new IntegerLittleMap<>();
+		groups = new GroupMap();
+		vips = new VipMap();
 
 		try {
 			initGroups();
@@ -347,7 +350,7 @@ public class GroupControl extends AbstractControl
 			while (rs.next())
 			{
 				Group group = getGroup(rs.getInt("id"));
-				groups.add(group.getID(), group);
+				groups.add(group);
 			}
 
 			logDebug("foram encontrados %d grupos em '%s'.\n", groups.size(), table);
@@ -375,7 +378,7 @@ public class GroupControl extends AbstractControl
 			while (rs.next())
 			{
 				Vip vip = getVip(rs.getInt("id"));
-				vips.add(vip.getID(), vip);
+				vips.add(vip);
 			}
 
 			logDebug("foram encontrados %d vip em '%s'.\n", groups.size(), table);
@@ -384,6 +387,38 @@ public class GroupControl extends AbstractControl
 			throw new RagnarokException(e);
 		}
 
+	}
+
+	/**
+	 * Permite exportar os dados de todos os grupos para um fila criada internamente.
+	 * A utilização desta fila não irá influenciar no mapeamento usado pelo controle.
+	 * @return aquisição de uma fila instanciada contendo os grupos em cache.
+	 */
+
+	public Queue<Group> exportGroups()
+	{
+		Queue<Group> queue = new DynamicQueue<>();
+
+		for (Group group : groups)
+			queue.offer(group);
+
+		return queue;
+	}
+
+	/**
+	 * Permite exportar os dados de todos os acessos VIP para um fila criada internamente.
+	 * A utilização desta fila não irá influenciar no mapeamento usado pelo controle.
+	 * @return aquisição de uma fila instanciada contendo os acessos VIP em cache.
+	 */
+
+	public Queue<Vip> exportVips()
+	{
+		Queue<Vip> queue = new DynamicQueue<>();
+
+		for (Vip vip : vips)
+			queue.offer(vip);
+
+		return queue;
 	}
 
 	/**

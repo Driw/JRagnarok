@@ -29,6 +29,7 @@ import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
+import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.lang.IntUtil.diff;
 
@@ -39,6 +40,7 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
 import org.diverproject.jragnarok.packets.common.PincodeState;
+import org.diverproject.jragnarok.packets.inter.SS_GroupData;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
@@ -69,10 +71,15 @@ import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
+import org.diverproject.jragnarok.server.common.GroupMap;
 import org.diverproject.jragnarok.server.common.Sex;
+import org.diverproject.jragnarok.server.common.VipMap;
+import org.diverproject.jragnarok.server.common.entities.Group;
+import org.diverproject.jragnarok.server.common.entities.Vip;
 import org.diverproject.util.BitWise8;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.collection.List;
+import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicList;
 import org.diverproject.util.lang.ByteUtil;
 
@@ -147,6 +154,16 @@ public class ServiceCharLogin extends AbstractCharService
 	private CharacterControl characters;
 
 	/**
+	 * Mapeamento dos grupos de contas disponíveis.
+	 */
+	private GroupMap groups;
+
+	/**
+	 * Mapeamento dos tipos de acessos VIP disponíveis.
+	 */
+	private VipMap vips;
+
+	/**
 	 * Instancia um novo serviço de comunicação do servidor de personagem com o de acesso.
 	 * Este serviço possui dependências portanto precisa ser iniciado e destruído.
 	 * @param server referência do servidor de personagem referente ao serviço.
@@ -176,6 +193,9 @@ public class ServiceCharLogin extends AbstractCharService
 		auths = getServer().getFacade().getAuthMap();
 		onlines = getServer().getFacade().getOnlineMap();
 		characters = getServer().getFacade().getCharacterControl();
+
+		groups = new GroupMap();
+		vips = new VipMap();
 
 		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
@@ -211,6 +231,12 @@ public class ServiceCharLogin extends AbstractCharService
 		auths = null;
 		onlines = null;
 		characters = null;
+
+		groups.clear();
+		vips.clear();
+
+		groups = null;
+		vips = null;
 
 		if (fd != null)
 		{
@@ -652,10 +678,12 @@ public class ServiceCharLogin extends AbstractCharService
 
 		sd.setCharSlots(ByteUtil.limit(packet.getCharSlots(), b(MIN_CHARS), b(MAX_CHARS)));
 		sd.setBirthdate(packet.getBirthdate());
+		sd.setGroup(groups.get(packet.getGroupID()));
+		sd.setVip(vips.get(packet.getVipID()));
 
-		// TODO sd.setGroup(group);
-		// TODO sd.setPincode(pincode);
-		// TODO sd.setVip(vip);
+		sd.getPincode().getChanged().set(packet.getPincodeChage());
+		sd.getPincode().setCode(packet.getPincode());
+		sd.getPincode().setEnabled(packet.isPincodeEnabled());
 
 		OnlineCharData online = onlines.get(sd.getID());
 		boolean enabled = false;
@@ -1036,5 +1064,43 @@ public class ServiceCharLogin extends AbstractCharService
 			packet.setAccountID(accountID);
 			packet.send(getFileDescriptor());
 		}
+	}
+
+	/**
+	 * Após o servidor de acesso aceitar a conexão do servidor de personagem irá receber esses dados.
+	 * Os dados aqui recebidos irão consistir nas informações dos grupos de contas e tipos de acesso VIP.
+	 * @param fd conexão do descritor de arquivo do servidor de personagem com o servidor de acesso.
+	 */
+
+	public void parseGroupData(CFileDescriptor fd)
+	{
+		SS_GroupData packet = new SS_GroupData();
+		packet.receive(fd);
+
+		List<Group> groupsBackup = new DynamicList<>();
+		Queue<Group> groups = packet.getGroups();
+		Queue<Vip> vips = packet.getVips();
+
+		while (!groups.isEmpty())
+		{
+			Group group = groups.poll();
+			groupsBackup.add(group);
+			this.groups.add(group);
+		}
+
+		for (int i = 0; i < groupsBackup.size(); i++)
+		{
+			Group group = groupsBackup.get(i);
+
+			if (group.getParent() != null)
+				group.setParent(this.groups.get(group.getParent().getID()));
+		}
+
+		while (!vips.isEmpty())
+			this.vips.add(vips.poll());
+
+		logNotice("%d grupos e %s tipos de VIP recebidos (%s).\n", this.groups.size(), this.vips.size(), fd.getAddressString());
+
+		// TODO repassar aos servidores de mapa conectados
 	}
 }

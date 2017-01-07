@@ -1,11 +1,13 @@
-package org.diverproject.jragnarok.server.login.entities;
+package org.diverproject.jragnarok.server.common.entities;
+
+import java.util.Iterator;
 
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.Map.MapItem;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;
 
-public class GroupCommands
+public class GroupCommands implements Iterable<MapItem<String, Integer>>
 {
 	public static final String ENABLED_ALL = "all_commands";
 
@@ -60,6 +62,12 @@ public class GroupCommands
 	public int size()
 	{
 		return commands.size();
+	}
+
+	@Override
+	public Iterator<MapItem<String, Integer>> iterator()
+	{
+		return commands.iteratorItems();
 	}
 
 	@Override

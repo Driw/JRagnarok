@@ -10,7 +10,7 @@ import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 import org.diverproject.jragnarok.server.common.LoginSeed;
 import org.diverproject.jragnarok.server.common.SessionData;
 import org.diverproject.jragnarok.server.common.Sex;
-import org.diverproject.jragnarok.server.login.entities.Group;
+import org.diverproject.jragnarok.server.common.entities.Group;
 import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.util.BitWise8;
 import org.diverproject.util.ObjectDescription;

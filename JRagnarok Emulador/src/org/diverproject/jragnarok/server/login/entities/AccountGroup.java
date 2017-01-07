@@ -1,5 +1,7 @@
 package org.diverproject.jragnarok.server.login.entities;
 
+import org.diverproject.jragnarok.server.common.entities.Group;
+import org.diverproject.jragnarok.server.common.entities.Vip;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
 

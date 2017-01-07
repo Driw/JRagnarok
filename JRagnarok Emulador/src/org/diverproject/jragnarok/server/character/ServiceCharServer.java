@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.server.character;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 
+import org.diverproject.jragnarok.packets.character.fromclient.CH_Ping;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
@@ -105,6 +106,18 @@ public class ServiceCharServer extends AbstractCharService
 		}
 
 		login.setAccountOnline(sd.getID());
+	}
+
+	/**
+	 * Recebe um pacote do cliente para dizer ao servidor que ele ainda está ativo (conectado).
+	 * Uma vez que o pacote tenha sido recebido o timeout da sessão (fd) será reiniciado.
+	 * @param fd código de identificação do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void keepAlive(CFileDescriptor fd)
+	{
+		CH_Ping packet = new CH_Ping();
+		packet.receive(fd);
 	}
 
 	public void setCharOnline(int mapID, OnlineCharData online)

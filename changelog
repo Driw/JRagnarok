@@ -1,3 +1,9 @@
+07.01.2017 - 1.5.177
+- Implementação do CH_PING para manter a conexão estabelecida do cliente com o servidor de personagem.
+- Servidor de Personagem envia os dados de grupos e tipos de acesso VIP ao servidor de personagem.
+- GroupControl irá utilizar GroupMap e VipMap para mapear os objetos em cache no servidor.
+- Movendo Group e Vip de server.login.entities para server.common.entities.
+
 07.01.2017 - 1.5.176
 - O envio de dados para exibição de personagens foi corrigido, ServiceCharServerAuth.
 	- Faltava enviar o aid do jogador ao cliente (tinha sido removido porém implementado errado).
@@ -166,7 +172,7 @@
 - Agora IpBanList irá funcionar com um código de identificação mas address_list será único.
 
 12.12.2016 - 1.4.146b
-- GrouControl agora deverá carregar os grupos de conta e vip quando inicializado por init().
+- GroupControl agora deverá carregar os grupos de conta e vip quando inicializado por init().
 	- Pequenos aprimoramentos para facilitar possíveis manutenções futuras.
 - ClientCharServer não estava inicializando o seu endereço de IP com InternetProtocol.
 - Alterando a forma como comandos e permissões são definidas aos grupos de conta.

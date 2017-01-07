@@ -1054,6 +1054,10 @@ public class RagnarokPacket
 //	public static final short PACKET_SC_BILLING_INFO							= 0x01B5;
 //	public static final short PACKET_SC_ACK_ENCRYPTION							= 0x01C7;
 
+	// -- RAGNAROK PACKET ID : LOGIN SERVER TO SERVERS (AS) --                        
+
+	public static final short PACKET_SS_GROUP_DATA								= 0x4001;
+
 	// -- RAGNAROK PACKET ID : ??? --                        
 
 //	public static final short PACKET_SERVER_ENTRY_ACK							= 0x008F;

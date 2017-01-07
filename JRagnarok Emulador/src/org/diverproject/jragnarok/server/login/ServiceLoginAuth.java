@@ -664,6 +664,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			fd.getFlag().set(FileDescriptor.FLAG_SERVER);
 
 			client.sendCharServerResult(fd, OK);
+			client.sendGroupData(fd, getServer().getFacade().getGroupControl());
+
 			return true;
 		}
 

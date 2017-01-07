@@ -25,6 +25,7 @@ import org.diverproject.jragnarok.packets.inter.loginchar.AH_AuthAccount;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_GlobalRegisters;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_VipData;
 import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
+import org.diverproject.jragnarok.packets.inter.SS_GroupData;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_ConnectInfoChanged;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_ExeHashCheck;
 import org.diverproject.jragnarok.packets.login.toclient.AC_AccepLogin;
@@ -33,8 +34,9 @@ import org.diverproject.jragnarok.packets.login.toclient.AC_RefuseLogin;
 import org.diverproject.jragnarok.packets.login.toclient.AC_RefuseLoginR2;
 import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
+import org.diverproject.jragnarok.server.common.entities.Vip;
+import org.diverproject.jragnarok.server.login.control.GroupControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
-import org.diverproject.jragnarok.server.login.entities.Vip;
 import org.diverproject.util.collection.Queue;
 
 /**
@@ -360,24 +362,12 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setBirthdate(account.getBirthDate());
 		packet.setCharSlots(MIN_CHARS);
 
+		packet.setPincodeEnabled(account.getPincode().isEnabled());
 		packet.setPincode(account.getPincode().getCode());
-		packet.setPincodeChage(i(account.getPincode().getChanged().get()));
+		packet.setPincodeChage(account.getPincode().getChanged().get());
 
 		Vip vip = account.getGroup().getVip();
-
-		if (vip != null)
-		{
-			packet.setVip(true);
-			packet.setCharVip(vip.getCharSlotCount());
-			packet.setCharBilling(vip.getCharSlotCount());
-		}
-
-		else
-		{
-			packet.setVip(false);
-			packet.setCharVip(b(0));
-			packet.setCharBilling(b(0));
-		}
+		packet.setVipID(vip == null ? 0 : vip.getID());
 
 		packet.send(fd);
 	}
@@ -468,6 +458,20 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		packet.setAccountID(accountID);
 		packet.setCharID(charID);
 		packet.setRegisters(registers);
+		packet.send(fd);
+	}
+
+	/**
+	 * Repassa todas as informações dos grupos de contas e tipos de acesso VIP a um servidor de personagem.
+	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor de personagem.
+	 * @param groupControl controle de grupos que irá informar os dados dos grupos e acessos VIP.
+	 */
+
+	public void sendGroupData(LFileDescriptor fd, GroupControl groupControl)
+	{
+		SS_GroupData packet = new SS_GroupData();
+		packet.setGroups(groupControl.exportGroups());
+		packet.setVips(groupControl.exportVips());
 		packet.send(fd);
 	}
 }

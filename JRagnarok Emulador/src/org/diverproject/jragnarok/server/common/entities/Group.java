@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.login.entities;
+package org.diverproject.jragnarok.server.common.entities;
 
 import org.diverproject.util.ObjectDescription;
 

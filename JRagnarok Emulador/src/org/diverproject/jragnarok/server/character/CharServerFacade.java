@@ -10,8 +10,10 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_CHANGE
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_GLOBAL_REGISTERS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_KEEP_ALIVE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_SYNCRONIZE_IPADDRESS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SS_GROUP_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CHARLIST_REQ;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_ENTER;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_PING;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -216,8 +218,11 @@ public class CharServerFacade
 			case PACKET_CH_ENTER:
 				return authService.parse(fd);
 
-			/*
 			case PACKET_CH_PING:
+				charService.keepAlive(fd);
+				return true;
+
+			/*
 			case PACKET_CH_REQ_IS_VALID_CHARNAME:
 			case PACKET_CH_ENTER_CHECKBOT:
 			case PACKET_CH_CHECKBOT:
@@ -322,6 +327,10 @@ public class CharServerFacade
 				} catch (StreamException e) {
 					return false;
 				}
+
+			case PACKET_SS_GROUP_DATA:
+				loginService.parseGroupData(fd);
+				return true;
 		}
 
 		return ackAccountPacket(fd, command);
