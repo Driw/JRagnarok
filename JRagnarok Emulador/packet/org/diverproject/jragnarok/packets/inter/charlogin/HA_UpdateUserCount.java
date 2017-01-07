@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets.inter.charlogin;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_USER_COUNT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -47,6 +48,14 @@ public class HA_UpdateUserCount extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 4;
+		return 6;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("count", count);
 	}
 }

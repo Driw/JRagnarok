@@ -18,13 +18,14 @@ public class HC_Accept2 extends ResponsePacket
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putShort(s(length() + 2));
+		output.putShort(s(length()));
 		output.putByte(normalSlots);
 		output.putByte(premiumSlots);
 		output.putByte(billingSlots);
 		output.putByte(producibleSlots);
 		output.putByte(validSlots);
 		output.skipe(20);
+		System.out.println(this);
 	}
 
 	public void setNormalSlots(byte normalSlots)
@@ -67,7 +68,7 @@ public class HC_Accept2 extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 27;
+		return 29;
 	}
 
 	@Override

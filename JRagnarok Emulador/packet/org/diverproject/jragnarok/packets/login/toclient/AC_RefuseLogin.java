@@ -51,7 +51,7 @@ public class AC_RefuseLogin extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 21;
+		return 23;
 	}
 
 	@Override

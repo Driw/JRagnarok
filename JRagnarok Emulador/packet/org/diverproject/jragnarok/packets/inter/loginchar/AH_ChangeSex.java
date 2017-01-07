@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets.inter.loginchar;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_CHANGE_SEX;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -60,6 +61,15 @@ public class AH_ChangeSex extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 5;
+		return 7;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("sex", sex);
 	}
 }

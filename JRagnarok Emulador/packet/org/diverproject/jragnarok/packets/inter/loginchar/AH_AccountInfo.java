@@ -9,6 +9,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_INFO;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -220,6 +221,30 @@ public class AH_AccountInfo extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 0;
+		return DYNAMIC_PACKET_LENGTH;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("serverFD", serverFD);
+		description.append("userFD", userFD);
+		description.append("accountID", accountID);
+
+		if (useData)
+		{
+			description.append("groupID", groupID);
+			description.append("loginCount", loginCount);
+			description.append("state", state);
+			description.append("email", email);
+			description.append("lastIP", lastIP);
+			description.append("lastLogin", lastLogin);
+			description.append("birthdate", birthdate);
+			description.append("password", password);
+			description.append("pincode", pincode);
+			description.append("username", username);
+		}
 	}
 }

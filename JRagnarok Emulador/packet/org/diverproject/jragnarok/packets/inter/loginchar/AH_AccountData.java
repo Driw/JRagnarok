@@ -8,6 +8,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_DATA;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -203,6 +204,25 @@ public class AH_AccountData extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 31 + EMAIL_LENGTH + PINCODE_LENGTH;
+		return 35 + EMAIL_LENGTH + PINCODE_LENGTH;
+	}
+
+	@Override
+	public void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("fdID", fdID);
+		description.append("accountID", accountID);
+		description.append("email", email);
+		description.append("expirationTime", expirationTime);
+		description.append("groupID", groupID);
+		description.append("charSlots", charSlots);
+		description.append("birthdate", birthdate);
+		description.append("pincode", pincode);
+		description.append("pincodeChage", pincodeChage);
+		description.append("vip", vip);
+		description.append("charVip", charVip);
+		description.append("charBilling", charBilling);
 	}
 }

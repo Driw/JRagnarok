@@ -1,42 +1,18 @@
 package org.diverproject.jragnarok.packets.inter.loginchar;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_BAN_NOTIFICATION;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.jragnarok.packets.common.BanNotification;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
 public class AH_BanNotification extends RequestPacket
 {
-	public enum BanNotificationType
-	{
-		CHANGE_OF_STATUS(0),
-		BAN(1);
-
-		public final byte CODE;
-
-		private BanNotificationType(int code)
-		{
-			CODE = b(code);
-		}
-
-		public static BanNotificationType parse(byte b)
-		{
-			switch (b)
-			{
-				case 0: return CHANGE_OF_STATUS;
-				case 1: return BAN;
-			}
-
-			throw new RagnarokRuntimeException("BanNotificationType#%d não encontrado", b);
-		}
-	}
-
 	private int accountID;
 	private int unbanTime;
-	private BanNotificationType type;
+	private BanNotification type;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -50,7 +26,7 @@ public class AH_BanNotification extends RequestPacket
 	protected void receiveInput(Input input)
 	{
 		accountID = input.getInt();
-		type = BanNotificationType.parse(input.getByte());
+		type = BanNotification.parse(input.getByte());
 		unbanTime = input.getInt();
 	}
 
@@ -74,12 +50,12 @@ public class AH_BanNotification extends RequestPacket
 		this.unbanTime = unbanTime;
 	}
 
-	public BanNotificationType getType()
+	public BanNotification getType()
 	{
 		return type;
 	}
 
-	public void setType(BanNotificationType type)
+	public void setType(BanNotification type)
 	{
 		this.type = type;
 	}
@@ -99,6 +75,16 @@ public class AH_BanNotification extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 9;
+		return 11;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accoutnID", accountID);
+		description.append("unbanTime", unbanTime);
+		description.append("type", type);
 	}
 }

@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok.packets.character.toclient;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
+import static org.diverproject.jragnarok.JRagnarokUtil.size;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_BLOCK_CHARACTER;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
@@ -15,7 +16,7 @@ public class HC_BlockCharacter extends ResponsePacket
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putShort(s(length() + 2));
+		output.putShort(s(length()));
 
 		while (!blocks.isEmpty())
 		{
@@ -46,7 +47,7 @@ public class HC_BlockCharacter extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 2 + (blocks.size() * TAG_CHARACTER_BLOCK_INFO.BYTES);
+		return 4 + (blocks.size() * TAG_CHARACTER_BLOCK_INFO.BYTES);
 	}
 
 	@Override
@@ -54,7 +55,6 @@ public class HC_BlockCharacter extends ResponsePacket
 	{
 		super.toString(description);
 
-		if (blocks != null)
-			description.append("charBlocked", blocks.size());
+		description.append("charBlocked", size(blocks));
 	}
 }

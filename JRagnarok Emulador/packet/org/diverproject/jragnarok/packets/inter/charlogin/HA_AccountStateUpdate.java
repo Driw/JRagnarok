@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUN
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -67,6 +68,15 @@ public class HA_AccountStateUpdate extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 8;
+		return 10;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("accountState", accountState);
 	}
 }

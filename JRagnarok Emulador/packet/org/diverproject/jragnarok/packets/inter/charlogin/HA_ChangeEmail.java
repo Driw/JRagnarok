@@ -5,6 +5,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_CHANGE_EMAIL;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -75,6 +76,16 @@ public class HA_ChangeEmail extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 84;
+		return 86;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("actualEmail", actualEmail);
+		description.append("newEmail", newEmail);
 	}
 }

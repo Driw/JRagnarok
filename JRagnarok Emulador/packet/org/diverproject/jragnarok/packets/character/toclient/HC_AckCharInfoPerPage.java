@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.packets.character.toclient;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
+import static org.diverproject.jragnarok.JRagnarokUtil.size;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_ACK_CHARINFO_PER_PAGE;
 
 import org.diverproject.jragnarok.packets.PacketStructures;
@@ -13,15 +14,15 @@ import org.diverproject.util.stream.Output;
 
 public class HC_AckCharInfoPerPage extends ResponsePacket
 {
-	private Index<Character> characters;
 	private boolean charMoveEnabled;
 	private boolean charMoveUnlimited;
 	private int charMoveCount;
+	private Index<Character> characters;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putShort(s(length() - 2));
+		output.putShort(s(length()));
 
 		for (int slot = 0; slot < MAX_CHARS; slot++)
 			if (characters.get(slot) != null)
@@ -63,7 +64,7 @@ public class HC_AckCharInfoPerPage extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return (Character.BYTES * characters.size()) + 2;
+		return 4 + (characters.size() * Character.BYTES);
 	}
 
 	@Override
@@ -74,8 +75,6 @@ public class HC_AckCharInfoPerPage extends ResponsePacket
 		description.append("charMoveEnabled", charMoveEnabled);
 		description.append("charMoveUnlimited", charMoveUnlimited);
 		description.append("charMoveCount", charMoveCount);
-
-		if (characters != null)
-			description.append("characters", characters.size());
+		description.append("characters", size(characters));
 	}
 }

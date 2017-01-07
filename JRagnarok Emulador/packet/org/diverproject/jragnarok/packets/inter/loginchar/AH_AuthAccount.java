@@ -115,12 +115,6 @@ public class AH_AuthAccount extends RequestPacket
 	}
 
 	@Override
-	protected int length()
-	{
-		return 22;
-	}
-
-	@Override
 	public String getName()
 	{
 		return "AH_AUTH_ACCOUNT";
@@ -130,6 +124,12 @@ public class AH_AuthAccount extends RequestPacket
 	public short getIdentify()
 	{
 		return PACKET_AH_AUTH_ACCOUNT;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 24;
 	}
 
 	@Override

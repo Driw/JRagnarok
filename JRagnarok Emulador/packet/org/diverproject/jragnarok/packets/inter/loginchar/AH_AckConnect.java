@@ -50,7 +50,7 @@ public class AH_AckConnect extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 1;
+		return 3;
 	}
 
 	@Override

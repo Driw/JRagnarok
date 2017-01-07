@@ -19,9 +19,7 @@ public class AC_AccepLogin extends ResponsePacket
 	@Override
 	protected void sendOutput(Output output)
 	{
-		int length = length() + 2;
-
-		output.putShort(s(length));
+		output.putShort(s(length()));
 		output.putInt(sd.getSeed().getFirst());
 		output.putInt(sd.getID());
 		output.putInt(sd.getSeed().getSecond());
@@ -74,7 +72,7 @@ public class AC_AccepLogin extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 45 + (32 * servers.size());
+		return 47 + (32 * servers.size());
 	}
 
 	@Override

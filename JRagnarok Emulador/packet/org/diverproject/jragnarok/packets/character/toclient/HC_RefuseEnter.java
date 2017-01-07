@@ -11,10 +11,6 @@ public class HC_RefuseEnter extends ResponsePacket
 {
 	private RefuseEnter error;
 
-	public HC_RefuseEnter()
-	{
-	}
-
 	@Override
 	protected void sendOutput(Output output)
 	{
@@ -41,7 +37,7 @@ public class HC_RefuseEnter extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 1;
+		return 3;
 	}
 
 	@Override

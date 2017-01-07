@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.packets.character.toclient;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
+import static org.diverproject.jragnarok.JRagnarokUtil.size;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_ACCEPT_ENTER_NEO_UNION;
 
 import org.diverproject.jragnarok.packets.PacketStructures;
@@ -30,7 +31,7 @@ public class HC_AcceptEnterNeoUnion extends ResponsePacket
 	@Override
 	protected void sendOutput(Output output)
 	{
-		output.putShort(s(length() + 2));
+		output.putShort(s(length()));
 		output.putByte(totalSlots);
 		output.putByte(premiumStartSlot);
 		output.putByte(premiumEndSlot);
@@ -123,7 +124,7 @@ public class HC_AcceptEnterNeoUnion extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 25 + (Character.BYTES * characters.size());
+		return 27 + (Character.BYTES * characters.size());
 	}
 
 	@Override
@@ -145,8 +146,6 @@ public class HC_AcceptEnterNeoUnion extends ResponsePacket
 		description.append("firstTime", firstTime);
 		description.append("secondTime", secondTime);
 		description.append("dummyEndBilling", dummyEndBilling);
-
-		if (characters != null)
-			description.append("characters", characters.size());
+		description.append("characters", size(characters));
 	}
 }

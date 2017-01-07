@@ -1,8 +1,10 @@
 package org.diverproject.jragnarok.packets.inter.charlogin;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.size;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_SEND_ACCOUNTS;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.abstraction.DynamicList;
 import org.diverproject.util.stream.Input;
@@ -56,6 +58,14 @@ public class HA_SendAccount extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 0;
+		return DYNAMIC_PACKET_LENGTH;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accounts", size(accounts));
 	}
 }

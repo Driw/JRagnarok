@@ -22,7 +22,7 @@ public class CA_LoginPCBang extends ReceivePacket
 	{
 		version = input.getInt();
 		username = strclr(input.getString(24));
-		password = strclr(input.getString(16));
+		password = strclr(input.getString(24));
 		clientType = ClientType.parse(input.getByte());
 		ip = strclr(input.getString(16));
 		macAddress = strclr(input.getString(13));
@@ -73,7 +73,7 @@ public class CA_LoginPCBang extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 58;
+		return 84;
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets.inter.charlogin;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_VIP_DATA;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -91,6 +92,17 @@ public class HA_VipData extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 13;
+		return 15;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("vipDuration", vipDuration);
+		description.append("mapFD", mapFD);
+		description.append("flag", flag);
 	}
 }

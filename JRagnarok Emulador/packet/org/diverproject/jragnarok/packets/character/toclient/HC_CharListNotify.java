@@ -25,7 +25,7 @@ public class HC_CharListNotify extends ResponsePacket
 	@Override
 	public String getName()
 	{
-		return "SEND_CHAR_PAGE_COUNT";
+		return "HC_CHARLIST_NOTIFY";
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class HC_CharListNotify extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 4;
+		return 6;
 	}
 
 	@Override

@@ -1,33 +1,13 @@
 package org.diverproject.jragnarok.packets.character.toclient;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_SECOND_PASSWD_LOGIN;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Output;
 
 public class HC_SecondPasswordLogin extends ResponsePacket
 {
-	public static enum PincodeState
-	{
-		OK(0),
-		ASK(1),
-		NOTSET(2),
-		EXPIRED(3),
-		NEW(4),
-		ILLEGAL(5),
-		KSSN(6),
-		SKIP(7),
-		WRONG(8);
-
-		public final short CODE;
-
-		private PincodeState(int code)
-		{
-			CODE = s(code);
-		}
-	}
-
 	private int pincodeSeed;
 	private int accountID;
 	private short state;
@@ -70,6 +50,16 @@ public class HC_SecondPasswordLogin extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 10;
+		return 12;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("pincodeSeed", pincodeSeed);
+		description.append("accountID", accountID);
+		description.append("state", state);
 	}
 }

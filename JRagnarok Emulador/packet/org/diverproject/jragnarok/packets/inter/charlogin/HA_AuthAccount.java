@@ -89,7 +89,7 @@ public class HA_AuthAccount extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 20;
+		return 22;
 	}
 
 	@Override

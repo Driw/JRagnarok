@@ -59,7 +59,7 @@ public class CA_Login extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 53;
+		return 55;
 	}
 
 	@Override

@@ -37,7 +37,7 @@ public class CA_ConnectInfoChanged extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 24;
+		return 26;
 	}
 
 	@Override

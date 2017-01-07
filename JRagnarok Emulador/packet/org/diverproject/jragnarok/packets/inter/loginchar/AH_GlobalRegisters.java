@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_GLOBAL
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicQueue;
 import org.diverproject.util.stream.Input;
@@ -123,6 +124,18 @@ public class AH_GlobalRegisters extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 0;
+		return DYNAMIC_PACKET_LENGTH;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("charID", charID);
+
+		if (registers != null)
+			description.append("registers", registers.size());
 	}
 }

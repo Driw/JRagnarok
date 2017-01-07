@@ -15,12 +15,6 @@ public class HA_KeepAlive extends ResponsePacket
 	}
 
 	@Override
-	protected int length()
-	{
-		return 0;
-	}
-
-	@Override
 	public String getName()
 	{
 		return "AH_RES_KEEP_ALIVE";
@@ -30,5 +24,11 @@ public class HA_KeepAlive extends ResponsePacket
 	public short getIdentify()
 	{
 		return PACKET_HA_KEEP_ALIVE;
-	} 
+	}
+
+	@Override
+	protected int length()
+	{
+		return 0;
+	}
 }

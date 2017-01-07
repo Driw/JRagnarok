@@ -25,7 +25,6 @@ public class RagnarokPacket
 //	public static final short PACKET_CA_LOGIN5									= 0x08CC;
 //	public static final short PACKET_CA_LOGIN6									= 0x0987;
 //	public static final short PACKET_CA_ACK_NEW_USER							= 0x098C;
-	public static final short PACKET_CA_CHARSERVERCONNECT						= 0x2710;
 
 	// -- RAGNAROK PACKET ID : LOGIN SERVER TO CLIENT (AC) --
 
@@ -149,6 +148,7 @@ public class RagnarokPacket
 
 	// -- RAGNAROK PACKET ID : CHAR SERVER TO LOGIN SERVER (HA) -- 
 
+	public static final short PACKET_HA_CHARSERVERCONNECT						= 0x2710;
 	public static final short PACKET_HA_AUTH_ACCOUNT							= 0x2712;
 	public static final short PACKET_HA_UPDATE_USER_COUNT						= 0x2714;
 	public static final short PACKET_HA_ACCOUNT_DATA							= 0x2716;

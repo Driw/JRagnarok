@@ -48,16 +48,14 @@ public class HA_NotifyPinError extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 4;
+		return 6;
 	}
 
 	@Override
-	public String toString()
+	protected void toString(ObjectDescription description)
 	{
-		ObjectDescription description = new ObjectDescription(getClass());
+		super.toString(description);
 
 		description.append("accountID", accountID);
-
-		return description.toString();
 	}
 }

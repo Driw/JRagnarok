@@ -28,10 +28,10 @@ public abstract class AbstractReceivePacket implements IReceivePacket
 
 		try {
 
-			if (packet.length() == 0)
+			if (packet.length() == AbstractPacket.DYNAMIC_PACKET_LENGTH)
 				input = builder.newInputPacket(packet.getName());
 			else
-				input = builder.newInputPacket(packet.getName(), packet.length() + (validate ? 2 : 0));
+				input = builder.newInputPacket(packet.getName(), packet.length() - (validate ? 0 : 2));
 
 			if (validate)
 				validate(input);

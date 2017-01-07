@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets.inter.charlogin;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_INFO;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -76,6 +77,16 @@ public class HA_AccountInfo extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 12;
+		return 14;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("ServerFD", ServerFD);
+		description.append("userFD", userFD);
+		description.append("accountID", accountID);
 	}
 }

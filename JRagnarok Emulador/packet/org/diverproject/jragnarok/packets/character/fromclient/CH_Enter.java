@@ -86,7 +86,7 @@ public class CH_Enter extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 15;
+		return 17;
 	}
 
 	@Override

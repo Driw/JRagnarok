@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets.inter.charlogin;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_STATE_NOTIFY;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -59,6 +60,15 @@ public class HA_BanAccount extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 8;
+		return 10;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("durationTime", durationTime);
 	}
 }

@@ -3,35 +3,36 @@ package org.diverproject.jragnarok.packets.inter.loginchar;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_VIP_DATA;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
 public class AH_VipData extends RequestPacket
 {
 	private int accountID;
-	private int groupID;
-	private int mapFD;
 	private long vipTimeout;
-	private byte flag;
+	private int vipGroupID;
+	private byte vipFlag;
+	private int mapFD;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
 		output.putInt(accountID);
-		output.putInt(groupID);
-		output.putInt(mapFD);
 		output.putLong(vipTimeout);
-		output.putByte(flag);
+		output.putInt(vipGroupID);
+		output.putByte(vipFlag);
+		output.putInt(mapFD);
 	}
 
 	@Override
 	protected void receiveInput(Input input)
 	{
 		accountID = input.getInt();
-		groupID = input.getInt();
-		mapFD = input.getInt();
 		vipTimeout = input.getLong();
-		flag = input.getByte();
+		vipGroupID = input.getInt();
+		vipFlag = input.getByte();
+		mapFD = input.getInt();
 	}
 
 	public int getAccountID()
@@ -54,14 +55,24 @@ public class AH_VipData extends RequestPacket
 		this.vipTimeout = vipTimeout;
 	}
 
-	public int getGroupID()
+	public byte getVipFlag()
 	{
-		return groupID;
+		return vipFlag;
 	}
 
-	public void setGroupID(int groupID)
+	public void setVipFlag(byte vipFlag)
 	{
-		this.groupID = groupID;
+		this.vipFlag = vipFlag;
+	}
+
+	public int getVipGroupID()
+	{
+		return vipGroupID;
+	}
+
+	public void setVipGroupID(int vipGroupID)
+	{
+		this.vipGroupID = vipGroupID;
 	}
 
 	public int getMapFD()
@@ -74,20 +85,10 @@ public class AH_VipData extends RequestPacket
 		this.mapFD = mapFD;
 	}
 
-	public byte getFlag()
-	{
-		return flag;
-	}
-
-	public void setFlag(byte flag)
-	{
-		this.flag = flag;
-	}
-
 	@Override
 	public String getName()
 	{
-		return "RES_VIP_DATA";
+		return "AH_VIP_DATA";
 	}
 
 	@Override
@@ -99,6 +100,18 @@ public class AH_VipData extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 17;
+		return 20;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("vipTimeout", vipTimeout);
+		description.append("vipGroupID", vipGroupID);
+		description.append("mapFD", mapFD);
+		description.append("vipFlag", vipFlag);
 	}
 }

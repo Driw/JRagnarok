@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets.inter.loginchar;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ALREADY_ONLINE;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -33,12 +34,6 @@ public class AH_AlreadyOnline extends RequestPacket
 	}
 
 	@Override
-	protected int length()
-	{
-		return 4;
-	}
-
-	@Override
 	public String getName()
 	{
 		return "AH_ALREADY_ONLINE";
@@ -48,5 +43,19 @@ public class AH_AlreadyOnline extends RequestPacket
 	public short getIdentify()
 	{
 		return PACKET_AH_ALREADY_ONLINE;
+	}
+
+	@Override
+	protected int length()
+	{
+		return 6;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
 	}
 }

@@ -1,11 +1,13 @@
 package org.diverproject.jragnarok.packets.inter.charlogin;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.size;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_REGISTERS;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
 import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicQueue;
 import org.diverproject.util.stream.Input;
@@ -135,6 +137,15 @@ public class HA_UpdateRegisters extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 0;
+		return DYNAMIC_PACKET_LENGTH;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("operations", size(operations));
 	}
 }

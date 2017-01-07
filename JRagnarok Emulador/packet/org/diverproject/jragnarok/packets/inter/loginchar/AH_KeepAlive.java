@@ -30,5 +30,5 @@ public class AH_KeepAlive extends ResponsePacket
 	public short getIdentify()
 	{
 		return PACKET_AH_KEEP_ALIVE;
-	} 
+	}
 }

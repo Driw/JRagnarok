@@ -5,13 +5,15 @@ import org.diverproject.util.lang.HexUtil;
 
 public abstract class AbstractPacket
 {
+	public static final int DYNAMIC_PACKET_LENGTH = -1;
+
 	public abstract String getName();
 	public abstract short getIdentify();
 	protected abstract int length();
 
 	public String getHexIdentify()
 	{
-		return HexUtil.parseInt(getIdentify(), 4);
+		return "0x" +HexUtil.parseInt(getIdentify(), 4);
 	}
 
 	protected void toString(ObjectDescription description)

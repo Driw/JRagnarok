@@ -28,6 +28,6 @@ public class CA_RequestHash extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 0;
+		return DYNAMIC_PACKET_LENGTH;
 	}
 }

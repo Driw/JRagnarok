@@ -63,17 +63,15 @@ public class HA_NotifyPinUpdate extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 4;
+		return 6 + PINCODE_LENGTH;
 	}
 
 	@Override
-	public String toString()
+	protected void toString(ObjectDescription description)
 	{
-		ObjectDescription description = new ObjectDescription(getClass());
+		super.toString(description);
 
 		description.append("accountID", accountID);
 		description.append("pincode", pincode);
-
-		return description.toString();
 	}
 }

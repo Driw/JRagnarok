@@ -24,10 +24,10 @@ public abstract class AbstractResponsePacket implements IResponsePacket
 
 		try {
 
-			if (packet.length() == 0)
+			if (packet.length() == AbstractPacket.DYNAMIC_PACKET_LENGTH)
 				output = builder.newOutputPacket(packet.getName());
 			else
-				output = builder.newOutputPacket(packet.getName(), packet.length() + 2);
+				output = builder.newOutputPacket(packet.getName(), packet.length());
 
 			output.setInvert(true);
 			output.putShort(packet.getIdentify());

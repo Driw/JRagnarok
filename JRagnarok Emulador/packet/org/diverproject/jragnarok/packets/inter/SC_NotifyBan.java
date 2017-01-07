@@ -37,7 +37,7 @@ public class SC_NotifyBan extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 1;
+		return 3;
 	}
 
 	@Override

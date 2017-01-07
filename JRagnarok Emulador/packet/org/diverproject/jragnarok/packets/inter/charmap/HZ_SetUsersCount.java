@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets.inter.charmap;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HZ_SET_USERS_COUNT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -48,5 +49,13 @@ public class HZ_SetUsersCount extends RequestPacket
 	protected int length()
 	{
 		return 4;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("users", users);
 	}
 }

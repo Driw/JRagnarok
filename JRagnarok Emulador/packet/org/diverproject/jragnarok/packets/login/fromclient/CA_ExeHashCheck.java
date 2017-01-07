@@ -36,7 +36,7 @@ public class CA_ExeHashCheck extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 16;
+		return 18;
 	}
 
 	@Override

@@ -3,7 +3,8 @@ package org.diverproject.jragnarok.packets.inter.charmap;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HZ_BAN;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
-import org.diverproject.jragnarok.packets.inter.loginchar.AH_BanNotification.BanNotificationType;
+import org.diverproject.jragnarok.packets.common.BanNotification;
+import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
 
@@ -11,7 +12,7 @@ public class HZ_Ban extends RequestPacket
 {
 	private int accountID;
 	private int unbanTime;
-	private BanNotificationType type;
+	private BanNotification type;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -25,7 +26,7 @@ public class HZ_Ban extends RequestPacket
 	protected void receiveInput(Input input)
 	{
 		accountID = input.getInt();
-		type = BanNotificationType.parse(input.getByte());
+		type = BanNotification.parse(input.getByte());
 		unbanTime = input.getInt();
 	}
 
@@ -49,12 +50,12 @@ public class HZ_Ban extends RequestPacket
 		this.unbanTime = unbanTime;
 	}
 
-	public BanNotificationType getType()
+	public BanNotification getType()
 	{
 		return type;
 	}
 
-	public void setType(BanNotificationType type)
+	public void setType(BanNotification type)
 	{
 		this.type = type;
 	}
@@ -74,6 +75,16 @@ public class HZ_Ban extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 9;
+		return 11;
+	}
+
+	@Override
+	protected void toString(ObjectDescription description)
+	{
+		super.toString(description);
+
+		description.append("accountID", accountID);
+		description.append("unbanTime", unbanTime);
+		description.append("type", type);
 	}
 }

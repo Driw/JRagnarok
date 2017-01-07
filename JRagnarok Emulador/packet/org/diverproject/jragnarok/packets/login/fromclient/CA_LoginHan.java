@@ -80,7 +80,7 @@ public class CA_LoginHan extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 83;
+		return 85;
 	}
 
 	@Override
