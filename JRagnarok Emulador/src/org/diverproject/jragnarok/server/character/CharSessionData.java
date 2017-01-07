@@ -10,6 +10,7 @@ import static org.diverproject.util.lang.IntUtil.interval;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.common.LoginSeed;
 import org.diverproject.jragnarok.server.common.SessionData;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.jragnarok.server.login.entities.Group;
 import org.diverproject.jragnarok.server.login.entities.Pincode;
 import org.diverproject.jragnarok.server.login.entities.Vip;
@@ -28,6 +29,7 @@ public class CharSessionData extends SessionData
 	private String birthdate;
 	private Time expiration;
 
+	private Sex sex;
 	private Vip vip;
 	private Group group;
 	private Pincode pincode;
@@ -99,6 +101,16 @@ public class CharSessionData extends SessionData
 	public Time getExpiration()
 	{
 		return expiration;
+	}
+
+	public Sex getSex()
+	{
+		return sex;
+	}
+
+	public void setSex(Sex sex)
+	{
+		this.sex = sex;
 	}
 
 	public Vip getVip()

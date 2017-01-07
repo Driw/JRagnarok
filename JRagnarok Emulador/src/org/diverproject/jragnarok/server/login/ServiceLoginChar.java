@@ -205,7 +205,8 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		if (node != null &&
 			node.getAccountID() == packet.getAccountID() &&
 			node.getSeed().getFirst() == packet.getFirstSeed() &&
-			node.getSeed().getSecond() == packet.getSecondSeed())
+			node.getSeed().getSecond() == packet.getSecondSeed() &&
+			node.getSex() == packet.getSex())
 		{
 			client.sendAuthAccount(fd, packet, node);
 			auths.remove(node); // cada autenticação é usada uma só vez

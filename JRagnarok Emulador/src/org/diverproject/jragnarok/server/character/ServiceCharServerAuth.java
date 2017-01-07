@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONLINE;
+import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 
@@ -116,6 +117,12 @@ public class ServiceCharServerAuth extends AbstractCharService
 
 		CharSessionData sd = fd.getSessionData();
 
+		if (packet.getSex() == SERVER)
+		{
+			logNotice("cliente tentando se conectar como servidor (aid: %d).\n", sd.getID());
+			return false;
+		}
+
 		if (sd.getID() > 0)
 		{
 			logNotice("cliente já autenticado (aid: %d).\n", sd.getID());
@@ -124,6 +131,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 
 		sd.setID(packet.getAccountID());
 		sd.getSeed().set(packet.getFirstSeed(), packet.getSecondSeed());
+		sd.setSex(packet.getSex());
 		sd.setAuth(false);
 
 		return parseAuthAccount(fd);

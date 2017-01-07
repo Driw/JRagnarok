@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.jragnarok.server.login.entities.AccountState;
 
@@ -86,6 +87,7 @@ public class AccountControl extends AbstractControl
 		account.setID(rs.getInt("id"));
 		account.setUsername(rs.getString("username"));
 		account.setPassword(rs.getString("password"));
+		account.setSex(Sex.parse(rs.getString("sex").charAt(0)));
 		account.getRegistered().set(rs.getDate("registered").getTime());
 		account.getLastLogin().set(rs.getDate("last_login").getTime());
 		account.setEmail(rs.getString("email"));
@@ -112,7 +114,7 @@ public class AccountControl extends AbstractControl
 	public Account get(String username)
 	{
 		String table = Tables.getInstance().getAccounts();
-		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date, "
+		String sql = format("SELECT id, username, password, sex, last_login, registered, email, birth_date, "
 						+	"login_count, unban_time, expiration, account_state, last_ip, char_slots "
 						+	"FROM %s WHERE username = ?",
 						table);
@@ -146,7 +148,7 @@ public class AccountControl extends AbstractControl
 	public Account get(int accountID)
 	{
 		String table = Tables.getInstance().getAccounts();
-		String sql = format("SELECT id, username, password, last_login, registered, email, birth_date, "
+		String sql = format("SELECT id, username, password, sex, last_login, registered, email, birth_date, "
 						+	"login_count, unban_time, expiration, account_state, last_ip, char_slots "
 						+	"FROM %s WHERE id = ?",
 						table);
@@ -219,8 +221,8 @@ public class AccountControl extends AbstractControl
 	public boolean setAccount(Account account)
 	{
 		String table = Tables.getInstance().getAccounts();
-		String sql = format("UPDATE %s SET login_count = ?, unban_time = ?, expiration = ?, account_state = ?, last_ip = ?, "
-						+	"char_slots = ? WHERE id = ?", table);
+		String sql = format("UPDATE %s SET login_count = ?, unban_time = ?, expiration = ?, account_state = ?, last_ip = ?, char_slots = ? "
+						+	"WHERE id = ?", table);
 
 		try {
 

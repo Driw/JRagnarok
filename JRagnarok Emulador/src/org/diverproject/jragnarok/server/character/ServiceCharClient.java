@@ -2,7 +2,6 @@ package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
-import static org.diverproject.jragnarok.JRagnarokConstants.MIN_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
@@ -212,10 +211,10 @@ public class ServiceCharClient extends AbstractCharService
 
 		HC_Accept2 packet = new HC_Accept2();
 		packet.setNormalSlots(sd.getCharSlots());
-		packet.setPremiumSlots(sd.getVip().getCharSlotCount());
-		packet.setBillingSlots(sd.getVip().getCharBilling());
+		packet.setPremiumSlots(b(MAX_CHARS - sd.getCharSlots()));
+		packet.setBillingSlots(b(MAX_CHARS - sd.getCharSlots()));
 		packet.setProducibleSlots(sd.getCharSlots());
-		packet.setValidSlots(b(MAX_CHARS));
+		packet.setValidSlots(b(sd.getCharSlots()));
 		packet.send(fd);
 	}
 
@@ -240,8 +239,8 @@ public class ServiceCharClient extends AbstractCharService
 
 				HC_AcceptEnterNeoUnion packet = new HC_AcceptEnterNeoUnion();
 				packet.setTotalSlots(MAX_CHARS);
-				packet.setPremiumStartSlot(MIN_CHARS);
-				packet.setPremiumEndSlot(b(MIN_CHARS + sd.getVip().getCharSlotCount()));
+				packet.setPremiumStartSlot(sd.getCharSlots());
+				packet.setPremiumEndSlot(MAX_CHARS);
 				packet.setCharMoveCount(sd.getCharactersMove());
 				packet.setCharMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
 				packet.setCharMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));

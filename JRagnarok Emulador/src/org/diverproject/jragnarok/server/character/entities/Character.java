@@ -5,10 +5,13 @@ import static org.diverproject.jragnarok.JRagnarokConstants.MAX_NAME_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SP;
 import static org.diverproject.jragnarok.JRagnarokConstants.MIN_NAME_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.server.common.Sex.FEMALE;
+import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 import static org.diverproject.util.lang.IntUtil.interval;
 import static org.diverproject.util.lang.IntUtil.limit;
 import static org.diverproject.util.lang.IntUtil.min;
 
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
@@ -59,9 +62,9 @@ public class Character
 	private String name;
 
 	/**
-	 * Sexo do personagem (apenas M ou F).
+	 * Enumeração representativa do sexo do personagem no sistema.
 	 */
-	private char sex;
+	private Sex sex;
 
 	/**
 	 * Quantidade em dinheiro do jogo (zeny).
@@ -241,7 +244,7 @@ public class Character
 		deleteDate = new Time();
 		unbanTime = new Time();
 
-		sex = 'M';
+		sex = FEMALE;
 		name = UNKNOWN;
 	}
 
@@ -288,25 +291,22 @@ public class Character
 	}
 
 	/**
-	 * @return aquisição do sexo do personagem.
+	 * @return aquisição da enumeração representativa do sexo do personagem no sistema.
 	 */
 
-	public char getSex()
+	public Sex getSex()
 	{
 		return sex;
 	}
 
 	/**
-	 * @param sex sexo do personagem (M: masculino ou F: feminino).
+	 * @param sex enumeração representativa do sexo do personagem no sistema.
 	 */
 
-	public void setSex(char sex)
+	public void setSex(Sex sex)
 	{
-		switch (sex)
-		{
-			case 'm': case 'M': this.sex = 'M'; break;
-			case 'f': case 'F': this.sex = 'F'; break;
-		}
+		if (sex != null && sex != SERVER)
+			this.sex = sex;
 	}
 
 	/**
@@ -884,28 +884,5 @@ public class Character
 		description.append("uniqueItemCounter", uniqueItemCounter);
 
 		return description.toString();
-	}
-
-	public static String strSexOf(char sex)
-	{
-		switch (sex)
-		{
-			case 'f': case 'F': return "feminino";
-			case 'm': case 'M': return "masculino";
-			case 's': case 'S': return "servidor";
-		}
-
-		return null;
-	}
-
-	public static byte intSexOf(char sex)
-	{
-		switch (sex)
-		{
-			case 'f': case 'F': return 0x00;
-			case 'm': case 'M': return 0x01;
-		}
-
-		return 0x63;
 	}
 }

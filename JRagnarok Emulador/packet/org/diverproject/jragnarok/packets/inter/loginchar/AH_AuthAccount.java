@@ -6,6 +6,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_AUTH_A
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
@@ -19,6 +20,7 @@ public class AH_AuthAccount extends RequestPacket
 	private boolean result;
 	private int version;
 	private ClientType clientType;
+	private Sex sex;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -30,6 +32,7 @@ public class AH_AuthAccount extends RequestPacket
 		output.putByte(b(result ? 1 : 0));
 		output.putInt(version);
 		output.putByte(clientType.CODE);
+		output.putByte(sex.code());
 	}
 
 	@Override
@@ -42,6 +45,7 @@ public class AH_AuthAccount extends RequestPacket
 		result = input.getByte() == 1;
 		version = input.getInt();
 		clientType = ClientType.parse(input.getByte());
+		sex = Sex.parse(input.getByte());
 	}
 
 	public int getFileDescriptorID()
@@ -114,6 +118,16 @@ public class AH_AuthAccount extends RequestPacket
 		this.clientType = clientType;
 	}
 
+	public Sex getSex()
+	{
+		return sex;
+	}
+
+	public void setSex(Sex sex)
+	{
+		this.sex = sex;
+	}
+
 	@Override
 	public String getName()
 	{
@@ -129,7 +143,7 @@ public class AH_AuthAccount extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 24;
+		return 25;
 	}
 
 	@Override
@@ -146,5 +160,7 @@ public class AH_AuthAccount extends RequestPacket
 			description.append("version", version);
 			description.append("clientType", clientType);
 		}
+
+		description.append("sex", sex);
 	}
 }

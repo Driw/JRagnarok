@@ -1,10 +1,13 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.server.common.Sex.FEMALE;
+import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.common.ClientType;
 import org.diverproject.jragnarok.server.common.LoginSeed;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.util.ObjectDescription;
 
 /**
@@ -36,6 +39,11 @@ public class AuthNode
 	private int accountID;
 
 	/**
+	 * Enumeração representativa do sexo da conta no sistema.
+	 */
+	private Sex sex;
+
+	/**
 	 * Seed gerada pelo servidor de acesso.
 	 */
 	private LoginSeed seed;
@@ -63,6 +71,7 @@ public class AuthNode
 	{
 		ip = new InternetProtocol();
 		seed = new LoginSeed();
+		sex = FEMALE;
 	}
 
 	/**
@@ -81,6 +90,25 @@ public class AuthNode
 	public void setAccountID(int accountID)
 	{
 		this.accountID = accountID;
+	}
+
+	/**
+	 * @return aquisição da enumeração representativa do sexo da conta no sistema.
+	 */
+
+	public Sex getSex()
+	{
+		return sex;
+	}
+
+	/**
+	 * @param sex enumeração representativa do sexo da conta no sistema.
+	 */
+
+	public void setSex(Sex sex)
+	{
+		if (sex != null && sex != SERVER)
+			this.sex = sex;
 	}
 
 	/**

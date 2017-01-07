@@ -69,6 +69,7 @@ import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.util.BitWise8;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.collection.List;
@@ -560,6 +561,7 @@ public class ServiceCharLogin extends AbstractCharService
 		packet.setFirstSeed(sd.getSeed().getFirst());
 		packet.setSecondSeed(sd.getSeed().getSecond());
 		packet.setIP(fd.getAddress());
+		packet.setSex(sd.getSex());
 
 		return sendPacket(fd, packet);
 	}
@@ -783,7 +785,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * @return true se for alterado com sucesso ou false se não encontrar o personagem.
 	 */
 
-	public boolean parseChangeCharSex(int charID, char sex)
+	public boolean parseChangeCharSex(int charID, Sex sex)
 	{
 		try {
 
@@ -820,7 +822,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * @param sex
 	 */
 
-	private void setCharSex(ChangeSex change, char sex)
+	private void setCharSex(ChangeSex change, Sex sex)
 	{
 		// TODO chlogif_parse_change_sex_sub
 		

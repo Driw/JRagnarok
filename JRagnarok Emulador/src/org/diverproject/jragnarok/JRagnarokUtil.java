@@ -332,7 +332,7 @@ public class JRagnarokUtil
 	{
 		int i = random.nextInt();
 
-		return i > 0 ? i : i * -1;
+		return i >= 0 ? i : i * -1;
 	}
 
 	/**

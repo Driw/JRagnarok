@@ -6,6 +6,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.util.lang.IntUtil.interval;
 
 import org.diverproject.jragnarok.server.InternetProtocol;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;
 
@@ -17,6 +18,7 @@ public class Account implements Login
 	private int id;
 	private String username;
 	private String password;
+	private Sex sex;
 	private Time lastLogin;
 	private Time registered;
 	private String email;
@@ -75,6 +77,16 @@ public class Account implements Login
 	public void setPassword(String password)
 	{
 		this.password = password;
+	}
+
+	public Sex getSex()
+	{
+		return sex;
+	}
+
+	public void setSex(Sex sex)
+	{
+		this.sex = sex;
 	}
 
 	public Time getLastLogin()

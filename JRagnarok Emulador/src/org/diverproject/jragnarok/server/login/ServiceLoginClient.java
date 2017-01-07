@@ -313,6 +313,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		response.setClientType(node.getClientType());
 		response.setVersion(node.getVersion());
 		response.setClientType(node.getClientType());
+		response.setSex(node.getSex());
 		response.setResult(true);
 		response.send(fd);
 	}
@@ -334,6 +335,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		response.setSecondSeed(packet.getSecondSeed());
 		response.setVersion(0);
 		response.setClientType(ClientType.CT_NONE);
+		response.setSex(packet.getSex());
 		response.setResult(false);
 		response.send(fd);
 	}

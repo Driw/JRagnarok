@@ -122,6 +122,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		sd.setID(account.getID());
 		sd.getLastLogin().set(account.getLastLogin().get());
 		sd.setGroup(account.getGroup().getCurrentGroup());
+		sd.setSex(account.getSex());
 
 		sd.getSeed().genFirst();
 		sd.getSeed().genSecond();

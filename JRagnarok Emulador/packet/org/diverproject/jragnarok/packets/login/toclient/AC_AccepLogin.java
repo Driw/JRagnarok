@@ -23,15 +23,10 @@ public class AC_AccepLogin extends ResponsePacket
 		output.putInt(sd.getSeed().getFirst());
 		output.putInt(sd.getID());
 		output.putInt(sd.getSeed().getSecond());
-
-		/* Era usado em versões antigas
-		 * output.putInt(sd.getAddress());
-		 * output.putString(sd.getLastLogin().toString(), 26);
-		 */
-
-		output.skipe(4);
-		output.skipe(26);
-		output.skipe(1);
+		output.putInt(0); // Endereço de IP (não é mais usado)
+		output.skipe(24); // Nome (não é mais usado)
+		output.skipe(2); // Desconhecido
+		output.putByte(sd.getSex().code());
 
 		for (ClientCharServer server : servers)
 		{

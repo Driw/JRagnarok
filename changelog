@@ -1,3 +1,8 @@
+07.01.2017 - 1.5.175
+- Adicionando atributo para representação do sexo do jogador em sua conta.
+- Revertendo valores conforme rAthena já que não está exibindo a seleção de personagens.
+- Enviando AC_AckHash que deveria ter sido enviado na rev174.
+
 07.01.2017 - 1.5.174
 - AH_AccountData e AH_VipData estavam com tamanhos incorretos ao que lhes compõe.
 - Correção para AcknowledgePacket onde é constituído por 2 bytes e não verifica PacketID (2 bytes).

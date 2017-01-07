@@ -4,9 +4,12 @@ import static org.diverproject.jragnarok.JRagnarokConstants.PASSWORD_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.USERNAME_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
+import static org.diverproject.jragnarok.server.common.Sex.FEMALE;
+import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 
 import org.diverproject.jragnarok.server.common.LoginSeed;
 import org.diverproject.jragnarok.server.common.SessionData;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.jragnarok.server.login.entities.Group;
 import org.diverproject.jragnarok.server.login.entities.Login;
 import org.diverproject.util.BitWise8;
@@ -67,6 +70,11 @@ public class LoginSessionData extends SessionData implements Login
 	private String password;
 
 	/**
+	 * Enumeração representativa do sexo da conta no sistema.
+	 */
+	private Sex sex;
+
+	/**
 	 * Horário do último acesso desta conta no sistema.
 	 */
 	private Time lastLogin;
@@ -113,10 +121,12 @@ public class LoginSessionData extends SessionData implements Login
 
 	public LoginSessionData()
 	{
-		this.lastLogin = new Time(System.currentTimeMillis());
-		this.registered = new Time(System.currentTimeMillis());
-		this.passDencrypt = new BitWise8(DENCRYPT_STRING);
-		this.seed = new LoginSeed();
+		lastLogin = new Time(System.currentTimeMillis());
+		registered = new Time(System.currentTimeMillis());
+		passDencrypt = new BitWise8(DENCRYPT_STRING);
+		seed = new LoginSeed();
+
+		sex = FEMALE;
 	}
 
 	/**
@@ -153,6 +163,25 @@ public class LoginSessionData extends SessionData implements Login
 	public void setPassword(String password)
 	{
 		this.password = strcap(password, PASSWORD_LENGTH);
+	}
+
+	/**
+	 * @return aquisição da enumeração representativa do sexo da conta no sistema.
+	 */
+
+	public Sex getSex()
+	{
+		return sex;
+	}
+
+	/**
+	 * @param sex enumeração representativa do sexo da conta no sistema.
+	 */
+
+	public void setSex(Sex sex)
+	{
+		if (sex != null && sex != SERVER)
+			this.sex = sex;
 	}
 
 	/**
@@ -268,7 +297,8 @@ public class LoginSessionData extends SessionData implements Login
 	{
 		description.append("username", username);
 		description.append("password", password);
-		description.append("lastLogin", lastLogin);		
+		description.append("sex", sex);
+		description.append("lastLogin", lastLogin);
 		description.append("group", group);
 		description.append("passDencrypt", passDencrypt);
 

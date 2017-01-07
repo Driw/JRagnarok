@@ -19,6 +19,7 @@ import org.diverproject.jragnarok.server.character.CharSessionData;
 import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.jragnarok.server.character.entities.Experience;
 import org.diverproject.jragnarok.server.character.entities.MercenaryRank;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.jragnarok.util.MapPoint;
 import org.diverproject.util.collection.Index;
 import org.diverproject.util.collection.List;
@@ -151,7 +152,7 @@ public class CharacterControl extends AbstractControl
 	public void setCharacterResult(Character character, ResultSet rs) throws SQLException
 	{
 		character.setName(rs.getString("name"));
-		character.setSex(rs.getString("sex").charAt(0));
+		character.setSex(Sex.parse(rs.getString("sex").charAt(0)));
 		character.setZeny(rs.getInt("zeny"));
 		character.setStatusPoint(rs.getShort("status_point"));
 		character.setSkillPoint(rs.getShort("skill_point"));
@@ -296,7 +297,7 @@ public class CharacterControl extends AbstractControl
 
 			PreparedStatement ps = prepare(sql);
 			ps.setString(1, character.getName());
-			ps.setString(2, java.lang.Character.toString(character.getSex()));
+			ps.setString(2, java.lang.Character.toString(character.getSex().c));
 			ps.setInt(3, character.getZeny());
 			ps.setInt(4, character.getStatusPoint());
 			ps.setInt(5, character.getSkillPoint());
@@ -623,7 +624,7 @@ public class CharacterControl extends AbstractControl
 
 			PreparedStatement ps = prepare(sql);
 			ps.setString(1, character.getName());
-			ps.setString(2, java.lang.Character.toString(character.getSex()));
+			ps.setString(2, java.lang.Character.toString(character.getSex().c));
 			ps.setInt(3, character.getZeny());
 			ps.setInt(4, character.getStatusPoint());
 			ps.setInt(5, character.getSkillPoint());
@@ -1307,7 +1308,7 @@ public class CharacterControl extends AbstractControl
 	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
 	 */
 
-	public boolean setSex(int charID, char sex) throws RagnarokException
+	public boolean setSex(int charID, Sex sex) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharacters();
 		String sql = format("UPDATE %s SET sex = ? WHERE id = ?", table);
@@ -1315,16 +1316,16 @@ public class CharacterControl extends AbstractControl
 		try {
 
 			PreparedStatement ps = prepare(sql);
-			ps.setString(1, java.lang.Character.toString(sex));
+			ps.setString(1, java.lang.Character.toString(sex.c));
 			ps.setInt(2, charID);
 
 			if (ps.executeUpdate() == 1)
 			{
-				logDebug("character#%d agora é do sexo '%s'.\n", Character.strSexOf(sex));
+				logDebug("character#%d agora é do sexo '%s'.\n", sex);
 				return true;
 			}
 
-			logDebug("character#%d não se tornou '%s'.\n", Character.strSexOf(sex));
+			logDebug("character#%d não se tornou '%s'.\n", sex);
 			return false;
 
 		} catch (SQLException e) {

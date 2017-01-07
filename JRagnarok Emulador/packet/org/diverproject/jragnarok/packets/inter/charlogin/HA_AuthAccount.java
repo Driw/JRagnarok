@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets.inter.charlogin;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_AUTH_ACCOUNT;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.stream.Input;
@@ -15,6 +16,7 @@ public class HA_AuthAccount extends RequestPacket
 	private int secondSeed;
 	private int ip;
 	private int fileDescriptorID;
+	private Sex sex;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -24,6 +26,7 @@ public class HA_AuthAccount extends RequestPacket
 		output.putInt(secondSeed);
 		output.putInt(ip);
 		output.putInt(fileDescriptorID);
+		output.putByte(sex.code());
 	}
 
 	@Override
@@ -34,6 +37,7 @@ public class HA_AuthAccount extends RequestPacket
 		secondSeed = input.getInt();
 		ip = input.getInt();
 		fileDescriptorID = input.getInt();
+		sex = Sex.parse(input.getByte());
 	}
 
 	public int getAccountID()
@@ -86,10 +90,20 @@ public class HA_AuthAccount extends RequestPacket
 		this.fileDescriptorID = fdID;
 	}
 
+	public Sex getSex()
+	{
+		return sex;
+	}
+
+	public void setSex(Sex sex)
+	{
+		this.sex = sex;
+	}
+
 	@Override
 	protected int length()
 	{
-		return 22;
+		return 23;
 	}
 
 	@Override
@@ -114,5 +128,6 @@ public class HA_AuthAccount extends RequestPacket
 		description.append("secondSeed", secondSeed);
 		description.append("ip", SocketUtil.socketIP(ip));
 		description.append("fileDescriptorID", fileDescriptorID);
+		description.append("sex", sex);
 	}
 }

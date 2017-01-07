@@ -381,6 +381,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		node.getIP().set(fd.getAddress());
 		node.setVersion(sd.getVersion());
 		node.setClientType(sd.getClientType());
+		node.setSex(sd.getSex());
 		auths.add(node);
 
 		client.sendCharServerList(fd);

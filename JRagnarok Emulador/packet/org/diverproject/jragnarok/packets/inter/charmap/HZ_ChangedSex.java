@@ -3,6 +3,7 @@ package org.diverproject.jragnarok.packets.inter.charmap;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HZ_CHANGED_SEX;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 import org.diverproject.util.stream.Output;
@@ -10,20 +11,20 @@ import org.diverproject.util.stream.Output;
 public class HZ_ChangedSex extends RequestPacket
 {
 	private int accountID;
-	private char sex;
+	private Sex sex;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
 		output.putInt(accountID);
-		output.putChar(sex);
+		output.putChar(sex.c);
 	}
 
 	@Override
 	protected void receiveInput(Input input)
 	{
 		accountID = input.getInt();
-		sex = input.getChar();
+		sex = Sex.parse(input.getChar());
 	}
 
 	public int getAccountID()
@@ -36,12 +37,12 @@ public class HZ_ChangedSex extends RequestPacket
 		this.accountID = accountID;
 	}
 
-	public char getSex()
+	public Sex getSex()
 	{
 		return sex;
 	}
 
-	public void setSex(char sex)
+	public void setSex(Sex sex)
 	{
 		this.sex = sex;
 	}

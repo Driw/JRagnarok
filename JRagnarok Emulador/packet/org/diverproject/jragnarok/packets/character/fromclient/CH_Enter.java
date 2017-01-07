@@ -5,6 +5,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_ENTER;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.jragnarok.server.common.ClientType;
+import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.stream.Input;
 
@@ -14,7 +15,7 @@ public class CH_Enter extends ReceivePacket
 	private int firstSeed;
 	private int secondSeed;
 	private ClientType clientType;
-	private char sex;
+	private Sex sex;
 
 	@Override
 	protected void receiveInput(Input input)
@@ -23,7 +24,7 @@ public class CH_Enter extends ReceivePacket
 		firstSeed = input.getInt();
 		secondSeed = input.getInt();
 		clientType = ClientType.parse(b(input.getShort()));
-		sex = (char) input.getByte();
+		sex = Sex.parse(input.getByte());
 	}
 
 	/**
@@ -63,10 +64,10 @@ public class CH_Enter extends ReceivePacket
 	}
 
 	/**
-	 * @return aquisição do sexo da conta acessada.
+	 * @return aquisição do sexo do servidor acessado (espero SERVER).
 	 */
 
-	public char getSex()
+	public Sex getSex()
 	{
 		return sex;
 	}
