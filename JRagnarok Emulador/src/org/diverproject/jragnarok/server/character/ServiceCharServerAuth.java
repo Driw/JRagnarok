@@ -6,12 +6,14 @@ import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 
+import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Enter;
 import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
+import org.diverproject.util.stream.Output;
 
 public class ServiceCharServerAuth extends AbstractCharService
 {
@@ -117,16 +119,16 @@ public class ServiceCharServerAuth extends AbstractCharService
 
 		CharSessionData sd = fd.getSessionData();
 
-		if (packet.getSex() == SERVER)
-		{
-			logNotice("cliente tentando se conectar como servidor (aid: %d).\n", sd.getID());
-			return false;
-		}
-
 		if (sd.getID() > 0)
 		{
 			logNotice("cliente já autenticado (aid: %d).\n", sd.getID());
 			return true;
+		}
+
+		if (packet.getSex() == SERVER)
+		{
+			logNotice("cliente tentando se conectar como servidor (aid: %d).\n", sd.getID());
+			return false;
 		}
 
 		sd.setID(packet.getAccountID());
@@ -134,7 +136,18 @@ public class ServiceCharServerAuth extends AbstractCharService
 		sd.setSex(packet.getSex());
 		sd.setAuth(false);
 
-		return parseAuthAccount(fd);
+		try {
+
+			Output output = fd.getPacketBuilder().newOutputPacket("SEND_BACK", 4);
+			output.setInvert(true);
+			output.putInt(sd.getID());
+			output.flush();
+
+		} catch (Exception e) {
+			throw new RagnarokRuntimeException(e);
+		}
+
+		return parseAuthNode(fd);
 	}
 
 	/**
@@ -144,7 +157,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 	 * @return true para manter a conexão do cliente ou false para fechar sua conexão.
 	 */
 
-	private boolean parseAuthAccount(CFileDescriptor fd)
+	private boolean parseAuthNode(CFileDescriptor fd)
 	{
 		CharSessionData sd = fd.getSessionData();
 		AuthNode node = auths.get(sd.getID());

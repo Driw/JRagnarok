@@ -1,3 +1,7 @@
+07.01.2017 - 1.5.176
+- O envio de dados para exibição de personagens foi corrigido, ServiceCharServerAuth.
+	- Faltava enviar o aid do jogador ao cliente (tinha sido removido porém implementado errado).
+
 07.01.2017 - 1.5.175
 - Adicionando atributo para representação do sexo do jogador em sua conta.
 - Revertendo valores conforme rAthena já que não está exibindo a seleção de personagens.
