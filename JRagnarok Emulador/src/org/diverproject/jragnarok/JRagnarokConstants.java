@@ -73,12 +73,12 @@ public class JRagnarokConstants
 	/**
 	 * Quantidade de slots mínimo para personagens por contas comuns (0: ilimitado).
 	 */
-	public static final byte MAX_CHARS = 9;
+	public static final byte MAX_CHARS = 21;
 
 	/**
 	 * Quantidade de slots mínimo para personagens por contas comuns.
 	 */
-	public static final byte MIN_CHARS = MAX_CHARS;
+	public static final byte MIN_CHARS = 15;
 
 	/**
 	 * Limite máximo de personagens por contas VIP (0: ilimitado).

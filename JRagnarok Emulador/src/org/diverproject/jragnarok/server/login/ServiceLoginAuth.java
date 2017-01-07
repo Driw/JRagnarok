@@ -25,8 +25,8 @@ import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnarok.packets.common.RefuseLogin;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_CharServerConnect;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AlreadyOnline;
-import org.diverproject.jragnarok.packets.login.fromclient.CA_CharServerConnect;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_Login;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_Login2;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_Login3;
@@ -164,7 +164,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		{
 			case PACKET_CA_LOGIN:
 				CA_Login loginPacket = new CA_Login();
-				loginPacket.receive(fd, false);
+				loginPacket.receive(fd);
 				sd.setVersion(loginPacket.getVersion());
 				sd.setClientType(loginPacket.getClientType());
 				sd.setUsername(loginPacket.getUsername());
@@ -173,7 +173,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN_PCBANG:
 				CA_LoginPCBang loginPCBang = new CA_LoginPCBang();
-				loginPCBang.receive(fd, false);
+				loginPCBang.receive(fd);
 				sd.setVersion(loginPCBang.getVersion());
 				sd.setClientType(loginPCBang.getClientType());
 				sd.setUsername(loginPCBang.getUsername());
@@ -182,7 +182,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN_HAN:
 				CA_LoginHan loginHan = new CA_LoginHan();
-				loginHan.receive(fd, false);
+				loginHan.receive(fd);
 				sd.setVersion(loginHan.getVersion());
 				sd.setClientType(loginHan.getClientType());
 				sd.setUsername(loginHan.getUsername());
@@ -191,7 +191,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 			case PACKET_CA_SSO_LOGIN_REQ:
 				CA_LoginSingleSignOn loginSingleSignOn = new CA_LoginSingleSignOn();
-				loginSingleSignOn.receive(fd, false);
+				loginSingleSignOn.receive(fd);
 				sd.setVersion(loginSingleSignOn.getVersion());
 				sd.setClientType(loginSingleSignOn.getClientType());
 				sd.setUsername(loginSingleSignOn.getUsername());
@@ -200,7 +200,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN2:
 				CA_Login2 loginMD5 = new CA_Login2();
-				loginMD5.receive(fd, false);
+				loginMD5.receive(fd);
 				sd.setVersion(loginMD5.getVersion());
 				sd.setUsername(loginMD5.getUsername());
 				sd.setPassword(loginMD5.getPassword());
@@ -210,7 +210,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN3:
 				CA_Login3 loginMD5Info = new CA_Login3();
-				loginMD5Info.receive(fd, false);
+				loginMD5Info.receive(fd);
 				sd.setVersion(loginMD5Info.getVersion());
 				sd.setUsername(loginMD5Info.getUsername());
 				sd.setPassword(loginMD5Info.getPassword());
@@ -220,7 +220,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 			case PACKET_CA_LOGIN4:
 				CA_Login4 loginMD5Mac = new CA_Login4();
-				loginMD5Mac.receive(fd, false);
+				loginMD5Mac.receive(fd);
 				sd.setVersion(loginMD5Mac.getVersion());
 				sd.setUsername(loginMD5Mac.getUsername());
 				sd.setPassword(loginMD5Mac.getPassword());
@@ -603,8 +603,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 	public boolean requestCharConnect(LFileDescriptor fd)
 	{
-		CA_CharServerConnect packet = new CA_CharServerConnect();
-		packet.receive(fd, false);
+		HA_CharServerConnect packet = new HA_CharServerConnect();
+		packet.receive(fd);
 
 		Account account = accounts.get(packet.getUsername());
 

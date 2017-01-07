@@ -41,6 +41,6 @@ public enum RefuseLogin
 			if (result.CODE == code)
 				return result;
 
-		throw new RagnarokRuntimeException("%d não é um AuthResult", code);
+		throw new RagnarokRuntimeException("RefuseLogin#%d não encontrado", code);
 	}
 }

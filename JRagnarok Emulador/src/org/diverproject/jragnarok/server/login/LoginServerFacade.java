@@ -2,7 +2,7 @@ package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOG_LOGIN;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CHARSERVERCONNECT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_CHARSERVERCONNECT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CONNECT_INFO_CHANGED;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_EXE_HASHCHECK;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN;
@@ -453,7 +453,7 @@ class LoginServerFacade
 			case PACKET_CA_LOGIN4:
 				return authService.requestAuth(fd, command);
 
-			case PACKET_CA_CHARSERVERCONNECT:
+			case PACKET_HA_CHARSERVERCONNECT:
 				return authService.requestCharConnect(fd);
 
 			default:

@@ -21,6 +21,6 @@ public enum NotifyAuthResult
 			if (result.CODE == code)
 				return result;
 
-		throw new RagnarokRuntimeException("%d não é um NotifyAuthResult", code);
+		throw new RagnarokRuntimeException("NotifyAuthResult#%d não encontrado", code);
 	}
 }

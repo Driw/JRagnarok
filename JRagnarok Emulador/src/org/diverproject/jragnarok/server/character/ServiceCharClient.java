@@ -23,8 +23,8 @@ import org.diverproject.jragnarok.packets.character.toclient.HC_BlockCharacter;
 import org.diverproject.jragnarok.packets.character.toclient.HC_CharListNotify;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
 import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin;
-import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin.PincodeState;
 import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
+import org.diverproject.jragnarok.packets.common.PincodeState;
 import org.diverproject.jragnarok.packets.common.RefuseEnter;
 import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
 import org.diverproject.jragnarok.server.FileDescriptor;
@@ -216,7 +216,6 @@ public class ServiceCharClient extends AbstractCharService
 		packet.setBillingSlots(sd.getVip().getCharBilling());
 		packet.setProducibleSlots(sd.getCharSlots());
 		packet.setValidSlots(b(MAX_CHARS));
-		packet.setValidSlots(sd.getCharSlots());
 		packet.send(fd);
 	}
 

@@ -109,7 +109,7 @@ public class Character
 	private short manner;
 
 	/**
-	 * TODO ?
+	 * Nível de virtude para influência em áreas PK.
 	 */
 	private short virtue;
 
@@ -164,7 +164,7 @@ public class Character
 	private BitWise effectState;
 
 	/**
-	 * TODO what is that?
+	 * Quantidade de vezes que o personagem foi renomado.
 	 */
 	private short rename;
 
@@ -472,7 +472,7 @@ public class Character
 	}
 
 	/**
-	 * @return aquisição do nível virtude para influência de PK.
+	 * @return aquisição do nível de virtude para influência em áreas PK.
 	 */
 
 	public short getVirtue()
@@ -481,7 +481,7 @@ public class Character
 	}
 
 	/**
-	 * @param virtue nível virtude para influência de PK.
+	 * @param virtue nível de virtude para influência em áreas PK.
 	 */
 
 	public void setVirtue(short virtue)
@@ -661,7 +661,7 @@ public class Character
 	}
 
 	/**
-	 * @return TODO
+	 * @return aquisição da quantidade de vezes que o personagem foi renomado.
 	 */
 
 	public short getRename()
@@ -670,7 +670,7 @@ public class Character
 	}
 
 	/**
-	 * @param rename TODO
+	 * @param rename quantidade de vezes que o personagem foi renomado.
 	 */
 
 	public void setRename(short rename)

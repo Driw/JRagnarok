@@ -1,6 +1,6 @@
 
 //==============================================================================
-// 0x0069 [PACKET_AC_ACCEPT_LOGIN] - Listar Servidores de Personagem
+// 0x0069 [PACKET_AC_ACCEPT_LOGIN] - Entrou no Servidor de Acesso
 //==============================================================================
 
 byte	length	type	name
@@ -27,7 +27,7 @@ char-servers
 size: 45 + (37 * server_count) bytes
 
 //==============================================================================
-// 0x006A [PACKET_AC_REFUSE_LOGIN] - Rejeitar Acesso
+// 0x006A [PACKET_AC_REFUSE_LOGIN] - Acesso Negado
 //==============================================================================
 
 byte	length	type	name

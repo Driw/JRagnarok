@@ -37,11 +37,12 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.IResponsePacket;
-import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin.PincodeState;
 import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
+import org.diverproject.jragnarok.packets.common.PincodeState;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_CharServerConnect;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_NotifyPinError;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_NotifyPinUpdate;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_SendAccount;
@@ -60,7 +61,6 @@ import org.diverproject.jragnarok.packets.inter.loginchar.AH_AuthAccount;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_BanNotification;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_ChangeSex;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_KeepAlive;
-import org.diverproject.jragnarok.packets.login.fromclient.CA_CharServerConnect;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorSystem;
 import org.diverproject.jragnarok.server.Timer;
@@ -94,6 +94,11 @@ import org.diverproject.util.lang.ByteUtil;
 
 public class ServiceCharLogin extends AbstractCharService
 {
+	/**
+	 * Tempo e milissegundos para fechar uma conexão em autenticação (TODO: 30 segundos).
+	 */
+	public static final int AUTH_TIMEOUT = seconds(5);
+
 	/**
 	 * Tempo em milissegundos de espera máxima para manter uma conexão viva.
 	 */
@@ -283,7 +288,7 @@ public class ServiceCharLogin extends AbstractCharService
 					short type = s(getConfigs().getInt(CHAR_MAINTANCE));
 					boolean newDisplay = getConfigs().getBool(CHAR_NEW_DISPLAY);
 
-					CA_CharServerConnect packet = new CA_CharServerConnect();
+					HA_CharServerConnect packet = new HA_CharServerConnect();
 					packet.setUsername(username);
 					packet.setPassword(password);
 					packet.setServerIP(serverIP);
@@ -457,8 +462,8 @@ public class ServiceCharLogin extends AbstractCharService
 				Timer waitingDisconnect = timers.acquireTimer();
 				waitingDisconnect.setTick(ts.getCurrentTime());
 				waitingDisconnect.setObjectID(online.getAccountID());
-				waitingDisconnect.setListener(character.WAITING_DISCONNECT);
-				timers.addInterval(waitingDisconnect, ServiceCharServer.AUTH_TIMEOUT);
+				waitingDisconnect.setListener(WAITING_DISCONNECT);
+				timers.addInterval(waitingDisconnect, AUTH_TIMEOUT);
 			}
 
 			else
@@ -489,6 +494,31 @@ public class ServiceCharLogin extends AbstractCharService
 
 		auths.remove(packet.getAccountID());
 	}
+
+	private final TimerListener WAITING_DISCONNECT = new TimerListener()
+	{
+		@Override
+		public void onCall(Timer timer, int now, int tick)
+		{
+			OnlineCharData data = onlines.get(timer.getObjectID());
+
+			if (data == null || data.getWaitingDisconnect() == null)
+				getTimerSystem().getTimers().delete(timer);
+
+			if (data != null)
+			{
+				onlines.remove(data);
+				getTimerSystem().getTimers().delete(data.getWaitingDisconnect());
+				data.setWaitingDisconnect(null);
+			}
+		}
+		
+		@Override
+		public String getName()
+		{
+			return "waitingDisconnect";
+		}
+	};
 
 	/**
 	 * Analisa a resposta de uma solicitação para se conectar com o servidor de acesso.

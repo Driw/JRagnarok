@@ -444,9 +444,9 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		AH_VipData packet = new AH_VipData();
 		packet.setVipTimeout(account.getGroup().getTime().get());
 		packet.setAccountID(account.getID());
-		packet.setGroupID(account.getGroupID());
+		packet.setVipGroupID(account.getGroupID());
 		packet.setMapFD(mapFD);
-		packet.setFlag(flag);
+		packet.setVipFlag(flag);
 		// TODO colocar os dados restantes da conta
 		packet.send(fd);
 	}

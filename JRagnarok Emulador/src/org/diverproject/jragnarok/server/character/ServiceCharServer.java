@@ -10,8 +10,6 @@ import org.diverproject.jragnarok.server.TimerSystem;
 
 public class ServiceCharServer extends AbstractCharService
 {
-	public static final int AUTH_TIMEOUT = seconds(30);
-
 	/**
 	 * Serviço para comunicação com o servidor de acesso.
 	 */
@@ -72,22 +70,6 @@ public class ServiceCharServer extends AbstractCharService
 		public String toString()
 		{
 			return getName();
-		}
-	};
-
-	public final TimerListener WAITING_DISCONNECT = new TimerListener()
-	{
-		@Override
-		public void onCall(Timer timer, int now, int tick)
-		{
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public String getName()
-		{
-			return "waitingDisconnect";
 		}
 	};
 

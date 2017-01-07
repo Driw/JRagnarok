@@ -19,6 +19,7 @@ import org.diverproject.jragnaork.messages.Messages;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.util.SizeUtil;
 import org.diverproject.util.SystemUtil;
+import org.diverproject.util.collection.Collection;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.lang.StringUtil;
 import org.diverproject.util.stream.StreamException;
@@ -41,7 +42,6 @@ public class JRagnarokUtil
 	 */
 	private static final int PACKETS_VER[] = new int[]
 	{
-		0,
 		       0,        0,        0,        0, 20040906,        0,        0,        0,        0, 20040920, // 10
 		20041005, 20041025, 20041129, 20050110, 20050509, 20050628, 20050718, 20050719, 20060327, 20070108, // 20
 		20070212, 20080910, 20080827, 20080910, 20101124, 20111005, 20111102, 20120307, 20120410, 20120418, // 30
@@ -284,6 +284,21 @@ public class JRagnarokUtil
 	}
 
 	/**
+	 * Procedimento que verifica o tamanho de uma coleção seja ela nula ou não.
+	 * Usado apenas para facilitar verificações que consideram null como zero.
+	 * @param collection referência da coleção do qual será verificada.
+	 * @return quantidade de elementos na coleção ou 0 (zero) se for null.
+	 */
+
+	public static int size(Collection<?> collection)
+	{
+		if (collection == null)
+			return 0;
+
+		return collection.size();
+	}
+
+	/**
 	 * Permite pular uma determinada quantidade de bytes de um FileDecriptor.
 	 * @param fd referência do FileDecriptor que terá bytes pulados na stream.
 	 * @param input true para pular da entrada de dados ou false para a saída.
@@ -421,7 +436,7 @@ public class JRagnarokUtil
 			else if (date < PACKETS_VER[i])
 				return i;
 
-		return 30;
+		return PACKETS_VER.length;
 	}
 
 	/**
