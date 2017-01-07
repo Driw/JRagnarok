@@ -50,6 +50,6 @@ public class AcknowledgePacket extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 2;
+		return 4;
 	}
 }

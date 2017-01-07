@@ -499,7 +499,7 @@ class LoginServerFacade
 	private boolean ackCharServerPacket(LFileDescriptor fd)
 	{
 		AcknowledgePacket packet = new AcknowledgePacket();
-		packet.receive(fd, false);
+		packet.receive(fd);
 
 		short command = packet.getPacketID();
 

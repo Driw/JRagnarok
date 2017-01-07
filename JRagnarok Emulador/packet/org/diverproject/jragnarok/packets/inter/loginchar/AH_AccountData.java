@@ -204,7 +204,7 @@ public class AH_AccountData extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 35 + EMAIL_LENGTH + PINCODE_LENGTH;
+		return 33 + EMAIL_LENGTH + PINCODE_LENGTH;
 	}
 
 	@Override

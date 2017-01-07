@@ -25,7 +25,6 @@ public class HC_Accept2 extends ResponsePacket
 		output.putByte(producibleSlots);
 		output.putByte(validSlots);
 		output.skipe(20);
-		System.out.println(this);
 	}
 
 	public void setNormalSlots(byte normalSlots)

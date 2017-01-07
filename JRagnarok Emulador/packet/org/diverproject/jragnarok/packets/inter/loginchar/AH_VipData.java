@@ -100,7 +100,7 @@ public class AH_VipData extends RequestPacket
 	@Override
 	protected int length()
 	{
-		return 20;
+		return 23;
 	}
 
 	@Override

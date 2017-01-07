@@ -1,3 +1,7 @@
+07.01.2017 - 1.5.174
+- AH_AccountData e AH_VipData estavam com tamanhos incorretos ao que lhes compõe.
+- Correção para AcknowledgePacket onde é constituído por 2 bytes e não verifica PacketID (2 bytes).
+
 07.01.2017 - 1.5.173
 - Modificado a forma como o tamanho dos pacotes são de fato calculados.
 	- Pacotes de tamanho dinâmico passam a ter valor igual a -1 ao invés de 0 conforme é de fato.
