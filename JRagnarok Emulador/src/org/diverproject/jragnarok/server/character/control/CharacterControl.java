@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.server.character.control;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.JRagnarokUtil.timestamp;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.util.lang.IntUtil.interval;
 
@@ -172,8 +173,8 @@ public class CharacterControl extends AbstractControl
 		character.setBaseLevel(rs.getInt("base_level"));
 		character.setJobLevel(rs.getInt("job_level"));
 		character.setRename(rs.getShort("rename_count"));
-		character.getUnbanTime().set(rs.getLong("unban_time"));
-		character.getDeleteDate().set(rs.getInt("delete_date"));
+		character.getUnbanTime().set(timestamp(rs.getTimestamp("unban_time")));
+		character.getDeleteDate().set(timestamp(rs.getTimestamp("delete_date")));
 		character.setMoves(rs.getShort("moves"));
 		character.setFont(rs.getByte("font"));
 		character.setUniqueItemCounter(rs.getInt("unique_item_counter"));		
@@ -317,8 +318,8 @@ public class CharacterControl extends AbstractControl
 			ps.setInt(14, character.getBaseLevel());
 			ps.setInt(15, character.getJobLevel());
 			ps.setShort(16, character.getRename());
-			ps.setTimestamp(17, character.getUnbanTime().toTimestamp());
-			ps.setTimestamp(18, character.getDeleteDate().toTimestamp());
+			ps.setTimestamp(17, timestamp(character.getUnbanTime().get()));
+			ps.setTimestamp(18, timestamp(character.getDeleteDate().get()));
 			ps.setShort(19, character.getMoves());
 			ps.setByte(20, character.getFont());
 			ps.setInt(21, character.getUniqueItemCounter());
@@ -644,8 +645,8 @@ public class CharacterControl extends AbstractControl
 			ps.setInt(14, character.getBaseLevel());
 			ps.setInt(15, character.getJobLevel());
 			ps.setShort(16, character.getRename());
-			ps.setTimestamp(17, character.getUnbanTime().toTimestamp());
-			ps.setTimestamp(18, character.getDeleteDate().toTimestamp());
+			ps.setTimestamp(17, timestamp(character.getUnbanTime().get()));
+			ps.setTimestamp(18, timestamp(character.getDeleteDate().get()));
 			ps.setShort(19, character.getMoves());
 			ps.setByte(20, character.getFont());
 			ps.setInt(21, character.getUniqueItemCounter());
@@ -1434,7 +1435,7 @@ public class CharacterControl extends AbstractControl
 	public boolean unban(int charID) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharacters();
-		String sql = format("UPDATE %s SET unban_time = 0 WHERE id = ?", table);
+		String sql = format("UPDATE %s SET unban_time = null WHERE id = ?", table);
 
 		try {
 

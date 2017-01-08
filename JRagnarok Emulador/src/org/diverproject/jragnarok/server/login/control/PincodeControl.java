@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok.server.login.control;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.JRagnarokUtil.timestamp;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -66,7 +67,7 @@ public class PincodeControl extends AbstractControl
 				pincode = new Pincode();
 				pincode.setEnabled(rs.getBoolean("enabled"));
 				pincode.setCode(rs.getString("code_number"));
-				pincode.getChanged().set(rs.getDate("change_time").getTime());
+				pincode.getChanged().set(timestamp(rs.getTimestamp("change_time")));
 			}
 
 			return pincode;
@@ -105,7 +106,7 @@ public class PincodeControl extends AbstractControl
 			Pincode pincode = account.getPincode();
 			pincode.setEnabled(rs.getBoolean("enabled"));
 			pincode.setCode(rs.getString("code_number"));
-			pincode.getChanged().set(rs.getDate("change_time").getTime());
+			pincode.getChanged().set(timestamp(rs.getTimestamp("change_time")));
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e);
@@ -135,7 +136,7 @@ public class PincodeControl extends AbstractControl
 			PreparedStatement ps = prepare(sql);
 			ps.setBoolean(1, pincode.isEnabled());
 			ps.setString(2, pincode.getCode());
-			ps.setTimestamp(3, pincode.getChanged().toTimestamp());
+			ps.setTimestamp(3, timestamp(pincode.getChanged().get()));
 			ps.setInt(4, account.getID());
 
 			return ps.executeUpdate() == 1;

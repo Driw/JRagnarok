@@ -501,7 +501,7 @@ public abstract class Server
 
 			} catch (RagnarokException e) {
 
-				logError("falha durante a inicialização do servidor:");
+				logError("falha durante a inicialização do servidor:\n");
 				logException(e);
 
 				return;

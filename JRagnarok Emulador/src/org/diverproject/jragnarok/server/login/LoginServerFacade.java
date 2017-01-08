@@ -282,7 +282,7 @@ class LoginServerFacade
 	 * @param loginServer referência do servidor de acesso que irá usá-los.
 	 */
 
-	public void create(LoginServer loginServer)
+	public void init(LoginServer loginServer)
 	{
 		accountControl = new AccountControl(loginServer.getMySQL().getConnection());
 		groupControl = new GroupControl(loginServer.getMySQL().getConnection());

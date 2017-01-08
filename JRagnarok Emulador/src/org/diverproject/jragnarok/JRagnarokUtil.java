@@ -10,6 +10,7 @@ import static org.diverproject.util.lang.IntUtil.interval;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.Locale;
 import java.util.Random;
 
@@ -366,6 +367,34 @@ public class JRagnarokUtil
 	public static int i(long value)
 	{
 		return (int) value;
+	}
+
+	/**
+	 * Converte um objeto do tipo timestamp em um valor do tipo numérico long.
+	 * @param timestamp objeto contendo o horário do qual será convertido.
+	 * @return zero se for o timestamp for nulo ou o valor respectivo ao mesmo.
+	 */
+
+	public static long timestamp(Timestamp timestamp)
+	{
+		if (timestamp == null)
+			return 0;
+
+		return timestamp.getTime();
+	}
+
+	/**
+	 * Converte um valor numérico inteiro em um objeto do tipo timestamp.
+	 * @param time valor numérico para ser convertido em objeto timestmap.
+	 * @return nulo se for zero ou o objeto com o timestamp já definido.
+	 */
+
+	public static Timestamp timestamp(long time)
+	{
+		if (time == 0)
+			return null;
+
+		return new Timestamp(time);
 	}
 
 	/**

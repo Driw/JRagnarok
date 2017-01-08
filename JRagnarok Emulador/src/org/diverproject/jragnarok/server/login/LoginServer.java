@@ -149,7 +149,7 @@ public class LoginServer extends Server
 		@Override
 		public void onRunning() throws RagnarokException
 		{
-			facade.create(LoginServer.this);
+			facade.init(LoginServer.this);
 
 			logInfo("o servidor de acesso está pronto (porta: %d).\n", getPort());
 

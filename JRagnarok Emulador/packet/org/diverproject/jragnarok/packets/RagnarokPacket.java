@@ -2,7 +2,7 @@ package org.diverproject.jragnarok.packets;
 
 public class RagnarokPacket
 {
-	// -- RAGNAROK PACKET ID : CLIENT TO CHAR SERVER (CA) --
+	// -- RAGNAROK PACKET ID : CLIENT TO LOGIN SERVER (CA) --
 
 	public static final short PACKET_CA_LOGIN									= 0x0064;
 //	public static final short PACKET_CA_REPLY_PNGAMEROOM						= 0x01BF;

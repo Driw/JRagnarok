@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok.server.login.control;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.JRagnarokUtil.timestamp;
 import static org.diverproject.log.LogSystem.logExeceptionSource;
 
 import java.sql.Connection;
@@ -88,13 +89,13 @@ public class AccountControl extends AbstractControl
 		account.setUsername(rs.getString("username"));
 		account.setPassword(rs.getString("password"));
 		account.setSex(Sex.parse(rs.getString("sex").charAt(0)));
-		account.getRegistered().set(rs.getDate("registered").getTime());
-		account.getLastLogin().set(rs.getDate("last_login").getTime());
+		account.getRegistered().set(timestamp(rs.getTimestamp("registered")));
+		account.getLastLogin().set(timestamp(rs.getTimestamp("last_login")));
 		account.setEmail(rs.getString("email"));
 		account.setBirthDate(rs.getString("birth_date"));
 		account.setLoginCount(rs.getInt("login_count"));
-		account.getUnban().set(rs.getTimestamp("unban_time").getTime());
-		account.getExpiration().set(rs.getTimestamp("expiration").getTime());
+		account.getUnban().set(timestamp(rs.getTimestamp("unban_time")));
+		account.getExpiration().set(timestamp(rs.getTimestamp("expiration")));
 		account.setState(AccountState.parse(rs.getInt("account_state")));
 		account.getLastIP().set(rs.getInt("last_ip"));
 		account.setCharSlots(rs.getByte("char_slots"));
@@ -199,7 +200,7 @@ public class AccountControl extends AbstractControl
 		try {
 
 			PreparedStatement ps = prepare(sql);
-			ps.setTimestamp(1, account.getLastLogin().toTimestamp());
+			ps.setTimestamp(1, timestamp(account.getLastLogin().get()));
 			ps.setInt(2, account.getID());
 
 			return ps.executeUpdate() == 1;
@@ -228,8 +229,8 @@ public class AccountControl extends AbstractControl
 
 			PreparedStatement ps = prepare(sql);
 			ps.setInt(1, account.getLoginCount());
-			ps.setTimestamp(2, account.getUnban().toTimestamp());
-			ps.setTimestamp(3, account.getExpiration().toTimestamp());
+			ps.setTimestamp(2, timestamp(account.getUnban().get()));
+			ps.setTimestamp(3, timestamp(account.getExpiration().get()));
 			ps.setInt(4, account.getState().CODE);
 			ps.setInt(5, account.getLastIP().get());
 			ps.setByte(6, account.getCharSlots());

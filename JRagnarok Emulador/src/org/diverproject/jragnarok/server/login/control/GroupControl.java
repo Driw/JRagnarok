@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok.server.login.control;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.JRagnarokUtil.timestamp;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
@@ -133,7 +134,7 @@ public class GroupControl extends AbstractControl
 				throw new RagnarokException("grupo de conta '%d' não encontrado", account.getID());
 
 			AccountGroup accountGroup = account.getGroup();
-			accountGroup.getTime().set(rs.getDate("timeout").getTime());
+			accountGroup.getTime().set(timestamp(rs.getTimestamp("timeout")));
 
 			int currentGroupID = rs.getInt("current_group");
 			int oldGroupID = rs.getInt("old_group");

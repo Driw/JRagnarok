@@ -1,3 +1,13 @@
+08.01.2017 - 1.5.179
+- Alterando o valor padrão de alguns DATETIME no banco de dados e permitir que estes sejam nulos.
+- Dois novos métodos timestamp() para trabalhar conforme a modificação acima.
+
+08.01.2017 - 1.5.178
+- Implementação da ação que permite a criação de personagens durante a seleção de personagens.
+- Novas configurações relacionadas ao gerenciamento de personagens como criação e exclusão.
+- Character passa a utilizar a enumeração Job para definir sua classe ao invés de um short.
+- Correção de alguns pequenos detalhes que estavam causando erro na criação de personagens, CharacterControl.
+
 07.01.2017 - 1.5.177
 - Implementação do CH_PING para manter a conexão estabelecida do cliente com o servidor de personagem.
 - Servidor de Personagem envia os dados de grupos e tipos de acesso VIP ao servidor de personagem.
