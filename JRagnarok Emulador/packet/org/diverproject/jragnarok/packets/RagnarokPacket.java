@@ -114,8 +114,8 @@ public class RagnarokPacket
 
 	public static final short PACKET_HC_ACCEPT_ENTER_NEO_UNION					= 0x006B;
 	public static final short PACKET_HC_REFUSE_ENTER							= 0x006C;
-//	public static final short PACKET_HC_ACCEPT_MAKECHAR_NEO_UNION				= 0x006D;
-//	public static final short PACKET_HC_REFUSE_MAKECHAR							= 0x006E;
+	public static final short PACKET_HC_ACCEPT_MAKECHAR_NEO_UNION				= 0x006D;
+	public static final short PACKET_HC_REFUSE_MAKECHAR							= 0x006E;
 //	public static final short PACKET_HC_ACCEPT_DELETECHAR						= 0x006F;
 //	public static final short PACKET_HC_REFUSE_DELETECHAR						= 0x0070;
 //	public static final short PACKET_HC_NOTIFY_ZONESVR							= 0x0071;

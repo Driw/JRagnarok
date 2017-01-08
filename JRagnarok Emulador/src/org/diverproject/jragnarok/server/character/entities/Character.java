@@ -11,6 +11,7 @@ import static org.diverproject.util.lang.IntUtil.interval;
 import static org.diverproject.util.lang.IntUtil.limit;
 import static org.diverproject.util.lang.IntUtil.min;
 
+import org.diverproject.jragnarok.server.common.Job;
 import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
@@ -84,7 +85,7 @@ public class Character
 	/**
 	 * Código de identificação da classe.
 	 */
-	private short jobID;
+	private Job jobID;
 
 	/**
 	 * Quantidade atual de HP.
@@ -367,18 +368,19 @@ public class Character
 	 * @return aquisição do código de identificação da classe.
 	 */
 
-	public short getJobID()
+	public Job getJob()
 	{
 		return jobID;
 	}
 
 	/**
-	 * @param jobID código de identificação da classe.
+	 * @param job código de identificação da classe.
 	 */
 
-	public void setJobID(short jobID)
+	public void setJob(Job job)
 	{
-		this.jobID = ShortUtil.min(jobID, (short) 0);
+		if (job != null)
+			this.jobID = job;
 	}
 
 	/**

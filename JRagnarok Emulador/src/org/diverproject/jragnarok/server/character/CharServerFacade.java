@@ -12,7 +12,10 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_KEEP_A
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SS_GROUP_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CHARLIST_REQ;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_ENTER;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR_NOT_STATS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_PING;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
@@ -239,7 +242,15 @@ public class CharServerFacade
 		{
 			/*
 			case PACKET_CH_SELECT_CHAR:
+			*/
+
 			case PACKET_CH_MAKE_CHAR:
+			case PACKET_CH_CREATE_NEW_CHAR:
+			case PACKET_CH_MAKE_CHAR_NOT_STATS:
+				charService.makeChar(fd, command);
+				return true;
+
+			/*
 			case PACKET_CH_DELETE_CHAR2:
 			case PACKET_CH_DELETE_CHAR3_RESERVED:
 			case PACKET_CH_DELETE_CHAR3:
@@ -250,10 +261,6 @@ public class CharServerFacade
 
 			case PACKET_CH_CHARLIST_REQ:
 				return clientService.sendCharsPerPage(fd);
-
-			/*
-			case PACKET_CH_CREATE_NEW_CHAR:
-			*/
 		}
 
 		return ackPincodePacket(fd, command);

@@ -224,7 +224,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 
 		sd.setAuth(true);
 		login.reqAccountData(fd);
-		character.setCharSelect(fd);
+		character.setCharSelectSection(fd);
 
 		logDebug("atualizando autenticação encontrada (aid: %d).\n", sd.getID());
 

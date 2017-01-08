@@ -79,6 +79,7 @@ public class JRagnarokConfigs
 	public static final String CHAR_USERNAME = CHAR_CONFIGS+ ".username";
 	public static final String CHAR_PASSWORD = CHAR_CONFIGS+ ".password";
 	public static final String CHAR_SERVER_NAME = CHAR_CONFIGS+ ".name";
+	public static final String CHAR_WISP_SERVER_NAME = CHAR_CONFIGS+ ".wisp_server_name";
 	public static final String CHAR_MAINTANCE = CHAR_CONFIGS+ ".maintance";
 	public static final String CHAR_NEW_DISPLAY = CHAR_CONFIGS+ ".new_display";
 	public static final String CHAR_MAX_USERS = CHAR_CONFIGS+ ".max_users";
@@ -122,6 +123,17 @@ public class JRagnarokConfigs
 	public static final String PINCODE_FORCE = PINCODE_CONFIGS+ ".force";
 	public static final String PINCODE_ALLOW_REPEATED = PINCODE_CONFIGS+ ".allow_repeated";
 	public static final String PINCODE_ALLOW_SEQUENTIAL = PINCODE_CONFIGS+ ".allow_sequential";
+
+	public static final String CHARACTER_CONFIGS = "character";
+	public static final String CHARACTER_CREATE = CHARACTER_CONFIGS+ ".create";
+	public static final String CHARACTER_PER_ACCOUNT = CHARACTER_CONFIGS+ ".per_account";
+	public static final String CHARACTER_IGNORING_CASE = CHARACTER_CONFIGS+ ".name_ignoring_case";
+	public static final String CHARACTER_UNKNOW_CHAR_NAME = CHARACTER_CONFIGS+ ".unknow_char_name";
+	public static final String CHARACTER_NAME_LETTERS = CHARACTER_CONFIGS+ ".name_letters";
+	public static final String CHARACTER_NAME_OPTION = CHARACTER_CONFIGS+ ".name_option";
+	public static final String CHARACTER_DELETE_OPTION = CHARACTER_CONFIGS+ ".delete_option";
+	public static final String CHARACTER_DELETE_LEVEL = CHARACTER_CONFIGS+ ".delete_level";
+	public static final String CHARACTER_DELETE_DELAY = CHARACTER_CONFIGS+ ".delete_delay";
 
 	public static final String VIP_CONFIGS = "vip";
 	public static final String VIP_GROUPID = VIP_CONFIGS+ ".groupid";
@@ -215,7 +227,8 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigInt(CHAR_PORT, 6900));
 		configurations.add(new ConfigString(CHAR_USERNAME, "server"));
 		configurations.add(new ConfigString(CHAR_PASSWORD, "passwd"));
-		configurations.add(new ConfigString(CHAR_SERVER_NAME, "Char Server"));
+		configurations.add(new ConfigString(CHAR_SERVER_NAME, "Servidor de Personagem"));
+		configurations.add(new ConfigString(CHAR_WISP_SERVER_NAME, "Servidor"));
 		configurations.add(new ConfigInt(CHAR_MAINTANCE, 0));
 		configurations.add(new ConfigBoolean(CHAR_NEW_DISPLAY, false));
 		configurations.add(new ConfigInt(CHAR_MAX_USERS, -1));
@@ -227,12 +240,23 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigString(CHAR_DEFAULT_MAP, "prontera"));
 		configurations.add(new ConfigInt(CHAR_DEFAULT_MAP_X, 156));
 		configurations.add(new ConfigInt(CHAR_DEFAULT_MAP_Y, 191));
+
 		configurations.add(new ConfigBoolean(PINCODE_ENABLED, true));
 		configurations.add(new ConfigInt(PINCODE_CHANGE_TIME, 0));
 		configurations.add(new ConfigInt(PINCODE_MAXTRY, 3));
 		configurations.add(new ConfigBoolean(PINCODE_FORCE, true));
 		configurations.add(new ConfigBoolean(PINCODE_ALLOW_REPEATED, false));
 		configurations.add(new ConfigBoolean(PINCODE_ALLOW_SEQUENTIAL, false));
+
+		configurations.add(new ConfigBoolean(CHARACTER_CREATE, true));
+		configurations.add(new ConfigInt(CHARACTER_PER_ACCOUNT, 0));
+		configurations.add(new ConfigBoolean(CHARACTER_IGNORING_CASE, false));
+		configurations.add(new ConfigString(CHARACTER_UNKNOW_CHAR_NAME, "Desconhecido"));
+		configurations.add(new ConfigString(CHARACTER_NAME_LETTERS, "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"));
+		configurations.add(new ConfigInt(CHARACTER_NAME_OPTION, 1));
+		configurations.add(new ConfigInt(CHARACTER_DELETE_OPTION, 2));
+		configurations.add(new ConfigInt(CHARACTER_DELETE_LEVEL, 150));
+		configurations.add(new ConfigInt(CHARACTER_DELETE_DELAY, 86400));
 
 		return configurations;
 	}

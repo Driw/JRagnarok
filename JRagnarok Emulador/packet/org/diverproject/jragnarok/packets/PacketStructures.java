@@ -30,7 +30,7 @@ public class PacketStructures
 		output.putShort(character.getSP());
 		output.putShort(character.getMaxSP());
 		output.putShort(s(DEFAULT_WALK_SPEED));
-		output.putShort(character.getJobID());
+		output.putShort(character.getJob().CODE);
 		output.putShort(character.getLook().getHair());
 		output.putShort(character.getLook().getBody());
 

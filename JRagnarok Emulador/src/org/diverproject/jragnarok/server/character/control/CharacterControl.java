@@ -19,6 +19,7 @@ import org.diverproject.jragnarok.server.character.CharSessionData;
 import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.jragnarok.server.character.entities.Experience;
 import org.diverproject.jragnarok.server.character.entities.MercenaryRank;
+import org.diverproject.jragnarok.server.common.Job;
 import org.diverproject.jragnarok.server.common.Sex;
 import org.diverproject.jragnarok.util.MapPoint;
 import org.diverproject.util.collection.Index;
@@ -65,15 +66,19 @@ public class CharacterControl extends AbstractControl
 	 * Procedimento interno para validação das informações com valores não aceitáveis de um personagem.
 	 * Não será aceito objetos nulos, com dependências nulas ou com identificação inválida.
 	 * @param character referência do objeto que representa os dados do personagem no sistema.
+	 * @param checkID true para verificar o código de identificação ou false caso contrário.
 	 * @throws RagnarokException informações inválidas ou nulas.
 	 */
 
-	public void validate(Character character) throws RagnarokException
+	public void validate(Character character, boolean checkID) throws RagnarokException
 	{
 		if (character == null)
 			throw new RagnarokException("personagem nulo");
 
-		if (character.getID() == 0 || character.getName().equals(Character.UNKNOWN))
+		if (character.getName().equals(Character.UNKNOWN))
+			throw new RagnarokException("personagem com nome inválido");
+
+		if (checkID && character.getID() <= 0)
 			throw new RagnarokException("personagem inválido");
 	}
 
@@ -156,7 +161,7 @@ public class CharacterControl extends AbstractControl
 		character.setZeny(rs.getInt("zeny"));
 		character.setStatusPoint(rs.getShort("status_point"));
 		character.setSkillPoint(rs.getShort("skill_point"));
-		character.setJobID(rs.getShort("jobid"));
+		character.setJob(Job.parse(rs.getShort("jobid")));
 		character.setHP(rs.getInt("hp"));
 		character.setMaxHP(rs.getInt("max_hp"));
 		character.setSP(rs.getShort("sp"));
@@ -285,13 +290,13 @@ public class CharacterControl extends AbstractControl
 
 	public boolean add(Character character) throws RagnarokException
 	{
-		validate(character);
+		validate(character, false);
 
 		String table = Tables.getInstance().getCharacters();
 		String sql = format("REPLACE INTO %s (name, sex, zeny, status_point, skill_point, jobid, hp, max_hp, sp, max_sp, "
-						+	"manner, effect_state, virtue, base_level, job_level, rename, unban_time, delete_date, "
-						+	"moves, font, unique_item_counter)"
-						+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", table);
+						+	"manner, effect_state, virtue, base_level, job_level, rename_count, unban_time, delete_date, "
+						+	"moves, font, unique_item_counter) "
+						+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", table);
 
 		try {
 
@@ -301,7 +306,7 @@ public class CharacterControl extends AbstractControl
 			ps.setInt(3, character.getZeny());
 			ps.setInt(4, character.getStatusPoint());
 			ps.setInt(5, character.getSkillPoint());
-			ps.setShort(6, character.getJobID());
+			ps.setShort(6, character.getJob().CODE);
 			ps.setInt(7, character.getHP());
 			ps.setInt(8, character.getMaxHP());
 			ps.setShort(9, character.getSP());
@@ -318,7 +323,7 @@ public class CharacterControl extends AbstractControl
 			ps.setByte(20, character.getFont());
 			ps.setInt(21, character.getUniqueItemCounter());
 
-			if (ps.execute())
+			if (interval(ps.executeUpdate(), 1, 2))
 			{
 				logDebug("Character#%d adicionado a '%s'.\n", character.getID(), table);
 
@@ -399,7 +404,7 @@ public class CharacterControl extends AbstractControl
 		String table = Tables.getInstance().getCharLook();
 		String sql = format("REPLACE INTO %s (charid, hair, hair_color, clothes_color, body, weapon, shield, "
 						+	"head_top, head_mid, head_bottom, robe) "
-						+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", table);
+						+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", table);
 
 		try {
 
@@ -472,7 +477,7 @@ public class CharacterControl extends AbstractControl
 
 	public boolean addExperience(Character character) throws RagnarokException
 	{
-		String table = Tables.getInstance().getCharFamily();
+		String table = Tables.getInstance().getCharExperiences();
 		String sql = format("REPLACE INTO %s (charid, base, job, fame) VALUES (?, ?, ?, ?)", table);
 
 		try {
@@ -594,7 +599,7 @@ public class CharacterControl extends AbstractControl
 
 	public boolean set(Character character) throws RagnarokException
 	{
-		validate(character);
+		validate(character, true);
 
 		return	setBase(character) ||
 				setStats(character) ||
@@ -628,7 +633,7 @@ public class CharacterControl extends AbstractControl
 			ps.setInt(3, character.getZeny());
 			ps.setInt(4, character.getStatusPoint());
 			ps.setInt(5, character.getSkillPoint());
-			ps.setShort(6, character.getJobID());
+			ps.setShort(6, character.getJob().CODE);
 			ps.setInt(7, character.getHP());
 			ps.setInt(8, character.getMaxHP());
 			ps.setShort(9, character.getSP());
@@ -914,7 +919,7 @@ public class CharacterControl extends AbstractControl
 
 	public boolean reload(Character character) throws RagnarokException
 	{
-		validate(character);
+		validate(character, true);
 
 		String table = Tables.getInstance().getCharacters();
 		String tableStats = Tables.getInstance().getCharStats();
@@ -1444,6 +1449,91 @@ public class CharacterControl extends AbstractControl
 	}
 
 	/**
+	 * Verifica se um determinado nome de personagem já está sendo utilizado por outro personagem.
+	 * @param name nome completo do personagem do qual deverá ser verificado no banco de dados.
+	 * @param ignoringCase true para ignorar 'case sensitive' ou false para considerar.
+	 * @return true se o nome de personagem já estiver sendo usado ou false caso contrário.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean exist(String name, boolean ignoringCase) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharacters();
+		String sql = format("SELECT 1 FROM %s WHERE " +(ignoringCase ? "BINARY " : "")+ "name = ? LIMIT 1", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setString(1, name);
+
+			ResultSet rs = ps.executeQuery();
+			return rs.next();
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Verifica se um determinado slot de personagem em uma conta especificada está disponível.
+	 * @param accountID código de identificação da conta do qual deseja verificar.
+	 * @param slot número do slot que deseja verificar a disponibilidade.
+	 * @return true se estiver disponível ou false caso já esteja sendo utilizado.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean avaiableSlot(int accountID, byte slot) throws RagnarokException
+	{
+		String table = Tables.getInstance().getAccountsCharacters();
+		String sql = format("SELECT 1 FROM %s WHERE accountid = ? AND slot = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, accountID);
+			ps.setInt(2, slot);
+
+			ResultSet rs = ps.executeQuery();
+			return !rs.next();
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Define a ocupação de um slot de personagem em uma conta especificadamente conforme abaixo:
+	 * @param accountID código de identificação da conta no qual o personagem será vinculado.
+	 * @param charID código de identificação do personagem do qual será vinculado ao slot.
+	 * @param slot número do slot em que o personagem será alocado na conta.
+	 * @return true se conseguir definir ou false caso não seja possível ou esteja ocupado.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean setSlot(int accountID, int charID, byte slot) throws RagnarokException
+	{
+		String table = Tables.getInstance().getAccountsCharacters();
+		String sql = format("INSERT INTO %s (accountid, charid, slot) VALUES (?, ?, ?)", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, accountID);
+			ps.setInt(2, charID);
+			ps.setByte(3, slot);
+
+			return ps.executeUpdate() == 1;
+
+		} catch (SQLException e) {
+
+			if (e.getErrorCode() == DUPLICATED_KEY)
+				return false;
+
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
 	 * Procedimento utilizado para atualizar as informações mínimas do personagem conforme abaixo:
 	 * @param sd sessão do qual terá as informações atualizadas de todos os CharData.
 	 * @param characters indexação dos personagens através do seu número de slot.
@@ -1466,6 +1556,5 @@ public class CharacterControl extends AbstractControl
 				data.getUnban().set(character.getUnbanTime().get());
 			}
 		}
-
 	}
 }
