@@ -2,22 +2,22 @@ package org.diverproject.jragnarok.packets.common;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 
-public enum NotifyAuthResult
+public enum NotifyAuth
 {
-	SERVER_CLOSED(1),
-	ALREADY_ONLINE(2),
-	RECOGNIZES_LAST_LOGIN(8);
+	NA_SERVER_CLOSED(1),
+	NA_ALREADY_ONLINE(2),
+	NA_RECOGNIZES_LAST_LOGIN(8);
 
 	public final byte CODE;
 
-	private NotifyAuthResult(int code)
+	private NotifyAuth(int code)
 	{
 		CODE = (byte) code;
 	}
 
-	public static NotifyAuthResult parse(int code)
+	public static NotifyAuth parse(int code)
 	{
-		for (NotifyAuthResult result : values())
+		for (NotifyAuth result : values())
 			if (result.CODE == code)
 				return result;
 

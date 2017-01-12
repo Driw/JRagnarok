@@ -22,8 +22,8 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_CHANGE_TIME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_FORCE;
-import static org.diverproject.jragnarok.packets.common.RefuseEnter.REJECTED_FROM_SERVER;
-import static org.diverproject.jragnarok.packets.common.RefuseLogin.OK;
+import static org.diverproject.jragnarok.packets.common.RefuseEnter.RE_REJECTED_FROM_SERVER;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_OK;
 import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONLINE;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
@@ -38,7 +38,7 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.IResponsePacket;
-import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
+import org.diverproject.jragnarok.packets.common.NotifyAuth;
 import org.diverproject.jragnarok.packets.common.PincodeState;
 import org.diverproject.jragnarok.packets.inter.SS_GroupData;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
@@ -270,7 +270,7 @@ public class ServiceCharLogin extends AbstractCharService
 	{
 		if (!isConnected())
 		{
-			client.refuseEnter(fd, REJECTED_FROM_SERVER);
+			client.refuseEnter(fd, RE_REJECTED_FROM_SERVER);
 			return false;
 		}
 
@@ -513,7 +513,7 @@ public class ServiceCharLogin extends AbstractCharService
 					character.setCharOffline(-1, packet.getAccountID());
 				else
 				{
-					client.sendNotifyResult(fd, NotifyAuthResult.ALREADY_ONLINE);
+					client.sendNotifyResult(fd, NotifyAuth.NA_ALREADY_ONLINE);
 					FileDescriptorSystem.setEndOfFile(fd);
 				}
 			}
@@ -558,13 +558,13 @@ public class ServiceCharLogin extends AbstractCharService
 		AH_AckConnect packet = new AH_AckConnect();
 		packet.receive(fd, false);
 
-		if (packet.getResult() == OK)
+		if (packet.getResult() == RL_OK)
 		{
 			logInfo("conectado ao servidor de acesso (ip: %s).\n", fd.getAddressString());
 			this.fd = fd;
 		}
 
-		return packet.getResult() == OK;
+		return packet.getResult() == RL_OK;
 	}
 
 	/**
@@ -626,7 +626,7 @@ public class ServiceCharLogin extends AbstractCharService
 				if (packet.isResult())
 					return auth.authOk(fd);
 
-				client.refuseEnter(fd, REJECTED_FROM_SERVER);
+				client.refuseEnter(fd, RE_REJECTED_FROM_SERVER);
 			}
 		}
 
@@ -716,7 +716,7 @@ public class ServiceCharLogin extends AbstractCharService
 		}
 
 		else
-			client.refuseEnter(fd, REJECTED_FROM_SERVER);
+			client.refuseEnter(fd, RE_REJECTED_FROM_SERVER);
 
 		return enabled;
 	}
@@ -928,14 +928,14 @@ public class ServiceCharLogin extends AbstractCharService
 			if (sd.getPincode().getCode() == null)
 			{
 				if (getConfigs().getBool(PINCODE_FORCE))
-					client.pincodeSendState(fd, PincodeState.NEW);
+					client.pincodeSendState(fd, PincodeState.PS_NEW);
 				else
-					client.pincodeSendState(fd, PincodeState.SKIP);
+					client.pincodeSendState(fd, PincodeState.PS_SKIP);
 			}
 
 			// Código PIN definido mas não habilitado
 			else if (!sd.getPincode().isEnabled())
-				client.pincodeSendState(fd, PincodeState.OK);
+				client.pincodeSendState(fd, PincodeState.PS_OK);
 
 			// Código PIN habilitado e definido
 			else
@@ -943,22 +943,22 @@ public class ServiceCharLogin extends AbstractCharService
 				int changeTime = getConfigs().getInt(PINCODE_CHANGE_TIME);
 
 				if (changeTime > 0 && sd.getPincode().getChanged().pass(changeTime))
-					client.pincodeSendState(fd, PincodeState.EXPIRED);
+					client.pincodeSendState(fd, PincodeState.PS_EXPIRED);
 
 				else
 				{
 					OnlineCharData online = onlines.get(sd.getID());
 
 					if (online != null && online.isPincodeSuccess())
-						client.pincodeSendState(fd, PincodeState.SKIP);
+						client.pincodeSendState(fd, PincodeState.PS_SKIP);
 					else
-						client.pincodeSendState(fd, PincodeState.ASK);
+						client.pincodeSendState(fd, PincodeState.PS_ASK);
 				}
 			}
 		}
 
 		else
-			client.pincodeSendState(fd, PincodeState.OK);
+			client.pincodeSendState(fd, PincodeState.PS_OK);
 	}
 
 	/**

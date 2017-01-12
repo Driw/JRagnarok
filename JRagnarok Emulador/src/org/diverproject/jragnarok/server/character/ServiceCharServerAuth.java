@@ -8,7 +8,7 @@ import static org.diverproject.log.LogSystem.logNotice;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Enter;
-import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
+import org.diverproject.jragnarok.packets.common.NotifyAuth;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
@@ -208,14 +208,14 @@ public class ServiceCharServerAuth extends AbstractCharService
 					online.setWaitingDisconnect(timer);
 				}
 
-				client.sendNotifyResult(fd, NotifyAuthResult.RECOGNIZES_LAST_LOGIN);
+				client.sendNotifyResult(fd, NotifyAuth.NA_RECOGNIZES_LAST_LOGIN);
 				return false;
 			}
 
 			// Já está conectado mas não selecionou um personagem
 			if (online.getFileDescriptor() != null && online.getFileDescriptor().getID() != fd.getID())
 			{
-				client.sendNotifyResult(fd, NotifyAuthResult.RECOGNIZES_LAST_LOGIN);
+				client.sendNotifyResult(fd, NotifyAuth.NA_RECOGNIZES_LAST_LOGIN);
 				return false;
 			}
 

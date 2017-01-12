@@ -6,7 +6,7 @@ import org.diverproject.jragnaork.RagnarokRuntimeException;
 
 public enum RefuseEnter
 {
-	REJECTED_FROM_SERVER(0);
+	RE_REJECTED_FROM_SERVER(0);
 
 	public final byte CODE;
 
@@ -19,7 +19,7 @@ public enum RefuseEnter
 	{
 		switch (code)
 		{
-			case 0: return RefuseEnter.REJECTED_FROM_SERVER;
+			case 0: return RefuseEnter.RE_REJECTED_FROM_SERVER;
 		}
 
 		throw new RagnarokRuntimeException("RefuseEnter#%d não encontrado", code);

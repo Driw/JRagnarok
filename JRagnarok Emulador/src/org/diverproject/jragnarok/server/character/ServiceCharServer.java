@@ -19,22 +19,22 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR2;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR_NOT_STATS;
-import static org.diverproject.jragnarok.packets.common.DeleteChar.BIRTH_DATE;
-import static org.diverproject.jragnarok.packets.common.DeleteChar.DATABASE_ERROR_DELETE;
-import static org.diverproject.jragnarok.packets.common.DeleteChar.DUE_SETTINGS;
-import static org.diverproject.jragnarok.packets.common.DeleteChar.NOT_YET_POSSIBLE_TIME;
-import static org.diverproject.jragnarok.packets.common.DeleteChar.SUCCCESS_DELETE;
-import static org.diverproject.jragnarok.packets.common.DeleteCharCancel.DATABASE_ERROR_CANCEL;
-import static org.diverproject.jragnarok.packets.common.DeleteCharCancel.SUCCCESS_CANCEL;
-import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.ADDED_TO_QUEUE;
-import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.ALREADY_ON_QUEUE;
-import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.CHAR_NOT_FOUND;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.DC_BIRTH_DATE;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.DC_DATABASE_ERROR_DELETE;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.DC_DUE_SETTINGS;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.DC_NOT_YET_POSSIBLE_TIME;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.DC_SUCCCESS_DELETE;
+import static org.diverproject.jragnarok.packets.common.DeleteCharCancel.DCC_DATABASE_ERROR_CANCEL;
+import static org.diverproject.jragnarok.packets.common.DeleteCharCancel.DCC_SUCCCESS_CANCEL;
+import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.DCR_ADDED_TO_QUEUE;
+import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.DCR_ALREADY_ON_QUEUE;
+import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.DCR_CHAR_NOT_FOUND;
 import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_CANNOT_BE_DELETED;
 import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_DENIED;
 import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_INCORRET_EMAIL_ADDRESS;
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.CREATION_DENIED;
-import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.NAME_USED;
-import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.NO_AVAIABLE_SLOT;
+import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_NAME_IN_USE;
+import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_UNAVAIABLE_SLOT;
 import static org.diverproject.jragnarok.server.common.Job.JOB_NOVICE;
 import static org.diverproject.jragnarok.server.common.Job.JOB_SUMMONER;
 import static org.diverproject.log.LogSystem.logError;
@@ -313,7 +313,7 @@ public class ServiceCharServer extends AbstractCharService
 			return refuse;
 
 		if (!interval(slot, 0, sd.getCharSlots() - 1))
-			return NO_AVAIABLE_SLOT;
+			return RMC_UNAVAIABLE_SLOT;
 
 		if (PACKETVER >= 20151001)
 		{
@@ -326,7 +326,7 @@ public class ServiceCharServer extends AbstractCharService
 		try {
 
 			if (!characters.avaiableSlot(sd.getID(), slot))
-				return NO_AVAIABLE_SLOT;
+				return RMC_UNAVAIABLE_SLOT;
 
 			if (characters.add(character) && characters.setSlot(sd.getID(), character.getID(), slot))
 				return null;
@@ -359,7 +359,7 @@ public class ServiceCharServer extends AbstractCharService
 			return CREATION_DENIED;
 
 		if (name.equals(getConfigs().getString(CHAR_WISP_SERVER_NAME)))
-			return NAME_USED;
+			return RMC_NAME_IN_USE;
 
 		String letters = getConfigs().getString(CHARACTER_NAME_LETTERS);
 
@@ -379,9 +379,9 @@ public class ServiceCharServer extends AbstractCharService
 
 		try {
 			if (characters.exist(name, getConfigs().getBool(CHARACTER_IGNORING_CASE)))
-				return NAME_USED;
+				return RMC_NAME_IN_USE;
 		} catch (RagnarokException e) {
-			return NAME_USED;
+			return RMC_NAME_IN_USE;
 		}
 
 		return null;
@@ -490,7 +490,7 @@ public class ServiceCharServer extends AbstractCharService
 
 		if (slot == -1)
 		{
-			client.deleteCharReserved(fd, charID, 0, CHAR_NOT_FOUND);
+			client.deleteCharReserved(fd, charID, 0, DCR_CHAR_NOT_FOUND);
 			return;
 		}
 
@@ -508,7 +508,7 @@ public class ServiceCharServer extends AbstractCharService
 				if (characters.setDeleteDate(charID, deleteDate))
 				{
 					logInfo("personagem reservado para ser excluído (aid: %d, cid: %d).\n", sd.getID(), charID);
-					client.deleteCharReserved(fd, charID, deleteDate, ADDED_TO_QUEUE);
+					client.deleteCharReserved(fd, charID, deleteDate, DCR_ADDED_TO_QUEUE);
 					return;
 				}
 			}
@@ -519,7 +519,7 @@ public class ServiceCharServer extends AbstractCharService
 			logException(e);
 		}
 
-		client.deleteCharReserved(fd, charID, 0, ALREADY_ON_QUEUE);
+		client.deleteCharReserved(fd, charID, 0, DCR_ALREADY_ON_QUEUE);
 	}
 
 	/**
@@ -546,7 +546,7 @@ public class ServiceCharServer extends AbstractCharService
 
 		if (slot == -1)
 		{
-			client.deleteCharReserved(fd, charID, 0, CHAR_NOT_FOUND);
+			client.deleteCharReserved(fd, charID, 0, DCR_CHAR_NOT_FOUND);
 			return;
 		}
 
@@ -556,13 +556,13 @@ public class ServiceCharServer extends AbstractCharService
 
 			if (deleteDate == 0 || deleteDate > now())
 			{
-				client.deleteAccept(fd, charID, NOT_YET_POSSIBLE_TIME);
+				client.deleteAccept(fd, charID, DC_NOT_YET_POSSIBLE_TIME);
 				return;
 			}
 
 			if (!birthDate.equals(sd.getBirthdate()))
 			{
-				client.deleteAccept(fd, charID, BIRTH_DATE);
+				client.deleteAccept(fd, charID, DC_BIRTH_DATE);
 				return;
 			}
 
@@ -571,18 +571,18 @@ public class ServiceCharServer extends AbstractCharService
 
 			if (deleteLevel > 0 && baseLevel >= deleteLevel || deleteLevel < 0 && baseLevel <= deleteLevel)
 			{
-				client.deleteAccept(fd, charID, DUE_SETTINGS);
+				client.deleteAccept(fd, charID, DC_DUE_SETTINGS);
 				return;
 			}
 
 			if (!characters.remove(charID))
 			{
 				sd.setCharData(null, slot);
-				client.deleteAccept(fd, charID, SUCCCESS_DELETE);
+				client.deleteAccept(fd, charID, DC_SUCCCESS_DELETE);
 				return;
 			}
 
-			client.deleteAccept(fd, charID, DATABASE_ERROR_DELETE);
+			client.deleteAccept(fd, charID, DC_DATABASE_ERROR_DELETE);
 
 		} catch (RagnarokException e) {
 
@@ -609,7 +609,7 @@ public class ServiceCharServer extends AbstractCharService
 
 			if (foundCharSlot(sd, charID) != -1 && characters.cancelDelete(charID))
 			{
-				client.deleteCancel(fd, charID, SUCCCESS_CANCEL);
+				client.deleteCancel(fd, charID, DCC_SUCCCESS_CANCEL);
 				return;
 			}
 
@@ -619,6 +619,6 @@ public class ServiceCharServer extends AbstractCharService
 			logException(e);
 		}
 
-		client.deleteCancel(fd, charID, DATABASE_ERROR_CANCEL);
+		client.deleteCancel(fd, charID, DCC_DATABASE_ERROR_CANCEL);
 	}
 }

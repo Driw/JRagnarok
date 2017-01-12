@@ -6,8 +6,8 @@ import org.diverproject.jragnaork.RagnarokRuntimeException;
 
 public enum BanNotification
 {
-	CHANGE_OF_STATUS(0),
-	BAN(1);
+	BN_CHANGE_OF_STATUS(0),
+	BN_BANNED(1);
 
 	public final byte CODE;
 
@@ -20,8 +20,8 @@ public enum BanNotification
 	{
 		switch (code)
 		{
-			case 0: return CHANGE_OF_STATUS;
-			case 1: return BAN;
+			case 0: return BN_CHANGE_OF_STATUS;
+			case 1: return BN_BANNED;
 		}
 
 		throw new RagnarokRuntimeException("BanNotification#%d não encontrado", code);

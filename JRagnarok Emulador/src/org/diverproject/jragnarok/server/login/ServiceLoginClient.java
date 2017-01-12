@@ -11,7 +11,7 @@ import static org.diverproject.log.LogSystem.logDebug;
 
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
-import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
+import org.diverproject.jragnarok.packets.common.NotifyAuth;
 import org.diverproject.jragnarok.packets.common.RefuseEnter;
 import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
@@ -139,7 +139,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param result resultado da liberação do acesso para o cliente.
 	 */
 
-	public void sendNotifyResult(LFileDescriptor fd, NotifyAuthResult result)
+	public void sendNotifyResult(LFileDescriptor fd, NotifyAuth result)
 	{
 		logDebug("notificando autenticação (fd: %d, result: %s).\n", fd.getID(), result);
 

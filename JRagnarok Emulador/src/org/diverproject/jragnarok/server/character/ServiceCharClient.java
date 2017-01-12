@@ -34,7 +34,7 @@ import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLo
 import org.diverproject.jragnarok.packets.common.DeleteChar;
 import org.diverproject.jragnarok.packets.common.DeleteCharCancel;
 import org.diverproject.jragnarok.packets.common.DeleteCharReserved;
-import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
+import org.diverproject.jragnarok.packets.common.NotifyAuth;
 import org.diverproject.jragnarok.packets.common.PincodeState;
 import org.diverproject.jragnarok.packets.common.RefuseDeleteChar;
 import org.diverproject.jragnarok.packets.common.RefuseEnter;
@@ -142,7 +142,7 @@ public class ServiceCharClient extends AbstractCharService
 	 * @param result resultado da liberação do acesso para o cliente.
 	 */
 
-	public void sendNotifyResult(CFileDescriptor fd, NotifyAuthResult result)
+	public void sendNotifyResult(CFileDescriptor fd, NotifyAuth result)
 	{
 		logDebug("notificar resultado (fd: %d).\n", fd.getID());
 

@@ -188,7 +188,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 			skip(fd, false, 23);
 
 			AC_RefuseLogin refuseLoginPacket = new AC_RefuseLogin();
-			refuseLoginPacket.setResult(RefuseLogin.REJECTED_FROM_SERVER);
+			refuseLoginPacket.setResult(RefuseLogin.RL_REJECTED_FROM_SERVER);
 			refuseLoginPacket.setBlockDate("");
 			refuseLoginPacket.send(fd);
 

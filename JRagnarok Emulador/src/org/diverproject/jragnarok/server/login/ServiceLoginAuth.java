@@ -14,10 +14,10 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN4
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_HAN;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_PCBANG;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_SSO_LOGIN_REQ;
-import static org.diverproject.jragnarok.packets.common.NotifyAuthResult.RECOGNIZES_LAST_LOGIN;
-import static org.diverproject.jragnarok.packets.common.NotifyAuthResult.SERVER_CLOSED;
-import static org.diverproject.jragnarok.packets.common.RefuseLogin.OK;
-import static org.diverproject.jragnarok.packets.common.RefuseLogin.REJECTED_FROM_SERVER;
+import static org.diverproject.jragnarok.packets.common.NotifyAuth.NA_RECOGNIZES_LAST_LOGIN;
+import static org.diverproject.jragnarok.packets.common.NotifyAuth.NA_SERVER_CLOSED;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_OK;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_REJECTED_FROM_SERVER;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logInfo;
@@ -265,13 +265,13 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		if (sd.getPassDencrypt().getValue() != 0 && getConfigs().getBool("login.use_md5_password"))
 		{
-			client.sendAuthResult(fd, RefuseLogin.REJECTED_FROM_SERVER);
+			client.sendAuthResult(fd, RefuseLogin.RL_REJECTED_FROM_SERVER);
 			return false;
 		}
 
 		RefuseLogin result = login.parseAuthLogin(fd, false);
 
-		if (result != RefuseLogin.OK)
+		if (result != RefuseLogin.RL_OK)
 		{
 			authFailed(fd, result);
 			return false;
@@ -333,7 +333,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		String blockDate = "";
 		LoginSessionData sd = fd.getSessionData();
 
-		if (result == RefuseLogin.BANNED_UNTIL)
+		if (result == RefuseLogin.RL_BANNED_UNTIL)
 		{
 			Account account = (Account) sd.getCache();
 			Time unbanTime = account.getUnban();
@@ -359,13 +359,13 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		if (!authServerConnected(fd) || !authServerState(sd) || !authGroupAccount(fd))
 		{
-			client.sendNotifyResult(fd, SERVER_CLOSED);
+			client.sendNotifyResult(fd, NA_SERVER_CLOSED);
 			return;
 		}
 
 		if (!authIsntOnline(fd))
 		{
-			client.sendNotifyResult(fd, RECOGNIZES_LAST_LOGIN);
+			client.sendNotifyResult(fd, NA_RECOGNIZES_LAST_LOGIN);
 			return;
 		}
 
@@ -646,7 +646,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		RefuseLogin result = login.parseAuthLogin(fd, true);
 
-		if (getServer().isState(ServerState.RUNNING) && result == RefuseLogin.OK && fd.isConnected())
+		if (getServer().isState(ServerState.RUNNING) && result == RefuseLogin.RL_OK && fd.isConnected())
 		{
 			logNotice("conexão do servidor de personagens '%s' aceita.\n", serverName);
 
@@ -663,7 +663,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			fd.setParseListener(getServer().getFacade().PARSE_CHAR_SERVER);
 			fd.getFlag().set(FileDescriptor.FLAG_SERVER);
 
-			client.sendCharServerResult(fd, OK);
+			client.sendCharServerResult(fd, RL_OK);
 			client.sendGroupData(fd, getServer().getFacade().getGroupControl());
 
 			return true;
@@ -671,7 +671,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		logNotice("Conexão com o servidor de personagens '%s' RECUSADA.\n", serverName);
 
-		client.sendCharServerResult(fd, REJECTED_FROM_SERVER);
+		client.sendCharServerResult(fd, RL_REJECTED_FROM_SERVER);
 		return false;
 	}
 }

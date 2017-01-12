@@ -1,12 +1,12 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.now;
-import static org.diverproject.jragnarok.packets.common.RefuseLogin.BANNED_UNTIL;
-import static org.diverproject.jragnarok.packets.common.RefuseLogin.EXE_LASTED_VERSION;
-import static org.diverproject.jragnarok.packets.common.RefuseLogin.EXPIRED;
-import static org.diverproject.jragnarok.packets.common.RefuseLogin.INCORRECT_PASSWORD;
-import static org.diverproject.jragnarok.packets.common.RefuseLogin.OK;
-import static org.diverproject.jragnarok.packets.common.RefuseLogin.UNREGISTERED_ID;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_BANNED_UNTIL;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_EXE_LASTED_VERSION;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_EXPIRED;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_INCORRECT_PASSWORD;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_OK;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_UNREGISTERED_ID;
 import static org.diverproject.jragnarok.server.login.entities.AccountState.NONE;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logNotice;
@@ -109,10 +109,10 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		RefuseLogin result = null;
 		LoginSessionData sd = fd.getSessionData();
 
-		if ((result = authClientVersion(sd)) != OK)
+		if ((result = authClientVersion(sd)) != RL_OK)
 			return result;
 
-		if ((result = makeLoginAccount(fd, server)) != OK)
+		if ((result = makeLoginAccount(fd, server)) != RL_OK)
 			return result;
 
 		Account account = (Account) sd.getCache();
@@ -134,7 +134,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		if (!accounts.set(account))
 			logError("falha ao persistir conta (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
 
-		return OK;
+		return RL_OK;
 	}
 
 	/**
@@ -153,29 +153,29 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		if (account == null)
 		{
 			logNotice("usuário não encontrado (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
-			return UNREGISTERED_ID;
+			return RL_UNREGISTERED_ID;
 		}
 
-		RefuseLogin result = RefuseLogin.OK;
+		RefuseLogin result = RefuseLogin.RL_OK;
 
-		if ((result = authPassword(fd, account)) != OK)
+		if ((result = authPassword(fd, account)) != RL_OK)
 			return result;
 
-		if ((result = authExpirationTime(fd, account)) != OK)
+		if ((result = authExpirationTime(fd, account)) != RL_OK)
 			return result;
 
-		if ((result = authBanTime(fd, account)) != OK)
+		if ((result = authBanTime(fd, account)) != RL_OK)
 			return result;
 
-		if ((result = authAccountState(fd, account)) != OK)
+		if ((result = authAccountState(fd, account)) != RL_OK)
 			return result;
 
-		if ((result = authClientHash(fd, account, server)) != OK)
+		if ((result = authClientHash(fd, account, server)) != RL_OK)
 			return result;
 
 		sd.setCache(account);
 
-		return OK;
+		return RL_OK;
 	}
 
 	/**
@@ -194,11 +194,11 @@ public class ServiceLoginServer extends AbstractServiceLogin
 			if (sd.getVersion() != version)
 			{
 				logNotice("versão inválida (account: %s, version (client/server): %d/%d).\n", sd.getUsername(), sd.getVersion(), version);
-				return EXE_LASTED_VERSION;
+				return RL_EXE_LASTED_VERSION;
 			}
 		}
 
-		return OK;
+		return RL_OK;
 	}
 
 	/**
@@ -217,10 +217,10 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		if (!sd.getPassword().equals(password))
 		{
 			logNotice("senha incorreta (username: %s, password: %s, receive pass: %s, ip: %s).\n", sd.getUsername(), sd.getPassword(), password, fd.getAddressString());
-			return INCORRECT_PASSWORD;
+			return RL_INCORRECT_PASSWORD;
 		}
 
-		return OK;
+		return RL_OK;
 	}
 
 	/**
@@ -238,10 +238,10 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		if (!account.getExpiration().isNull() && account.getExpiration().get() < now())
 		{
 			logNotice("conta expirada (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
-			return EXPIRED;
+			return RL_EXPIRED;
 		}
 
-		return OK;
+		return RL_OK;
 	}
 
 	/**
@@ -259,10 +259,10 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		if (!account.getUnban().isNull() && account.getUnban().get() < now())
 		{
 			logNotice("conta banida (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
-			return BANNED_UNTIL;
+			return RL_BANNED_UNTIL;
 		}
 
-		return OK;
+		return RL_OK;
 	}
 
 	/**
@@ -283,7 +283,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 			return RefuseLogin.parse(account.getState().CODE - 1);
 		}
 
-		return OK;
+		return RL_OK;
 	}
 
 	/**
@@ -303,7 +303,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 			if (sd.getClientHash() == null)
 			{
 				logNotice("client não enviou hash (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
-				return EXE_LASTED_VERSION;
+				return RL_EXE_LASTED_VERSION;
 			}
 
 			Object object = getConfigs().getObject("client.hash_nodes");
@@ -328,11 +328,11 @@ public class ServiceLoginServer extends AbstractServiceLogin
 			if (!match)
 			{
 				logNotice("client hash inválido (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
-				return EXE_LASTED_VERSION;
+				return RL_EXE_LASTED_VERSION;
 			}
 		}
 
-		return OK;
+		return RL_OK;
 	}
 
 	/**
