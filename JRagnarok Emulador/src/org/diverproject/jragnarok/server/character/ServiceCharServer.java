@@ -32,7 +32,7 @@ import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.DCR_C
 import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_CANNOT_BE_DELETED;
 import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_DENIED;
 import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_INCORRET_EMAIL_ADDRESS;
-import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.CREATION_DENIED;
+import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_CREATION_DENIED;
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_NAME_IN_USE;
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_UNAVAIABLE_SLOT;
 import static org.diverproject.jragnarok.server.common.Job.JOB_NOVICE;
@@ -276,10 +276,10 @@ public class ServiceCharServer extends AbstractCharService
 				throw new RagnarokRuntimeException("0x%s não é usado aqui", HexUtil.parseInt(command, 4));
 		}
 
-		RefuseMakeChar error = CREATION_DENIED;
+		RefuseMakeChar error = RMC_CREATION_DENIED;
 
 		if (!getConfigs().getBool(CHARACTER_CREATE))
-			error = CREATION_DENIED;
+			error = RMC_CREATION_DENIED;
 
 		error = tryMakeChar(fd.getSessionData(), character, slot);
 
@@ -318,7 +318,7 @@ public class ServiceCharServer extends AbstractCharService
 		if (PACKETVER >= 20151001)
 		{
 			if (character.getJob() != JOB_NOVICE && character.getJob() != JOB_SUMMONER)
-				return CREATION_DENIED;
+				return RMC_CREATION_DENIED;
 		}
 
 		// TODO itens iniciais
@@ -339,7 +339,7 @@ public class ServiceCharServer extends AbstractCharService
 			logException(e);
 		}
 
-		return CREATION_DENIED;
+		return RMC_CREATION_DENIED;
 	}
 
 	/**
@@ -353,10 +353,10 @@ public class ServiceCharServer extends AbstractCharService
 	private RefuseMakeChar checkCharName(String name)
 	{
 		if (name == null || name.isEmpty() || name.length() < 4)
-			return CREATION_DENIED;
+			return RMC_CREATION_DENIED;
 
 		if (name.replaceAll("[\u0000-\u001f]", "").length() != name.length())
-			return CREATION_DENIED;
+			return RMC_CREATION_DENIED;
 
 		if (name.equals(getConfigs().getString(CHAR_WISP_SERVER_NAME)))
 			return RMC_NAME_IN_USE;
@@ -367,14 +367,14 @@ public class ServiceCharServer extends AbstractCharService
 			for (int i = 0; i < name.length(); i++)
 			{
 				if (!letters.contains(java.lang.Character.toString(name.charAt(i))))
-					return CREATION_DENIED;
+					return RMC_CREATION_DENIED;
 			}
 
 		else if (getConfigs().getInt(CHARACTER_NAME_OPTION) == 2)
 			for (int i = 0; i < name.length(); i++)
 			{
 				if (letters.contains(java.lang.Character.toString(name.charAt(i))))
-					return CREATION_DENIED;
+					return RMC_CREATION_DENIED;
 			}
 
 		try {
