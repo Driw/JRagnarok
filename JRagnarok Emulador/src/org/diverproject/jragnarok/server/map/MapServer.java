@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.server.map;
 
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.MAP_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.MAP_PORT;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_MAP_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newMapServerConfigs;
 
 import java.net.Socket;
@@ -29,6 +30,12 @@ public class MapServer extends Server
 	public int getPort()
 	{
 		return getConfigs().getInt(MAP_PORT);
+	}
+
+	@Override
+	public String getDefaultConfigs()
+	{
+		return getConfigs().getString(SYSTEM_SERVER_DEFAULT_MAP_FILES);
 	}
 
 	@Override

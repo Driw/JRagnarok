@@ -1,3 +1,9 @@
+11.01.2017 - 1.5.180
+- Documentação dos novos pacotes que foram implementados recentemente no sistema.
+	- Estará sendo considerado ainda nos dados dos pacotes a identificação dos mesmo.
+- Configurações padrões não estavam sendo carregadas corretamente em todos servidores.
+- FileDecriptor agora possui um novo listener chamado quando uma conexão é fechada.
+
 08.01.2017 - 1.5.179
 - Alterando o valor padrão de alguns DATETIME no banco de dados e permitir que estes sejam nulos.
 - Dois novos métodos timestamp() para trabalhar conforme a modificação acima.

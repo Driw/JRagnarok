@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PASSWORD;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_USERNAME;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_LOGIN_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newClientConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newIPBanConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newLogConfigs;
@@ -94,10 +95,17 @@ public class LoginServer extends Server
 	}
 
 	@Override
+	public String getDefaultConfigs()
+	{
+		return getConfigs().getString(SYSTEM_SERVER_DEFAULT_LOGIN_FILES);
+	}
+
+	@Override
 	protected LFileDescriptor acceptSocket(Socket socket)
 	{
 		LFileDescriptor fd = new LFileDescriptor(socket);
 		fd.setParseListener(facade.PARSE_CLIENT);
+		fd.setCloseListener(facade.CLOSE_LISTENER);
 
 		return fd;
 	}

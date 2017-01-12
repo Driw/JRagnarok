@@ -1,5 +1,17 @@
 
 //==============================================================================
+// [SERVER_ADDR] - Servidor de Personagem
+//==============================================================================
+
+bytes	length	type	name
+00		04		int		endereço de ip
+04		02		short	porta de acesso
+06		20		string	nome do servidor
+26		02		short	jogadores online
+28		02		short	tipo do servidor
+30		02		short	exibir como novo (boolean)
+
+//==============================================================================
 // [CHARACTER_INFO_NEO_UNION] - Informações de Personagem
 //==============================================================================
 
@@ -49,3 +61,13 @@ byte	length	type	name
 146		01		uchar	sexo do personagem
 
 size: 147 bytes
+
+//==============================================================================
+// [TAG_CHARACTER_BLOCK_INFO] - Informações de Bloqueio do Personagem
+//==============================================================================
+
+byte	length	type	name
+00		04		uint	código de identificação do personagem
+04		20		uchar	horário para expirar o bloqueio
+
+size: 24 bytes

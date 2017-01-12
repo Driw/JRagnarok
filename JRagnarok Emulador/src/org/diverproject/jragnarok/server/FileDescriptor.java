@@ -98,6 +98,11 @@ public abstract class FileDescriptor
 	private FileDescriptorListener parseListener;
 
 	/**
+	 * Listener para realizar o fechamento da conexão.
+	 */
+	private FileDescriptorListener closeListener;
+
+	/**
 	 * Criador de pacotes.
 	 */
 	private PacketBuilder packetBuilder;
@@ -195,6 +200,26 @@ public abstract class FileDescriptor
 	public void setParseListener(FileDescriptorListener parseListener)
 	{
 		this.parseListener = parseListener;
+	}
+
+	/**
+	 * Listener que possui um método para processar ações após o fechamento do socket.
+	 * @return aquisição do listener usado após a conexão ter sido fechada.
+	 */
+
+	public FileDescriptorListener getCloseListener()
+	{
+		return closeListener;
+	}
+
+	/**
+	 * Listener que possui um método para processar ações após o fechamento do socket.
+	 * @param closeListener listener usado após a conexão ter sido fechada.
+	 */
+
+	public void setCloseListener(FileDescriptorListener closeListener)
+	{
+		this.closeListener = closeListener;
 	}
 
 	/**

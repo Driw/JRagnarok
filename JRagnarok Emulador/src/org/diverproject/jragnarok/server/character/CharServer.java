@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PORT;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_CHAR_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newCharServerConfigs;
 import static org.diverproject.log.LogSystem.logInfo;
 
@@ -86,10 +87,17 @@ public class CharServer extends Server
 	}
 
 	@Override
+	public String getDefaultConfigs()
+	{
+		return getConfigs().getString(SYSTEM_SERVER_DEFAULT_CHAR_FILES);
+	}
+
+	@Override
 	protected CFileDescriptor acceptSocket(Socket socket)
 	{
 		CFileDescriptor fd = new CFileDescriptor(socket);
 		fd.setParseListener(facade.CLIENT_PARSE);
+		fd.setCloseListener(facade.CLOSE_LISTENER);
 
 		return fd;
 	}

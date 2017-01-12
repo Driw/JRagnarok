@@ -4,7 +4,7 @@
 //==============================================================================
 
 byte	length	type	name
-
+00		02		short	identificação do pacote
 00		01		byte	tipo de rejeição
 
-size: 1 byte
+size: 03 bytes

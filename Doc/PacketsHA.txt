@@ -1,0 +1,26 @@
+
+//==============================================================================
+// 0x2710 [PACKET_HA_CHARSERVERCONNECT] - Solicitação de Acesso do Char Server
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		24		string	nome do usuário
+26		24		string	senha para o acesso
+50		04		int		endereço de ip
+54		02		short	porta para acesso
+56		20		string	nome do servidor
+76		02		short	tipo de servidor
+78		02		short	exibir como novo
+
+size: 80 bytes
+
+//==============================================================================
+// 0x2710 [PACKET_CA_CHARSERVERCONNECT] - Resposta da Acesso do Char Server
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+00		01		byte	resultado do acesso
+
+size: 03 bytes

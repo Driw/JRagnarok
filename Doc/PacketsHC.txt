@@ -4,83 +4,155 @@
 //==============================================================================
 
 byte	length	type	name
-00		02		short	tamanho do pacote em bytes
-02		01		uchar	número de slots total
-03		01		uchar	número do primeiro slot premium
-04		01		uchar	número do último slot premium
-05		01		char	primeiro slot faturado ???
-06		04		int		code ???
-10		04		int		time1 ???
-14		04		int		time2 ???
-18		07		char	outros slots faturados ???
+00		02		short	identificação do pacote
+02		02		short	tamanho do pacote em bytes
+04		01		uchar	número de slots total
+05		01		uchar	número do primeiro slot premium
+06		01		uchar	número do último slot premium
+07		01		char	primeiro slot faturado ???
+08		04		int		code ???
+12		04		int		time1 ???
+16		04		int		time2 ???
+20		07		char	outros slots faturados ???
 
-size: 25 + (147|CHARACTER_INFO_NEO_UNION) bytes
+size: 27 + (147|CHARACTER_INFO_NEO_UNION) bytes
 
 //==============================================================================
 // 0x6C [PACKET_HC_REFUSE_ENTER] - Rejeitar Entrada
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
 00		01		uchar	código do erro
 
-size: 1 byte
+size: 03 byte
+
+//==============================================================================
+// 0x006D [PACKET_HC_ACCEPT_MAKECHAR_NEO_UNION] - Personagem Criado com Sucesso
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+
+size: 02 + CHARACTER_INFO_NEO_UNION bytes
+
+//==============================================================================
+// 0x006E [PACKET_HC_REFUSE_MAKECHAR] - Rejeitar Criação de Personagem
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		01		byte	códgio do erro
+
+size: 03 bytes
+
+//==============================================================================
+// 0x006F [PACKET_HC_ACCEPT_DELETECHAR] - Exclusão de Personagem com Sucesso
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+
+size: 02 bytes
+
+//==============================================================================
+// 0x0070 [PACKET_HC_REFUSE_DELETECHAR] - Rejeitar Exclusão de Personagem
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		01		byte	códgio do erro
+
+size: 03 bytes
 
 //==============================================================================
 // 0x020D [PACKET_HC_BLOCK_CHARACTER] - Personagens Bloqueados
 //==============================================================================
 
 byte	length	type	name
-00		02		short	tamanho do pacote
+00		02		short	identificação do pacote
+02		02		short	tamanho do pacote
 
-TAG_CHARACTER_BLOCK_INFO
-[
-	byte	length	type	name
-	00		04		uint	código de identificação do personagem
-	04		20		uchar	horário para expirar o bloqueio
-]
+size: 04 + (24|TAG_CHARACTER_BLOCK_INFO) bytes
 
-size: 2 + (24|TAG_CHARACTER_BLOCK_INFO) bytes
+//==============================================================================
+// 0x0828 [PACKET_HC_DELETE_CHAR3_RESERVED] - Exclusão de Personagem Agendada
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação do personagem
+06		04		int		resultado do agendamento
+10		04		uint	horário do agendamento para excluir
+
+size: 14 bytes
+
+//==============================================================================
+// 0x082A [PACKET_HC_DELETE_CHAR3] - Resultado da Exclusão do Personagem
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação do personagem
+06		04		int		resultado do agendamento
+
+size: 10 bytes
+
+//==============================================================================
+// 0x082B [PACKET_HC_DELETE_CHAR3_CANCEL] - Resultado do Cancelamento de Agendamento
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação do personagem
+06		04		int		resultado do agendamento
+
+size: 10 bytes
 
 //==============================================================================
 // 0x082D [PACKET_HC_ACCEPT2] - Aceito no Servidor de Personagem
 //==============================================================================
 
 byte	length	type	name
-00		02		ushort	tamanho do pacote em bytes
-02		01		uchar	quantidade de slots comuns
-03		01		uchar	quantidade de slots premium
-04		01		uchar	quantidade de slots faturados
-05		01		uchar	quantidade de slots produtivo
-06		01		uchar	quantidade de slots válidos
-07		20		char	extension ???
+00		02		short	identificação do pacote
+02		02		ushort	tamanho do pacote em bytes
+04		01		uchar	quantidade de slots comuns
+05		01		uchar	quantidade de slots premium
+06		01		uchar	quantidade de slots faturados
+07		01		uchar	quantidade de slots produtivo
+08		01		uchar	quantidade de slots válidos
+09		20		char	extension ???
 
-size: 27 + (147|CHARACTER_INFO_NEO_UNION) bytes
+size: 29 + (147|CHARACTER_INFO_NEO_UNION) bytes
 
 //==============================================================================
 // 0x08B9 [PACKET_HC_SECOND_PASSWD_LOGIN] - Enviar Estado para Código PIN
 //==============================================================================
 
 byte	length	type	name
-00		04		uint	valor da seed para código pin
-04		04		uint	código de identificação da conta
-08		02		ushort	estado em que o código pin deve entrar
+00		02		short	identificação do pacote
+02		04		uint	valor da seed para código pin
+06		04		uint	código de identificação da conta
+10		02		ushort	estado em que o código pin deve entrar
 
-size: 10 bytes
+size: 12 bytes
 
 //==============================================================================
 // 0x099D [PACKET_HC_ACK_CHARINFO_PER_PAGE] - Informações de Personagem por Página
 //==============================================================================
 
 byte	length	type	name
-00		02		short	tamanho do pacote
+00		02		short	identificação do pacote
+02		02		short	tamanho do pacote
 
-size: 2 + (147|CHARACTER_INFO_NEO_UNION) bytes
+size: 04 + (147|CHARACTER_INFO_NEO_UNION) bytes
 
 //==============================================================================
 // 0x9A0 [PACKET_HC_CHARLIST_NOTIFY] - Notificar Lista de Personagens
 //==============================================================================
 
 byte	length	type	name
-00		04		int		quantidade para páginas de personagens
+00		02		short	identificação do pacote
+02		04		int		quantidade para páginas de personagens
 
-size: 4 bytes
+size: 06 bytes

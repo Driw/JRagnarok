@@ -147,7 +147,10 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigString(SYSTEM_CONFIG_TYPES, "ConfigTypes.conf"));
 		configurations.add(new ConfigString(SYSTEM_SERVER_FILES));
 		configurations.add(new ConfigString(SYSTEM_SERVER_FOLDER, "Servers"));
-		configurations.add(new ConfigString(SYSTEM_SERVER_DEFAULT_FILES, "IpBan.conf,Log.conf,Client.conf,LoginServer.conf,CharServer.conf,MapServer.conf"));
+		configurations.add(new ConfigString(SYSTEM_SERVER_DEFAULT_FILES, "Log.conf"));
+		configurations.add(new ConfigString(SYSTEM_SERVER_DEFAULT_LOGIN_FILES, "IpBan.conf,Client.conf,LoginServer.conf"));
+		configurations.add(new ConfigString(SYSTEM_SERVER_DEFAULT_CHAR_FILES, "CharServer.conf"));
+		configurations.add(new ConfigString(SYSTEM_SERVER_DEFAULT_MAP_FILES, "MapServer.conf"));
 		configurations.add(new ConfigString(SYSTEM_SERVER_DEFAULT_FOLDER, "Default"));
 		configurations.add(new ConfigBoolean(SYSTEM_USE_CONSOLE, true));
 		configurations.add(new ConfigBoolean(SYSTEM_USE_LOG, true));
@@ -214,6 +217,7 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigInt(LOGIN_MIN_GROUP_TO_CONNECT, 0));
 		configurations.add(new ConfigInt(LOGIN_ALLOWED_REGS, 1));
 		configurations.add(new ConfigInt(LOGIN_TIME_ALLOWED, 10));
+
 		configurations.add(new ConfigInt(VIP_GROUPID, 4));
 		configurations.add(new ConfigInt(VIP_CHAR_INCREASE, MAX_CHAR_VIP));
 

@@ -381,7 +381,7 @@ public class JRagnarok
 		server.setConfigurations(configs);
 
 		String files = configs.getString(SYSTEM_SERVER_DEFAULT_FILES)+ "," +configs.getString(SYSTEM_SERVER_DEFAULT_LOGIN_FILES);
-		configs.add(SYSTEM_SERVER_DEFAULT_FILES, files, true);
+		configs.add(SYSTEM_SERVER_DEFAULT_LOGIN_FILES, files, true);
 
 		SERVERS.add(server);
 		CONSOLE.addLoginServer(server);
@@ -400,7 +400,7 @@ public class JRagnarok
 		server.setConfigurations(configs);
 
 		String files = configs.getString(SYSTEM_SERVER_DEFAULT_FILES)+ "," +configs.getString(SYSTEM_SERVER_DEFAULT_CHAR_FILES);
-		configs.add(SYSTEM_SERVER_DEFAULT_FILES, files, true);
+		configs.add(SYSTEM_SERVER_DEFAULT_CHAR_FILES, files, true);
 
 		SERVERS.add(server);
 		CONSOLE.addCharServer(server);
@@ -419,7 +419,7 @@ public class JRagnarok
 		server.setConfigurations(configs);
 
 		String files = configs.getString(SYSTEM_SERVER_DEFAULT_FILES)+ "," +configs.getString(SYSTEM_SERVER_DEFAULT_MAP_FILES);
-		configs.add(SYSTEM_SERVER_DEFAULT_FILES, files, true);
+		configs.add(SYSTEM_SERVER_DEFAULT_MAP_FILES, files, true);
 
 		SERVERS.add(server);
 		CONSOLE.addMapServer(server);

@@ -12,19 +12,8 @@ byte	length	type	name
 14		04		int		endereço de ip
 18		26		string	horário do último acesso (?)
 44		01		byte	sexo da conta (ainda é usado?)
-
-char-servers
-[
-	offset	length	type	name
-	00		04		int		endereço de ip
-	04		02		short	porta de acesso
-	06		20		string	nome do servidor
-	26		02		short	jogadores online
-	28		02		short	tipo do servidor
-	30		02		short	exibir como novo (boolean)
-]
-
-size: 45 + (37 * server_count) bytes
+0
+size: 45 + (37|SERVER_ADDR) bytes
 
 //==============================================================================
 // 0x006A [PACKET_AC_REFUSE_LOGIN] - Acesso Negado

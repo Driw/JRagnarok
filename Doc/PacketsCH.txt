@@ -4,38 +4,162 @@
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação da conta
+06		04		uint	valor da segunda seed
+10		04		uint	valor da primeira seed
+14		02		ushort	tipo do cliente
+16		01		uchar	sexo da conta
 
-00		04		uint	código de identificação da conta
-04		04		uint	valor da segunda seed
-08		04		uint	valor da primeira seed
-12		02		ushort	tipo do cliente
-14		01		uchar	sexo da conta
-
-size: 15 bytes
+size: 17 bytes
 
 //==============================================================================
 // 0x0066 [PACKET_CH_SELECT_CHAR] - Selecionar Personagem
 //==============================================================================
 
 byte	length	type	name
-00		01		uchar	char_slot
+00		02		short	identificação do pacote
+02		01		uchar	char_slot
 
-size: 01 byte
+size: 03 bytes
 
 //==============================================================================
 // 0x0066 [PACKET_CH_MAKE_CHAR] - Criar Personagem
 //==============================================================================
 
 byte	length	type	name
-00		24		uchar	nome do personagem
-24		01		uchar	pontos distribuídos em força
-25		01		uchar	pontos distribuídos em agilidade
-26		01		uchar	pontos distribuídos em vitalidade
-27		01		uchar	pontos distribuídos em inteligência
-28		01		uchar	pontos distribuídos em dextreza
-29		01		uchar	pontos distribuídos em sorte
-30		01		uchar	númelo de slot do personagem
-31		02		short	cor do cabelo
-33		02		short	estilo do cabelo
+00		02		short	identificação do pacote
+02		24		uchar	nome do personagem
+26		01		uchar	pontos distribuídos em força
+27		01		uchar	pontos distribuídos em agilidade
+28		01		uchar	pontos distribuídos em vitalidade
+29		01		uchar	pontos distribuídos em inteligência
+30		01		uchar	pontos distribuídos em dextreza
+31		01		uchar	pontos distribuídos em sorte
+32		01		uchar	númelo de slot do personagem
+33		02		short	cor do cabelo
+35		02		short	estilo do cabelo
 
-size: 35 bytes
+size: 37 bytes
+
+//==============================================================================
+// 0x0068 [PACKET_CH_DELETE_CHAR] - Excluir Personagem por Email
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação do personagem
+06		40		string	endereço de e-mail da conta
+
+size: 46 bytes
+
+//==============================================================================
+// 0x0187 [PACKET_CH_PING] - Manter Conexão com o Servidor (Ping)
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta
+
+size: 06 bytes
+
+//==============================================================================
+// 0x01FB [PACKET_CH_DELETE_CHAR2] - Excluir Personagem por Email (2)
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação do personagem
+06		50		string	endereço de e-mail da conta
+
+size: 56 bytes
+
+//==============================================================================
+// 0x020B [PACKET_CH_EXE_HASHCHECK] - Enviar Hash para o Servidor de Personagem
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		01		byte	tipo do cliente
+03		16		byte	valor de hash do cliente
+
+size: 18 bytes
+
+//=================================================================================================
+// 0x0827 [PACKET_CH_DELETE_CHAR3_RESERVED] - Agencar Exclusão de Personagem
+//=================================================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação do personagem
+
+size: 06 bytes
+
+//=================================================================================================
+// 0x0829 [PACKET_CH_DELETE_CHAR3] - Excluir Personagem com Data de Nascimento
+//=================================================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação do personagem
+06		06		string	data de nascimento do jogador
+
+size: 12 bytes
+
+//=================================================================================================
+// 0x082B [PACKET_CH_DELETE_CHAR3_CANCEL] - Cancelar Agendamento para Exclusão de Personagem
+//=================================================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação do personagem
+
+size: 06 bytes
+
+//==============================================================================
+// 0x0970 [PACKET_CH_MAKE_CHAR_NOT_STATS] - Criar Personagem sem Atributos
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		24		string	nome do personagem
+26		01		byte	número de slot
+27		02		short	cor do cabelo
+29		02		short	estilo do cabelo
+
+size: 31 bytes
+
+//==============================================================================
+// 0x099C [PACKET_CH_REQ_CHARINFO_PER_PAGE] - Quantidade de Páginas para Personagens
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		quantidade de páginas para personagens
+
+size: 06 bytes
+
+//==============================================================================
+// 0x09A1 [PACKET_CH_CHARLIST_REQ] - Solicitar Lista de Personagens por Página
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+
+size: 02 bytes
+
+//==============================================================================
+// 0x0A39 [PACKET_CH_CREATE_NEW_CHAR] - Criar Novo Personagem
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		24		string	nome do personagem
+26		01		byte	número de slot
+27		02		short	cor do cabelo
+29		02		short	estilo do corte de cabelo
+31		02		short	classe inicial (raça)
+33		02		short	???
+35		01		byte	sexo do personagem
+
+size: 36 bytes

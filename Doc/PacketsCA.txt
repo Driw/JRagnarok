@@ -4,153 +4,129 @@
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	versão do cliente
+06		24		uchar	nome de usuário
+30		24		uchar	senha de acesso
+54		01		ubyte	tipo de cliente
 
-00		04		uint	versão do cliente
-04		24		uchar	nome de usuário
-28		24		uchar	senha de acesso
-52		01		ubyte	tipo de cliente
-
-size: 53 bytes
+size: 55 bytes
 
 //==============================================================================
 // 0x01DB [PACKET_CA_REQ_HASH] - Solicitação do Hash
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
+02		02		short	tamanho da chave em hash
+04		20		string	código hash em md5
 
-00		02		short	chave do valor em hash
-02		20		string	código hash em md5
-
-size: 22 bytes
+size: 24 bytes
 
 //==============================================================================
 // 0x01DD [PACKET_CA_LOGIN2] - Solicitação de Acesso 2.0
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		versão do cliente
+06		24		str		nome de usuário
+30		16		str		senha de acesso (hash)
+46		01		byte	tipo de cliente
 
-00		04		int		versão do cliente
-04		24		str		nome de usuário
-28		16		str		senha de acesso (hash)
-52		01		byte	tipo de cliente
-
-size: 45 bytes
+size: 47 bytes
 
 //==============================================================================
 // 0x01FA [PACKET_CA_LOGIN3] - Solicitação de Acesso 3.0
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		versão do cliente
+06		24		str		nome de usuário
+30		16		str		senha de acesso (hash)
+46		01		byte	tipo de cliente
+47		01		byte	informação do cliente
 
-00		04		int		versão do cliente
-04		24		str		nome de usuário
-28		16		str		senha de acesso (hash)
-52		01		byte	tipo de cliente
-53		01		byte	informação do cliente
-
-size: 46 bytes
+size: 48 bytes
 
 //==============================================================================
 // 0x0200 [PACKET_CA_CONNECT_INFO_CHANGED] - Manter Conectado
 //==============================================================================
 
 byte	length	type	name
-
+00		02		short	identificação do pacote
 00		24		str		identificação
 
-size: 24 bytes
+size: 26 bytes
 
 //==============================================================================
 // 0x0204 [PACKET_CA_EXE_HASHCHECK] - Update Client Hash
 //==============================================================================
 
 byte	length	type	name
-
+00		02		short	identificação do pacote
 00		16		byte[]	valor hash
 
-size: 16 bytes
+size: 18 bytes
 
 //==============================================================================
 // 0x0277 [PACKET_CA_LOGIN_PCBANG] - Acesso por LAN House
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		versão do cliente
+06		24		str		nome de usuário
+30		24		str		senha de acesso
+54		16		byte	tipo de cliente
+70		13		str		endereço mac
 
-00		04		int		versão do cliente
-04		24		str		nome de usuário
-28		24		str		senha de acesso
-52		16		byte	tipo de cliente
-68		13		str		endereço mac
-
-size: 81 bytes
+size: 83 bytes
 
 //==============================================================================
 // 0x027C [PACKET_CA_LOGIN4] - Solicitação de Acesso 4.0
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		versão do cliente
+06		24		str		nome de usuário
+30		16		str		senha de acesso (hash)
+46		01		byte	tipo de cliente
+47		13		string	endereço mac
 
-00		04		int		versão do cliente
-04		24		str		nome de usuário
-28		16		str		senha de acesso (hash)
-52		01		byte	tipo de cliente
-53		13		string	endereço mac
-
-size: 58 bytes
+size: 60 bytes
 
 //==============================================================================
 // 0x02B0 [PACKET_CA_LOGIN_HAN] - Acesso por LAN House (?)
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		versão do cliente
+06		24		str		nome de usuário
+30		24		str		senha de acesso
+54		01		byte	tipo de cliente
+55		16		string	endereço de ip
+71		13		str		endereço mac
+84		01		bool	han game user (?)
 
-00		04		int		versão do cliente
-04		24		str		nome de usuário
-28		24		str		senha de acesso
-52		01		byte	tipo de cliente
-53		16		string	endereço de ip
-69		13		str		endereço mac
-82		01		bool	han game user (?)
-
-size: 83 bytes
+size: 85 bytes
 
 //==============================================================================
 // 0x0825 [PACKET_CA_SSO_LOGIN_REQ] - Acesso por Token
 //==============================================================================
 
 byte	length	type	name
+00		02		short	identificação do pacote
+02		02		short	tamanho do token [token_size]
+04		04		int		versão do cliente
+08		01		byte	tipo de cliente
+09		24		str		nome de usuário
+33		27		str		senha de acesso
+60		17		str		endereço mac
+77		15		string	endereço de ip
+92		xx		string	token
 
-00		02		short	tamanho do token [token_size]
-02		04		int		versão do cliente
-06		01		byte	tipo de cliente
-07		24		str		nome de usuário
-31		27		str		senha de acesso
-58		17		str		endereço mac
-75		15		string	endereço de ip
-90		xx		string	token
-
-size: 90 + token_size bytes
-
-//==============================================================================
-// 0x2710 [PACKET_CA_REQ_CHAR_CONNECT] - Solicitação de Acesso do Char Server
-//==============================================================================
-
-byte	length	type	name
-
-00		24		string	nome do usuário
-24		24		string	senha para o acesso
-48		04		int		endereço de ip
-52		02		short	porta para acesso
-54		20		string	nome do servidor
-74		02		short	tipo de servidor
-76		02		short	exibir como novo
-
-size: 78 bytes
-
-//==============================================================================
-// 0x2710 [PACKET_CA_CHARSERVERCONNECT] - Resposta da Acesso do Char Server
-//==============================================================================
-
-byte	length	type	name
-
-00		01		byte	resultado do acesso
+size: 92 + token_size bytes

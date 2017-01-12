@@ -108,6 +108,13 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 				if (!fd.isConnected())
 					fd.close();
 
+				try {
+					fd.getCloseListener().onCall(fd);
+				} catch (RagnarokException e) {
+					logError("falha ao encerrar conexão (fd: %d).\n", fd.getID());
+					logExeceptionSource(e);
+				}
+
 				if (fd.getFlag().is(FLAG_SERVER))
 					logInfo("sessão server#%d fechada e removida (ip: %s).\n", fd.getID(), fd.getAddressString());
 				else
