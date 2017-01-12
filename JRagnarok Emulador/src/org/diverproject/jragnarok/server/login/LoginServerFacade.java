@@ -33,6 +33,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_REGISTERS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_USER_COUNT;
 import static org.diverproject.log.LogSystem.logDebug;
+import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
@@ -369,6 +370,22 @@ class LoginServerFacade
 		charService = null;
 		loginService = null;		
 	}
+
+	public final FileDescriptorListener CLOSE_LISTENER = new FileDescriptorListener()
+	{
+		@Override
+		public boolean onCall(FileDescriptor fd) throws RagnarokException
+		{
+			LFileDescriptor lfd = (LFileDescriptor) fd;
+			LoginSessionData sd = lfd.getSessionData();
+
+			loginService.removeOnlineUser(sd.getID());
+
+			logNotice("conta completamente removido do servidor de acesso (aid: %d).\n", sd.getID());
+
+			return false;
+		}
+	};
 
 	/**
 	 * Listener usado para receber novas conexões solicitadas com o servidor de acesso.

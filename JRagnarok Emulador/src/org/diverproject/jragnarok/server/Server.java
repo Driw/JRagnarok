@@ -14,7 +14,6 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_PASSWORD;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_TIMEZONE;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_USERNAME;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FOLDER;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FOLDER;
 import static org.diverproject.jragnarok.JRagnarokConstants.LOCALHOST;
@@ -233,6 +232,14 @@ public abstract class Server
 	 */
 
 	public abstract int getPort();
+
+	/**
+	 * As configurações padrões identificam o nome dos arquivos que serão lidos por padrão.
+	 * Após a leitura dos arquivos padrões é feito a leitura dos arquivos especificados que sobrepõe.
+	 * @return aquisição da string contendo o nome de todos os arquivos padrões separados por vírgula.
+	 */
+
+	public abstract String getDefaultConfigs();
 
 	/**
 	 * O estado do servidor pode ser útil para realizar determinadas operações.
@@ -708,7 +715,7 @@ public abstract class Server
 		String defaultFolder = configs.getString(SYSTEM_SERVER_DEFAULT_FOLDER);
 		String defaultFolderPath = format("config/%s/%s", serverFolder, defaultFolder);
 
-		String defaultFilesConfig = configs.getString(SYSTEM_SERVER_DEFAULT_FILES);
+		String defaultFilesConfig = getDefaultConfigs();
 		String defaultFiles[] = defaultFilesConfig.split(",");
 
 		for (String file : defaultFiles)

@@ -13,6 +13,11 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_SYNCRO
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SS_GROUP_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CHARLIST_REQ;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR2;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR3;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR3_CANCEL;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR3_RESERVED;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_ENTER;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR_NOT_STATS;
@@ -188,6 +193,16 @@ public class CharServerFacade
 		clientService = null;
 		authService = null;
 	}
+
+	public final FileDescriptorListener CLOSE_LISTENER = new FileDescriptorListener()
+	{
+		@Override
+		public boolean onCall(FileDescriptor fd) throws RagnarokException
+		{
+			// TODO Auto-generated method stub
+			return false;
+		}
+	};
 
 	public final FileDescriptorListener CLIENT_PARSE = new FileDescriptorListener()
 	{
