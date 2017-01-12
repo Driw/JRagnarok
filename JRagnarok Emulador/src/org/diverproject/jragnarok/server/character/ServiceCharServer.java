@@ -1,35 +1,58 @@
 package org.diverproject.jragnarok.server.character;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.DEFAULT_EMAIL;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
+import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_CREATE;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_DELETE_DELAY;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_DELETE_LEVEL;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_IGNORING_CASE;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_NAME_LETTERS;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_NAME_OPTION;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_ENABLED;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_UNLIMITED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_WISP_SERVER_NAME;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR2;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR_NOT_STATS;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.BIRTH_DATE;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.DATABASE_ERROR_DELETE;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.DUE_SETTINGS;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.NOT_YET_POSSIBLE_TIME;
+import static org.diverproject.jragnarok.packets.common.DeleteChar.SUCCCESS_DELETE;
+import static org.diverproject.jragnarok.packets.common.DeleteCharCancel.DATABASE_ERROR_CANCEL;
+import static org.diverproject.jragnarok.packets.common.DeleteCharCancel.SUCCCESS_CANCEL;
+import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.ADDED_TO_QUEUE;
+import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.ALREADY_ON_QUEUE;
+import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.CHAR_NOT_FOUND;
+import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_CANNOT_BE_DELETED;
+import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_DENIED;
+import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_INCORRET_EMAIL_ADDRESS;
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.CREATION_DENIED;
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.NAME_USED;
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.NO_AVAIABLE_SLOT;
 import static org.diverproject.jragnarok.server.common.Job.JOB_NOVICE;
-import static org.diverproject.jragnarok.server.common.Job.JOB_SUMMER;
+import static org.diverproject.jragnarok.server.common.Job.JOB_SUMMONER;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
+import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.util.lang.IntUtil.interval;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_CreateNewChar;
+import org.diverproject.jragnarok.packets.character.fromclient.CH_DeleteChar;
+import org.diverproject.jragnarok.packets.character.fromclient.CH_DeleteChar2;
+import org.diverproject.jragnarok.packets.character.fromclient.CH_DeleteChar3;
+import org.diverproject.jragnarok.packets.character.fromclient.CH_DeleteCharCancel;
+import org.diverproject.jragnarok.packets.character.fromclient.CH_DeleteCharReserved;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_MakeChar;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_MakeCharNotStats;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Ping;
-import org.diverproject.jragnarok.packets.character.toclient.HC_AcceptMakeCharNeoUnion;
-import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseMakeChar;
 import org.diverproject.jragnarok.packets.common.RefuseMakeChar;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerListener;
@@ -42,6 +65,11 @@ import org.diverproject.util.lang.HexUtil;
 
 public class ServiceCharServer extends AbstractCharService
 {
+	/**
+	 * Serviço para comunicação inicial com o cliente.
+	 */
+	private ServiceCharClient client;
+
 	/**
 	 * Serviço para comunicação com o servidor de acesso.
 	 */
@@ -70,6 +98,7 @@ public class ServiceCharServer extends AbstractCharService
 	@Override
 	public void init()
 	{
+		client = getServer().getFacade().getCharClient();
 		login = getServer().getFacade().getLoginService();
 		characters = getServer().getFacade().getCharacterControl();
 		onlines = getServer().getFacade().getOnlineMap();
@@ -86,6 +115,7 @@ public class ServiceCharServer extends AbstractCharService
 	@Override
 	public void destroy()
 	{
+		client = null;
 		login = null;
 		characters = null;
 		onlines = null;
@@ -190,10 +220,10 @@ public class ServiceCharServer extends AbstractCharService
 
 	/**
 	 * Cria um personagem de diversas formas de acordo com o comando passado, cada comando é um pacote diferente.
-	 * Os seguintes tipos de pacotes são aceitos e terão efeitos ao utilizar este médo de criação do personagem:
+	 * Os seguintes tipos de pacotes são aceitos e terão efeitos ao utilizar este método de criação do personagem:
 	 * <code>PACKET_CH_MAKE_CHAR</code>, <code>PACKET_CH_MAKE_CHAR_NOT_STATS</code>, <code>PACKET_CH_CREATE_NEW_CHAR</code>.
-	 * @param fd código de identificação do descritor de arquivo do cliente com o servidor.
-	 * @param command código de identificação do pacote (comando) recebido para a criação do personagem.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param command identificação do pacote (comando) recebido para criar um personagem.
 	 */
 
 	public void makeChar(CFileDescriptor fd, short command)
@@ -255,13 +285,7 @@ public class ServiceCharServer extends AbstractCharService
 
 		if (error == null)
 		{
-			HC_AcceptMakeCharNeoUnion accept = new HC_AcceptMakeCharNeoUnion();
-			accept.setCharacter(character);
-			accept.setSlot(slot);
-			accept.setMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
-			accept.setMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));
-			accept.setMoveCount(character.getMoves());
-			accept.send(fd);
+			client.acceptMakeChar(fd, character, slot);
 
 			CharData data = new CharData();
 			data.setID(character.getID());
@@ -269,12 +293,8 @@ public class ServiceCharServer extends AbstractCharService
 			fd.getSessionData().setCharData(data, slot);
 		}
 
-		if (error != null)
-		{
-			HC_RefuseMakeChar refuse = new HC_RefuseMakeChar();
-			refuse.setError(error);
-			refuse.send(fd);
-		}
+		else
+			client.refuseMakeChar(fd, error);
 	}
 
 	/**
@@ -297,7 +317,7 @@ public class ServiceCharServer extends AbstractCharService
 
 		if (PACKETVER >= 20151001)
 		{
-			if (character.getJob() != JOB_NOVICE && character.getJob() != JOB_SUMMER)
+			if (character.getJob() != JOB_NOVICE && character.getJob() != JOB_SUMMONER)
 				return CREATION_DENIED;
 		}
 
@@ -365,5 +385,240 @@ public class ServiceCharServer extends AbstractCharService
 		}
 
 		return null;
+	}
+
+	/**
+	 * Procedimento interno utilizado para localizar o número de slot de um determinado personagem.
+	 * A busca é feita levando em consideração uma sessão no servidor de personagem.
+	 * @param sd sessão no servidor do qual será realizada a busca pelo slot do personagem.
+	 * @param charID código de identificação do personagem do qual deseja o número de slot.
+	 * @return aquisição do número de slot respectivo a identificação do personagem ou -1 se não encontrar.
+	 */
+
+	private int foundCharSlot(CharSessionData sd, int charID)
+	{
+		for (int slot = 0; slot < MAX_CHARS; slot++)
+			if (sd.getCharData(slot) != null && sd.getCharData(slot).getID() == charID)
+				return slot;
+
+		return -1;
+	}
+
+	/**
+	 * Procedimento para realizar a deleção de todos os dados possíveis de um determinado personagem.
+	 * Esta deleção é feita através da confirmação do e-mail que será recebido através de pacote.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param command identificação do pacote (comando) recebido para excluir um personagem.
+	 */
+
+	public void deleteCharByEmail(CFileDescriptor fd, short command)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		int charID;
+		String email;
+
+		switch (command)
+		{
+			case PACKET_CH_DELETE_CHAR:
+				CH_DeleteChar deleteChar = new CH_DeleteChar();
+				deleteChar.receive(fd);
+				charID = deleteChar.getCharID();
+				email = deleteChar.getEmail();
+				break;
+
+			case PACKET_CH_DELETE_CHAR2:
+				CH_DeleteChar2 deleteChar2 = new CH_DeleteChar2();
+				deleteChar2.receive(fd);
+				charID = deleteChar2.getCharID();
+				email = deleteChar2.getEmail();
+				break;
+
+			default:
+				throw new RagnarokRuntimeException("0x%s não é usado aqui", HexUtil.parseInt(command, 4));
+		}
+
+		logInfo("solicitação para deleção de personagem por e-mail (aid: %d, cid: %d).\n", sd.getID(), charID);
+
+		if (email.isEmpty() || !email.equals(sd.getEmail()) || email.equals(DEFAULT_EMAIL))
+		{
+			client.refuseDeleteChar(fd, RDC_INCORRET_EMAIL_ADDRESS);
+			return;
+		}
+
+		int slot = foundCharSlot(sd, charID);
+
+		if (slot < 0)
+		{
+			client.refuseDeleteChar(fd, RDC_DENIED);
+			return;
+		}
+
+		try {
+
+			if (characters.remove(charID))
+			{
+				sd.setCharData(null, slot);
+				client.acceptDeleteChar(fd);
+			}
+
+			else
+				client.refuseDeleteChar(fd, RDC_CANNOT_BE_DELETED);
+
+		} catch (RagnarokException e) {
+
+			logError("falha ao excluir personagem (aid: %d, cid: %d).\n", sd.getID(), charID);
+			logException(e);
+		}
+	}
+
+	/**
+	 * Realiza a ação de reservar de um horário para que um personagem específico possa ser excluído.
+	 * A reserva considera o horário atual do servidor com um adicional de intervalo configurável.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void deleteCharReserved(CFileDescriptor fd)
+	{
+		CH_DeleteCharReserved packet = new CH_DeleteCharReserved();
+		packet.receive(fd);
+
+		CharSessionData sd = fd.getSessionData();
+
+		int charID = packet.getCharID();
+		int slot = foundCharSlot(sd, charID);
+
+		if (slot == -1)
+		{
+			client.deleteCharReserved(fd, charID, 0, CHAR_NOT_FOUND);
+			return;
+		}
+
+		try {
+
+			long deleteDate = characters.getDeleteDate(charID);
+
+			if (deleteDate == 0)
+			{
+				// TODO verificar se está em um clã
+				// TODO verificar se está em um grupo
+
+				deleteDate = now() + seconds(getConfigs().getInt(CHARACTER_DELETE_DELAY));
+
+				if (characters.setDeleteDate(charID, deleteDate))
+				{
+					logInfo("personagem reservado para ser excluído (aid: %d, cid: %d).\n", sd.getID(), charID);
+					client.deleteCharReserved(fd, charID, deleteDate, ADDED_TO_QUEUE);
+					return;
+				}
+			}
+
+		} catch (RagnarokException e) {
+
+			logError("falha ao obter horário de deleção (cid: %d):\n", charID);
+			logException(e);
+		}
+
+		client.deleteCharReserved(fd, charID, 0, ALREADY_ON_QUEUE);
+	}
+
+	/**
+	 * Solicitação para confirmar a deleção do personagem da conta após o horário de reserva do mesmo.
+	 * Irá verificar se as condições de horário, data de nascimento, nível de base estão de acordo.
+	 * Em seguida informa ao cliente o resultado da ação, se foi bem sucedido ou o problema ocorrido.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void deleteCharByBirthDate(CFileDescriptor fd)
+	{
+		CH_DeleteChar3 packet = new CH_DeleteChar3();
+		packet.receive(fd);
+
+		CharSessionData sd = fd.getSessionData();
+
+		int charID = packet.getCharID();
+		String temp = packet.getBirthDate();
+		String birthDate = format("%s-%s-%s", temp.substring(0, 2), temp.substring(2, 4), temp.substring(4, 6));
+
+		logInfo("solicitação para deleção de personagem por data de nascimento (aid: %d, cid: %d).\n", sd.getID(), charID);
+
+		int slot = foundCharSlot(sd, charID);
+
+		if (slot == -1)
+		{
+			client.deleteCharReserved(fd, charID, 0, CHAR_NOT_FOUND);
+			return;
+		}
+
+		try {
+
+			long deleteDate = characters.getDeleteDate(charID);
+
+			if (deleteDate == 0 || deleteDate > now())
+			{
+				client.deleteAccept(fd, charID, NOT_YET_POSSIBLE_TIME);
+				return;
+			}
+
+			if (!birthDate.equals(sd.getBirthdate()))
+			{
+				client.deleteAccept(fd, charID, BIRTH_DATE);
+				return;
+			}
+
+			int baseLevel = characters.getBaseLevel(charID);
+			int deleteLevel = getConfigs().getInt(CHARACTER_DELETE_LEVEL);
+
+			if (deleteLevel > 0 && baseLevel >= deleteLevel || deleteLevel < 0 && baseLevel <= deleteLevel)
+			{
+				client.deleteAccept(fd, charID, DUE_SETTINGS);
+				return;
+			}
+
+			if (!characters.remove(charID))
+			{
+				sd.setCharData(null, slot);
+				client.deleteAccept(fd, charID, SUCCCESS_DELETE);
+				return;
+			}
+
+			client.deleteAccept(fd, charID, DATABASE_ERROR_DELETE);
+
+		} catch (RagnarokException e) {
+
+			logError("falha ao confirmar deleção de personagem (aid: %d, cid: %d):\n");
+			logException(e);
+		}
+	}
+
+	/**
+	 * Cancela a reserva para a deleção de um personagem do qual já esteja em reserva marcada.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void deleteCharCancel(CFileDescriptor fd)
+	{
+		CH_DeleteCharCancel packet = new CH_DeleteCharCancel();
+		packet.receive(fd);
+
+		CharSessionData sd = fd.getSessionData();
+
+		int charID = packet.getCharID();
+
+		try {
+
+			if (foundCharSlot(sd, charID) != -1 && characters.cancelDelete(charID))
+			{
+				client.deleteCancel(fd, charID, SUCCCESS_CANCEL);
+				return;
+			}
+
+		} catch (RagnarokException e) {
+
+			logError("falha ao cancelar reserva para excluir personagem (aid: %d, cid: %d):\n", sd.getID(), charID);
+			logException(e);
+		}
+
+		client.deleteCancel(fd, charID, DATABASE_ERROR_CANCEL);
 	}
 }

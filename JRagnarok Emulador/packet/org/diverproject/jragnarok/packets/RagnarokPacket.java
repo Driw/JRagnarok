@@ -78,7 +78,7 @@ public class RagnarokPacket
 	// -- RAGNAROK PACKET ID : CLIENT TO CHAR SERVER (CH) -- 
 
 	public static final short PACKET_CH_ENTER									= 0x0065;
-	public static final short PACKET_CH_SELECT_CHAR								= 0x0066;
+//	public static final short PACKET_CH_SELECT_CHAR								= 0x0066;
 	public static final short PACKET_CH_MAKE_CHAR								= 0x0067;
 	public static final short PACKET_CH_DELETE_CHAR								= 0x0068;
 	public static final short PACKET_CH_PING									= 0x0187;
@@ -86,29 +86,29 @@ public class RagnarokPacket
 //	public static final short PACKET_CH_EXE_HASHCHECK							= 0x020B;
 //	public static final short PACKET_CH_ENTER2									= 0x0275;
 //	public static final short PACKET_CH_SELECT_CHAR_GOINGTOBEUSED				= 0x028C;
-	public static final short PACKET_CH_REQ_IS_VALID_CHARNAME					= 0x028D;
-	public static final short PACKET_CH_REQ_CHANGE_CHARNAME						= 0x028F;
+//	public static final short PACKET_CH_REQ_IS_VALID_CHARNAME					= 0x028D;
+//	public static final short PACKET_CH_REQ_CHANGE_CHARNAME						= 0x028F;
 //	public static final short PACKET_CH_ACK_GAME_GUARD							= 0x03DE;
-	public static final short PACKET_CH_ENTER_CHECKBOT							= 0x07E5;
-	public static final short PACKET_CH_CHECKBOT								= 0x07E7;
+//	public static final short PACKET_CH_ENTER_CHECKBOT							= 0x07E5;
+//	public static final short PACKET_CH_CHECKBOT								= 0x07E7;
 	public static final short PACKET_CH_DELETE_CHAR3_RESERVED					= 0x0827;
 	public static final short PACKET_CH_DELETE_CHAR3							= 0x0829;
 	public static final short PACKET_CH_DELETE_CHAR3_CANCEL						= 0x082B;
 //	public static final short PACKET_CH_SELECT_ACCESSIBLE_MAPNAME				= 0x0841;
 //	public static final short PACKET_CH_WAITING_LOGIN							= 0x08B0;
-	public static final short PACKET_CH_SECOND_PASSWD_ACK						= 0x08B8;
-	public static final short PACKET_CH_MAKE_SECOND_PASSWD						= 0x08BA;
+//	public static final short PACKET_CH_SECOND_PASSWD_ACK						= 0x08B8;
+//	public static final short PACKET_CH_MAKE_SECOND_PASSWD						= 0x08BA;
 //	public static final short PACKET_CH_DELETE_SECOND_PASSWD					= 0x08BC;
-	public static final short PACKET_CH_EDIT_SECOND_PASSWD						= 0x08BE;
+//	public static final short PACKET_CH_EDIT_SECOND_PASSWD						= 0x08BE;
 //	public static final short PACKET_CH_NOT_AVAILABLE_SECOND_PASSWD				= 0x08C3;
-	public static final short PACKET_CH_AVAILABLE_SECOND_PASSWD					= 0x08C5;
-	public static final short PACKET_CH_REQ_CHANGE_CHARACTER_SLOT				= 0x08D4;
+//	public static final short PACKET_CH_AVAILABLE_SECOND_PASSWD					= 0x08C5;
+//	public static final short PACKET_CH_REQ_CHANGE_CHARACTER_SLOT				= 0x08D4;
 //	public static final short PACKET_CH_REQ_CHANGE_CHARACTERNAME				= 0x08FC;
 	public static final short PACKET_CH_MAKE_CHAR_NOT_STATS						= 0x0970;
 //	public static final short PACKET_CH_REQ_CHARINFO_PER_PAGE					= 0x099C;
 	public static final short PACKET_CH_CHARLIST_REQ							= 0x09A1;
 	public static final short PACKET_CH_CREATE_NEW_CHAR							= 0x0A39;
-	public static final short PACKET_CH_PARSE_MAP_LOGIN							= 0x2AF8;
+//	public static final short PACKET_CH_PARSE_MAP_LOGIN							= 0x2AF8;
 
 	// -- RAGNAROK PACKET ID : CHAR SERVER TO CLIENT (HC) -- 
 
@@ -116,8 +116,8 @@ public class RagnarokPacket
 	public static final short PACKET_HC_REFUSE_ENTER							= 0x006C;
 	public static final short PACKET_HC_ACCEPT_MAKECHAR_NEO_UNION				= 0x006D;
 	public static final short PACKET_HC_REFUSE_MAKECHAR							= 0x006E;
-//	public static final short PACKET_HC_ACCEPT_DELETECHAR						= 0x006F;
-//	public static final short PACKET_HC_REFUSE_DELETECHAR						= 0x0070;
+	public static final short PACKET_HC_ACCEPT_DELETECHAR						= 0x006F;
+	public static final short PACKET_HC_REFUSE_DELETECHAR						= 0x0070;
 //	public static final short PACKET_HC_NOTIFY_ZONESVR							= 0x0071;
 	public static final short PACKET_HC_BLOCK_CHARACTER							= 0x020D;
 //	public static final short PACKET_HC_REQUEST_CHARACTER_PASSWORD				= 0x023E;
@@ -127,9 +127,9 @@ public class RagnarokPacket
 //	public static final short PACKET_HC_CHARACTER_LIST							= 0x0448;
 //	public static final short PACKET_HC_CHECKBOT								= 0x07E8;
 //	public static final short PACKET_HC_CHECKBOT_RESULT							= 0x07E9;
-//	public static final short PACKET_HC_DELETE_CHAR3_RESERVED					= 0x0828;
-//	public static final short PACKET_HC_DELETE_CHAR3							= 0x082A;
-//	public static final short PACKET_HC_DELETE_CHAR3_CANCEL						= 0x082C;
+	public static final short PACKET_HC_DELETE_CHAR3_RESERVED					= 0x0828;
+	public static final short PACKET_HC_DELETE_CHAR3							= 0x082A;
+	public static final short PACKET_HC_DELETE_CHAR3_CANCEL						= 0x082C;
 	public static final short PACKET_HC_ACCEPT2									= 0x082D;
 //	public static final short PACKET_HC_WAITING_LOGIN							= 0x08AF;
 //	public static final short PACKET_HC_SECOND_PASSWD_REQ						= 0x08B7;

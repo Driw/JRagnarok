@@ -12,19 +12,33 @@ import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logWarning;
+import static org.diverproject.util.Util.i;
+import static org.diverproject.util.Util.now;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.character.toclient.TAG_CHARACTER_BLOCK_INFO;
 import org.diverproject.jragnarok.packets.character.toclient.HC_Accept2;
+import org.diverproject.jragnarok.packets.character.toclient.HC_AcceptDeleteChar;
 import org.diverproject.jragnarok.packets.character.toclient.HC_AcceptEnterNeoUnion;
+import org.diverproject.jragnarok.packets.character.toclient.HC_AcceptMakeCharNeoUnion;
 import org.diverproject.jragnarok.packets.character.toclient.HC_AckCharInfoPerPage;
 import org.diverproject.jragnarok.packets.character.toclient.HC_BlockCharacter;
 import org.diverproject.jragnarok.packets.character.toclient.HC_CharListNotify;
+import org.diverproject.jragnarok.packets.character.toclient.HC_DeleteChar3;
+import org.diverproject.jragnarok.packets.character.toclient.HC_DeleteCharCancel;
+import org.diverproject.jragnarok.packets.character.toclient.HC_DeleteCharReserved;
+import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseDeleteChar;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
+import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseMakeChar;
 import org.diverproject.jragnarok.packets.character.toclient.HC_SecondPasswordLogin;
+import org.diverproject.jragnarok.packets.common.DeleteChar;
+import org.diverproject.jragnarok.packets.common.DeleteCharCancel;
+import org.diverproject.jragnarok.packets.common.DeleteCharReserved;
 import org.diverproject.jragnarok.packets.common.NotifyAuthResult;
 import org.diverproject.jragnarok.packets.common.PincodeState;
+import org.diverproject.jragnarok.packets.common.RefuseDeleteChar;
 import org.diverproject.jragnarok.packets.common.RefuseEnter;
+import org.diverproject.jragnarok.packets.common.RefuseMakeChar;
 import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.Timer;
@@ -95,7 +109,7 @@ public class ServiceCharClient extends AbstractCharService
 	 * Essa funcionalidade é chamada durante a análise de novos pacotes recebidos pelo cliente.
 	 * Além disso a condição mínima para este chamado é que esteja em EOF (end of file).
 	 * Deve verificar se o jogador (sessão) já foi autenticado e está online no sistema.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 * @return true se foi autenticado ou false caso contrário (true fecha conexão).
 	 */
 
@@ -124,7 +138,7 @@ public class ServiceCharClient extends AbstractCharService
 	/**
 	 * Notifica o cliente que houve algum problema após a autenticação do acesso.
 	 * O acesso foi autenticado porém houve algum problema em liberar o acesso.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 * @param result resultado da liberação do acesso para o cliente.
 	 */
 
@@ -139,7 +153,7 @@ public class ServiceCharClient extends AbstractCharService
 
 	/**
 	 * Recusa a entrada de uma determinada sessão no servidor de acesso.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 * @param error resultado que será mostrado ao cliente.
 	 */
 
@@ -154,7 +168,7 @@ public class ServiceCharClient extends AbstractCharService
 
 	/**
 	 * Informa ao cliente que o sistema de código PIN está entrando no estado de:
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 * @param sd dados da sessão do cliente com o servidor de personagem.
 	 * @param state estado do qual o código PIN deve assumir.
 	 */
@@ -175,7 +189,7 @@ public class ServiceCharClient extends AbstractCharService
 
 	/**
 	 * Envia todos os dados para a exibição da lista de personagens de uma conta de acordo com o cliente.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 */
 
 	public void sendCharList(CFileDescriptor fd)
@@ -200,7 +214,7 @@ public class ServiceCharClient extends AbstractCharService
 
 	/**
 	 * Envia ao cliente os dados relacionados a quantidade de slots disponíveis para personagens.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 */
 
 	public void sendAccountSlot(CFileDescriptor fd)
@@ -221,7 +235,7 @@ public class ServiceCharClient extends AbstractCharService
 	/**
 	 * Envia todos os dados dos personagens da conta respectiva a sessão que foi estabelecida.
 	 * Os dados são enviados ao cliente para que ele possa exibir a seleção do personagem.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 */
 
 	public void sendAccountChars(CFileDescriptor fd)
@@ -257,7 +271,7 @@ public class ServiceCharClient extends AbstractCharService
 	/**
 	 * Envia ao cliente a quantidade de páginas disponíveis para seleção de personagens.
 	 * Cada página é composta por 3 slots para alocação de um único personagem no mesmo.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 */
 
 	public void sendCharPageCount(CFileDescriptor fd)
@@ -274,7 +288,7 @@ public class ServiceCharClient extends AbstractCharService
 	/**
 	 * Envia todos os dados dos personagens da conta respectiva a sessão que foi estabelecida.
 	 * Os dados são enviados ao cliente para que ele possa exibir a seleção do personagem.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
 	 */
 
 	public boolean sendCharsPerPage(CFileDescriptor fd)
@@ -497,5 +511,107 @@ public class ServiceCharClient extends AbstractCharService
 	public void sendMoveCharSlotResult(CFileDescriptor fd)
 	{
 		// TODO chclif_moveCharSlotReply
+	}
+
+	/**
+	 * Informa o cliente durante a seleção de personagem que a criação do personagem falhou.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param error erro que especifica qual o problema ocorrido durante a criação.
+	 */
+
+	public void refuseMakeChar(CFileDescriptor fd, RefuseMakeChar error)
+	{
+		HC_RefuseMakeChar packet = new HC_RefuseMakeChar();
+		packet.setError(error);
+		packet.send(fd);		
+	}
+
+	/**
+	 * Informa o cliente durante a seleção de personagem a confirmação e dados do personagem criado.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param character personagem contendo todas as informações que possam ser necessárias.
+	 * @param slot número de slot para alocação do personagem respectivamente a sua conta.
+	 */
+
+	public void acceptMakeChar(CFileDescriptor fd, Character character, byte slot)
+	{
+		HC_AcceptMakeCharNeoUnion packet = new HC_AcceptMakeCharNeoUnion();
+		packet.setCharacter(character);
+		packet.setSlot(slot);
+		packet.setMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
+		packet.setMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));
+		packet.setMoveCount(character.getMoves());
+		packet.send(fd);		
+	}
+
+	/**
+	 * Informa o cliente durante a seleção de personagem que a exclusão do personagem falhou.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param error erro que especifica qual o problema ocorrido durante a exclusão.
+	 */
+
+	public void refuseDeleteChar(CFileDescriptor fd, RefuseDeleteChar error)
+	{
+		HC_RefuseDeleteChar packet = new HC_RefuseDeleteChar();
+		packet.setError(error);
+		packet.send(fd);
+	}
+
+	/**
+	 * Informa o cliente durante a seleção de personagem que a exclusão do personagem foi feita.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void acceptDeleteChar(CFileDescriptor fd)
+	{
+		HC_AcceptDeleteChar packet = new HC_AcceptDeleteChar();
+		packet.send(fd);
+	}
+
+	/**
+	 * Informa ao cliente o resultado da solicitação para agendar a exclusão de um personagem.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param charID código de identificação do personagem do qual a ação foi feita.
+	 * @param deleteDate horário em que o personagem deverá ser excluído ou zero se não for.
+	 * @param result resultado obtido da tentativa de agendar a exclusão do personagem.
+	 */
+
+	public void deleteCharReserved(CFileDescriptor fd, int charID, long deleteDate, DeleteCharReserved result)
+	{
+		HC_DeleteCharReserved packet = new HC_DeleteCharReserved();
+		packet.setCharID(charID);
+		packet.setDeleteDate(i(deleteDate - now())/1000);
+		packet.setResult(result);
+		packet.send(fd);
+	}
+
+	/**
+	 * Informa ao cliente o resultado da ação para excluir um personagem de sua conta.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param charID código de identificação do personagem do qual a ação foi feita.
+	 * @param result resultado obtido da tentativa de excluir o personagem especificado.
+	 */
+
+	public void deleteAccept(CFileDescriptor fd, int charID, DeleteChar result)
+	{
+		HC_DeleteChar3 packet = new HC_DeleteChar3();
+		packet.setCharID(charID);
+		packet.setResult(result);
+		packet.send(fd);
+	}
+
+	/**
+	 * Informa ao cliente o resultado da ação para cancelar o agendamento de exclusão do personagem especificado.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param charID código de identificação do personagem do qual a ação foi feita.
+	 * @param result resultado obtido após realizar o cancelamento do agendamento.
+	 */
+
+	public void deleteCancel(CFileDescriptor fd, int charID, DeleteCharCancel result)
+	{
+		HC_DeleteCharCancel packet = new HC_DeleteCharCancel();
+		packet.setCharID(charID);
+		packet.setResult(result);
+		packet.send(fd);
 	}
 }

@@ -33,6 +33,11 @@ public class JRagnarokConstants
 	 */
 	public static final String DATETIME_FORMAT = "dd/MM/yyyy";
 
+	/**
+	 * Email padrão.
+	 */
+	public static final String DEFAULT_EMAIL = "a@a.com";
+
 
 	/**
 	 * Quantidade de caracteres que compõe um nome.

@@ -265,11 +265,24 @@ public class CharServerFacade
 				charService.makeChar(fd, command);
 				return true;
 
-			/*
+			case PACKET_CH_DELETE_CHAR:
 			case PACKET_CH_DELETE_CHAR2:
+				charService.deleteCharByEmail(fd, command);
+				return true;
+
 			case PACKET_CH_DELETE_CHAR3_RESERVED:
+				charService.deleteCharReserved(fd);
+				return true;
+
 			case PACKET_CH_DELETE_CHAR3:
+				charService.deleteCharByBirthDate(fd);
+				return true;
+
 			case PACKET_CH_DELETE_CHAR3_CANCEL:
+				charService.deleteCharCancel(fd);
+				return true;
+
+			/*
 			case PACKET_CH_REQ_CHANGE_CHARACTER_SLOT:
 			case PACKET_CH_MAKE_CHAR_NOT_STATS:
 			*/

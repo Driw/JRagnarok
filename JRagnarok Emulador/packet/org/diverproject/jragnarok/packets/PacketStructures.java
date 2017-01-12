@@ -6,6 +6,7 @@ import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.i;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
+import static org.diverproject.util.Util.now;
 
 import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.util.stream.Output;
@@ -55,7 +56,7 @@ public class PacketStructures
 		output.putShort(s(slot));
 		output.putShort(s(character.getRename() > 0 ? 0 : 1));
 		output.putString(character.getLocations().getSavePoint().getMap()+ ".gat", MAP_NAME_LENGTH_EXT); // TODO pegar de outro lugar
-		output.putInt(i(character.getDeleteDate().get()));
+		output.putInt(i(character.getDeleteDate().get()/1000 - now()/1000));
 		output.putInt(character.getLook().getRobe());
 		output.putInt(!moveEnabled ? 0 : moveUnlimited ? 1 : moveCount);
 		output.putInt(character.getRename() > 0 ? 1 : 0);

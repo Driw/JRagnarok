@@ -1,3 +1,10 @@
+11.01.2017 - 1.5.182
+- Implementação das funcionalidades para deleção de personagens durante a seleção.
+- CHARACTER_INFO_NEO_UNION não estava enviando o horário de deleção corretamente.
+- Mudanças no controle de personagens, CharacterControl:
+	- Remoção de personagens alterada já que está sendo usado InnoDB com ON DELETE.
+	- Operação setCharData() não estava sendo realizada adequadamente.
+
 11.01.2017 - 1.5.181
 - Enviando o restante da implementação que deveria ter sido subida na rev180.
 

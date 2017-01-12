@@ -1212,36 +1212,23 @@ public class CharacterControl extends AbstractControl
 	/**
 	 * Exclui todas as informações básicas e das dependências de um personagem existentes no banco de dados.
 	 * @param charID código de identificação do personagem do qual deseja excluir do sistema.
+	 * @return true se tiver sido excluído com sucesso ou false caso contrário.
 	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
 	 */
 
-	public void remove(int charID) throws RagnarokException
+	public boolean remove(int charID) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharacters();
-		String tableLook = Tables.getInstance().getCharLook();
-		String tableStats = Tables.getInstance().getCharStats();
-		String tableExperiences = Tables.getInstance().getCharExperiences();
-		String tableFamily = Tables.getInstance().getCharFamily();
-		String tableMercenaryRank = Tables.getInstance().getCharMercenaryRank();
-		String sql = format("DELETE FROM %s WHERE id = ?; "
-						+	"DELETE FROM %s WHERE id = ?; "
-						+	"DELETE FROM %s WHERE id = ?; "
-						+	"DELETE FROM %s WHERE id = ?; "
-						+	"DELETE FROM %s WHERE id = ?; "
-						+	"DELETE FROM %s WHERE id = ?",
-						table, tableLook, tableStats, tableExperiences, tableFamily, tableMercenaryRank);
+		String sql = format("DELETE FROM %s WHERE id = ?", table);
 
 		try {
 
 			PreparedStatement ps = prepare(sql);
 			ps.setInt(1, charID);
-			ps.setInt(2, charID);
-			ps.setInt(3, charID);
-			ps.setInt(4, charID);
-			ps.setInt(5, charID);
-			ps.setInt(6, charID);
 
 			logDebug("Character#%d excluído.\n", charID);
+
+			return ps.executeUpdate() > 0;
 
 		} catch (SQLException e) {
 			throw new RagnarokException(e.getMessage());
@@ -1535,6 +1522,114 @@ public class CharacterControl extends AbstractControl
 	}
 
 	/**
+	 * Permite obter o horário de agendamento para exclusão de um personagem especificado abaixo:
+	 * @param charID código de identificação do personagem do qual deseja o horário agendado.
+	 * @return aquisição do horário (timestamp) para que o personagem possa ser excluído.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public long getDeleteDate(int charID) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharacters();
+		String sql = format("SELECT delete_date FROM %s WHERE id = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, charID);
+
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next())
+				return timestamp(rs.getTimestamp("delete_date"));
+
+			return 0;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Permite obter o nível de base de um personagem especificado conforme identificação abaixo:
+	 * @param charID código de identificação do personagem do qual deseja o nível de base.
+	 * @return aquisição do nível de base do personagem especificado por parâmetro.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public int getBaseLevel(int charID) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharacters();
+		String sql = format("SELECT base_level FROM %s WHERE id = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, charID);
+
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next())
+				return rs.getInt("base_level");
+
+			return 0;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Atualiza um personagem definindo um horário de agendamento para que este seja excluído.
+	 * @param charID código de identificação do personagem do qual deseja fazer o agendamento.
+	 * @param deleteDate horário agendado para ele possa ser excluído em segurança.
+	 * @return true se conseguir realizar o agendamento ou false caso não encontre.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean setDeleteDate(int charID, long deleteDate) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharacters();
+		String sql = format("UPDATE %s SET delete_date = ? WHERE id = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setTimestamp(1, timestamp(deleteDate));
+			ps.setInt(2, charID);
+
+			return ps.executeUpdate() == 1;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Atualiza um personagem removendo o seu horário para agendamento de sua própria exclusão.
+	 * @param charID código de identificação do personagem do qual deseja cancelar o agendamento.
+	 * @return true se conseguir cancelar o agendamento ou false caso contrário.
+	 * @throws RagnarokException apenas por falha de conexão com o banco de dados.
+	 */
+
+	public boolean cancelDelete(int charID) throws RagnarokException
+	{
+		String table = Tables.getInstance().getCharacters();
+		String sql = format("UPDATE %s SET delete_date = NULL WHERE id = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, charID);
+
+			return ps.executeUpdate() == 1;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
 	 * Procedimento utilizado para atualizar as informações mínimas do personagem conforme abaixo:
 	 * @param sd sessão do qual terá as informações atualizadas de todos os CharData.
 	 * @param characters indexação dos personagens através do seu número de slot.
@@ -1544,10 +1639,9 @@ public class CharacterControl extends AbstractControl
 	{
 		for (int i = 0; i < MAX_CHARS; i++)
 		{
-			if (characters.get(i) == null)
-				sd.setCharData(null, i);
+			sd.setCharData(null, i);
 
-			else
+			if (characters.get(i) != null)
 			{
 				Character character = characters.get(i);
 
@@ -1555,6 +1649,7 @@ public class CharacterControl extends AbstractControl
 				data.setID(character.getID());
 				data.setCharMove(character.getMoves());
 				data.getUnban().set(character.getUnbanTime().get());
+				sd.setCharData(data, i);
 			}
 		}
 	}
