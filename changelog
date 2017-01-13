@@ -1,3 +1,9 @@
+12.01.2017 - 1.5.185
+- Removendo alguns registros de mensagens (log) dos serviços no servidor de acesso.
+- Renomeando algumas funções dos serviços de forma a deixá-los mais nítidos a sua finalidade.
+- Chamado para manter conexão (keep alive) entre servidor de acesso e personagem corrigido.
+	- Ainda falta que o servidor de personagem implemente e considere o mesmo com válida.
+
 12.01.2017 - 1.5.184
 - Pequena correção da rev183 de atualizações que não foram feitas.
 

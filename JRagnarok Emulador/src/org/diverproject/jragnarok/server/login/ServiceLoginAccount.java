@@ -75,11 +75,6 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	private GlobalRegisterControl globalRegisters;
 
 	/**
-	 * Controlador para identificar jogadores online.
-	 */
-	private OnlineMap onlines;
-
-	/**
 	 * Cria uma nova instância do serviço para gerenciamento de contas.
 	 * @param server referência do servidor de acesso que irá usá-lo.
 	 */
@@ -97,7 +92,6 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		accounts = getServer().getFacade().getAccountControl();
 		logs = getServer().getFacade().getLoginLogControl();
 		globalRegisters = getServer().getFacade().getGlobalRegistersControl();
-		onlines = getServer().getFacade().getOnlineMap();
 	}
 
 	@Override
@@ -108,7 +102,6 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 		accounts = null;
 		logs = null;
 		globalRegisters = null;
-		onlines = null;
 	}
 
 	/**
@@ -181,7 +174,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 			else
 			{
 				logNotice("alterado de '%s' para '%s' (account: %d, ip: %s).\n", old, packet.getAccountState(), packet.getAccountID(), fd.getAddressString());
-				client.sendNotifyAccountState(fd, account, false);
+				client.sendAccountStateNotify(fd, account, false);
 			}
 		}
 	}
@@ -217,7 +210,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 			else
 			{
 				logNotice("'%s' banido por '%s' (ip: %s).\n", account.getUsername(), time(packet.getDurationTime()), fd.getAddressString());
-				client.sendNotifyAccountState(fd, account, true);
+				client.sendAccountStateNotify(fd, account, true);
 			}
 		}
 	}
@@ -343,7 +336,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o servidor de personagem.
 	 */
 
-	public void updatePinCode(LFileDescriptor fd)
+	public void pincodeUpdate(LFileDescriptor fd)
 	{
 		HA_NotifyPinUpdate packet = new HA_NotifyPinUpdate();
 		packet.receive(fd);
@@ -368,27 +361,24 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o servidor de personagem.
 	 */
 
-	public void failPinCode(LFileDescriptor fd)
+	public void pincodeFailure(LFileDescriptor fd)
 	{
 		HA_NotifyPinError packet = new HA_NotifyPinError();
 		packet.receive(fd);
 
-		if (accounts.exist(packet.getAccountID()))
+		if (accounts.exist(packet.getAccountID()) && login.isOnline(packet.getAccountID()))
 		{
-			if (onlines.get(packet.getAccountID()) != null)
-			{
-				try {
+			try {
 
-					LoginLog log = new LoginLog();
-					log.setLogin(new LoginAdapt(packet.getAccountID()));
-					log.setMessage("Falha na verificação do código PIN");
-					log.setRCode(100);
-					logs.add(log);
+				LoginLog log = new LoginLog();
+				log.setLogin(new LoginAdapt(packet.getAccountID()));
+				log.setMessage("Falha na verificação do código PIN");
+				log.setRCode(100);
+				logs.add(log);
 
-				} catch (RagnarokException e) {
-					logError("falha durante o registro da falha no código pin (aid: %d).\n", packet.getAccountID());
-					logException(e);
-				}
+			} catch (RagnarokException e) {
+				logError("falha durante o registro da falha no código pin (aid: %d).\n", packet.getAccountID());
+				logException(e);
 			}
 		}
 

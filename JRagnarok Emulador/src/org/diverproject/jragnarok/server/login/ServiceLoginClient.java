@@ -17,12 +17,12 @@ import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountStateNotify;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
-import org.diverproject.jragnarok.packets.inter.charlogin.HA_KeepAlive;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AccountData;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AckConnect;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AuthAccount;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_GlobalRegisters;
+import org.diverproject.jragnarok.packets.inter.loginchar.AH_KeepAlive;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_VipData;
 import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
 import org.diverproject.jragnarok.packets.inter.SS_GroupData;
@@ -94,8 +94,6 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void keepAlive(LFileDescriptor fd)
 	{
-		logDebug("recebendo ping (fd: %d).\n", fd.getID());
-
 		CA_ConnectInfoChanged packet = new CA_ConnectInfoChanged();
 		packet.receive(fd);
 	}
@@ -107,7 +105,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void updateClientHash(LFileDescriptor fd)
 	{
-		logDebug("recebendo atualização para o cliente hash (fd: %d).\n", fd.getID());
+		logDebug("recebendo client hash (fd: %d).\n", fd.getID());
 
 		CA_ExeHashCheck packet = new CA_ExeHashCheck();
 		packet.receive(fd);
@@ -123,94 +121,9 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param result resultado da autenticação solicitada pelo cliente.
 	 */
 
-	public void sendAuthResult(LFileDescriptor fd, RefuseLogin result)
+	public void refuseLogin(LFileDescriptor fd, RefuseLogin result)
 	{
-		logDebug("enviando resultado de autenticação (fd: %d, result: %s).\n", fd.getID(), result);
-
-		AC_RefuseLogin refuseLoginPacket = new AC_RefuseLogin();
-		refuseLoginPacket.setResult(result);
-		refuseLoginPacket.send(fd);
-	}
-
-	/**
-	 * Notifica o cliente que houve algum problema após a autenticação do acesso.
-	 * O acesso foi autenticado porém houve algum problema em liberar o acesso.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @param result resultado da liberação do acesso para o cliente.
-	 */
-
-	public void sendNotifyResult(LFileDescriptor fd, NotifyAuth result)
-	{
-		logDebug("notificando autenticação (fd: %d, result: %s).\n", fd.getID(), result);
-
-		SC_NotifyBan packet = new SC_NotifyBan();
-		packet.setResult(result);
-		packet.send(fd);
-	}
-
-	/**
-	 * Envia o mesmo pacote para todos do servidor exceto a si mesmo.
-	 * Caso nenhum cliente seja definido será enviados a todos sem exceção.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @param packet referência do pacote contendo os dados a serem enviados.
-	 * @return quantidade de clientes que tiverem os dados recebidos.
-	 */
-
-	public int sendAllWithoutOurSelf(LFileDescriptor fd, IResponsePacket packet)
-	{
-		int count = 0;
-
-		for (ClientCharServer server : getServer().getCharServerList())
-			if (fd == null || server.getFileDecriptor().getID() != fd.getID())
-			{
-				packet.send(server.getFileDecriptor());
-				count++;
-			}
-
-		logDebug("%d sessões receberam '%s'.\n", count, nameOf(packet));
-
-		return count;
-	}
-
-	/**
-	 * Analisa uma solicitação de um cliente para gerar uma chave de acesso com o servidor.
-	 * Deve gerar a chave e enviar o mesmo para o cliente possuir a chave de acesso.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 */
-
-	public void parseRequestKey(LFileDescriptor fd)
-	{
-		logDebug("enviando chave md5 (fd: %d).\n", fd.getID());
-
-		short md5KeyLength = (short) (12 + (random() % 4));
-		String md5Key = md5Salt(md5KeyLength);
-
-		LoginSessionData sd = fd.getSessionData();
-		sd.setMd5Key(md5Key);
-		sd.setMd5KeyLenght(md5KeyLength);
-
-		AC_AckHash packet = new AC_AckHash();
-		packet.setMD5KeyLength(md5KeyLength);
-		packet.setMD5Key(md5Key);
-		packet.send(fd);
-	}
-
-	/**
-	 * Envia ao cliente uma lista contendo os dados dos servidores de personagens.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 */
-
-	public void sendCharServerList(LFileDescriptor fd)
-	{
-		logDebug("lista com servidores de personagem enviado (fd: %d).\n", fd.getID());
-
-		LoginSessionData sd = fd.getSessionData();
-		CharServerList servers = getServer().getCharServerList();
-
-		AC_AccepLogin packet = new AC_AccepLogin();
-		packet.setServers(servers);
-		packet.setSessionData(sd);
-		packet.send(fd);
+		refuseLogin(fd, result, "");
 	}
 
 	/**
@@ -242,6 +155,87 @@ public class ServiceLoginClient extends AbstractServiceLogin
 			packet.setResult(result);
 			packet.send(fd);
 		}
+	}
+
+	/**
+	 * Notifica o cliente que houve algum problema após a autenticação do acesso.
+	 * O acesso foi autenticado porém houve algum problema em liberar o acesso.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param result resultado da liberação do acesso para o cliente.
+	 */
+
+	public void notifyBan(LFileDescriptor fd, NotifyAuth result)
+	{
+		logDebug("notificando autenticação (fd: %d, result: %s).\n", fd.getID(), result);
+
+		SC_NotifyBan packet = new SC_NotifyBan();
+		packet.setResult(result);
+		packet.send(fd);
+	}
+
+	/**
+	 * Envia o mesmo pacote para todos do servidor exceto a si mesmo.
+	 * Caso nenhum cliente seja definido será enviados a todos sem exceção.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param packet referência do pacote contendo os dados a serem enviados.
+	 * @return quantidade de clientes que tiverem os dados recebidos.
+	 */
+
+	public int broadcast(LFileDescriptor fd, IResponsePacket packet)
+	{
+		int count = 0;
+
+		for (ClientCharServer server : getServer().getCharServerList())
+			if (fd == null || server.getFileDecriptor().getID() != fd.getID())
+			{
+				packet.send(server.getFileDecriptor());
+				count++;
+			}
+
+		logDebug("%d sessões receberam '%s'.\n", count, nameOf(packet));
+
+		return count;
+	}
+
+	/**
+	 * Analisa uma solicitação de um cliente para gerar uma chave de acesso com o servidor.
+	 * Deve gerar a chave e enviar o mesmo para o cliente possuir a chave de acesso.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void parseMD5Key(LFileDescriptor fd)
+	{
+		logDebug("enviando chave md5 (fd: %d).\n", fd.getID());
+
+		short md5KeyLength = (short) (12 + (random() % 4));
+		String md5Key = md5Salt(md5KeyLength);
+
+		LoginSessionData sd = fd.getSessionData();
+		sd.setMd5Key(md5Key);
+		sd.setMd5KeyLenght(md5KeyLength);
+
+		AC_AckHash packet = new AC_AckHash();
+		packet.setMD5KeyLength(md5KeyLength);
+		packet.setMD5Key(md5Key);
+		packet.send(fd);
+	}
+
+	/**
+	 * Envia ao cliente uma lista contendo os dados dos servidores de personagens.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 */
+
+	public void sendCharServerList(LFileDescriptor fd)
+	{
+		logDebug("enviando lista com servidores de personagem disponíveis (fd: %d).\n", fd.getID());
+
+		LoginSessionData sd = fd.getSessionData();
+		CharServerList servers = getServer().getCharServerList();
+
+		AC_AccepLogin packet = new AC_AccepLogin();
+		packet.setServers(servers);
+		packet.setSessionData(sd);
+		packet.send(fd);
 	}
 
 	/**
@@ -284,13 +278,13 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
-	public void pingCharRequest(LFileDescriptor fd)
+	public void keepAliveCharServer(LFileDescriptor fd)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
 		logDebug("pingar servidor de personagem (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
 
-		HA_KeepAlive packet = new HA_KeepAlive();
+		AH_KeepAlive packet = new AH_KeepAlive();
 		packet.send(fd);
 	}
 
@@ -411,7 +405,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	 * @param banned true se tiver sendo banida ou false se for outro estado.
 	 */
 
-	public void sendNotifyAccountState(LFileDescriptor fd, Account account, boolean banned)
+	public void sendAccountStateNotify(LFileDescriptor fd, Account account, boolean banned)
 	{
 		logDebug("notificando alteração de estado (fd: %d, username: %s).\n", fd.getID(), account.getUsername());
 
@@ -420,7 +414,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		notify.setValue(banned ? i(account.getUnban().get()) : account.getState().CODE);
 		notify.setType(banned ? HA_AccountStateNotify.BAN : HA_AccountStateNotify.CHANGE_STATE);
 
-		sendAllWithoutOurSelf(null, notify);		
+		broadcast(null, notify);		
 	}
 
 	/**

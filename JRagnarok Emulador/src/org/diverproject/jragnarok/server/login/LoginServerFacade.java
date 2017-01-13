@@ -379,6 +379,7 @@ class LoginServerFacade
 			LFileDescriptor lfd = (LFileDescriptor) fd;
 			LoginSessionData sd = lfd.getSessionData();
 
+			authAccountMap.remove(sd.getID());
 			loginService.removeOnlineUser(sd.getID());
 
 			logNotice("conta completamente removido do servidor de acesso (aid: %d).\n", sd.getID());
@@ -404,11 +405,9 @@ class LoginServerFacade
 				return false;
 
 			// Já conectou, verificar se está banido
-			if (lfd.getSessionData().getCache() == null)
-				if (!ipBanService.parseBanTime(lfd))
-					return true;
-
-			logDebug("recebendo pacote de um cliente (fd: %d).\n", fd.getID());
+			if (lfd.getSessionData().getID() == 0)
+				if (ipBanService.onBanTime(lfd))
+					return false;
 
 			return ackClientPacket(lfd);
 		}
@@ -417,7 +416,7 @@ class LoginServerFacade
 	/**
 	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
 	 * Neste caso irá identificar o comando e que é esperado como fase inicial do cliente.
-	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @return true se o pacote recebido for de um tipo válido para análise.
 	 */
 
@@ -427,6 +426,8 @@ class LoginServerFacade
 		packetReceivePacketID.receive(fd);
 
 		short command = packetReceivePacketID.getPacketID();
+
+		logDebug("recebendo pacote de um cliente (fd: %d, pid: %s).\n", fd.getID(), HexUtil.parseShort(command, 4));
 
 		switch (command)
 		{
@@ -439,23 +440,23 @@ class LoginServerFacade
 				return true;
 
 			case PACKET_CA_REQ_HASH:
-				clientService.parseRequestKey(fd);
+				clientService.parseMD5Key(fd);
 				return true;
 		}
 
-		return dispatchAuthPacket(fd, command);
+		return ackAuthPacket(fd, command);
 	}
 
 	/**
 	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
 	 * Neste caso o comando já está identificado e deverá apenas despachar a conexão.
 	 * Os comandos aqui são de acesso inicial dos clientes com o servidor de acesso.
-	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param command comando que está sendo solicitado (código do pacote recebido).
 	 * @return true se o pacote recebido for de um tipo válido para análise.
 	 */
 
-	public boolean dispatchAuthPacket(LFileDescriptor fd, short command)
+	public boolean ackAuthPacket(LFileDescriptor fd, short command)
 	{
 		switch (command)
 		{
@@ -468,10 +469,10 @@ class LoginServerFacade
 			case PACKET_CA_LOGIN2:
 			case PACKET_CA_LOGIN3:
 			case PACKET_CA_LOGIN4:
-				return authService.requestAuth(fd, command);
+				return authService.parseClient(fd, command);
 
 			case PACKET_HA_CHARSERVERCONNECT:
-				return authService.requestCharConnect(fd);
+				return authService.parseCharServer(fd);
 
 			default:
 				String packet = HexUtil.parseInt(command, 4);
@@ -498,8 +499,6 @@ class LoginServerFacade
 			if (!fd.isConnected())
 				return false;
 
-			logDebug("recebendo pacote de um servidor de personagem (fd: %d).\n", fd.getID());
-
 			return ackCharServerPacket(lfd);
 		}
 	};
@@ -508,7 +507,7 @@ class LoginServerFacade
 	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
 	 * Neste caso o comando já está identificado e deverá apenas despachar a conexão.
 	 * Os comandos aqui são básicos entre os servidores de personagem com o de acesso.
-	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param command comando que está sendo solicitado (código do pacote recebido).
 	 * @return true se o pacote recebido for de um tipo válido para análise.
 	 */
@@ -519,6 +518,7 @@ class LoginServerFacade
 		packet.receive(fd);
 
 		short command = packet.getPacketID();
+		logDebug("recebendo pacote de um servidor de personagem (fd: %d, pid: %s).\n", fd.getID(), HexUtil.parseShort(command, 4));
 
 		switch (command)
 		{
@@ -527,7 +527,7 @@ class LoginServerFacade
 				return true;
 
 			case PACKET_HA_KEEP_ALIVE:
-				clientService.pingCharRequest(fd);
+				charService.keepAlive(fd);
 				return true;
 
 			case PACKET_HA_SET_ACCOUNT_ONLINE:
@@ -539,7 +539,7 @@ class LoginServerFacade
 				return true;
 
 			case PACKET_HA_SEND_ACCOUNTS:
-				charService.receiveSentAccounts(fd);
+				charService.receiveOnlineUsers(fd);
 				return true;
 
 			case PACKET_HA_SET_ALL_ACC_OFFLINE:
@@ -555,7 +555,7 @@ class LoginServerFacade
 	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
 	 * Neste caso o comando já está identificado e deverá apenas despachar a conexão.
 	 * Além disso os comandos aqui são esperados que sejam de um servidor de personagem.
-	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param command comando que está sendo solicitado (código do pacote recebido).
 	 * @return true se o pacote recebido for de um tipo válido para análise.
 	 */
@@ -593,7 +593,7 @@ class LoginServerFacade
 	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
 	 * Neste caso o comando já está identificado e deverá apenas despachar a conexão.
 	 * Além disso os comandos aqui são esperados que sejam de um servidor de personagem.
-	 * @param fd referência da conexão com o cliente para enviar e receber dados.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param command comando que está sendo solicitado (código do pacote recebido).
 	 * @return true se o pacote recebido for de um tipo válido para análise.
 	 */
@@ -627,11 +627,11 @@ class LoginServerFacade
 				return true;
 
 			case PACKET_HA_NOTIFY_PIN_UPDATE:
-				accountService.updatePinCode(fd);
+				accountService.pincodeUpdate(fd);
 				return true;
 
 			case PACKET_HA_NOTIFY_PIN_ERROR:
-				accountService.failPinCode(fd);
+				accountService.pincodeFailure(fd);
 				return true;
 
 			default:

@@ -175,10 +175,10 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 	 * Verifica se o endereço de IP de uma conexão foi banida afim de recusar seu acesso.
 	 * Essa operação só terá efeito se tiver sido habilitado o banimento por IP.
 	 * @param fd referência da conexão do qual deseja verificar o banimento.
-	 * @return true se estiver liberado o acesso ou false se estiver banido.
+	 * @return true se estiver banido ou false caso contrário.
 	 */
 
-	public boolean parseBanTime(LFileDescriptor fd)
+	public boolean onBanTime(LFileDescriptor fd)
 	{
 		if (getConfigs().getBool("ipban.enabled") && isBanned(fd.getAddress()))
 		{

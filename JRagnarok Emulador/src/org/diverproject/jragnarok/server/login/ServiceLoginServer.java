@@ -420,6 +420,11 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		return offlines;
 	}
 
+	public boolean isOnline(int accountID)
+	{
+		return onlines.get(accountID) != null;
+	}
+
 	/**
 	 * TODO
 	 * @param ip

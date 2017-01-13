@@ -16,6 +16,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN_
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_SSO_LOGIN_REQ;
 import static org.diverproject.jragnarok.packets.common.NotifyAuth.NA_RECOGNIZES_LAST_LOGIN;
 import static org.diverproject.jragnarok.packets.common.NotifyAuth.NA_SERVER_CLOSED;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_BANNED_UNTIL;
 import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_OK;
 import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_REJECTED_FROM_SERVER;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
@@ -38,6 +39,7 @@ import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.ServerState;
 import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerAdapt;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
@@ -155,7 +157,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * @return true se efetuar a análise com êxito ou false caso contrário.
 	 */
 
-	public boolean requestAuth(LFileDescriptor fd, short command)
+	public boolean parseClient(LFileDescriptor fd, short command)
 	{
 		boolean usingRawPassword = true;
 		LoginSessionData sd = fd.getSessionData();
@@ -229,7 +231,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				break;
 		}
 
-		return parseRequest(fd, usingRawPassword);
+		return parseClientRequest(fd, usingRawPassword);
 	}
 
 	/**
@@ -240,7 +242,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * @return true se for autenticado com êxito ou false caso contrário.
 	 */
 
-	private boolean parseRequest(LFileDescriptor fd, boolean usingRawPassword)
+	private boolean parseClientRequest(LFileDescriptor fd, boolean usingRawPassword)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
@@ -265,13 +267,13 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		if (sd.getPassDencrypt().getValue() != 0 && getConfigs().getBool("login.use_md5_password"))
 		{
-			client.sendAuthResult(fd, RefuseLogin.RL_REJECTED_FROM_SERVER);
+			client.refuseLogin(fd, RL_REJECTED_FROM_SERVER);
 			return false;
 		}
 
 		RefuseLogin result = login.parseAuthLogin(fd, false);
 
-		if (result != RefuseLogin.RL_OK)
+		if (result != RL_OK)
 		{
 			authFailed(fd, result);
 			return false;
@@ -333,7 +335,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		String blockDate = "";
 		LoginSessionData sd = fd.getSessionData();
 
-		if (result == RefuseLogin.RL_BANNED_UNTIL)
+		if (result == RL_BANNED_UNTIL)
 		{
 			Account account = (Account) sd.getCache();
 			Time unbanTime = account.getUnban();
@@ -359,13 +361,13 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		if (!authServerConnected(fd) || !authServerState(sd) || !authGroupAccount(fd))
 		{
-			client.sendNotifyResult(fd, NA_SERVER_CLOSED);
+			client.notifyBan(fd, NA_SERVER_CLOSED);
 			return;
 		}
 
 		if (!authIsntOnline(fd))
 		{
-			client.sendNotifyResult(fd, NA_RECOGNIZES_LAST_LOGIN);
+			client.notifyBan(fd, NA_RECOGNIZES_LAST_LOGIN);
 			return;
 		}
 
@@ -376,6 +378,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		logNotice("conexão da conta '%s' aceita.\n", sd.getUsername());
 
 		AuthNode node = new AuthNode();
+		node.setFdID(fd.getID());
 		node.setAccountID(sd.getID());
 		node.getSeed().copyFrom(sd.getSeed());
 		node.getIP().set(fd.getAddress());
@@ -384,8 +387,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		node.setSex(sd.getSex());
 		auths.add(node);
 
-		client.sendCharServerList(fd);
 		login.addOnlineUser(OnlineLogin.NO_CHAR_SERVER, sd.getID());
+		client.sendCharServerList(fd);
 	}
 
 	/**
@@ -541,7 +544,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		AH_AlreadyOnline packet = new AH_AlreadyOnline();
 		packet.setAccountID(account.getID());
 
-		client.sendAllWithoutOurSelf(fd, packet);
+		client.broadcast(fd, packet);
 
 		if (online.getWaitingDisconnect() == null)
 		{
@@ -560,7 +563,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * Função para temporizadores executarem a remoção de uma conta como acesso online.
 	 */
 
-	public final TimerListener WAITING_DISCONNECT_TIMER = new TimerListener()
+	public final TimerListener WAITING_DISCONNECT_TIMER = new TimerAdapt()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -585,13 +588,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		@Override
 		public String getName()
 		{
-			return "waitingDisconnectTimer";
-		}
-
-		@Override
-		public String toString()
-		{
-			return getName();
+			return "WAITING_DISCONNECT_TIMER";
 		}
 	};
 
@@ -602,7 +599,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * @return true se tiver sido autorizado ou false caso contrário.
 	 */
 
-	public boolean requestCharConnect(LFileDescriptor fd)
+	public boolean parseCharServer(LFileDescriptor fd)
 	{
 		HA_CharServerConnect packet = new HA_CharServerConnect();
 		packet.receive(fd);

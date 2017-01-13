@@ -13,17 +13,15 @@ import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_
 import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_NONE;
 import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_SHOW_RATES;
 import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_VIP;
-import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
-import static org.diverproject.log.LogSystem.logNotice;
+import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
-import org.diverproject.jragnarok.packets.inter.charlogin.HA_KeepAlive;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_SendAccount;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_SetAccountOffline;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_SetAccountOnline;
@@ -31,6 +29,7 @@ import org.diverproject.jragnarok.packets.inter.charlogin.HA_UpdateUserCount;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_SyncronizeAddress;
 import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerAdapt;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
@@ -129,7 +128,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		auths = null;
 	}
 
-	private final TimerListener SYNCRONIZE_IPADDRESS = new TimerListener()
+	private final TimerListener SYNCRONIZE_IPADDRESS = new TimerAdapt()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -137,21 +136,26 @@ public class ServiceLoginChar extends AbstractServiceLogin
 			logInfo("Sincronização de IP em progresso...\n");
 
 			AH_SyncronizeAddress packet = new AH_SyncronizeAddress();
-			client.sendAllWithoutOurSelf(null, packet);
+			client.broadcast(null, packet);
 		}
 
 		@Override
 		public String getName()
 		{
-			return "syncronizeIpAddress";
-		}
-
-		@Override
-		public String toString()
-		{
-			return getName();
+			return "SYNCRONIZE_IPADDRESS";
 		}
 	};
+
+	/**
+	 * TODO
+	 * @param fd referência da sessão da conexão com o servidor de personagem.
+	 */
+
+	public void updateCharIP(LFileDescriptor fd)
+	{
+		// TODO logchrif_parse_updcharip
+		
+	}
 
 	/**
 	 * Um servidor de personagem envia a quantidade de jogadores online.
@@ -179,14 +183,9 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
 	 */
 
-	public void pingCharRequest(LFileDescriptor fd)
+	public void keepAlive(LFileDescriptor fd)
 	{
-		LoginSessionData sd = fd.getSessionData();
-
-		logDebug("pingar servidor de personagem (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
-
-		HA_KeepAlive packet = new HA_KeepAlive();
-		packet.send(fd);
+		client.keepAliveCharServer(fd);
 	}
 
 	/**
@@ -230,11 +229,11 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		HA_AccountData packet = new HA_AccountData();
 		packet.receive(fd);
 
-		int id = packet.getAccountID();
-		Account account = accounts.get(id);
+		int accountID = packet.getAccountID();
+		Account account = accounts.get(accountID);
 
 		if (account == null)
-			logNotice("conta #%d não encontrada (ip: %s).\n", id, fd.getAddressString());
+			logWarning("dados de conta não encontrada (ip: %s, aid: %d).\n", fd.getAddressString(), accountID);
 		else
 			client.sendAccountData(fd, packet.getFdID(), account);
 	}
@@ -249,28 +248,36 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	{
 		HA_AccountInfo packet = new HA_AccountInfo();
 
-		int id = packet.getAccountID();
-		Account account = accounts.get(id);
-		client.sendAccountInfo(fd, packet, account);
+		int accountID = packet.getAccountID();
+		Account account = accounts.get(accountID);
+
+		if (account == null)
+			logWarning("informações de conta não encontrada (ip: %s, aid: %d).\n", fd.getAddressString(), accountID);
+		else
+			client.sendAccountInfo(fd, packet, account);
 	}
 
 	/**
 	 * Solicitação para enviar ao servidor de personagem os dados VIP de uma conta.
 	 * @param fd referência da sessão da conexão com o servidor de personagem.
-	 * @return  true se conseguir enviar ou false caso contrário.
 	 */
 
-	public boolean requestVipData(LFileDescriptor fd)
+	public void requestVipData(LFileDescriptor fd)
 	{
 		HA_VipData packet = new HA_VipData();
 		packet.receive(fd);
 
-		Account account = accounts.get(packet.getAccountID());
-		BitWise8 flag = new BitWise8(HA_VipData.VIP_DATA_STRINGS);
-		flag.set(packet.getFlag());
+		int accountID = packet.getAccountID();
+		Account account = accounts.get(accountID);
 
-		if (account != null)
+		if (account == null)
+			logWarning("informações vip de conta não encontrada (ip: %s, aid: %d).\n", fd.getAddressString(), accountID);
+
+		else
 		{
+			BitWise8 flag = new BitWise8(HA_VipData.VIP_DATA_STRINGS);
+			flag.set(packet.getFlag());
+
 			int vipGID = getConfigs().getInt(VIP_GROUPID);
 
 			// Nível de acesso 
@@ -325,19 +332,6 @@ public class ServiceLoginChar extends AbstractServiceLogin
 				client.sendVipData(fd, account, vipFlag, packet.getMapFD());
 			}
 		}
-
-		return account != null;
-	}
-
-	/**
-	 * TODO
-	 * @param fd referência da sessão da conexão com o servidor de personagem.
-	 */
-
-	public void updateCharIP(LFileDescriptor fd)
-	{
-		// TODO logchrif_parse_updcharip
-		
 	}
 
 	/**
@@ -345,7 +339,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	 * @param fd referência da sessão da conexão com o servidor de personagem.
 	 */
 
-	public void receiveSentAccounts(LFileDescriptor fd)
+	public void receiveOnlineUsers(LFileDescriptor fd)
 	{
 		HA_SendAccount packet = new HA_SendAccount();
 		packet.receive(fd);
