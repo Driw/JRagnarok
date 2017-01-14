@@ -199,7 +199,23 @@ public class CharServerFacade
 		@Override
 		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
-			// TODO Auto-generated method stub
+			CFileDescriptor cfd = (CFileDescriptor) fd;
+			CharSessionData sd = cfd.getSessionData();
+
+			if (sd.getID() > 0)
+			{
+				/*
+				 * TODO Confirmar se ao entrar no servidor de mapa a conexão será fechada também
+
+				OnlineCharData online = onlineMap.get(sd.getID());
+
+				if (online != null)
+					onlineMap.remove(online);
+				 */
+
+				loginService.setAccountOffline(sd.getID());
+			}
+
 			return false;
 		}
 	};
@@ -326,7 +342,6 @@ public class CharServerFacade
 			}
 
 			CFileDescriptor cfd = (CFileDescriptor) fd;
-			loginService.parsePing(cfd);
 
 			return ackLoginServerPacket(cfd);
 		}
@@ -345,7 +360,8 @@ public class CharServerFacade
 				return loginService.parseLoginResult(fd);
 
 			case PACKET_AH_KEEP_ALIVE:
-				return loginService.keepAlive(fd);
+				loginService.keepAlive(fd);
+				return true;
 
 			case PACKET_AH_GLOBAL_REGISTERS:
 				loginService.reqGlobalAccountReg(fd);

@@ -248,14 +248,14 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 	}
 
 	@Override
-	public void toString(ObjectDescription description)
-	{
-		description.append("online", cache.size());
-	}
-
-	@Override
 	public Iterator<OnlineCharData> iterator()
 	{
 		return cache.iterator();
+	}
+
+	@Override
+	public void toString(ObjectDescription description)
+	{
+		description.append("online", cache.size());
 	}
 }

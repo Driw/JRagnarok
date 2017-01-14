@@ -31,7 +31,6 @@ import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
-import static org.diverproject.util.lang.IntUtil.diff;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -45,6 +44,7 @@ import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_CharServerConnect;
+import org.diverproject.jragnarok.packets.inter.charlogin.HA_KeepAlive;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_NotifyPinError;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_NotifyPinUpdate;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_SendAccount;
@@ -62,10 +62,10 @@ import org.diverproject.jragnarok.packets.inter.loginchar.AH_AlreadyOnline;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AuthAccount;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_BanNotification;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_ChangeSex;
-import org.diverproject.jragnarok.packets.inter.loginchar.AH_KeepAlive;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorSystem;
 import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerAdapt;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
@@ -111,6 +111,16 @@ public class ServiceCharLogin extends AbstractCharService
 	 * Tempo em milissegundos de espera máxima para manter uma conexão viva.
 	 */
 	public static final int STALL_TIME = seconds(60);
+
+	/**
+	 * Tempo de intervalo para que um ping seja enviado ao servidor de acesso.
+	 */
+	public static final int PING_INTERVAL = seconds(10);
+
+	/**
+	 * Quantas vezes o temporizador poderá esperar a resposta de ping do servidor de acesso.
+	 */
+	public static final int PING_MAX_WAITING = 3;
 
 
 	/**
@@ -164,6 +174,16 @@ public class ServiceCharLogin extends AbstractCharService
 	private VipMap vips;
 
 	/**
+	 * Quantidade de vezes que o temporizador foi chamado sem resposta de ping.
+	 */
+	private int pingCount;
+
+	/**
+	 * Determina se o serviço espera resposta de ping do servidor de acesso.
+	 */
+	private boolean ping;
+
+	/**
 	 * Instancia um novo serviço de comunicação do servidor de personagem com o de acesso.
 	 * Este serviço possui dependências portanto precisa ser iniciado e destruído.
 	 * @param server referência do servidor de personagem referente ao serviço.
@@ -214,6 +234,11 @@ public class ServiceCharLogin extends AbstractCharService
 		timer.setTick(ts.getCurrentTime() + seconds(1));
 		timer.setListener(BROADCAST_USER_COUNT);
 		timers.addLoop(timer, seconds(5));
+
+		Timer keepAlive = timers.acquireTimer();
+		keepAlive.setListener(KEEP_ALIVE);
+		keepAlive.setTick(ts.getCurrentTime() + seconds(10));
+		timers.addLoop(keepAlive, seconds(10));
 	}
 
 	/**
@@ -285,7 +310,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * Caso já exista uma conexão, esse procedimento não terá qualquer efeito.
 	 */
 
-	private final TimerListener CHECK_LOGIN_CONNECTION = new TimerListener()
+	private final TimerListener CHECK_LOGIN_CONNECTION = new TimerAdapt()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -335,13 +360,7 @@ public class ServiceCharLogin extends AbstractCharService
 		@Override
 		public String getName()
 		{
-			return "checkLoginConnection";
-		}
-
-		@Override
-		public String toString()
-		{
-			return getName();
+			return "CHECK_LOGIN_CONNECTION";
 		}
 	};
 
@@ -350,7 +369,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * Irá listar o código de identificação de todas as contas que estiverem online.
 	 */
 
-	private final TimerListener SEND_ACCOUNTS = new TimerListener()
+	private final TimerListener SEND_ACCOUNTS = new TimerAdapt()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -371,13 +390,7 @@ public class ServiceCharLogin extends AbstractCharService
 		@Override
 		public String getName()
 		{
-			return "send_accounts_tologin";
-		}
-
-		@Override
-		public String toString()
-		{
-			return getName();
+			return "SEND_ACCOUNTS";
 		}
 	};
 
@@ -387,7 +400,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * como também para todos os servidores de mapa do mesmo (apenas se tiver alterado).
 	 */
 
-	private final TimerListener BROADCAST_USER_COUNT = new TimerListener()
+	private final TimerListener BROADCAST_USER_COUNT = new TimerAdapt()
 	{
 		private int previous;
 
@@ -413,32 +426,57 @@ public class ServiceCharLogin extends AbstractCharService
 		@Override
 		public String getName()
 		{
-			return "broadcast_user_count";
+			return "BROADCAST_USER_COUNT";
 		}
 	};
 
 	/**
-	 * Verifica se a conexão está em estado para solicitação de um ping.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * Listener usado para manter a conexão entre o servidor de acesso e o servidor de personagem.
 	 */
 
-	public void parsePing(CFileDescriptor fd)
+	private final TimerListener KEEP_ALIVE = new TimerAdapt()
 	{
-		if (fd.getFlag().is(FileDescriptor.FLAG_PING))
+		@Override
+		public void onCall(Timer timer, int now, int tick)
 		{
-			// Tempo de limite de espera alcançado - fechar conexão
-			if (diff(getTimerSystem().getCurrentTime(), fd.getTimeout()) > STALL_TIME * 2)
-				fd.getFlag().set(FileDescriptor.FLAG_EOF);
+			if (!isConnected())
+				return;
 
-			// Ping ainda não foi enviado - enviar
-			else if (!fd.getFlag().is(FileDescriptor.FLAG_PING_SENT))
+			if (ping)
 			{
-				AH_KeepAlive packet = new AH_KeepAlive();
-				packet.send(fd);
+				if (pingCount == PING_MAX_WAITING)
+				{
+					logNotice("conexão com o servidor de acesso fechado por falta de resposta.\n");
+					getFileDescriptor().close();
+				}
 
-				fd.getFlag().set(FileDescriptor.FLAG_PING_SENT);
+				else
+					logWarning("aguardando servidor de acesso (%d de %d tentativas)...\n", pingCount++, PING_MAX_WAITING);
 			}
-		}		
+
+			HA_KeepAlive packet = new HA_KeepAlive();
+			packet.send(getFileDescriptor());
+
+			ping = true;
+		}
+		
+		@Override
+		public String getName()
+		{
+			return "KEEP_ALIVE";
+		}
+	};
+
+	/**
+	 * Mantém a conexão de um descritor de arquivo vida dentro do sistema com um "ping".
+	 * @param lfd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 * @return true se ainda estiver conectado ou false caso contrário.
+	 */
+
+	public void keepAlive(CFileDescriptor lfd)
+	{
+		ping = false;
+		pingCount = 0;
 	}
 
 	/**
@@ -498,7 +536,7 @@ public class ServiceCharLogin extends AbstractCharService
 				CFileDescriptor fd = null;
 
 				for (FileDescriptor ifd : getFileDescriptorSystem())
-					if (fd instanceof CFileDescriptor)
+					if (ifd instanceof CFileDescriptor)
 					{
 						CFileDescriptor cfd = (CFileDescriptor) ifd;
 
@@ -509,7 +547,7 @@ public class ServiceCharLogin extends AbstractCharService
 						}
 					}
 
-				if (fd != null)
+				if (fd == null)
 					character.setCharOffline(-1, packet.getAccountID());
 				else
 				{
@@ -755,21 +793,6 @@ public class ServiceCharLogin extends AbstractCharService
 		logDebug("recebendo informações da conta do servidor de acesso (aid: %d).\n", packet.getAccountID());
 
 		map.receiveAccountInfo(packet);
-	}
-
-	/**
-	 * Mantém a conexão de um descritor de arquivo vida dentro do sistema com um "ping".
-	 * @param lfd conexão do descritor de arquivo do servidor de acesso com o servidor.
-	 * @return true se ainda estiver conectado ou false caso contrário.
-	 */
-
-	public boolean keepAlive(CFileDescriptor lfd)
-	{
-		logDebug("recebendo ping do servidor de acesso (ip: %s).\n", getFileDescriptor().getAddressString());
-
-		lfd.getFlag().unset(FileDescriptor.FLAG_PING);
-
-		return lfd.isConnected();
 	}
 
 	/**

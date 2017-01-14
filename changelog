@@ -1,3 +1,8 @@
+14.01.2017 - 1.5.188
+- ServiceCharLogin irá manter um temporizador de keepAlive com o servidor de acesso.
+- Evitar duas contas acessadas não estava funcionando corretamente em alreadyOnline(), ServiceCharLogin.
+- Ao entrar na seleção de personagem alguns dados em setCharSelectSection() não estavam corretos.
+
 14.01.2017 - 1.5.187
 - Toda a parte do acesso de uma conta no servidor de acesso ficará em ServiceLoginAuth.
 - Modificando ServiceLoginChar para que aceite corretamente o KeepAlive do servidor de personagem.

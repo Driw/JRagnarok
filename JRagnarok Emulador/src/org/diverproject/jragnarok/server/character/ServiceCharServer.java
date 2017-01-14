@@ -194,8 +194,8 @@ public class ServiceCharServer extends AbstractCharService
 				server.setUsers(s(server.getUsers() - 1));
 		}
 
-		online.setCharID(0);
-		online.setServer(0);
+		online.setCharID(-1);
+		online.setServer(OnlineCharData.NO_SERVER);
 
 		if (online.getWaitingDisconnect() != null)
 		{

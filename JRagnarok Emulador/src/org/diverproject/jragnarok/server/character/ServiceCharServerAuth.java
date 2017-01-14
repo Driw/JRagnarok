@@ -10,6 +10,7 @@ import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Enter;
 import org.diverproject.jragnarok.packets.common.NotifyAuth;
 import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerAdapt;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
@@ -86,7 +87,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 	 * Isso não irá notificar o jogador de que ficou online, apenas remover do sistema.
 	 */
 
-	private final TimerListener WAITING_DISCONNECT = new TimerListener()
+	private final TimerListener WAITING_DISCONNECT = new TimerAdapt()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -98,7 +99,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 		@Override
 		public String getName()
 		{
-			return "waitingDisconnect";
+			return "WAITING_DISCONNECT";
 		}
 	};
 
