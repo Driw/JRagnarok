@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
 import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
+import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CLIENT_CHAR_PER_ACCOUNT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP_SYNC_INTERVAL;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.VIP_CHAR_INCREASE;
@@ -19,6 +20,7 @@ import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AuthAccount;
@@ -106,16 +108,21 @@ public class ServiceLoginChar extends AbstractServiceLogin
 
 		int interval = getConfigs().getInt(LOGIN_IP_SYNC_INTERVAL);
 
+		TimerSystem ts = getTimerSystem();
+		TimerMap timers = ts.getTimers();
+
 		if (interval > 0)
 		{
-			TimerSystem ts = getTimerSystem();
-			TimerMap timers = ts.getTimers();
-
 			Timer siaTimer = timers.acquireTimer();
 			siaTimer.setListener(SYNCRONIZE_IPADDRESS);
 			siaTimer.setTick(ts.getCurrentTime() + minutes(interval));
 			ts.getTimers().addLoop(siaTimer, minutes(interval));
 		}
+
+		Timer siaTimer = timers.acquireTimer();
+		siaTimer.setListener(KEEP_ALIVE);
+		siaTimer.setTick(ts.getCurrentTime() + seconds(10));
+		ts.getTimers().addLoop(siaTimer, seconds(10));
 	}
 
 	@Override
@@ -143,6 +150,25 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		public String getName()
 		{
 			return "SYNCRONIZE_IPADDRESS";
+		}
+	};
+
+	private final TimerListener KEEP_ALIVE = new TimerAdapt()
+	{
+		@Override
+		public void onCall(Timer timer, int now, int tick)
+		{
+			CharServerList servers = getServer().getCharServerList();
+
+			for (ClientCharServer server : servers)
+				if (!server.getFileDecriptor().isConnected())
+					servers.remove(server);
+		}
+
+		@Override
+		public String getName()
+		{
+			return "KEEP_ALIVE";
 		}
 	};
 
@@ -214,7 +240,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		else
 		{
 			logInfo("autenticação de conta RECUSADA (server-fd: %d, ufd: %d).\n", fd.getID(), packet.getFileDescriptorID());
-			client.sendAuthAccount(fd, packet);
+			client.refuseLogin(fd, RefuseLogin.RL_REJECTED_FROM_SERVER);
 		}
 	}
 

@@ -280,12 +280,15 @@ public class ServiceLoginClient extends AbstractServiceLogin
 
 	public void keepAliveCharServer(LFileDescriptor fd)
 	{
-		LoginSessionData sd = fd.getSessionData();
+		if (fd.isConnected())
+		{
+			LoginSessionData sd = fd.getSessionData();
 
-		logDebug("pingar servidor de personagem (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
+			logDebug("pingar servidor de personagem (server-fd: %d, username: %s).\n", fd.getID(), sd.getUsername());
 
-		AH_KeepAlive packet = new AH_KeepAlive();
-		packet.send(fd);
+			AH_KeepAlive packet = new AH_KeepAlive();
+			packet.send(fd);
+		}
 	}
 
 	/**

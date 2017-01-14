@@ -66,6 +66,7 @@ public class JRagnarokConfigs
 	public static final String LOGIN_USERNAME = LOGIN_CONFIGS+ ".username";
 	public static final String LOGIN_PASSWORD = LOGIN_CONFIGS+ ".password";
 	public static final String LOGIN_IP_SYNC_INTERVAL = LOGIN_CONFIGS+ ".ip_sync_interval";
+	public static final String LOGIN_ONLINE_CLEANUP_INTERVAL = LOGIN_CONFIGS+ ".online_cleanup_interval";
 	public static final String LOGIN_DATE_FORMAT = LOGIN_CONFIGS+ ".date_format";
 	public static final String LOGIN_USE_MD5_PASSWORD = LOGIN_CONFIGS+ ".use_md5_password";
 	public static final String LOGIN_GROUP_TO_CONNECT = LOGIN_CONFIGS+ ".group_to_connnect";
@@ -211,6 +212,7 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigString(LOGIN_USERNAME, "server"));
 		configurations.add(new ConfigString(LOGIN_PASSWORD, "passwd"));
 		configurations.add(new ConfigInt(LOGIN_IP_SYNC_INTERVAL, 10));
+		configurations.add(new ConfigInt(LOGIN_ONLINE_CLEANUP_INTERVAL, 30));
 		configurations.add(new ConfigString(LOGIN_DATE_FORMAT, "YY-mm-dd HH:MM:SS"));
 		configurations.add(new ConfigBoolean(LOGIN_USE_MD5_PASSWORD, false));
 		configurations.add(new ConfigInt(LOGIN_GROUP_TO_CONNECT, 0));

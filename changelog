@@ -1,3 +1,10 @@
+14.01.2017 - 1.5.187
+- Toda a parte do acesso de uma conta no servidor de acesso ficará em ServiceLoginAuth.
+- Modificando ServiceLoginChar para que aceite corretamente o KeepAlive do servidor de personagem.
+	- ServiceLoginClient.keepAliveCharServer() foi atualizado para evitar NullPointerException.
+- ServiceLoginIpBan.onBanTime() corrigido, os valores de retorno estavam invertidos.
+- Métodos que faziam o acesso de uma conta em ServiceLoginServer removidos e outros aprimorados.
+
 14.01.2017 - 1.5.186
 - Nova coluna para accounts denominada de 'online' para quanto esta estiver sendo utilizada.
 - Evitando que FileDescriptorSystem faça uma chamada de closeListener() quando for nulo.

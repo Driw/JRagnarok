@@ -194,9 +194,9 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 
 			fd.close();
 
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 }

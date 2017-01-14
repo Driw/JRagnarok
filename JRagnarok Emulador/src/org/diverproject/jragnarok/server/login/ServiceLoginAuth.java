@@ -6,7 +6,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.binToHex;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.loginMessage;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Encrypt;
-import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
+import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN2;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN3;
@@ -17,17 +17,22 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_SSO_LO
 import static org.diverproject.jragnarok.packets.common.NotifyAuth.NA_RECOGNIZES_LAST_LOGIN;
 import static org.diverproject.jragnarok.packets.common.NotifyAuth.NA_SERVER_CLOSED;
 import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_BANNED_UNTIL;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_EXE_LASTED_VERSION;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_EXPIRED;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_INCORRECT_PASSWORD;
 import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_OK;
 import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_REJECTED_FROM_SERVER;
+import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_UNREGISTERED_ID;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
+import static org.diverproject.jragnarok.server.login.entities.AccountState.NONE;
 import static org.diverproject.log.LogSystem.log;
+import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_CharServerConnect;
-import org.diverproject.jragnarok.packets.inter.loginchar.AH_AlreadyOnline;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_Login;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_Login2;
 import org.diverproject.jragnarok.packets.login.fromclient.CA_Login3;
@@ -38,16 +43,12 @@ import org.diverproject.jragnarok.packets.login.fromclient.CA_LoginSingleSignOn;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.ServerState;
-import org.diverproject.jragnarok.server.Timer;
-import org.diverproject.jragnarok.server.TimerAdapt;
-import org.diverproject.jragnarok.server.TimerListener;
-import org.diverproject.jragnarok.server.TimerMap;
-import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.common.CharServerType;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.util.SocketUtil;
 import org.diverproject.util.Time;
+import org.diverproject.util.collection.Node;
 import org.diverproject.util.lang.IntUtil;
 
 /**
@@ -72,12 +73,6 @@ import org.diverproject.util.lang.IntUtil;
 
 public class ServiceLoginAuth extends AbstractServiceLogin
 {
-	/**
-	 * Tempo para que uma autenticação entre em timeout.
-	 */
-	private static final int AUTH_TIMEOUT = seconds(10);
-
-
 	/**
 	 * Serviço para comunicação entre o servidor e o cliente.
 	 */
@@ -104,11 +99,6 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	private ServiceLoginLog log;
 
 	/**
-	 * Controlador para identificar jogadores online.
-	 */
-	private OnlineMap onlines;
-
-	/**
 	 * Controlador para identificar jogadores autenticados.
 	 */
 	private AuthAccountMap auths;
@@ -132,7 +122,6 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		ipban = getServer().getFacade().getIpBanService();
 		log = getServer().getFacade().getLogService();
 		login = getServer().getFacade().getLoginService();
-		onlines = getServer().getFacade().getOnlineMap();
 		auths = getServer().getFacade().getAuthAccountMap();
 	}
 
@@ -144,7 +133,6 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		ipban = null;
 		log = null;
 		login = null;
-		onlines = null;
 		auths = null;
 	}
 
@@ -152,7 +140,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	 * Efetua a solicitação de acesso com o servidor de personagens recebido de um cliente.
 	 * Para este caso o cliente já é reconhecido como um jogador através do executável.
 	 * Deverá receber os dados do cliente adequadamente conforme o tipo de autenticação.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param command qual o comando que foi executado (tipo de pacote).
 	 * @return true se efetuar a análise com êxito ou false caso contrário.
 	 */
@@ -231,18 +219,21 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				break;
 		}
 
-		return parseClientRequest(fd, usingRawPassword);
+		if (!parsePassword(fd, usingRawPassword))
+			return false;
+
+		return parseAuthentication(fd, false);
 	}
 
 	/**
 	 * Procedimento que irá fazer a conclusão da autenticação da solicitação de um cliente.
 	 * Neste momentos os dados passados pelo cliente já terão sido lidos e guardados na sessão.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param usingRawPassword true se estiver usando senha direta ou false se for md5.
 	 * @return true se for autenticado com êxito ou false caso contrário.
 	 */
 
-	private boolean parseClientRequest(LFileDescriptor fd, boolean usingRawPassword)
+	private boolean parsePassword(LFileDescriptor fd, boolean usingRawPassword)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
@@ -271,22 +262,250 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			return false;
 		}
 
-		RefuseLogin result = login.parseAuthLogin(fd, false);
+		return true;
+	}
 
-		if (result != RL_OK)
+	/**
+	 * Procedimento chamado quando o serviço de identificação do cliente tiver autenticado o mesmo.
+	 * Aqui deverá ser autenticado os dados que foram passados pelo cliente em relação a uma conta.
+	 * Deverá garantir primeiramente que o nome de usuário é válido para se fazer um acesso.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
+	 * @param server true se o cliente for um servidor ou false caso seja um jogador.
+	 * @return true para manter a conexão ou false se for para fechar a conexão.
+	 */
+
+	public boolean parseAuthentication(LFileDescriptor fd, boolean server)
+	{
+		RefuseLogin result = null;
+		LoginSessionData sd = fd.getSessionData();
+
+		if (((result = authClientVersion(sd)) != RL_OK) ||
+			((result = makeLoginAccount(fd, server)) != RL_OK))
 		{
 			authFailed(fd, result);
 			return false;
 		}
 
-		authOk(fd);
-		return true;
+		Account account = (Account) sd.getCache();
+
+		logNotice("autenticação aceita (id: %d, username: %s, ip: %s).\n", account.getID(), account.getUsername(), fd.getAddressString());
+
+		sd.setID(account.getID());
+		sd.getLastLogin().set(account.getLastLogin().get());
+		sd.setGroup(account.getGroup().getCurrentGroup());
+		sd.setSex(account.getSex());
+
+		sd.getSeed().genFirst();
+		sd.getSeed().genSecond();
+
+		account.getLastLogin().set(now());
+		account.getLastIP().set(fd.getAddress());
+		account.setLoginCount(account.getLoginCount() + 1);
+
+		if (!accounts.set(account))
+			logError("falha ao atualizar acesso (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
+
+		// Contas de servidores não precisam ser registrados como online
+		if (server)
+			return true;
+
+		return authOk(fd);
+	}
+
+	/**
+	 * Comunica-se com o controle de contas para obter todos os dados da conta desejada.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
+	 * @param server true se o cliente for um servidor ou false se for um jogador.
+	 * @return resultado da obtenção dos dados da conta que o cliente passou,
+	 * caso os dados tenham sido obtidos com êxito ficaram no cache do FileDescriptor.
+	 */
+
+	private RefuseLogin makeLoginAccount(LFileDescriptor fd, boolean server)
+	{
+		LoginSessionData sd = fd.getSessionData();
+		Account account = accounts.get(sd.getUsername());
+
+		if (account == null)
+		{
+			logNotice("usuário não encontrado (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
+			return RL_UNREGISTERED_ID;
+		}
+
+		RefuseLogin result = RefuseLogin.RL_OK;
+
+		if (((result = authPassword(fd, account)) != RL_OK) ||
+			((result = authExpirationTime(fd, account)) != RL_OK) ||
+			((result = authBanTime(fd, account)) != RL_OK) ||
+			((result = authAccountState(fd, account)) != RL_OK) ||
+			((result = authClientHash(fd, account, server)) != RL_OK))
+			return result;
+
+		sd.setCache(account);
+
+		return RL_OK;
+	}
+
+	/**
+	 * Verifica primeiramente se está habilitado a verificação para versão do cliente.
+	 * Caso esteja habilitado a versão do cliente deverá ser igual a da configuração definida.
+	 * @param sd referência da sessão que contém os dados de acesso do cliente em questão.
+	 * @return resultado da autenticação da versão que o cliente está usando.
+	 */
+
+	private RefuseLogin authClientVersion(LoginSessionData sd)
+	{
+		if (getConfigs().getBool("client.check_version"))
+		{
+			int version = getConfigs().getInt("client.version");
+
+			if (sd.getVersion() != version)
+			{
+				logNotice("versão inválida (account: %s, version (client/server): %d/%d).\n", sd.getUsername(), sd.getVersion(), version);
+				return RL_EXE_LASTED_VERSION;
+			}
+		}
+
+		return RL_OK;
+	}
+
+	/**
+	 * Autentica se a senha passada pelo cliente corresponde com a senha da conta acessada.
+	 * Caso não sejam iguais o cliente receberá uma mensagem de que a conta não pode ser acessada.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
+	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
+	 * @return resultado da autenticação da senha passada pelo cliente com a da conta.
+	 */
+
+	private RefuseLogin authPassword(LFileDescriptor fd, Account account)
+	{
+		LoginSessionData sd = fd.getSessionData();
+		String password = account.getPassword();
+
+		if (!sd.getPassword().equals(password))
+		{
+			logNotice("senha incorreta (username: %s, password: %s, receive pass: %s, ip: %s).\n", sd.getUsername(), sd.getPassword(), password, fd.getAddressString());
+			return RL_INCORRECT_PASSWORD;
+		}
+
+		return RL_OK;
+	}
+
+	/**
+	 * Autentica o tempo de expiração da conta acessada pelo cliente.
+	 * Caso a conta já tenha sido expirada o cliente deverá ser informado sobre.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
+	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
+	 * @return resultado da autenticação sobre o tempo de expiração da conta.
+	 */
+
+	private RefuseLogin authExpirationTime(LFileDescriptor fd, Account account)
+	{
+		LoginSessionData sd = fd.getSessionData();
+
+		if (!account.getExpiration().isNull() && account.getExpiration().get() < now())
+		{
+			logNotice("conta expirada (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
+			return RL_EXPIRED;
+		}
+
+		return RL_OK;
+	}
+
+	/**
+	 * Autentica o tempo de banimento da conta acessada pelo cliente.
+	 * Caso a conta ainda esteja banida o cliente deverá ser informado sobre.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
+	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
+	 * @return resultado da autenticação sobre o tempo de banimento da conta.
+	 */
+
+	private RefuseLogin authBanTime(LFileDescriptor fd, Account account)
+	{
+		LoginSessionData sd = fd.getSessionData();
+
+		if (!account.getUnban().isNull() && account.getUnban().get() < now())
+		{
+			logNotice("conta banida (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
+			return RL_BANNED_UNTIL;
+		}
+
+		return RL_OK;
+	}
+
+	/**
+	 * Autentica o estado atual da conta acessada pelo cliente.
+	 * Caso a conta esteja em um estado inacessível o cliente deve ser informado sobre.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
+	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
+	 * @return resultado da autenticação do estado atual da conta.
+	 */
+
+	private RefuseLogin authAccountState(LFileDescriptor fd, Account account)
+	{
+		LoginSessionData sd = fd.getSessionData();
+
+		if (account.getState() != NONE)
+		{
+			logNotice("conexão recusada (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
+			return RefuseLogin.parse(account.getState().CODE - 1);
+		}
+
+		return RL_OK;
+	}
+
+	/**
+	 * Autentica o hash passado pelo cliente para realizar o acesso com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
+	 * @param account objeto contendo os dados da conta do qual o cliente tentou acessar.
+	 * @param server true se o cliente for um servidor ou false caso seja um jogador.
+	 * @return resultado da autenticação do hash passado pelo cliente para com o servidor.
+	 */
+
+	private RefuseLogin authClientHash(LFileDescriptor fd, Account account, boolean server)
+	{
+		LoginSessionData sd = fd.getSessionData();
+
+		if (getConfigs().getBool("client.hash_check") && !server)
+		{
+			if (sd.getClientHash() == null)
+			{
+				logNotice("client não enviou hash (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
+				return RL_EXE_LASTED_VERSION;
+			}
+
+			Object object = getConfigs().getObject("client.hash_nodes");
+			Node<ClientHash> node = null;
+			boolean match = false;
+
+			if (object != null)
+				for (node = (ClientHashNode) object; node != null; node = node.getNext())
+				{
+					ClientHashNode chn = (ClientHashNode) node;
+
+					if (account.getGroup().getCurrentGroup().getAccessLevel() < chn.getGroupLevel())
+						continue;
+
+					if (chn.get().getHashString().isEmpty() || chn.get().equals(sd.getClientHash()))
+					{
+						match = true;
+						break;
+					}
+				}
+
+			if (!match)
+			{
+				logNotice("client hash inválido (username: %s, ip: %s).\n", sd.getUsername(), fd.getAddressString());
+				return RL_EXE_LASTED_VERSION;
+			}
+		}
+
+		return RL_OK;
 	}
 
 	/**
 	 * Chamado internamente sempre que uma solicitação de acesso tiver falhado na autenticação.
 	 * Deve registrar a falha se habilitado o log e responder ao cliente qual o motivo da falha.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param result resultando obtido da autenticação feita com o cliente.
 	 */
 
@@ -299,7 +518,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * Registra uma solicitação de acesso que não foi autenticada corretamente.
 	 * Esse registro é feito no banco de dados para identificar quem falhou.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param result resultando obtido da autenticação feita com o cliente.
 	 */
 
@@ -326,7 +545,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * Procedimento que irá responder ao cliente os detalhes do resultado da autenticação.
 	 * Caso o cliente esteja banido no servidor irá informar até quando o mesmo ocorre.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param result resultando obtido da autenticação feita com o cliente.
 	 */
 
@@ -352,23 +571,26 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * Chamado internamente sempre que uma solicitação de acesso tiver sido aprovada na autenticação.
 	 * O segundo passo é verificar a conexão e estado do servidor, grupos habilitados e se está online.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
+	 * @return true se conseguir completar a autenticação com sucesso ou false caso contrário.
 	 */
 
-	private void authOk(LFileDescriptor fd)
+	private boolean authOk(LFileDescriptor fd)
 	{
 		LoginSessionData sd = fd.getSessionData();
 
 		if (!authServerConnected(fd) || !authServerState(sd) || !authGroupAccount(fd))
 		{
 			client.notifyBan(fd, NA_SERVER_CLOSED);
-			return;
+			return false;
 		}
 
-		if (!authIsntOnline(fd))
+		if (!login.isOnline(fd))
 		{
+			auths.remove(sd.getID());
 			client.notifyBan(fd, NA_RECOGNIZES_LAST_LOGIN);
-			return;
+
+			return false;
 		}
 
 		Account account = (Account) sd.getCache();
@@ -378,7 +600,6 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		logNotice("conexão da conta '%s' aceita.\n", sd.getUsername());
 
 		AuthNode node = new AuthNode();
-		node.setFdID(fd.getID());
 		node.setAccountID(sd.getID());
 		node.getSeed().copyFrom(sd.getSeed());
 		node.getIP().set(fd.getAddress());
@@ -389,11 +610,13 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 		login.addOnlineUser(OnlineLogin.NO_CHAR_SERVER, sd.getID());
 		client.sendCharServerList(fd);
+
+		return true;
 	}
 
 	/**
 	 * Faz a autenticação para verificar se há algum servidor de personagens conectado.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @return true se houver ao menos um servidor ou false se não houver nenhum
 	 */
 
@@ -435,7 +658,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	/**
 	 * Faz a autenticação para verificar se o cliente está contido nos grupos habilitados.
 	 * Essa autenticação só será válida caso tenha sido configurado grupos de acesso.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @return true se estiver habilitado a conectar-se nesse servidor.
 	 */
 
@@ -496,105 +719,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	}
 
 	/**
-	 * Autentica um cliente verificando se há um outro cliente usando a conta acessada.
-	 * Caso haja um cliente usado a conta, deverá avisar quem está online e rejeitar o acesso.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @return true se não houver ninguém na conta online ou false caso contrário.
-	 */
-
-	private boolean authIsntOnline(LFileDescriptor fd)
-	{
-		LoginSessionData sd = fd.getSessionData();
-		Account account = (Account) sd.getCache();
-		OnlineLogin online = onlines.get(account.getID());
-
-		if (online != null)
-		{
-			int id = online.getCharServerID();
-
-			CharServerList servers = getServer().getCharServerList();
-			ClientCharServer server = servers.get(id);
-
-			if (server != null)
-			{
-				authIsOnline(fd, account, online, server);
-				return false;
-			}
-
-			auths.remove(sd.getID());
-			login.removeOnlineUser(online.getAccountID());
-		}
-
-		return true;
-	}
-
-	/**
-	 * A autenticação do cliente indicou que a conta já está sendo usada (online).
-	 * Notificar ao cliente de que a conta que o servidor ainda o considera online.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
-	 * @param account objeto contendo os detalhes da conta que está sendo acessada.
-	 * @param online objeto que contém o gatilho para efetuar logout forçado.
-	 * @param server servidor de personagens do qual a conta está online.
-	 */
-
-	private void authIsOnline(LFileDescriptor fd, Account account, OnlineLogin online, ClientCharServer server)
-	{
-		logNotice("usuário '%s' já está online em '%s'.\n", account.getUsername(), server.getName());
-
-		AH_AlreadyOnline packet = new AH_AlreadyOnline();
-		packet.setAccountID(account.getID());
-
-		client.broadcast(fd, packet);
-
-		if (online.getWaitingDisconnect() == null)
-		{
-			TimerSystem ts = getTimerSystem();
-			TimerMap timers = ts.getTimers();
-
-			Timer timer = timers.acquireTimer();
-			timer.setTick(ts.getCurrentTime());
-			timer.setObjectID(account.getID());
-			timer.setListener(WAITING_DISCONNECT_TIMER);
-			timers.addInterval(timer, AUTH_TIMEOUT);
-		}
-	}
-
-	/**
-	 * Função para temporizadores executarem a remoção de uma conta como acesso online.
-	 */
-
-	public final TimerListener WAITING_DISCONNECT_TIMER = new TimerAdapt()
-	{
-		@Override
-		public void onCall(Timer timer, int now, int tick)
-		{
-			int accountID = timer.getObjectID();
-			OnlineLogin online = onlines.get(accountID);
-
-			if (online == null)
-				getTimerSystem().getTimers().delete(timer);
-			else
-			{
-				onlines.remove(accountID);
-
-				if (online.getWaitingDisconnect() != null)
-				{
-					getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
-					online.setWaitingDisconnect(null);
-				}
-			}
-		}
-
-		@Override
-		public String getName()
-		{
-			return "WAITING_DISCONNECT_TIMER";
-		}
-	};
-
-	/**
 	 * Chamado quando um servidor de personagens solicita a conexão com o servidor de acesso.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de acesso.
 	 * @param sd sessão sessão contendo os dados de acesso do cliente no servidor.
 	 * @return true se tiver sido autorizado ou false caso contrário.
 	 */
@@ -641,9 +767,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		String message = format("charserver - %s@%s:%d", serverName, SocketUtil.socketIP(serverIP), serverPort);
 		log.add(fd.getAddress(), sd, 100, message);
 
-		RefuseLogin result = login.parseAuthLogin(fd, true);
-
-		if (getServer().isState(ServerState.RUNNING) && result == RefuseLogin.RL_OK && fd.isConnected())
+		if (parseAuthentication(fd, true) && getServer().isState(ServerState.RUNNING) && fd.isConnected())
 		{
 			logNotice("conexão do servidor de personagens '%s' aceita.\n", serverName);
 
