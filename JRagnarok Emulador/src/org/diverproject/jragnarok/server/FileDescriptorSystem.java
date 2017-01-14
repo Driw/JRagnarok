@@ -105,11 +105,17 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 
 			if (fd.getFlag().is(FLAG_EOF))
 			{
-				if (!fd.isConnected())
-					fd.close();
-
 				try {
-					fd.getCloseListener().onCall(fd);
+
+					if (fd.getCloseListener() != null)
+					{
+						fd.getCloseListener().onCall(fd);
+						fd.setCloseListener(null);
+					}
+
+					if (!fd.isConnected())
+						fd.close();
+
 				} catch (RagnarokException e) {
 					logError("falha ao encerrar conexão (fd: %d).\n", fd.getID());
 					logExeceptionSource(e);
@@ -130,7 +136,7 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 
 				else if (!fd.getFlag().is(FLAG_SERVER))
 				{
-					logInfo("sessão #%d encerrada por ociosidade (ip: %s).\n", fd.getID(), fd.getAddressString());
+					logInfo("sessão #%d econtrou-se ociosa no sistema (ip: %s).\n", fd.getID(), fd.getAddressString());
 					setEndOfFile(fd);
 				}
 			}

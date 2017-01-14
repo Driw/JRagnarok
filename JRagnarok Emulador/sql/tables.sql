@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS accounts
 	account_state TINYINT NOT NULL DEFAULT 0,
 	last_ip VARCHAR(15) NOT NULL DEFAULT '127.0.0.1',
 	char_slots TINYINT NOT NULL DEFAULT 0,
+	online TINYINT(1) NOT NULL DEFAULT 0,
 
 	UNIQUE (email, username),
 	CONSTRAINT pk_accountid PRIMARY KEY (id)

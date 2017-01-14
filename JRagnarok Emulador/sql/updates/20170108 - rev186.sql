@@ -1,0 +1,2 @@
+
+ALTER TABLE accounts ADD COLUMN online TINYINT(1) NOT NULL DEFAULT 0 AFTER char_slots;

@@ -1,3 +1,9 @@
+14.01.2017 - 1.5.186
+- Nova coluna para accounts denominada de 'online' para quanto esta estiver sendo utilizada.
+- Evitando que FileDescriptorSystem faça uma chamada de closeListener() quando for nulo.
+- Agora CLOSE_LISTENER de LoginServerFacade não poderá remover autenticação ou conta online.
+	- Uma conta já na seleção de personagem fica acaba ficando offline no servidor de acesso.
+
 12.01.2017 - 1.5.185
 - Removendo alguns registros de mensagens (log) dos serviços no servidor de acesso.
 - Renomeando algumas funções dos serviços de forma a deixá-los mais nítidos a sua finalidade.

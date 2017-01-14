@@ -379,9 +379,6 @@ class LoginServerFacade
 			LFileDescriptor lfd = (LFileDescriptor) fd;
 			LoginSessionData sd = lfd.getSessionData();
 
-			authAccountMap.remove(sd.getID());
-			loginService.removeOnlineUser(sd.getID());
-
 			logNotice("conta completamente removido do servidor de acesso (aid: %d).\n", sd.getID());
 
 			return false;
