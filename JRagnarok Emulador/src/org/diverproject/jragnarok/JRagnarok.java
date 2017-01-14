@@ -16,6 +16,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FOLDER;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_CONFIGS;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_LANGUAGE;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
@@ -24,18 +25,22 @@ import static org.diverproject.log.LogSystem.logExeceptionSource;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.MessageUtil.die;
+import static org.diverproject.util.MessageUtil.showException;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnaork.configuration.Config;
 import org.diverproject.jragnaork.configuration.ConfigBoolean;
 import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.configuration.ConfigString;
 import org.diverproject.jragnaork.configuration.ConfigSystem;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnaork.messages.Messages;
 import org.diverproject.jragnarok.console.JRagnarokConsole;
 import org.diverproject.jragnarok.server.ServerControl;
 import org.diverproject.jragnarok.server.character.CharServer;
@@ -44,7 +49,9 @@ import org.diverproject.jragnarok.server.map.MapServer;
 import org.diverproject.log.LogPreferences;
 import org.diverproject.log.LogSystem;
 import org.diverproject.util.SystemUtil;
+import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;
+import org.diverproject.util.lang.IntUtil;
 import org.diverproject.util.lang.StringUtil;
 
 /**
@@ -110,15 +117,22 @@ public class JRagnarok
 	{
 		SystemUtil.setWindowsInterface();
 
-		prepareSystemConfig();
-		prepareArguments();
-		readArguments(args);
-		prepareLog();
-		prepareConsole();
-		loadSystemConfig();
-		prepareConfigTypes();
-		prepareServers();
-		runServers();
+		try {
+
+			prepareSystemConfig();
+			prepareArguments();
+			readArguments(args);
+			prepareLog();
+			prepareConsole();
+			prepareMessages();
+			loadSystemConfig();
+			prepareConfigTypes();
+			prepareServers();
+			runServers();
+
+		} catch (Exception e) {
+			showException(e);
+		}
 	}
 
 	/**
@@ -146,12 +160,14 @@ public class JRagnarok
 		ARGUMENTS.add("c", SYSTEM_USE_CONSOLE);
 		ARGUMENTS.add("l", SYSTEM_USE_LOG);
 		ARGUMENTS.add("lf", SYSTEM_LOG_FILENAME);
+		ARGUMENTS.add("lang", SYSTEM_LANGUAGE);
 
 		ARGUMENT_CONFIGS.add(new ConfigString("arg.fs"));
 		ARGUMENT_CONFIGS.add(new ConfigString("arg.fct"));
 		ARGUMENT_CONFIGS.add(new ConfigBoolean("arg.c"));
 		ARGUMENT_CONFIGS.add(new ConfigBoolean("arg.l"));
 		ARGUMENT_CONFIGS.add(new ConfigString("arg.lf"));
+		ARGUMENT_CONFIGS.add(new ConfigString("arg.lang"));
 	}
 
 	/**
@@ -227,6 +243,77 @@ public class JRagnarok
 		if (ARGUMENT_CONFIGS.getBool("arg.c"))
 		{
 			CONSOLE.show();
+		}
+	}
+
+	/**
+	 * Prepara o sistema para realizar a leitura das mensagens utilizadas pelo sistema.
+	 * Irá considerar as mensagens conforme a definição do idioma passado por argumento.
+	 */
+
+	private static void prepareMessages()
+	{
+		String language = ARGUMENT_CONFIGS.getString("arg.lang");
+
+		if (language == null || language.isEmpty())
+			throw new RagnarokRuntimeException("idioma não definido");
+
+		File folder = new File(format("messages/%s", language));
+
+		if (!folder.exists())
+			throw new RagnarokRuntimeException("idioma %s não encontrado", language);
+
+		File loginMessages = new File(folder, "LoginServer.conf");
+		File charMessages = new File(folder, "CharServer.conf");
+		File mapMessages = new File(folder, "MapServer.conf");
+
+		readMessages(loginMessages, Messages.getInstance().getLoginMessages());
+		readMessages(charMessages, Messages.getInstance().getCharMessages());
+		readMessages(mapMessages, Messages.getInstance().getMapMessages());
+	}
+
+	/**
+	 * Faz a leitura de um arquivo específico carregando mensagens com suas identificações.
+	 * @param file arquivo em disco contendo todas as mensagens para serem carregadas.
+	 * @param messages mapa de mensagens no sistema onde as mensagens serão salvas.
+	 */
+
+	private static void readMessages(File file, Map<Integer, String> messages)
+	{
+		try {
+
+			logNotice("iniciando leitura de mensagens em '%s':\n", file.getPath());
+
+			int read = 0;
+			FileReader in = new FileReader(file);
+			BufferedReader br = new BufferedReader(in);
+
+			for (int i = 1; br.ready(); i++)
+			{
+				String line = br.readLine();
+
+				if (line.startsWith("//") || line.isEmpty())
+					continue;
+
+				if (!line.contains(":"))
+				{
+					logWarning("linha %d invalidada como mensagem.\n", i);
+					continue;
+				}
+
+				int id = IntUtil.parse(line.substring(0, line.indexOf(':')).trim());
+				String message = line.substring(line.indexOf(':') + 1, line.length()).trim();
+
+				if (messages.add(id, message))
+					read++;
+			}
+
+			br.close();
+
+			logNotice("%d mensagens encontradas.\n", read);
+
+		} catch (IOException e) {
+			throw new RagnarokRuntimeException(e);
 		}
 	}
 

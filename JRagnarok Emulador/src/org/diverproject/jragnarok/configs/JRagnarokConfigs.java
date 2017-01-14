@@ -19,6 +19,7 @@ public class JRagnarokConfigs
 	public static final String TYPES_CONFIGS = "types";
 
 	public static final String SYSTEM_CONFIGS = "system";
+	public static final String SYSTEM_LANGUAGE = SYSTEM_CONFIGS+ ".language";
 	public static final String SYSTEM_CONFIG_TYPES = SYSTEM_CONFIGS+ ".types";
 	public static final String SYSTEM_SERVER_FILES = SYSTEM_CONFIGS+ ".files";
 	public static final String SYSTEM_SERVER_FOLDER = SYSTEM_CONFIGS+ ".folder";
@@ -145,6 +146,7 @@ public class JRagnarokConfigs
 	public static final Configurations newSystemConfigs()
 	{
 		Configurations configurations = new Configurations();
+		configurations.add(new ConfigString(SYSTEM_LANGUAGE));
 		configurations.add(new ConfigString(SYSTEM_CONFIG_TYPES, "ConfigTypes.conf"));
 		configurations.add(new ConfigString(SYSTEM_SERVER_FILES));
 		configurations.add(new ConfigString(SYSTEM_SERVER_FOLDER, "Servers"));
