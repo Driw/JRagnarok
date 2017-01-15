@@ -16,6 +16,28 @@ import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.util.stream.Output;
 
+/**
+ * <h1>Serviço para Autenticação de Personagem</h1>
+ *
+ * <p>Neste serviço será feito toda a autenticação de um cliente logo que entra no servidor de personagem.
+ * Irá validar as informações para garantir que seja o mesmo jogador utilizando a conta desde o servidor de acesso.
+ * A autenticação consiste em solicitar as informações de seed (primeira/segunda), versão do cliente e afins.</p>
+ *
+ * <p>Um jogador só poderá prosseguir para a tela de seleção dos personagens apenas se aqui for autenticado.
+ * A autenticação pode falhar por falha de conexão, outro jogador entrou ou já estava utilizando a mesma conta.
+ * Também será responsável por solicitar ao servidor de acesso algumas informações da conta do jogador.</p>
+ *
+ * @see AbstractCharService
+ * @see ServiceCharClient
+ * @see ServiceCharServer
+ * @see ServiceCharLogin
+ * @see ServiceCharMap
+ * @see AuthMap
+ * @see OnlineMap
+ *
+ * @author Andrew
+ */
+
 public class ServiceCharServerAuth extends AbstractCharService
 {
 	/**

@@ -14,6 +14,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_IGNO
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_NAME_LETTERS;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_NAME_OPTION;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_WISP_SERVER_NAME;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR2;
@@ -37,6 +38,7 @@ import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_NAME_
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_UNAVAIABLE_SLOT;
 import static org.diverproject.jragnarok.server.common.Job.JOB_NOVICE;
 import static org.diverproject.jragnarok.server.common.Job.JOB_SUMMONER;
+import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
@@ -62,6 +64,19 @@ import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.jragnarok.server.common.Job;
 import org.diverproject.util.lang.HexUtil;
+
+/**
+ * <h1>Serviço para Gerenciamento de Personagens</h1>
+ *
+ * <p>Esse é o principal serviço do servidor de personagem onde será possível gerenciar os personagens.
+ * Todas as ações dos jogadores de criação de personagens, solicitação de reservas ou deleção de personagens,
+ * tal como utilização do sistema de código PIN será repassado a este serviço que irá processar adequadamente.</p>
+ *
+ * <p>Nele ficará responsável ainda definir quando uma conta/personagem ficará online no servidor.
+ * Incluindo neste mesmo aspecto definir quando um ficará offline e obter a quantidade de jogadores online.</p>
+ *
+ * @author Andrew
+ */
 
 public class ServiceCharServer extends AbstractCharService
 {
@@ -142,10 +157,23 @@ public class ServiceCharServer extends AbstractCharService
 		}
 	};
 
+	/**
+	 * 
+	 * @param mapID
+	 * @param online
+	 */
+
 	public void setCharOnline(int mapID, OnlineCharData online)
 	{
-		onlines.makeOnline(online);
+		// TODO Auto-generated method stub
+		//onlines.makeOnline(online);
 	}
+
+	/**
+	 * 
+	 * @param charID
+	 * @param accountID
+	 */
 
 	public void setCharOffline(int charID, int accountID)
 	{
@@ -153,12 +181,22 @@ public class ServiceCharServer extends AbstractCharService
 		
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+
 	public int getCountUsers()
 	{
 		// TODO Auto-generated method stub
 
 		return 0;
 	}
+
+	/**
+	 * 
+	 * @param accountID
+	 */
 
 	public void disconnectPlayer(int accountID)
 	{
@@ -620,5 +658,68 @@ public class ServiceCharServer extends AbstractCharService
 		}
 
 		client.deleteCancel(fd, charID, DCC_DATABASE_ERROR_CANCEL);
+	}
+
+	/**
+	 * 
+	 * @param pincode
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public boolean isPincodeAllowed(String pincode)
+	{
+		// TODO pincode_allowed
+		return false;
+	}
+
+	/**
+	 * 
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void parsePincodeSetNew(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("definindo primeiro código PIN (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_parse_pincode_setnew
+	}
+
+	/**
+	 * 
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void parsePincodeChange(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("alterando código PIN existente (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_parse_pincode_change
+	}
+
+	/**
+	 * 
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void parsePincodeCheck(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("recebendo código PIN inserido (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_parse_pincode_check
 	}
 }

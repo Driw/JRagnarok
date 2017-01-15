@@ -12,6 +12,7 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
+import org.diverproject.jragnarok.server.login.CharServerList;
 
 /**
  * <h1>Servidor de Personagem</h1>
@@ -28,9 +29,9 @@ import org.diverproject.jragnarok.server.ServerListener;
  * servidor de acesso especificado nas configurações, pois algumas informações serão obtidas dele.
  * Por exemplo, alguns dados da conta do jogador necessários serão solicitados do mesmo.</p>
  *
- * @see ServiceCharClient
- * @see ServiceCharServer
- * @see ServiceCharLogin
+ * @see Server
+ * @see MapServerList
+ * @see CharServerList
  *
  * @author Andrew
  */

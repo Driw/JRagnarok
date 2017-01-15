@@ -34,6 +34,25 @@ import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.util.lang.HexUtil;
 import org.diverproject.util.stream.StreamException;
 
+/**
+ * <h1>Servidor de Personagem - Façade</h1>
+ *
+ * <p>Essa classe é usada para centralizar todos os serviços e controles do servidor de personagem.
+ * Através dele os serviços poderão comunicar-se entre si como também chamar os controles disponíveis.
+ * Possui métodos que irão realizar a criação das instâncias e destruição das mesmas quando necessário.</p>
+ *
+ * @see ServiceCharClient
+ * @see ServiceCharServer
+ * @see ServiceCharLogin
+ * @see ServiceCharMap
+ * @see ServiceCharServerAuth
+ * @see AuthMap
+ * @see OnlineMap
+ * @see CharacterControl
+ *
+ * @author Andrew
+ */
+
 public class CharServerFacade
 {
 	/**
@@ -225,12 +244,10 @@ public class CharServerFacade
 		@Override
 		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
-			logDebug("recebendo pacote de cliente (fd: %d).\n", fd.getID());
-
-			CFileDescriptor cfd = (CFileDescriptor) fd;
-
 			if (!fd.isConnected())
 				return false;
+
+			CFileDescriptor cfd = (CFileDescriptor) fd;
 
 			// Já foi autenticado, não deveria estar aqui
 			if (fd.getFlag().is(FileDescriptor.FLAG_EOF) && clientService.parseAlreadyAuth(cfd))
@@ -246,6 +263,8 @@ public class CharServerFacade
 		packetReceivePacketID.receive(fd, false);
 
 		short command = packetReceivePacketID.getPacketID();
+
+		logDebug("recebendo pacote de cliente (fd: %d, pid: %s).\n", fd.getID(), HexUtil.parseShort(command, 4));
 
 		switch (command)
 		{

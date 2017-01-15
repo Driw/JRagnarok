@@ -42,8 +42,10 @@ import org.diverproject.jragnarok.packets.common.RefuseMakeChar;
 import org.diverproject.jragnarok.packets.inter.SC_NotifyBan;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerAdapt;
 import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
+import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.util.collection.Index;
@@ -318,6 +320,12 @@ public class ServiceCharClient extends AbstractCharService
 		return false;
 	}
 
+	/**
+	 * Informa ao cliente uma lista contendo as informações dos personagens que estão bloqueados.
+	 * Além disso irá criar um temporizador que deverá reenviar a lista após um intervalo de tempo.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
 	public void sendBlockCharacters(CFileDescriptor fd)
 	{
 		CharSessionData sd = fd.getSessionData();
@@ -360,13 +368,20 @@ public class ServiceCharClient extends AbstractCharService
 		for (int slot = 0; slot < MAX_CHARS; slot++)
 			if (sd.getCharData(slot) != null && !sd.getCharData(slot).getUnban().isOver())
 			{
-				TimerMap timers = getTimerSystem().getTimers();
+				TimerSystem ts = getTimerSystem();
+				TimerMap timers = ts.getTimers();
+				Timer timer = sd.getCharBlockTime();
 
-				Timer timer = timers.acquireTimer();
-				timer.setTick(getTimerSystem().getCurrentTime() + seconds(10));
-				timer.setListener(CHAR_BLOCK_TIMER);
-				timer.setObjectID(sd.getID());
-				sd.setCharBlockTime(timer);
+				if (timer == null)
+				{
+					timer = timers.acquireTimer();
+					timer.setListener(CHAR_BLOCK_TIMER);
+					timer.setObjectID(sd.getID());
+					sd.setCharBlockTime(timer);
+				}
+
+				timer.setTick(ts.getCurrentTime() + seconds(10));
+				timers.add(timer);
 
 				break;
 			}
@@ -376,7 +391,7 @@ public class ServiceCharClient extends AbstractCharService
 		packet.send(fd);
 	}
 
-	private final TimerListener CHAR_BLOCK_TIMER = new TimerListener()
+	private final TimerListener CHAR_BLOCK_TIMER = new TimerAdapt()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -399,7 +414,10 @@ public class ServiceCharClient extends AbstractCharService
 			}
 
 			if (fd == null || sd == null || sd.getCharBlockTime() == null)
+			{
+				getTimerSystem().getTimers().delete(timer);
 				return;
+			}
 
 			if (!sd.getCharBlockTime().equals(timer))
 				sd.setCharBlockTime(null);
@@ -413,105 +431,6 @@ public class ServiceCharClient extends AbstractCharService
 			return "CHAR_BLOCK_TIMER";
 		}
 	};
-
-	// TODO chclif_char_delete2_ack
-	// TODO chclif_char_delete2_accept_ack
-	// TODO chclif_char_delete2_cancel_ack
-	// TODO chclif_parse_char_delete2_req
-	// TODO chclif_delchar_check
-	// TODO chclif_parse_char_delete2_accept
-	// TODO chclif_parse_char_delete2_cancel
-	// TODO chclif_parse_maplogin
-	// TODO chclif_parse_reqtoconnect
-	// TODO chclif_parse_req_charlist
-	// TODO chclif_parse_charselect
-	// TODO chclif_parse_createnewchar
-	// TODO chclif_refuse_delchar
-	// TODO chclif_parse_delchar
-	// TODO chclif_parse_reqrename
-	// TODO charblock_timer
-	// TODO chclif_block_character
-	// TODO chclif_parse_ackrename
-	// TODO chclif_ack_captcha
-	// TODO chclif_reject
-	// TODO chclif_parse_reqcaptcha
-	// TODO chclif_parse_chkcaptcha
-
-	public boolean isPincodeAllowed(String pincode)
-	{
-		// TODO pincode_allowed
-		return false;
-	}
-
-	public void parsePincodeSetNew(CFileDescriptor fd)
-	{
-		CharSessionData sd = fd.getSessionData();
-
-		logDebug("definindo primeiro código PIN (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
-
-		if (!getConfigs().getBool(PINCODE_ENABLED))
-			return;
-
-		// TODO chclif_parse_pincode_setnew
-	}
-
-	public void parsePincodeChange(CFileDescriptor fd)
-	{
-		CharSessionData sd = fd.getSessionData();
-
-		logDebug("alterando código PIN existente (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
-
-		if (!getConfigs().getBool(PINCODE_ENABLED))
-			return;
-
-		// TODO chclif_parse_pincode_change
-	}
-
-	public void parsePincodeCheck(CFileDescriptor fd)
-	{
-		CharSessionData sd = fd.getSessionData();
-
-		logDebug("recebendo código PIN inserido (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
-
-		if (!getConfigs().getBool(PINCODE_ENABLED))
-			return;
-
-		// TODO chclif_parse_pincode_check
-	}
-
-	public void reqPincodeWindow(CFileDescriptor fd)
-	{
-		CharSessionData sd = fd.getSessionData();
-
-		logDebug("solicitar tela para digitar código PIN (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
-
-		if (!getConfigs().getBool(PINCODE_ENABLED))
-			return;
-
-		// TODO chclif_parse_reqpincode_window
-	}
-
-	public void sendPincodeState(CFileDescriptor fd, PincodeState state)
-	{
-		CharSessionData sd = fd.getSessionData();
-
-		logDebug("enviando código PIN paraa atuar em %s (fd: %d, aid: %d).\n", state, fd.getID(), sd.getID());
-
-		if (!getConfigs().getBool(PINCODE_ENABLED))
-			return;
-
-		// TODO chclif_pincode_sendstate
-	}
-
-	public void parseMoveCharSlot(CFileDescriptor fd)
-	{
-		// TODO chclif_parse_moveCharSlot
-	}
-
-	public void sendMoveCharSlotResult(CFileDescriptor fd)
-	{
-		// TODO chclif_moveCharSlotReply
-	}
 
 	/**
 	 * Informa o cliente durante a seleção de personagem que a criação do personagem falhou.
@@ -613,5 +532,61 @@ public class ServiceCharClient extends AbstractCharService
 		packet.setCharID(charID);
 		packet.setResult(result);
 		packet.send(fd);
+	}
+
+	/**
+	 * Informa ao cliente que este deverá exibir na tela o sistema de código PIN para o jogador.
+	 * Após a janela ser aberta o jogador deverá utilizar o sistema de código PIN para continuar.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void showPIncodeWindow(CFileDescriptor fd)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("solicitar tela para digitar código PIN (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_parse_reqpincode_window
+	}
+
+	/**
+	 * Informa ao cliente um novo estado (ação) para ser exibido no sistema de código PIN.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param state estado em que o sistema de código PIN estará assumindo.
+	 */
+
+	public void sendPincodeState(CFileDescriptor fd, PincodeState state)
+	{
+		CharSessionData sd = fd.getSessionData();
+
+		logDebug("enviando código PIN paraa atuar em %s (fd: %d, aid: %d).\n", state, fd.getID(), sd.getID());
+
+		if (!getConfigs().getBool(PINCODE_ENABLED))
+			return;
+
+		// TODO chclif_pincode_sendstate
+	}
+
+	/**
+	 * 
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void parseMoveCharSlot(CFileDescriptor fd)
+	{
+		// TODO chclif_parse_moveCharSlot
+	}
+
+	/**
+	 * 
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void sendMoveCharSlotResult(CFileDescriptor fd)
+	{
+		// TODO chclif_moveCharSlotReply
 	}
 }

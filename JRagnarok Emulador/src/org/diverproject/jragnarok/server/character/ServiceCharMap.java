@@ -38,6 +38,12 @@ public class ServiceCharMap extends AbstractCharService
 				packet.send(server.getFileDecriptor());
 	}
 
+	/**
+	 * 
+	 * @param packet
+	 * @return
+	 */
+
 	public boolean receiveAccountInfo(AH_AccountInfo packet)
 	{
 		// TODO mapif_accinfo_ack
@@ -45,12 +51,24 @@ public class ServiceCharMap extends AbstractCharService
 		return false;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+
 	public boolean receiveVipData(/*VipDataResult packet*/)
 	{
 		// TODO Auto-generated method stub
 
 		return false;
 	}
+
+	/**
+	 * 
+	 * @param fd
+	 * @param charID
+	 * @param reason
+	 */
 
 	public void disconnectPlayer(CFileDescriptor fd, int charID, DisconnectPlayer reason)
 	{

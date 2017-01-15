@@ -396,10 +396,10 @@ class LoginServerFacade
 		@Override
 		public boolean onCall(FileDescriptor fd) throws RagnarokException
 		{
-			LFileDescriptor lfd = (LFileDescriptor) fd;
-
 			if (!fd.isConnected())
 				return false;
+
+			LFileDescriptor lfd = (LFileDescriptor) fd;
 
 			// Já conectou, verificar se está banido
 			if (lfd.getSessionData().getID() == 0)
