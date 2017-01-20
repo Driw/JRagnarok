@@ -1,3 +1,6 @@
+19.01.2017 - 1.5.191
+- Documentação do restante das classes do servidor de personagem (server.character).
+
 15.01.2017 - 1.5.190
 - Movimentação de alguns métodos entre os serviços do servidor de personagem para ficarem corretos.
 - Documentação de algumas classes e métodos que ainda não haviam sido documentadas.

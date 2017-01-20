@@ -5,13 +5,51 @@ import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_PER_SERVER;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.util.ObjectDescription;
 
+/**
+ * <h1>Servidor de Mapa como Cliente</h1>
+ *
+ * <p>Objeto que contém informações básicas para conexão do servidor de acesso com um servidor de mapa.
+ * As informações deste consistem em: conexão socket (descritor de arquivo) com o servidor de mapa,
+ * endereço de IP, porta para conexão, quantidade de personagens online, lista de mapas no servidor.</p>
+ *
+ * @see CFileDescriptor
+ * @see InternetProtocol
+ *
+ * @author Andrew
+ */
+
 public class ClientMapServer
 {
+	/**
+	 * Arquivo descritor de conexão com o servidor de mapa.
+	 */
 	private CFileDescriptor fd;
+
+	/**
+	 * Endereço de IP da conexão estabelecida.
+	 */
 	private InternetProtocol ip;
+
+	/**
+	 * Porta para conexão com o servidor de mapa.
+	 */
 	private short port;
+
+	/**
+	 * Quantidade de personagens online no servidor.
+	 */
 	private short users;
+
+	/**
+	 * TODO
+	 */
 	private short map[];
+
+	/**
+	 * Cria uma nova instância de um cliente para representação do servidor de mapa no servidor de personagem.
+	 * Será necessário passar um arquivo descritor utilizado para realizar a conexão entre os servidores.
+	 * @param fileDecriptor referência da conexão do servidor de personagem com o servidor de mapa.
+	 */
 
 	public ClientMapServer(CFileDescriptor fileDecriptor)
 	{
@@ -19,40 +57,72 @@ public class ClientMapServer
 		this.map = new short[MAX_MAP_PER_SERVER];
 	}
 
+	/**
+	 * @return aquisição da conexão do servidor de personagem com o servidor de mapa.
+	 */
+
 	public CFileDescriptor getFileDecriptor()
 	{
 		return fd;
 	}
+
+	/**
+	 * @return aquisição do endereço de IP do servidor de mapa.
+	 */
 
 	public InternetProtocol getIP()
 	{
 		return ip;
 	}
 
+	/**
+	 * @param serverIP endereço de IP do servidor de mapa.
+	 */
+
 	public void setIP(InternetProtocol serverIP)
 	{
 		this.ip = serverIP;
 	}
+
+	/**
+	 * @return aquisição do número da porta para conexão com o servidor de mapa.
+	 */
 
 	public short getPort()
 	{
 		return port;
 	}
 
+	/**
+	 * @param port número da porta para conexão com o servidor de mapa.
+	 */
+
 	public void setPort(short port)
 	{
 		this.port = port;
 	}
+
+	/**
+	 * @return aquisição do número de personagens online no servidor de mapa.
+	 */
 
 	public short getUsers()
 	{
 		return users;
 	}
 
+	/**
+	 * @param users número de personagens online no servidor de mapa.
+	 */
+
 	public void setUsers(short users)
 	{
 		this.users = users;
 	}
+
+	/**
+	 * @return ???
+	 */
 
 	public short[] getMaps()
 	{

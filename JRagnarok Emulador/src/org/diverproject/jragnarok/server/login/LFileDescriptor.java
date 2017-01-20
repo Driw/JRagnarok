@@ -12,7 +12,7 @@ import org.diverproject.jragnarok.server.FileDescriptor;
  * Esses dados são necessários para boa parte das operações realizadas.</p>
  *
  * @see FileDescriptor
- * @see LFileDescriptor
+ * @see LoginSessionData
  *
  * @author Andrew
  */
