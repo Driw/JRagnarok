@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.MAP_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.MAP_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_MAP_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newMapServerConfigs;
+import static org.diverproject.log.LogSystem.logInfo;
 
 import java.net.Socket;
 
@@ -15,15 +16,28 @@ import org.diverproject.jragnarok.server.ServerListener;
 
 public class MapServer extends Server
 {
+	private MapServerFacade facade;
+
 	public MapServer()
 	{
 		setListener(listener);
 	}
 
+	/**
+	 * @return aquisição do façade que possui os serviços e controles do servidor de acesso.
+	 */
+
+	
+
 	@Override
 	public String getHost()
 	{
 		return getConfigs().getString(MAP_IP);
+	}
+
+	public MapServerFacade getFacade()
+	{
+		return facade;
 	}
 
 	@Override
@@ -42,7 +56,8 @@ public class MapServer extends Server
 	protected FileDescriptor acceptSocket(Socket socket)
 	{
 		MFileDescriptor fd = new MFileDescriptor(socket);
-		fd.setParseListener(null/* TODO */);
+		fd.setParseListener(facade.PARSE_CLIENT);
+		fd.setCloseListener(facade.CLOSE_LISTENER);
 
 		return fd;
 	}
@@ -65,7 +80,6 @@ public class MapServer extends Server
 		private void setDefaultConfigs()
 		{
 			Configurations server = newMapServerConfigs();
-	
 			Configurations configs = getConfigs();
 
 			if (configs == null)
@@ -77,15 +91,15 @@ public class MapServer extends Server
 		@Override
 		public void onCreated() throws RagnarokException
 		{
-			// TODO Auto-generated method stub
-			
+			facade = new MapServerFacade();
 		}
 
 		@Override
 		public void onRunning() throws RagnarokException
 		{
-			// TODO Auto-generated method stub
-			
+			facade.init(MapServer.this);
+
+			logInfo("o servidor de mapa está pronto (porta: %d).\n", getPort());
 		}
 
 		@Override
@@ -105,15 +119,14 @@ public class MapServer extends Server
 		@Override
 		public void onDestroy() throws RagnarokException
 		{
-			// TODO Auto-generated method stub
-			
+			facade.destroy(MapServer.this);
 		}
 
 		@Override
 		public void onDestroyed() throws RagnarokException
 		{
-			// TODO Auto-generated method stub
-			
+			facade.destroyed();
+			facade = null;
 		}
 	};
 }

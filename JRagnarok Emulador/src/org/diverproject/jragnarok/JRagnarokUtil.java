@@ -18,6 +18,8 @@ import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnaork.messages.Messages;
 import org.diverproject.jragnarok.server.FileDescriptor;
+import org.diverproject.jragnarok.server.ServerThreaed;
+import org.diverproject.jragnarok.server.map.MapServer;
 import org.diverproject.util.SizeUtil;
 import org.diverproject.util.SystemUtil;
 import org.diverproject.util.collection.Collection;
@@ -547,5 +549,51 @@ public class JRagnarokUtil
 	public static int hours(int hours, int minutes, int seconds)
 	{
 		return hours(hours) + minutes(minutes) + seconds(seconds);
+	}
+
+	/**
+	 * Este método só irá funcionar caso esteja sendo utilizado dentro do servidor de mapas.
+	 * @param mapname nome do mapa do qual deseja obter o código de identificação.
+	 * @return aquisição do código de identificação do nome do mapa passado.
+	 */
+
+	public static int mapname2mapid(String mapname)
+	{
+		if (Thread.currentThread() instanceof ServerThreaed)
+		{
+			ServerThreaed thread = (ServerThreaed) Thread.currentThread();
+
+			if (thread.getServer() instanceof MapServer)
+			{
+				MapServer server = (MapServer) thread.getServer();
+
+				return server.getFacade().getMapIndexes().get(mapname);
+			}
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Este método só irá funcionar caso esteja sendo utilizado dentro do servidor de mapas.
+	 * @param mapid código de identificação do mapa do qual deseja obter o nome.
+	 * @return aquisição do nome do mapa referente ao código de identificação passado.
+	 */
+
+	public static String mapid2mapname(int mapid)
+	{
+		if (Thread.currentThread() instanceof ServerThreaed)
+		{
+			ServerThreaed thread = (ServerThreaed) Thread.currentThread();
+
+			if (thread.getServer() instanceof MapServer)
+			{
+				MapServer server = (MapServer) thread.getServer();
+
+				return server.getFacade().getMapIndexes().get(mapid);
+			}
+		}
+
+		return null;
 	}
 }

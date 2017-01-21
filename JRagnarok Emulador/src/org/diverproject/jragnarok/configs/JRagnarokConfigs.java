@@ -100,6 +100,15 @@ public class JRagnarokConfigs
 	public static final String MAP_USERNAME = MAP_CONFIGS+ ".username";
 	public static final String MAP_PASSWORD = MAP_CONFIGS+ ".password";
 
+	public static final String DATABASE_CONFIGS = "database";
+	public static final String DATABASE_SQL_HOST = DATABASE_CONFIGS+ ".sql_host";
+	public static final String DATABASE_SQL_PORT = DATABASE_CONFIGS+ ".sql_port";
+	public static final String DATABASE_SQL_DATABASE = DATABASE_CONFIGS+ ".sql_database";
+	public static final String DATABASE_SQL_USERNAME = DATABASE_CONFIGS+ ".sql_username";
+	public static final String DATABASE_SQL_PASSWORD = DATABASE_CONFIGS+ ".sql_password";
+	public static final String DATABASE_FOLDER = DATABASE_CONFIGS+ ".folder";
+	public static final String DATABASE_MAP_INDEX = DATABASE_CONFIGS+ ".map_index";
+
 	public static final String LOG_CONFIGS = "log";
 	public static final String LOG_LOGIN = LOG_CONFIGS+ ".login";
 
@@ -276,6 +285,14 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigInt(MAP_PORT, 6900));
 		configurations.add(new ConfigString(MAP_USERNAME, "server"));
 		configurations.add(new ConfigString(MAP_PASSWORD, "passwd"));
+
+		configurations.add(new ConfigString(DATABASE_FOLDER, "database"));
+		configurations.add(new ConfigInt(DATABASE_SQL_PORT, 3306));
+		configurations.add(new ConfigString(DATABASE_SQL_HOST, "localhost"));
+		configurations.add(new ConfigString(DATABASE_SQL_DATABASE, "jragnarok_db"));
+		configurations.add(new ConfigString(DATABASE_SQL_USERNAME, "server"));
+		configurations.add(new ConfigString(DATABASE_SQL_PASSWORD, "passwd"));
+		configurations.add(new ConfigString(DATABASE_MAP_INDEX, "map_index.txt"));
 
 		return configurations;
 	}

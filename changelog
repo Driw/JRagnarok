@@ -1,3 +1,9 @@
+19.01.2017 - 1.5.193
+- Serviço abstrato para ser utilizado no servidor de mapas adicionado, AbstractMapService.
+- Adicionado o facade e serviço de gerenciamento no servidor de mapas, MapServerFacede e ServiceMapServer.
+- Comentando diversos métodos que devem ser implementados futuramente em ServiceMapServer.
+- ServiceMapServer irá criar uma conexão com um banco de dados para leitura de bases de dados.
+
 19.01.2017 - 1.5.192
 - Estruturas básicas para criação de coleções que armazenem as bases de dados (jragnarok.database).
 - Implementação da estrutura de MapIndex que pode ser armazenado em MapIndexes.
