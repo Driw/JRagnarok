@@ -8,7 +8,7 @@ import static org.diverproject.jragnarok.JRagnarokUtil.i;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.util.Util.now;
 
-import org.diverproject.jragnarok.server.character.entities.Character;
+import org.diverproject.jragnarok.server.common.entities.Character;
 import org.diverproject.util.stream.Output;
 
 public class PacketStructures

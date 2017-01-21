@@ -47,7 +47,7 @@ import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
-import org.diverproject.jragnarok.server.character.entities.Character;
+import org.diverproject.jragnarok.server.common.entities.Character;
 import org.diverproject.util.collection.Index;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicQueue;

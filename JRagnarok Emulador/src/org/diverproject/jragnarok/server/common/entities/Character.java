@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok.server.character.entities;
+package org.diverproject.jragnarok.server.common.entities;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_HP;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_NAME_LENGTH;

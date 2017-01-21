@@ -1,3 +1,7 @@
+19.01.2017 - 1.5.194
+- Movendo as entidades utilizadas no servidor de personagem para common.entities.
+	- O Servidor de Mapas também irá utilizar-se destas entidades.
+
 19.01.2017 - 1.5.193
 - Serviço abstrato para ser utilizado no servidor de mapas adicionado, AbstractMapService.
 - Adicionado o facade e serviço de gerenciamento no servidor de mapas, MapServerFacede e ServiceMapServer.

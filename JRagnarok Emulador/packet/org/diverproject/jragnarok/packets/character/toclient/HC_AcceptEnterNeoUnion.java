@@ -7,7 +7,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_ACCEPT
 
 import org.diverproject.jragnarok.packets.PacketStructures;
 import org.diverproject.jragnarok.packets.ResponsePacket;
-import org.diverproject.jragnarok.server.character.entities.Character;
+import org.diverproject.jragnarok.server.common.entities.Character;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Index;
 import org.diverproject.util.stream.Output;

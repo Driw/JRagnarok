@@ -15,7 +15,7 @@ import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.entities.Account;
 
 /**
- * <h1>Serviço de Acesso</h1>
+ * <h1>Serviço para Gerenciamento do Servidor de Acesso</h1>
  *
  * <p>Esse serviço irá receber uma solicitação de conexão do serviço de acesso para clientes.
  * Essa solicitação deverá ser autenticada conforme os dados da conta passados pelo cliente.

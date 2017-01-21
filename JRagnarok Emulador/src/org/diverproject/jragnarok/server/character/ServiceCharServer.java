@@ -61,12 +61,12 @@ import org.diverproject.jragnarok.server.TimerListener;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
-import org.diverproject.jragnarok.server.character.entities.Character;
 import org.diverproject.jragnarok.server.common.Job;
+import org.diverproject.jragnarok.server.common.entities.Character;
 import org.diverproject.util.lang.HexUtil;
 
 /**
- * <h1>Serviço para Gerenciamento de Personagens</h1>
+ * <h1>Serviço para Gerenciamento do Servidor de Personagem</h1>
  *
  * <p>Esse é o principal serviço do servidor de personagem onde será possível gerenciar os personagens.
  * Todas as ações dos jogadores de criação de personagens, solicitação de reservas ou deleção de personagens,

@@ -41,7 +41,7 @@ import org.diverproject.jragnarok.server.login.entities.Account;
 import org.diverproject.util.BitWise8;
 
 /**
- * <h1>Serviço de Acesso para Servidor de Personagens</h1>
+ * <h1>Serviço para Comunicação com o Servidor de Personagem</h1>
  *
  * <p>Após a identificação de uma solicitação de conexão com o servidor de acesso e que tenha sido autenticado,
  * caso a solicitação tenha vindo de um servidor de personagem será passado para um analisador de pacotes que

@@ -84,7 +84,7 @@ import org.diverproject.util.collection.abstraction.DynamicList;
 import org.diverproject.util.lang.ByteUtil;
 
 /**
- * <h1>Serviço de Comunicação do Servidor de Acesso</h1>
+ * <h1>Serviço para Comunicação com o Servidor de Acesso</h1>
  *
  * <p>Todos os servidores de personagens devem passar por um servidor de acesso afim de autenticá-lo.
  * Após ser autenticado por este, fica registrado no servidor de acesso com um servidor de personagem.
