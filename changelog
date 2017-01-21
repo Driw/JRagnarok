@@ -1,3 +1,8 @@
+19.01.2017 - 1.5.192
+- Estruturas básicas para criação de coleções que armazenem as bases de dados (jragnarok.database).
+- Implementação da estrutura de MapIndex que pode ser armazenado em MapIndexes.
+- IOMapIndex irá permitir a leitura de vários MapIndex em um arquivo de texto ou tabela SQL.
+
 19.01.2017 - 1.5.191
 - Documentação do restante das classes do servidor de personagem (server.character).
 
