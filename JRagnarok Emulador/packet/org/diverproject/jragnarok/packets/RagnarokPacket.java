@@ -108,7 +108,6 @@ public class RagnarokPacket
 //	public static final short PACKET_CH_REQ_CHARINFO_PER_PAGE					= 0x099C;
 	public static final short PACKET_CH_CHARLIST_REQ							= 0x09A1;
 	public static final short PACKET_CH_CREATE_NEW_CHAR							= 0x0A39;
-//	public static final short PACKET_CH_PARSE_MAP_LOGIN							= 0x2AF8;
 
 	// -- RAGNAROK PACKET ID : CHAR SERVER TO CLIENT (HC) -- 
 
@@ -172,6 +171,7 @@ public class RagnarokPacket
 
 	// -- RAGNAROK PACKET ID : CHAR SERVER TO MAP SERVER (HZ) -- 
 
+	public static final short PACKET_HZ_RESULT_MAP_CONNECTION					= 0x2AF9;
 //	public static final short PACKET_HZ_GET_MAP_NAME							= 0x2AFA;
 //	public static final short PACKET_HZ_ASK_SC_DATA								= 0x2AFC;
 //	public static final short PACKET_HZ_GET_USER_COUNT							= 0x2AFE;
@@ -1043,6 +1043,10 @@ public class RagnarokPacket
 	// -- RAGNAROK PACKET ID : MAP SERVER TO CHAR SERVER (ZH) --                
 
 //	public static final short PACKET_ZH_MOVE_PVPWORLD							= 0x0211;
+	public static final short PACKET_ZH_MAP_SERVER_CONNECTION					= 0x2AF8;
+	public static final short PACKET_ZH_SEND_MAPS								= 0x2AFA;
+	public static final short PACKET_ZH_NOTIFY_USER_COUNT						= 0x2AFE;
+	public static final short PACKET_ZH_SEND_INFORMATIONS						= 0x2B16;
 
 	// -- RAGNAROK PACKET ID : CLIENT TO SERVERS (CS) --     
 

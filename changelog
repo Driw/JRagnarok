@@ -1,3 +1,9 @@
+19.01.2017 - 1.5.195
+- Alterando constante PASSWORD_LENGTH de 32 para 24 conforme tamanho padrão de senhas.
+- Implementação da conexão para comunicação entre servidor de personagem e servidor de mapa.
+- MapServerList deve permitir verificar se há espaço para uma nova conexão.
+- Enviando mapeamento para autenticações feitas no servidor de mapas (será usado futuramente).
+
 19.01.2017 - 1.5.194
 - Movendo as entidades utilizadas no servidor de personagem para common.entities.
 	- O Servidor de Mapas também irá utilizar-se destas entidades.

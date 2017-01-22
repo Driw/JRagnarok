@@ -11,6 +11,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_GLOBAL
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_KEEP_ALIVE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SS_GROUP_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_MAP_SERVER_CONNECTION;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CHARLIST_REQ;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR;
@@ -239,6 +240,11 @@ public class CharServerFacade
 		}
 	};
 
+	/**
+	 * Listener usado para receber novas conexões solicitadas através do cliente (jogador).
+	 * Irá validar a conexão e repassar para um método que deverá reconhecer o pacote.
+	 */
+
 	public final FileDescriptorListener CLIENT_PARSE = new FileDescriptorListener()
 	{
 		@Override
@@ -256,6 +262,13 @@ public class CharServerFacade
 			return ackClientPacket(cfd);
 		}
 	};
+
+	/**
+	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
+	 * Neste caso irá identificar o comando e que é esperado como fase inicial do cliente.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
 
 	private boolean ackClientPacket(CFileDescriptor fd)
 	{
@@ -279,12 +292,22 @@ public class CharServerFacade
 			case PACKET_CH_REQ_IS_VALID_CHARNAME:
 			case PACKET_CH_ENTER_CHECKBOT:
 			case PACKET_CH_CHECKBOT:
-			case PACKET_CH_PARSE_MAP_LOGIN:
 			*/
+
+			case PACKET_ZH_MAP_SERVER_CONNECTION:
+				return mapService.parse(fd);
 		}
 
 		return ackCharactersPacket(fd, command);
 	}
+
+	/**
+	 * Procedimento para repassar a conexão do cliente durante a seleção de personagens.
+	 * O redirecionamento será feito de acordo com o tipo de comando recebido por pacote.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param command identificação do comando solicitado pelo cliente (jogador).
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
 
 	private boolean ackCharactersPacket(CFileDescriptor fd, short command)
 	{
@@ -329,6 +352,14 @@ public class CharServerFacade
 		return ackPincodePacket(fd, command);
 	}
 
+	/**
+	 * Procedimento para repassar a conexão do cliente durante a utilização do código PIN.
+	 * O redirecionamento será feito de acordo com o tipo de comando recebido por pacote.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param command identificação do comando solicitado pelo cliente (jogador).
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
+
 	private boolean ackPincodePacket(CFileDescriptor fd, short command)
 	{
 		switch (command)
@@ -349,6 +380,11 @@ public class CharServerFacade
 		}
 	}
 
+	/**
+	 * Listener usado para receber pacotes da comunicação com o servidor de acesso.
+	 * Irá validar a conexão e repassar para um método que deverá reconhecer o pacote.
+	 */
+
 	public final FileDescriptorListener PARSE_LOGIN_SERVER = new FileDescriptorListener()
 	{
 		@Override
@@ -365,6 +401,14 @@ public class CharServerFacade
 			return ackLoginServerPacket(cfd);
 		}
 	};
+
+	/**
+	 * Procedimento para repassar a conexão do servidor de acesso para os comandos básicos.
+	 * O redirecionamento será feito de acordo com o tipo de comando recebido por pacote.
+	 * A identificação do comando é feito neste método e pode repassar a outras funções.
+	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
 
 	private boolean ackLoginServerPacket(CFileDescriptor fd)
 	{
@@ -406,6 +450,14 @@ public class CharServerFacade
 		return ackAccountPacket(fd, command);
 	}
 
+	/**
+	 * Procedimento para repassar a conexão do servidor de acesso para gerenciar contas.
+	 * O redirecionamento será feito de acordo com o tipo de comando recebido por pacote.
+	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 * @param command identificação do comando solicitado pelo servidor de acesso.
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
+
 	private boolean ackAccountPacket(CFileDescriptor fd, short command)
 	{
 		switch (command)
@@ -427,6 +479,54 @@ public class CharServerFacade
 				loginService.parseAccountInfo(fd);
 				return true;
 
+			default:
+				String packet = HexUtil.parseInt(command, 4);
+				String address = fd.getAddressString();
+				logNotice("fim de conexão inesperado (pacote: 0x%s, ip: %s)\n", packet, address);
+				fd.close();
+				return false;
+		}
+	}
+
+	/**
+	 * Listener usado para receber pacotes da comunicação com o servidor de mapa.
+	 * Irá validar a conexão e repassar para um método que deverá reconhecer o pacote.
+	 */
+
+	public final FileDescriptorListener PARSE_MAP_SERVER = new FileDescriptorListener()
+	{
+		@Override
+		public boolean onCall(FileDescriptor fd) throws RagnarokException
+		{
+			if (!fd.isConnected())
+			{
+				logWarning("conexão com o servidor de mapa perdida.\n");
+				return false;
+			}
+
+			CFileDescriptor cfd = (CFileDescriptor) fd;
+
+			return ackMapServerPacket(cfd);
+		}
+	};
+
+	/**
+	 * Procedimento para repassar a conexão do servidor de mapa para os comandos básicos.
+	 * O redirecionamento será feito de acordo com o tipo de comando recebido por pacote.
+	 * A identificação do comando é feito neste método e pode repassar a outras funções.
+	 * @param fd conexão do descritor de arquivo do servidor de mapa com o servidor.
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
+
+	private boolean ackMapServerPacket(CFileDescriptor fd)
+	{
+		AcknowledgePacket ack = new AcknowledgePacket();
+		ack.receive(fd, false);
+
+		short command = ack.getPacketID();
+
+		switch (command)
+		{
 			default:
 				String packet = HexUtil.parseInt(command, 4);
 				String address = fd.getAddressString();

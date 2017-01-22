@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.map;
 
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HZ_RESULT_MAP_CONNECTION;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logWarning;
 
@@ -13,14 +14,24 @@ import org.diverproject.util.lang.HexUtil;
 public class MapServerFacade
 {
 	/**
-	 * Serviço de gerenciamento do servidor de mapa.
+	 * Serviço para gerenciamento do servidor de mapa.
 	 */
 	private ServiceMapServer serviceMapServer;
+
+	/**
+	 * Serviço para comunicação com o servidor de personagem.
+	 */
+	private ServiceMapChar serviceMapChar;
 
 	/**
 	 * Indexação de todos os mapas do jogo.
 	 */
 	private MapIndexes mapIndexes;
+
+	/**
+	 * Mapeamento das autenticações no servidor de mapas.
+	 */
+	private AuthMap authMap;
 
 	/**
 	 * @return aquisição do serviço para gerenciamento do servidor de mapa.
@@ -29,6 +40,15 @@ public class MapServerFacade
 	public ServiceMapServer getServiceMapServer()
 	{
 		return serviceMapServer;
+	}
+
+	/**
+	 * @return aquisição do serviço para comunicação com o servidor de personagem.
+	 */
+
+	public ServiceMapChar getServiceMapChar()
+	{
+		return serviceMapChar;
 	}
 
 	/**
@@ -41,6 +61,15 @@ public class MapServerFacade
 	}
 
 	/**
+	 * @return aquisição do mapeamento das autenticações no servidor de mapas.
+	 */
+
+	public AuthMap getAuthMap()
+	{
+		return authMap;
+	}
+
+	/**
 	 * Cria todas as instâncias dos serviços e controles para um servidor de mapa.
 	 * @param mapServer referência do servidor de mapa que irá usá-los.
 	 */
@@ -48,10 +77,12 @@ public class MapServerFacade
 	public void init(MapServer mapServer)
 	{
 		serviceMapServer = new ServiceMapServer(mapServer);
+		serviceMapChar = new ServiceMapChar(mapServer);
 
 		mapIndexes = new MapIndexes();
 
 		serviceMapServer.init();
+		serviceMapChar.init();
 	}
 
 	/**
@@ -90,7 +121,8 @@ public class MapServerFacade
 	};
 
 	/**
-	 * Listener usado para receber novas conexões solicitadas com o servidor de mapa.
+	 * Listener usado para receber novas conexões solicitadas através do cliente (jogador).
+	 * Irá validar a conexão e repassar para um método que deverá reconhecer o pacote.
 	 */
 
 	public final FileDescriptorListener PARSE_CLIENT = new FileDescriptorListener()
@@ -112,9 +144,10 @@ public class MapServerFacade
 	};
 
 	/**
-	 * Procedimento chamado para identificar o tipo de pacote que encontrado e despachá-lo.
-	 * Neste caso irá identificar o comando e que é esperado como fase inicial do cliente.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor de mapa.
+	 * Procedimento para repassar a conexão do servidor de personagem aos comandos básicos.
+	 * O redirecionamento será feito de acordo com o tipo de comando recebido por pacote.
+	 * A identificação do comando é feito neste método e pode repassar a outras funções.
+	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor.
 	 * @return true se o pacote recebido for de um tipo válido para análise.
 	 */
 
@@ -129,6 +162,59 @@ public class MapServerFacade
 
 		switch (command)
 		{
+			default:
+				String packet = HexUtil.parseInt(command, 4);
+				String address = fd.getAddressString();
+				logWarning("pacote desconhecido recebido (pacote: 0x%s, ip: %s)\n", packet, address);
+				fd.close();
+				return false;
+		}
+	}
+
+	/**
+	 * Listener usado para receber pacotes da comunicação com o servidor de personagem.
+	 * Irá validar a conexão e repassar para um método que deverá reconhecer o pacote.
+	 */
+
+	public final FileDescriptorListener PARSE_CHAR_SERVER = new FileDescriptorListener()
+	{
+		@Override
+		public boolean onCall(FileDescriptor fd) throws RagnarokException
+		{
+			if (!fd.isConnected())
+			{
+				logWarning("conexão com o servidor de personagem perdida.\n");
+				return false;
+			}
+
+			MFileDescriptor mfd = (MFileDescriptor) fd;
+
+			return ackCharServerPacket(mfd);
+		}
+	};
+
+	/**
+	 * Procedimento para repassar a conexão do servidor de personagem aos comandos básicos.
+	 * O redirecionamento será feito de acordo com o tipo de comando recebido por pacote.
+	 * A identificação do comando é feito neste método e pode repassar a outras funções.
+	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 * @return true se o pacote recebido for de um tipo válido para análise.
+	 */
+
+	private boolean ackCharServerPacket(MFileDescriptor fd)
+	{
+		AcknowledgePacket packetReceivePacketID = new AcknowledgePacket();
+		packetReceivePacketID.receive(fd, false);
+
+		short command = packetReceivePacketID.getPacketID();
+
+		logDebug("recebendo pacote do servidor de personagem (fd: %d, pid: %s).\n", fd.getID(), HexUtil.parseShort(command, 4));
+
+		switch (command)
+		{
+			case PACKET_HZ_RESULT_MAP_CONNECTION:
+				return serviceMapChar.parseResultConnection(fd);
+
 			default:
 				String packet = HexUtil.parseInt(command, 4);
 				String address = fd.getAddressString();

@@ -44,12 +44,12 @@ public class MapServerList implements Iterable<ClientMapServer>
 	/**
 	 * Adiciona um novo cliente de um servidor de mapa como acessada.
 	 * @param server referência do cliente que representa o servidor.
+	 * @return true se adicionad ou false caso contrário.
 	 */
 
-	public void add(ClientMapServer server)
+	public boolean add(ClientMapServer server)
 	{
-		if (!servers.contains(server))
-			servers.add(server);
+		return !servers.contains(server) && servers.add(server);
 	}
 
 	/**
@@ -97,6 +97,16 @@ public class MapServerList implements Iterable<ClientMapServer>
 	public int size()
 	{
 		return servers.size();
+	}
+
+	/**
+	 * Verifica se a lista para servidores de mapa está cheia ou não.
+	 * @return trure se estiver cheia ou false caso contrário.
+	 */
+
+	public boolean isFull()
+	{
+		return servers.size() == servers.length();
 	}
 
 	/**

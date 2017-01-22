@@ -62,7 +62,7 @@ public class JRagnarokConstants
 	/**
 	 * Limite de caracteres permitido por senhas de usuários.
 	 */
-	public static final int PASSWORD_LENGTH = 32;
+	public static final int PASSWORD_LENGTH = 24;
 
 	/**
 	 * Limite de caracteres permitido no endereço de e-mail.

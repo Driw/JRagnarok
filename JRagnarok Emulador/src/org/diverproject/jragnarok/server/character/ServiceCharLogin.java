@@ -271,10 +271,9 @@ public class ServiceCharLogin extends AbstractCharService
 	}
 
 	/**
-	 * Verifica se o servidor de personagens desse serviço possui conexão estabelecida.
-	 * Essa conexão é referente ao servidor de personagens, para ser listado no acesso.
-	 * Caso esteja conectado um jogador ao conectar terá esse servidor listado.
-	 * @return true se estiver conectado ou false caso contrário.
+	 * Verifica se o servidor de personagem desse serviço possui conexão com o servidor de acesso.
+	 * Através dessa conexão será possível a comunicação entre os dois servidores e troca de informações.
+	 * @return true se a conexão estiver estabelecida e conectada ou false caso contrário.
 	 */
 
 	public boolean isConnected()
@@ -350,6 +349,7 @@ public class ServiceCharLogin extends AbstractCharService
 					packet.setNewDisplay(newDisplay);
 					packet.send(fd);
 				}
+
 				fd.setParseListener(getServer().getFacade().PARSE_LOGIN_SERVER);
 
 			} catch (IOException e) {

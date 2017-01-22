@@ -25,6 +25,11 @@ import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.util.sql.MySQL;
 
+/**
+ * 
+ * @author Andrew
+ */
+
 public class ServiceMapServer extends AbstractMapService
 {
 	/**
