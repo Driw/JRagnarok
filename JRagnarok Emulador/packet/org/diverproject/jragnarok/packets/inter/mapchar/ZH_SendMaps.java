@@ -2,6 +2,7 @@ package org.diverproject.jragnarok.packets.inter.mapchar;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_SEND_MAPS;
 
+import org.diverproject.jragnaork.database.impl.MapIndex;
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicQueue;
@@ -10,7 +11,7 @@ import org.diverproject.util.stream.Output;
 
 public class ZH_SendMaps extends RequestPacket
 {
-	private Queue<Integer> maps;
+	private Queue<MapIndex> maps;
 
 	@Override
 	protected void sendOutput(Output output)
@@ -18,7 +19,12 @@ public class ZH_SendMaps extends RequestPacket
 		output.putInt(maps.size());
 
 		while (!maps.isEmpty())
-			output.putInt(maps.poll());
+		{
+			MapIndex map = maps.poll();
+
+			output.putInt(map.getID());
+			output.putString(map.getMapName());
+		}
 	}
 
 	@Override
@@ -28,15 +34,20 @@ public class ZH_SendMaps extends RequestPacket
 		int size = input.getInt();
 
 		for (int i = 0; i < size; i++)
-			maps.offer(input.getInt());
+		{
+			MapIndex map = new MapIndex();
+			map.setID(input.getInt());
+			map.setMapName(input.getString());
+			maps.offer(map);
+		}
 	}
 
-	public Queue<Integer> getMaps()
+	public Queue<MapIndex> getMaps()
 	{
 		return maps;
 	}
 
-	public void setMaps(Queue<Integer> maps)
+	public void setMaps(Queue<MapIndex> maps)
 	{
 		this.maps = maps;
 	}

@@ -80,6 +80,7 @@ public class MapServerFacade
 		serviceMapChar = new ServiceMapChar(mapServer);
 
 		mapIndexes = new MapIndexes();
+		authMap = new AuthMap();
 
 		serviceMapServer.init();
 		serviceMapChar.init();

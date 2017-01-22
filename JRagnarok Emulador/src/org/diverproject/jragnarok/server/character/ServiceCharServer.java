@@ -57,7 +57,7 @@ import org.diverproject.jragnarok.packets.character.fromclient.CH_MakeCharNotSta
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Ping;
 import org.diverproject.jragnarok.packets.common.RefuseMakeChar;
 import org.diverproject.jragnarok.server.Timer;
-import org.diverproject.jragnarok.server.TimerListener;
+import org.diverproject.jragnarok.server.TimerAdapt;
 import org.diverproject.jragnarok.server.TimerMap;
 import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
@@ -136,7 +136,13 @@ public class ServiceCharServer extends AbstractCharService
 		onlines = null;
 	}
 
-	private final TimerListener ONLINE_DATA_CLEANUP = new TimerListener()
+	/**
+	 * Listener utilizado por um temporizador que será chamado a cada intervalo de tempo pré-definido.
+	 * Esse chamado irá engatilhar esse listener que por sua vez chama a limpeza de jogadores online.
+	 * A limpeza consiste em remover a autenticação de jogadores que não estejam mais online.
+	 */
+
+	private final TimerAdapt ONLINE_DATA_CLEANUP = new TimerAdapt()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)

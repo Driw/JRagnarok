@@ -12,6 +12,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_KEEP_A
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SS_GROUP_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_MAP_SERVER_CONNECTION;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_SEND_MAPS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CHARLIST_REQ;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR;
@@ -28,6 +29,7 @@ import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 
 import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnaork.database.MapIndexes;
 import org.diverproject.jragnarok.packets.AcknowledgePacket;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;
@@ -54,7 +56,7 @@ import org.diverproject.util.stream.StreamException;
  * @author Andrew
  */
 
-public class CharServerFacade
+class CharServerFacade
 {
 	/**
 	 * Serviço para comunicação inicial com o cliente.
@@ -96,6 +98,11 @@ public class CharServerFacade
 	 * Controle para gerenciar dados dos personagens.
 	 */
 	private CharacterControl characterControl;
+
+	/**
+	 * Indexação dos mapas disponíveis no servidor.
+	 */
+	private MapIndexes mapIndexes;
 
 	/**
 	 * @return aquisição do serviço para comunicação inicial com clientes.
@@ -170,11 +177,27 @@ public class CharServerFacade
 		return characterControl;
 	}
 
+	/**
+	 * @return aquisição da indexação dos mapas disponíveis no servidor.
+	 */
+
+	public MapIndexes getMapIndexes()
+	{
+		return mapIndexes;
+	}
+
+	/**
+	 * Inicializa as dependências necessárias para a criação do facade no servidor de personagem.
+	 * As dependências consistem em classes de controles, serviços utilizados e coleções de dados.
+	 * @param charServer servidor de personagem do qual está solicitando a inicialização.
+	 */
+
 	public void init(CharServer charServer)
 	{
 		authMap = new AuthMap();
 		onlineMap = new OnlineMap(charServer.getMySQL().getConnection());
 		characterControl = new CharacterControl(charServer.getMySQL().getConnection());
+		mapIndexes = new MapIndexes();
 
 		clientService = new ServiceCharClient(charServer);
 		charService = new ServiceCharServer(charServer);
@@ -189,6 +212,11 @@ public class CharServerFacade
 		authService.init();
 	}
 
+	/**
+	 * Solicita a destruição do facade que irá chamar o método para destruir suas dependências.
+	 * A destruição consiste em apenas tornar as dependências inválidas e não remover as referências.
+	 */
+
 	public void destroy()
 	{
 		clientService.destroy();
@@ -200,6 +228,11 @@ public class CharServerFacade
 		authMap.clear();
 		onlineMap.clear();
 	}
+
+	/**
+	 * Após a destruição das informações contidas nas dependências do facade deve remover suas referências.
+	 * Assim será possível criar novas dependências caso seja necessário sem gasto desnecessário de memória.
+	 */
 
 	public void destroyed()
 	{
@@ -213,6 +246,12 @@ public class CharServerFacade
 		clientService = null;
 		authService = null;
 	}
+
+	/**
+	 * Listener utilizado para aplicar a uma conexão estabelecida no servidor de personagem.
+	 * Esse listener pode ser utilizado para remover informações quando um jogador ficar offline.
+	 * Pode ser ainda então informações que devem ser removidas quando o jogador fechar o jogo.
+	 */
 
 	public final FileDescriptorListener CLOSE_LISTENER = new FileDescriptorListener()
 	{
@@ -527,6 +566,10 @@ public class CharServerFacade
 
 		switch (command)
 		{
+			case PACKET_ZH_SEND_MAPS:
+				mapService.receiveMapIndexes(fd);
+				return true;
+
 			default:
 				String packet = HexUtil.parseInt(command, 4);
 				String address = fd.getAddressString();

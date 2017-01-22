@@ -3,6 +3,7 @@ package org.diverproject.jragnaork.database;
 import static org.diverproject.util.Util.format;
 import static org.diverproject.util.lang.IntUtil.interval;
 
+import java.lang.reflect.Array;
 import java.util.Iterator;
 
 import org.diverproject.util.ObjectDescription;
@@ -13,11 +14,11 @@ public abstract class IndexableDatabase<I extends IndexableDatabaseItem> extends
 	protected I items[];
 
 	@SuppressWarnings("unchecked")
-	public IndexableDatabase(String name, int max)
+	public IndexableDatabase(Class<I> cls, String name, int max)
 	{
 		super(name);
 
-		items = (I[]) new IndexableDatabaseItem[max];
+		items = (I[]) Array.newInstance(cls, max);
 	}
 
 	@Override
@@ -70,18 +71,27 @@ public abstract class IndexableDatabase<I extends IndexableDatabaseItem> extends
 	{
 		return new Iterator<I>()
 		{
-			private int iterate;
+			private int offset;
+			private int iteration;
+			private int size = IndexableDatabase.this.size;
+			private I items[] = IndexableDatabase.this.items.clone();
 
 			@Override
 			public boolean hasNext()
 			{
-				return iterate < items.length;
+				return iteration < size;
 			}
 
 			@Override
 			public I next()
 			{
-				return items[iterate++];
+				while (offset < items.length)
+					if (items[offset++] != null)
+						break;
+
+				iteration++;
+
+				return items[offset - 1];
 			}
 
 			@Override

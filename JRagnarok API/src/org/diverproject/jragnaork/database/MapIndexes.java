@@ -9,7 +9,7 @@ public class MapIndexes extends IndexableDatabase<MapIndex>
 {
 	public MapIndexes()
 	{
-		super("MapIndexDB", MAX_MAPINDEX);
+		super(MapIndex.class, "MapIndexDB", MAX_MAPINDEX);
 	}
 
 	public int get(String mapname)
@@ -28,5 +28,19 @@ public class MapIndexes extends IndexableDatabase<MapIndex>
 				return items[mapid].getMapName();
 
 		return null;
+	}
+
+	public boolean contains(String mapname)
+	{
+		for (int i = 0, f = 0; i < length() && f < size(); i++)
+			if (items[i] != null)
+			{
+				f++;
+
+				if (items[i].getMapName().equals(mapname))
+					return true;
+			}
+
+		return false;
 	}
 }

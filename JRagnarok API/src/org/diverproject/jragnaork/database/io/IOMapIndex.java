@@ -179,10 +179,10 @@ public class IOMapIndex extends IODefault<MapIndexes>
 
 				String columns[] = line.split(",");
 
-				if (columns.length > 2)
+				if (columns.length > 2 || columns[columns.length == 2 ? 1 : 0].contains(" |\t"))
 				{
 					if (getPreferences().is(PREFERENCES_THROWS_FORMAT))
-						newException("fomarto inválido, máximo de 2 colunas (linha: %d)", i);
+						newException("fomarto inválido - limite de duas colunas e sem espaçamento (linha: %d)", i);
 					continue;
 				}
 

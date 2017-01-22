@@ -4,7 +4,7 @@ import static org.diverproject.util.Util.format;
 
 import org.diverproject.util.ObjectDescription;
 
-public abstract class AbstractDatabase<I> implements GenericDatabase<I>, Iterable<I>
+public abstract class AbstractDatabase<I> implements GenericDatabase<I>
 {
 	private String name;
 

@@ -1,6 +1,6 @@
 package org.diverproject.jragnaork.database;
 
-public interface GenericDatabase<I>
+public interface GenericDatabase<I> extends Iterable<I>
 {
 	void clear();
 

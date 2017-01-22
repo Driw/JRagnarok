@@ -16,6 +16,8 @@ import static org.diverproject.util.Util.s;
 import java.io.IOException;
 import java.net.Socket;
 
+import org.diverproject.jragnaork.database.MapIndexes;
+import org.diverproject.jragnaork.database.impl.MapIndex;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.inter.charmap.HZ_ResultMapServerConnection;
 import org.diverproject.jragnarok.packets.inter.mapchar.ZH_MapServerConnection;
@@ -57,6 +59,11 @@ public class ServiceMapChar extends AbstractMapService
 	private AuthMap auths;
 
 	/**
+	 * Indexação de todos os mapas do jogo.
+	 */
+	private MapIndexes maps;
+
+	/**
 	 * Determina ser o serviço já enviou as informações do servidor.
 	 */
 	private boolean sentInformations;
@@ -89,6 +96,7 @@ public class ServiceMapChar extends AbstractMapService
 	public void init()
 	{
 		auths = getServer().getFacade().getAuthMap();
+		maps = getServer().getFacade().getMapIndexes();
 
 		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
@@ -113,6 +121,7 @@ public class ServiceMapChar extends AbstractMapService
 	public void destroy()
 	{
 		auths = null;
+		maps = null;
 
 		if (fd != null)
 		{
@@ -329,12 +338,13 @@ public class ServiceMapChar extends AbstractMapService
 	{
 		logInfo("enviando mapas ao servidor de personagem...\n");
 
-		Queue<Integer> maps = new DynamicQueue<>();
+		Queue<MapIndex> indexes = new DynamicQueue<>();
 
-		// TODO pegar o índice de todos os mapas que não sejam instâncias - 
+		for (MapIndex map : maps)
+			indexes.offer(map);
 
 		ZH_SendMaps packet = new ZH_SendMaps();
-		packet.setMaps(maps);
-		//packet.send(fd);
+		packet.setMaps(indexes);
+		packet.send(fd);
 	}
 }

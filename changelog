@@ -1,25 +1,34 @@
-19.01.2017 - 1.5.195
+22.01.2017 - 1.5.196
+- Servidor de mapas informa ao servidor de mapas os mapas que estão disponíveis.
+- Algumas correções referentes a iteração e criação de um database com AbstractDatabase.
+- GenericaDatabase irá forçar a implementação de Iterable ao invés de AbstractDatabase.
+- IndexableDatabase irá instanciar o array (items) de forma diferente para evitar problema de cast.
+- MapIndexes agora possui método que permite verificar se um mapa existe através do seu nome.
+- ZH_SendMaps irá enviar não apenas a identificação do mapa como o nome do mapa também.
+- MapServerFacade não estava criando a instância para AuthMap, causava NullPointerException.
+
+21.01.2017 - 1.5.195
 - Alterando constante PASSWORD_LENGTH de 32 para 24 conforme tamanho padrão de senhas.
 - Implementação da conexão para comunicação entre servidor de personagem e servidor de mapa.
 - MapServerList deve permitir verificar se há espaço para uma nova conexão.
 - Enviando mapeamento para autenticações feitas no servidor de mapas (será usado futuramente).
 
-19.01.2017 - 1.5.194
+21.01.2017 - 1.5.194
 - Movendo as entidades utilizadas no servidor de personagem para common.entities.
 	- O Servidor de Mapas também irá utilizar-se destas entidades.
 
-19.01.2017 - 1.5.193
+21.01.2017 - 1.5.193
 - Serviço abstrato para ser utilizado no servidor de mapas adicionado, AbstractMapService.
 - Adicionado o facade e serviço de gerenciamento no servidor de mapas, MapServerFacede e ServiceMapServer.
 - Comentando diversos métodos que devem ser implementados futuramente em ServiceMapServer.
 - ServiceMapServer irá criar uma conexão com um banco de dados para leitura de bases de dados.
 
-19.01.2017 - 1.5.192
+21.01.2017 - 1.5.192
 - Estruturas básicas para criação de coleções que armazenem as bases de dados (jragnarok.database).
 - Implementação da estrutura de MapIndex que pode ser armazenado em MapIndexes.
 - IOMapIndex irá permitir a leitura de vários MapIndex em um arquivo de texto ou tabela SQL.
 
-19.01.2017 - 1.5.191
+20.01.2017 - 1.5.191
 - Documentação do restante das classes do servidor de personagem (server.character).
 
 15.01.2017 - 1.5.190
