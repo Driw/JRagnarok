@@ -1,6 +1,5 @@
 package org.diverproject.jragnarok.server.character;
 
-import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.util.ObjectDescription;
 
@@ -11,7 +10,7 @@ import org.diverproject.util.ObjectDescription;
  * As informações são referentes a conexão estabelecida, código de identificação (conta e personagem),
  * uma identificação do servidor de personagem do qual se encontra conectado, código PIN e um temporizador.</p>
  *
- * @see FileDescriptor
+ * @see CFileDescriptor
  *
  * @author Andrew
  */
@@ -32,7 +31,7 @@ public class OnlineCharData
 	/**
 	 * Descritor de Arquivo da conexão do jogador.
 	 */
-	private FileDescriptor fd;
+	private CFileDescriptor fd;
 
 	/**
 	 * Código de identificação da conta que o jogador acessou.
@@ -63,7 +62,7 @@ public class OnlineCharData
 	 * @return aquisição do descritor de arquivo da conexão do jogador.
 	 */
 
-	public FileDescriptor getFileDescriptor()
+	public CFileDescriptor getFileDescriptor()
 	{
 		return fd;
 	}
@@ -72,7 +71,7 @@ public class OnlineCharData
 	 * @param fd descritor de arquivo da conexão do jogador.
 	 */
 
-	public void setFileDescriptor(FileDescriptor fd)
+	public void setFileDescriptor(CFileDescriptor fd)
 	{
 		this.fd = fd;
 	}
@@ -92,7 +91,8 @@ public class OnlineCharData
 
 	public void setAccountID(int accountID)
 	{
-		this.accountID = accountID;
+		if (this.accountID == 0)
+			this.accountID = accountID;
 	}
 
 	/**

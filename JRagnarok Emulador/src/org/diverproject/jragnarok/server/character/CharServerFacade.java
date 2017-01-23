@@ -219,6 +219,8 @@ class CharServerFacade
 
 	public void destroy()
 	{
+		loginService.onlnesSetAllOffline(OnlineCharData.NO_SERVER);
+
 		clientService.destroy();
 		charService.destroy();
 		loginService.destroy();
@@ -263,16 +265,10 @@ class CharServerFacade
 
 			if (sd.getID() > 0)
 			{
-				/*
-				 * TODO Confirmar se ao entrar no servidor de mapa a conexão será fechada também
-
 				OnlineCharData online = onlineMap.get(sd.getID());
 
-				if (online != null)
-					onlineMap.remove(online);
-				 */
-
-				loginService.setAccountOffline(sd.getID());
+				if (online == null || online.getCharID() == 0)
+					loginService.sendAccountOffline(sd.getID());
 			}
 
 			return false;

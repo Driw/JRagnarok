@@ -56,10 +56,6 @@ import org.diverproject.jragnarok.packets.character.fromclient.CH_MakeChar;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_MakeCharNotStats;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Ping;
 import org.diverproject.jragnarok.packets.common.RefuseMakeChar;
-import org.diverproject.jragnarok.server.Timer;
-import org.diverproject.jragnarok.server.TimerAdapt;
-import org.diverproject.jragnarok.server.TimerMap;
-import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.common.Job;
 import org.diverproject.jragnarok.server.common.entities.Character;
@@ -117,14 +113,6 @@ public class ServiceCharServer extends AbstractCharService
 		login = getServer().getFacade().getLoginService();
 		characters = getServer().getFacade().getCharacterControl();
 		onlines = getServer().getFacade().getOnlineMap();
-
-		TimerSystem ts = getTimerSystem();
-		TimerMap timers = ts.getTimers();
-
-		Timer odcTimer = timers.acquireTimer();
-		odcTimer.setListener(ONLINE_DATA_CLEANUP);
-		odcTimer.setTick(ts.getCurrentTime() + seconds(1));
-		timers.addLoop(odcTimer, seconds(10));
 	}
 
 	@Override
@@ -135,33 +123,6 @@ public class ServiceCharServer extends AbstractCharService
 		characters = null;
 		onlines = null;
 	}
-
-	/**
-	 * Listener utilizado por um temporizador que será chamado a cada intervalo de tempo pré-definido.
-	 * Esse chamado irá engatilhar esse listener que por sua vez chama a limpeza de jogadores online.
-	 * A limpeza consiste em remover a autenticação de jogadores que não estejam mais online.
-	 */
-
-	private final TimerAdapt ONLINE_DATA_CLEANUP = new TimerAdapt()
-	{
-		@Override
-		public void onCall(Timer timer, int now, int tick)
-		{
-			onlines.cleanup();
-		}
-		
-		@Override
-		public String getName()
-		{
-			return "onlineDataCleanup";
-		}
-
-		@Override
-		public String toString()
-		{
-			return getName();
-		}
-	};
 
 	/**
 	 * 
@@ -211,8 +172,9 @@ public class ServiceCharServer extends AbstractCharService
 	}
 
 	/**
-	 * Identifica uma determinada conexão no servidor de que esta se encontra na seleção de personagem.
-	 * Essa identificação é feita através da criação de um registro da sessão/conta como online.
+	 * Após a realização de autenticação do jogador no servidor de personagem ele está autorizado.
+	 * Quando autorizado será necessário configurá-lo para saber que está na seleção de personagens.
+	 * Aqui será aplicado ações que irá tornar sua conta online no sistema.
 	 * @param fd código de identificação do descritor de arquivo do cliente com o servidor.
 	 */
 
@@ -222,32 +184,26 @@ public class ServiceCharServer extends AbstractCharService
 		OnlineCharData online = onlines.get(sd.getID());
 
 		if (online == null)
+			online = onlines.newOnlineCharData(sd.getID());
+
+		else if (online.getServer() > OnlineCharData.NO_SERVER)
 		{
-			online = new OnlineCharData();
-			online.setAccountID(sd.getID());
-			onlines.add(online);
-		}
+			ClientMapServer server = getServer().getMapServers().get(online.getServer());
 
-		MapServerList servers = getServer().getMapServers();
-
-		if (online.getServer() > 0)
-		{
-			ClientMapServer server = servers.get(online.getServer());
-
-			if (server.getUsers() > 0)
+			if (server != null && server.getUsers() > 0)
 				server.setUsers(s(server.getUsers() - 1));
+
+			if (online.getWaitingDisconnect() != null)
+			{
+				getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+				online.setWaitingDisconnect(null);
+			}
+
+			online.setCharID(0);
+			online.setServer(OnlineCharData.NO_SERVER);
 		}
 
-		online.setCharID(-1);
-		online.setServer(OnlineCharData.NO_SERVER);
-
-		if (online.getWaitingDisconnect() != null)
-		{
-			getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
-			online.setWaitingDisconnect(null);
-		}
-
-		login.setAccountOnline(sd.getID());
+		login.sendAccountOnline(sd.getID());
 	}
 
 	/**

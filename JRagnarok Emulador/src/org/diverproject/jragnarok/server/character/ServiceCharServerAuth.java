@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
-import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONLINE;
+import static org.diverproject.jragnarok.server.common.DisconnectPlayer.DP_KICK_ONLINE;
 import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
@@ -115,7 +115,9 @@ public class ServiceCharServerAuth extends AbstractCharService
 		public void onCall(Timer timer, int now, int tick)
 		{
 			OnlineCharData online = onlines.get(timer.getObjectID());
-			onlines.remove(online);
+			online.setWaitingDisconnect(null);
+
+			login.setCharOffline(timer.getObjectID(), online.getCharID());
 		}
 		
 		@Override
@@ -215,7 +217,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 			// Personagem online, dar kick do servidor
 			if (online.getServer() > -1)
 			{
-				map.disconnectPlayer(fd, online.getCharID(), KICK_ONLINE);
+				map.disconnectPlayer(fd, online.getCharID(), DP_KICK_ONLINE);
 
 				if (online.getWaitingDisconnect() == null)
 				{

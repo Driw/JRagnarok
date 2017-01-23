@@ -44,8 +44,42 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 	{
 		super(connection);
 
-		this.cache = new IntegerLittleMap<>();
+		cache = new IntegerLittleMap<>();
 
+		initAccountsOffline();
+		initCharsOffline();
+	}
+
+	/**
+	 * Chamado internamente e sua finalidade é atualizar o banco de dados das contas.
+	 * Sua atualização consiste em definir todas as contas como offline no sistema.
+	 * Assim, quando o servidor de personagem criar o controle todos estarão offline.
+	 */
+
+	private void initAccountsOffline()
+	{
+		String table = Tables.getInstance().getAccounts();
+		String sql = format("UPDATE %s SET online = 0", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.executeUpdate();
+
+		} catch (SQLException | RagnarokException e) {
+			logError("falha ao deixar contas como offline:\n");
+			logException(e);
+		}		
+	}
+
+	/**
+	 * Chamado internamente e sua finalidade é atualizar o banco de dados dos personagens.
+	 * Sua atualização consiste em definir todos os personagens como offline no sistema.
+	 * Assim, quando o servidor de personagem criar o controle todos estarão offline.
+	 */
+
+	private void initCharsOffline()
+	{
 		String table = Tables.getInstance().getCharacters();
 		String sql = format("UPDATE %s SET online = 0", table);
 
@@ -57,86 +91,85 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 		} catch (SQLException | RagnarokException e) {
 			logError("falha ao deixar jogadores como offline:\n");
 			logException(e);
-		}
+		}		
 	}
 
 	/**
 	 * Obtém informações de um determinado jogador online pelo seu ID.
-	 * @param id código de identificação da conta do jogador desejado.
+	 * @param accountID código de identificação da conta do jogador desejado.
 	 * @return aquisição do objeto com as informações do jogador online.
 	 */
 
-	public OnlineCharData get(int id)
+	public OnlineCharData get(int accountID)
 	{
-		return cache.get(id);
+		return cache.get(accountID);
 	}
 
 	/**
-	 * Adiciona um novo jogador como online através das informações abaixo:
-	 * @param online informações referentes ao jogador online.
+	 * Solicita ao controle para criar um novo objeto para manter um jogador/conta online.
+	 * @param accountID código de identificação da conta do qual quer tornar online.
+	 * @return aquisição do objeto configurado com a conta que foi passada.
 	 */
 
-	public void add(OnlineCharData online)
+	public OnlineCharData newOnlineCharData(int accountID)
 	{
-		cache.add(online.getAccountID(), online);
+		OnlineCharData online = new OnlineCharData();
+		online.setAccountID(accountID);
 
-		logDebug("account#%d adicionado ao cache.\n", online.getAccountID());
+		return online;
 	}
 
 	/**
-	 * Torna um determinado jogador como online mesmo que não esteja em cache.
-	 * Caso não esteja em cache também será adicionado conforme informações abaixo:
-	 * @param online informações referentes ao jogador online.
+	 * Através das informações passadas irá atualizar o banco de dados podendo:
+	 * definir uma conta e/ou personagem como online se houver uma identificação.
+	 * Caso não haja uma identificação não será efetuada mudanças no banco de dados.
+	 * @param online objeto com as informações do jogador online.
 	 */
 
 	public void makeOnline(OnlineCharData online)
 	{
-		if (!cache.containsKey(online.getAccountID()))
-			add(online);
+		if (online != null)
+		{
+			if (online.getAccountID() > 0)
+				setAccountState(online, true);
 
-		try{
-
-			setAccountOnline(online.getAccountID(), true);
-			setCharOnline(online.getCharID(), true);
-
-		} catch (RagnarokException e) {
-			logException(e);
+			if (online.getCharID() > 0)
+				setCharState(online, true);
 		}
 	}
 
 	/**
-	 * Atualiza as informações de uma conta para tornar uma conta online ou offline.
-	 * @param online informações referentes ao jogador online a ser removido.
+	 * Através das informações passadas irá atualizar o banco de dados podendo:
+	 * definir uma conta e/ou personagem como offline se houver uma identificação.
+	 * Caso não haja uma identificação não será efetuada mudanças no banco de dados.
+	 * @param online objeto com as informações do jogador online.
 	 */
 
 	public void remove(OnlineCharData online)
 	{
-		try {
+		if (cache.removeKey(online.getAccountID()))
+		{
+			if (online.getAccountID() > 0)
+				setAccountState(online, false);
 
-			if (online.getCharID() == 0)
-				setAccountOnline(online.getAccountID(), false);
-			else
-				setCharOnline(online.getCharID(), false);
+			if (online.getCharID() > 0)
+				setCharState(online, false);
 
-		} catch (RagnarokException e) {
-			logException(e);
+			cache.removeKey(online.getAccountID());
+
+			logDebug("account#%d removido do cache.\n", online.getAccountID());
 		}
-
-		cache.removeKey(online.getAccountID());
-
-		logDebug("account#%d removido do cache.\n", online.getAccountID());
 	}
 
 	/**
 	 * Procedimento interno que irá fazer a alteração direta no banco de dados (online/offline).
 	 * Este método irá alterar o estado de uma conta especificada a seguir:
-	 * @param accountID código da conta que terá o estado alterado em online ou offline.
+	 * @param onlineData dados do identificador online para alterar o estado da conta.
 	 * @param online true para deixar online ou false caso seja para deixar offline.
 	 * @return true se conseguir alterar o estado da conta ou false caso contrário.
-	 * @throws RagnarokException apenas se houver falha na conexão.
 	 */
 
-	private boolean setAccountOnline(int accountID, boolean online) throws RagnarokException
+	public boolean setAccountState(OnlineCharData onlineData, boolean online)
 	{
 		String table = Tables.getInstance().getAccounts();
 		String sql = format("UPDATE %s SET online = ? WHERE id = ?", table);
@@ -145,35 +178,37 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 
 			PreparedStatement ps = prepare(sql);
 			ps.setBoolean(1, online);
-			ps.setInt(2, accountID);
+			ps.setInt(2, onlineData.getAccountID());
 
 			boolean result = ps.executeUpdate() == 1;
 
 			if (result)
 			{
 				if (online)
-					logDebug("account#%d está online.\n", accountID);
+					logDebug("account#%d está online.\n", onlineData.getAccountID());
 				else
-					logDebug("account#%d está offline.\n", accountID);
+					logDebug("account#%d está offline.\n", onlineData.getAccountID());
 			}
 
 			return result;
 
-		} catch (SQLException e) {
-			throw new RagnarokException(e.getMessage());
+		} catch (SQLException | RagnarokException e) {
+			logError("falha ao mudar o estado da conta (aid: %d, online: %s)", onlineData.getAccountID(), online);
+			logException(e);
 		}
+
+		return false;
 	}
 
 	/**
 	 * Procedimento interno que irá fazer a alteração direta no banco de dados (online/offline).
 	 * Este método irá alterar o estado de um personagem específico a seguir:
-	 * @param charID código da conta que terá o estado alterado em online ou offline.
+	 * @param onlineData dados do identificador online para alterar o estado do personagem.
 	 * @param online true para deixar online ou false caso seja para deixar offline.
 	 * @return true se conseguir alterar o estado da conta ou false caso contrário.
-	 * @throws RagnarokException apenas se houver falha na conexão.
 	 */
 
-	private boolean setCharOnline(int charID, boolean online) throws RagnarokException
+	public boolean setCharState(OnlineCharData onlineData, boolean online)
 	{
 		String table = Tables.getInstance().getCharacters();
 		String sql = format("UPDATE %s SET online = ? WHERE id = ?", table);
@@ -182,52 +217,26 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 
 			PreparedStatement ps = prepare(sql);
 			ps.setBoolean(1, online);
-			ps.setInt(2, charID);
+			ps.setInt(2, onlineData.getCharID());
 
 			boolean result = ps.executeUpdate() == 1;
 
 			if (result)
 			{
 				if (online)
-					logDebug("char#%d está online.\n", charID);
+					logDebug("char#%d está online.\n", onlineData.getCharID());
 				else
-					logDebug("char#%d está offline.\n", charID);
+					logDebug("char#%d está offline.\n", onlineData.getCharID());
 			}
 
 			return result;
 
-		} catch (SQLException e) {
-			throw new RagnarokException(e.getMessage());
-		}		
-	}
-
-	/**
-	 * Efetua uma limpeza deixando jogadores offline em servidores desconhecidos,
-	 * como também remover informações dos jogadores que não estejam em um servidor.
-	 */
-
-	public void cleanup()
-	{
-		for (OnlineCharData online : cache)
-		{
-			if (online.getFileDescriptor() == null)
-			{
-				cache.remove(online);
-				continue;
-			}
-
-			if (!online.getFileDescriptor().isConnected() || online.getServer() == OnlineCharData.UNKNOW_SERVER)
-				try {
-					setCharOnline(online.getCharID(), false);
-				} catch (RagnarokException e) {
-					logException(e);
-				}
-
-			if (online.getServer() < 0)
-				cache.remove(online);
+		} catch (SQLException | RagnarokException e) {
+			logError("falha ao mudar o estado do personagem (cid: %d, online: %s)", onlineData.getCharID(), online);
+			logException(e);
 		}
 
-		logDebug("%d jogadores online.\n", cache.size());
+		return false;
 	}
 
 	/**
@@ -238,11 +247,10 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 	public void clear()
 	{
 		for (OnlineCharData online : cache)
-			try {
-				setCharOnline(online.getCharID(), false);
-			} catch (RagnarokException e) {
-				logException(e);
-			}
+		{
+			setAccountState(online, false);
+			setCharState(online, false);
+		}
 
 		cache.clear();
 	}

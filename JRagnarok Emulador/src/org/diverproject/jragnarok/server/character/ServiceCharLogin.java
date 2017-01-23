@@ -24,7 +24,8 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLE
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_FORCE;
 import static org.diverproject.jragnarok.packets.common.RefuseEnter.RE_REJECTED_FROM_SERVER;
 import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_OK;
-import static org.diverproject.jragnarok.server.common.DisconnectPlayer.KICK_ONLINE;
+import static org.diverproject.jragnarok.server.common.DisconnectPlayer.DP_KICK_OFFLINE;
+import static org.diverproject.jragnarok.server.common.DisconnectPlayer.DP_KICK_ONLINE;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
@@ -239,6 +240,11 @@ public class ServiceCharLogin extends AbstractCharService
 		keepAlive.setListener(KEEP_ALIVE);
 		keepAlive.setTick(ts.getCurrentTime() + seconds(10));
 		timers.addLoop(keepAlive, seconds(10));
+
+		Timer onlineClenaup = timers.acquireTimer();
+		onlineClenaup.setListener(ONLINE_CLEANUP);
+		onlineClenaup.setTick(ts.getCurrentTime() + seconds(1));
+		timers.addLoop(onlineClenaup, seconds(600));
 	}
 
 	/**
@@ -468,6 +474,26 @@ public class ServiceCharLogin extends AbstractCharService
 	};
 
 	/**
+	 * Listener usado para manter a conexão entre o servidor de acesso e o servidor de personagem.
+	 */
+
+	private final TimerListener ONLINE_CLEANUP = new TimerAdapt()
+	{
+		@Override
+		public void onCall(Timer timer, int now, int tick)
+		{
+			for (OnlineCharData online : onlines)
+				onlinesClenaup(online);
+		}
+		
+		@Override
+		public String getName()
+		{
+			return "ONLINE_CLEANUP";
+		}
+	};
+
+	/**
 	 * Mantém a conexão de um descritor de arquivo vida dentro do sistema com um "ping".
 	 * @param lfd conexão do descritor de arquivo do servidor de acesso com o servidor.
 	 * @return true se ainda estiver conectado ou false caso contrário.
@@ -518,7 +544,7 @@ public class ServiceCharLogin extends AbstractCharService
 			if (online.getServer() > OnlineCharData.NO_SERVER)
 			{
 				ClientMapServer server = getServer().getMapServers().get(online.getServer());
-				map.disconnectPlayer(server.getFileDecriptor(), online.getCharID(), KICK_ONLINE);
+				map.disconnectPlayer(server.getFileDecriptor(), online.getCharID(), DP_KICK_ONLINE);
 
 				TimerSystem ts = getTimerSystem();
 				TimerMap timers = ts.getTimers();
@@ -930,6 +956,233 @@ public class ServiceCharLogin extends AbstractCharService
 	}
 
 	/**
+	 * Notifica ao servidor de acesso para definir uma conta especificada como online no sistema.
+	 * @param accountID código de identificação da conta do qual ficará online no sistema.
+	 */
+
+	public void sendAccountOnline(int accountID)
+	{
+		if (isConnected())
+		{
+			logDebug("solicitado ao servidor de acesso para account#%d ficar online.\n", accountID);
+
+			HA_SetAccountOnline packet = new HA_SetAccountOnline();
+			packet.setAccountID(accountID);
+			packet.send(getFileDescriptor());
+		}
+	}
+
+	/**
+	 * Notifica ao servidor de acesso em que se está conectado para definir uma conta como offline.
+	 * @param accountID código de identificação da conta que ficará offline no servidor.
+	 */
+
+	public void sendAccountOffline(int accountID)
+	{
+		if (isConnected())
+		{
+			logDebug("solicitado ao servidor de acesso para account#%d ficar offline.\n", accountID);
+
+			HA_SetAccountOffline packet = new HA_SetAccountOffline();
+			packet.setAccountID(accountID);
+			packet.send(getFileDescriptor());
+		}
+	}
+
+	/**
+	 * Torna um personagem online no servidor, resultado da ação do jogador selecionar um personagem.
+	 * @param fd conexão do arquivo descritor do cliente com o servidor de personagem.
+	 * @param charID código de identificação do personagem que foi selecionado.
+	 * @param mapID código de identificação do servidor de mapas que será usado.
+	 */
+
+	public void setCharOnline(CFileDescriptor fd, int charID, int mapID)
+	{
+		CharSessionData sd = fd.getSessionData();
+		OnlineCharData online = onlines.get(sd.getID());
+
+		if (online == null)
+		{
+			logWarning("account#%d não encontrada para mudar estado do personagem (aid: %d).\n", sd.getID());
+			return;
+		}
+
+		onlines.setAccountState(online, true);
+
+		if (online.getCharID() != 0 && online.getCharID() != mapID && online.getServer() > OnlineCharData.NO_SERVER)
+		{
+			logNotice("personagem marcado como online porém já está no servidor (aid: %d, cid: %d, mid: %d)", sd.getID(), charID, mapID);
+			map.disconnectPlayer(fd, charID, DP_KICK_ONLINE);
+		}
+
+		online.setCharID(charID);
+		online.setServer(mapID);
+
+		if (online.getServer() > 0)
+		{
+			ClientMapServer server = getServer().getMapServers().get(online.getServer());
+
+			if (server != null)
+				server.setUsers(s(server.getUsers() + 1));
+		}
+
+		if (online.getWaitingDisconnect() != null)
+		{
+			getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+			online.setWaitingDisconnect(null);
+		}
+
+		// TODO char.c:inter_guild_CharOnline [140]
+
+		sendAccountOnline(sd.getID());
+	}
+
+	/**
+	 * Define que um jogador não tem mais um personagem selecionado (caiu ou voltou a seleção de personagens).
+	 * @param accountID código de identificação da conta do qual não haverá personagem selecionado.
+	 * @param charID código de identificação do personagem do qual estava sendo utilizado.
+	 */
+
+	public void setCharOffline(int accountID, int charID)
+	{
+		OnlineCharData online = onlines.get(accountID);
+
+		if (online == null)
+		{
+			logWarning("account#%d não encontrada para mudar estado do personagem (aid: %d).\n", accountID);
+			return;
+		}
+
+		onlines.remove(online);
+
+		if (online.getServer() > OnlineCharData.NO_SERVER)
+		{
+			ClientMapServer server = getServer().getMapServers().get(online.getServer());
+
+			if (server != null)
+				server.setUsers(s(server.getUsers() - 1));
+		}
+
+		if (online.getWaitingDisconnect() != null)
+		{
+			getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+			online.setWaitingDisconnect(null);
+		}
+
+		if (online.getCharID() == charID)
+		{
+			online.setCharID(0);
+			online.setServer(OnlineCharData.NO_SERVER);
+			online.setPincodeSuccess(false);
+		}
+
+		if (charID == 0 || online == null || online.getFileDescriptor() == null)
+			sendAccountOffline(accountID);
+	}
+
+	/**
+	 * Atualiza um jogador para que este não tenha nenhum personagem selecionado no sistema.
+	 * @param online objeto contendo as informações do jogador online no servidor de personagem.
+	 * @param disconnected true se o jogador foi desconectado ou false se foi o servidor.
+	 */
+
+	public void onlinesSetOffline(OnlineCharData online, boolean disconnected)
+	{
+		if (!disconnected)
+			online.setServer(OnlineCharData.UNKNOW_SERVER);
+
+		else
+		{
+			online.setCharID(0);
+			online.setServer(OnlineCharData.NO_SERVER);
+
+			if (online.getWaitingDisconnect() != null)
+			{
+				getTimerSystem().getTimers().delete(online.getWaitingDisconnect());
+				online.setWaitingDisconnect(null);
+			}
+		}
+	}
+
+	/**
+	 * Procedimento interno utilizado para tornar um jogador offline e notificar ao servidor de mapa.
+	 * A notificação ao servidor de mapa será feito apenas se for especificado um servidor válido.
+	 * @param online objeto contendo as informações do jogador online no servidor de personagem.
+	 * @param serverID código de identificação do servidor ou tipo de kick que irá receber.
+	 * @return true se o jogador ficar offline no servidor ou false se permanecer.
+	 */
+
+	private boolean onlinesKickOffline(OnlineCharData online, int serverID)
+	{
+		if (serverID > OnlineCharData.NO_SERVER && online.getServer() != serverID)
+			return false;
+
+		if (online.getServer() > OnlineCharData.NO_SERVER)
+			map.disconnectPlayer(getServer().getMapServers().get(serverID).getFileDecriptor(), online.getCharID(), DP_KICK_OFFLINE);
+
+		else if (online.getWaitingDisconnect() == null)
+			setCharOffline(online.getAccountID(), online.getCharID());
+
+		else
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Procedimento parar definir todos os jogadores online no servidor como offline.
+	 * @param serverID código de identificação do servidor do qual quer remover,
+	 * <code>NO_SERVER</code> ou <code>UNKNOW_SERVER</code> remove todos.
+	 */
+
+	public void onlnesSetAllOffline(int serverID)
+	{
+		if (serverID < 0)
+			logNotice("definindo todos os jogadores como offline.\n");
+		else
+			logNotice("definindo jogadores do servidor de mapas %d como offline", serverID);
+
+		for (OnlineCharData online : onlines)
+			onlinesKickOffline(online, serverID);
+
+		if (serverID > OnlineCharData.NO_SERVER && !isConnected())
+			return;
+
+		sendAllAccountOffline(getFileDescriptor());
+	}
+
+	/**
+	 * Procedimento para limpar dados de um jogador online no servidor de personagem se possível.
+	 * Será removido do sistema apenas se a conexão estiver fechada e nenhum servidor selecionado.
+	 * @param online referência dos dados que especificam o estado do jogador no servidor.
+	 */
+
+	public void onlinesClenaup(OnlineCharData online)
+	{
+		if (online.getFileDescriptor() != null && online.getFileDescriptor().isConnected())
+			return;
+
+		if (online.getServer() == OnlineCharData.UNKNOW_SERVER)
+			setCharOffline(online.getAccountID(), online.getCharID());
+	}
+
+	/**
+	 * Notifica o servidor de acesso que uma conta se tornou offline no servidor de personagem.
+	 * @param fd conexão do descritor de arquivo do servidor de acesso com o servidor de personagem.
+	 */
+
+	public void sendAllAccountOffline(CFileDescriptor fd)
+	{
+		if (isConnected())
+		{
+			logDebug("solicitado ao servidor de acesso para todas as contas ficarem offline.\n");
+
+			HA_SetAllAccountOffline packet = new HA_SetAllAccountOffline();
+			packet.send(getFileDescriptor());
+		}
+	}
+
+	/**
 	 * Analise a situação do sistema de código PIN conforme configurações e estado do jogador.
 	 * Se estiver habilitado antes de tudo verifica se a conta possuir um código PIn definido
 	 * ou ainda então se a conta deseja utilizar o sistema de código PIN como segurança extra.
@@ -1038,55 +1291,6 @@ public class ServiceCharLogin extends AbstractCharService
 		packet.setCount(users);
 
 		return sendPacket(fd, packet);
-	}
-
-	/**
-	 * Envia ao servidor de acesso em que se está conectado para definir todas as contas como offline.
-	 */
-
-	public void setAllAccountOffline()
-	{
-		if (isConnected())
-		{
-			logDebug("solicitado ao servidor de acesso para todas as contas ficarem offline.\n");
-
-			HA_SetAllAccountOffline packet = new HA_SetAllAccountOffline();
-			packet.send(getFileDescriptor());
-		}
-	}
-
-	/**
-	 * Envia ao servidor de acesso em que se está conectado para definir uma conta como offline.
-	 * @param accountID código de identificação da conta que ficará offline no servidor.
-	 */
-
-	public void setAccountOffline(int accountID)
-	{
-		if (isConnected())
-		{
-			logDebug("solicitado ao servidor de acesso para account#%d ficar offline.\n", accountID);
-
-			HA_SetAccountOffline packet = new HA_SetAccountOffline();
-			packet.setAccountID(accountID);
-			packet.send(getFileDescriptor());
-		}
-	}
-
-	/**
-	 * Envia ao servidor de acesso em que se está conectado para definir uma conta como online.
-	 * @param accountID código de identificação da conta que ficará online no servidor.
-	 */
-
-	public void setAccountOnline(int accountID)
-	{
-		if (isConnected())
-		{
-			logDebug("solicitado ao servidor de acesso para account#%d ficar online.\n", accountID);
-
-			HA_SetAccountOnline packet = new HA_SetAccountOnline();
-			packet.setAccountID(accountID);
-			packet.send(getFileDescriptor());
-		}
 	}
 
 	/**

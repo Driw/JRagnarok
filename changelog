@@ -1,3 +1,11 @@
+22.01.2017 - 1.5.197
+- Quando o servidor de personagem for destruído notifica o servidor de acesso das constas como offline.
+- Agora se uma conexão for fechada no servidor de personagem remove OnlineCharData adequadamente.
+- Retirando algumas funcionalidades de OnlineMap e tornando outras públicas para serem chamadas.
+	- Modificado a forma como ele será utilizado pelos serviços.
+- ServiceCharLogin irá realizar a operação de limpeza dos dados de jogadores online.
+	- Não deve ser parte de ServiceCharServer já que este "não se comunica" com o servidor de acesso.
+
 22.01.2017 - 1.5.196
 - Servidor de mapas informa ao servidor de mapas os mapas que estão disponíveis.
 - Algumas correções referentes a iteração e criação de um database com AbstractDatabase.
