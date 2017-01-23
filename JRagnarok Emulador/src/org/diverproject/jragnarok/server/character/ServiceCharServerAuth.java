@@ -33,7 +33,7 @@ import org.diverproject.util.stream.Output;
  * @see ServiceCharLogin
  * @see ServiceCharMap
  * @see AuthMap
- * @see OnlineMap
+ * @see OnlineControl
  *
  * @author Andrew
  */
@@ -68,7 +68,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 	/**
 	 * Controle para dados de personagens online.
 	 */
-	private OnlineMap onlines;
+	private OnlineControl onlines;
 
 	/**
 	 * Cria uma nova instância de um serviço para autenticação de clientes no servidor de personagem.
@@ -89,7 +89,7 @@ public class ServiceCharServerAuth extends AbstractCharService
 		map = getServer().getFacade().getMapService();
 
 		auths = getServer().getFacade().getAuthMap();
-		onlines = getServer().getFacade().getOnlineMap();
+		onlines = getServer().getFacade().getOnlineControl();
 	}
 
 	@Override

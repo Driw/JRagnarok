@@ -27,7 +27,7 @@ import org.diverproject.util.collection.abstraction.IntegerLittleMap;
  * @author Andrew
  */
 
-public class OnlineMap extends AbstractControl implements Iterable<OnlineCharData>
+public class OnlineControl extends AbstractControl implements Iterable<OnlineCharData>
 {
 	/**
 	 * Mapeamento dos jogadores que se encontram online no sistema.
@@ -40,7 +40,7 @@ public class OnlineMap extends AbstractControl implements Iterable<OnlineCharDat
 	 * que mantém jogadores como online utilizam temporizadores para tal.
 	 */
 
-	public OnlineMap(Connection connection)
+	public OnlineControl(Connection connection)
 	{
 		super(connection);
 

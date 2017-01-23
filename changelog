@@ -1,3 +1,6 @@
+22.01.2017 - 1.5.198
+- Mudando o nome de OnlineMap para OnlineControl já que este utiliza o banco de dados.
+
 22.01.2017 - 1.5.197
 - Quando o servidor de personagem for destruído notifica o servidor de acesso das constas como offline.
 - Agora se uma conexão for fechada no servidor de personagem remove OnlineCharData adequadamente.

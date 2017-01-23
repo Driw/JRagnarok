@@ -50,7 +50,7 @@ import org.diverproject.util.stream.StreamException;
  * @see ServiceCharMap
  * @see ServiceCharServerAuth
  * @see AuthMap
- * @see OnlineMap
+ * @see OnlineControl
  * @see CharacterControl
  *
  * @author Andrew
@@ -92,7 +92,7 @@ class CharServerFacade
 	/**
 	 * Controle para dados de personagens online.
 	 */
-	private OnlineMap onlineMap;
+	private OnlineControl onlineControl;
 
 	/**
 	 * Controle para gerenciar dados dos personagens.
@@ -163,9 +163,9 @@ class CharServerFacade
 	 * @return aquisição do controle para dados de personagens online.
 	 */
 
-	public OnlineMap getOnlineMap()
+	public OnlineControl getOnlineControl()
 	{
-		return onlineMap;
+		return onlineControl;
 	}
 
 	/**
@@ -195,7 +195,7 @@ class CharServerFacade
 	public void init(CharServer charServer)
 	{
 		authMap = new AuthMap();
-		onlineMap = new OnlineMap(charServer.getMySQL().getConnection());
+		onlineControl = new OnlineControl(charServer.getMySQL().getConnection());
 		characterControl = new CharacterControl(charServer.getMySQL().getConnection());
 		mapIndexes = new MapIndexes();
 
@@ -228,7 +228,7 @@ class CharServerFacade
 		authService.destroy();
 
 		authMap.clear();
-		onlineMap.clear();
+		onlineControl.clear();
 	}
 
 	/**
@@ -240,7 +240,7 @@ class CharServerFacade
 	{
 		characterControl = null;
 		authMap = null;
-		onlineMap = null;
+		onlineControl = null;
 
 		charService = null;
 		loginService = null;
@@ -265,7 +265,7 @@ class CharServerFacade
 
 			if (sd.getID() > 0)
 			{
-				OnlineCharData online = onlineMap.get(sd.getID());
+				OnlineCharData online = onlineControl.get(sd.getID());
 
 				if (online == null || online.getCharID() == 0)
 					loginService.sendAccountOffline(sd.getID());

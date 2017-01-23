@@ -157,7 +157,7 @@ public class ServiceCharLogin extends AbstractCharService
 	/**
 	 * Controle para dados de personagens online.
 	 */
-	private OnlineMap onlines;
+	private OnlineControl onlines;
 
 	/**
 	 * Controle para gerenciar dados dos personagens.
@@ -212,7 +212,7 @@ public class ServiceCharLogin extends AbstractCharService
 		map = getServer().getFacade().getMapService();
 		auth = getServer().getFacade().getAuthService();
 		auths = getServer().getFacade().getAuthMap();
-		onlines = getServer().getFacade().getOnlineMap();
+		onlines = getServer().getFacade().getOnlineControl();
 		characters = getServer().getFacade().getCharacterControl();
 
 		groups = new GroupMap();

@@ -94,7 +94,7 @@ public class ServiceCharServer extends AbstractCharService
 	/**
 	 * Controle para dados de personagens online.
 	 */
-	private OnlineMap onlines;
+	private OnlineControl onlines;
 
 	/**
 	 * Cria uma nova instância do principal serviço para um servidor de personagem.
@@ -112,7 +112,7 @@ public class ServiceCharServer extends AbstractCharService
 		client = getServer().getFacade().getCharClient();
 		login = getServer().getFacade().getLoginService();
 		characters = getServer().getFacade().getCharacterControl();
-		onlines = getServer().getFacade().getOnlineMap();
+		onlines = getServer().getFacade().getOnlineControl();
 	}
 
 	@Override
