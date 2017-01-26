@@ -557,7 +557,7 @@ public class JRagnarokUtil
 	 * @return aquisição do código de identificação do nome do mapa passado.
 	 */
 
-	public static int mapname2mapid(String mapname)
+	public static short mapname2mapid(String mapname)
 	{
 		if (Thread.currentThread() instanceof ServerThreaed)
 		{
@@ -567,7 +567,7 @@ public class JRagnarokUtil
 			{
 				MapServer server = (MapServer) thread.getServer();
 
-				return server.getFacade().getMapIndexes().get(mapname);
+				return s(server.getFacade().getMapIndexes().get(mapname));
 			}
 		}
 
@@ -580,7 +580,7 @@ public class JRagnarokUtil
 	 * @return aquisição do nome do mapa referente ao código de identificação passado.
 	 */
 
-	public static String mapid2mapname(int mapid)
+	public static String mapid2mapname(short mapid)
 	{
 		if (Thread.currentThread() instanceof ServerThreaed)
 		{

@@ -1,9 +1,16 @@
 package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.DEFAULT_EMAIL;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_ALBERTA;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_GEFFEN;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_IZLUDE;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_MORROC;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_PAYON;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_PRONTERA;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
 import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.jragnarok.JRagnarokUtil.mapname2mapid;
 import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
@@ -30,9 +37,11 @@ import static org.diverproject.jragnarok.packets.common.DeleteCharCancel.DCC_SUC
 import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.DCR_ADDED_TO_QUEUE;
 import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.DCR_ALREADY_ON_QUEUE;
 import static org.diverproject.jragnarok.packets.common.DeleteCharReserved.DCR_CHAR_NOT_FOUND;
+import static org.diverproject.jragnarok.packets.common.NotifyAuth.NA_SERVER_CLOSED;
 import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_CANNOT_BE_DELETED;
 import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_DENIED;
 import static org.diverproject.jragnarok.packets.common.RefuseDeleteChar.RDC_INCORRET_EMAIL_ADDRESS;
+import static org.diverproject.jragnarok.packets.common.RefuseEnter.RE_REJECTED_FROM_SERVER;
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_CREATION_DENIED;
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_NAME_IN_USE;
 import static org.diverproject.jragnarok.packets.common.RefuseMakeChar.RMC_UNAVAIABLE_SLOT;
@@ -42,6 +51,7 @@ import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
+import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.util.lang.IntUtil.interval;
 
 import org.diverproject.jragnaork.RagnarokException;
@@ -55,10 +65,12 @@ import org.diverproject.jragnarok.packets.character.fromclient.CH_DeleteCharRese
 import org.diverproject.jragnarok.packets.character.fromclient.CH_MakeChar;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_MakeCharNotStats;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Ping;
+import org.diverproject.jragnarok.packets.character.fromclient.CH_SelectChar;
 import org.diverproject.jragnarok.packets.common.RefuseMakeChar;
 import org.diverproject.jragnarok.server.character.control.CharacterControl;
 import org.diverproject.jragnarok.server.common.Job;
 import org.diverproject.jragnarok.server.common.entities.Character;
+import org.diverproject.jragnarok.util.MapPoint;
 import org.diverproject.util.lang.HexUtil;
 
 /**
@@ -87,9 +99,19 @@ public class ServiceCharServer extends AbstractCharService
 	private ServiceCharLogin login;
 
 	/**
+	 * Serviço para comunicação com o servidor de mapa.
+	 */
+	private ServiceCharMap map;
+
+	/**
 	 * Controle dos dados básicos dos personagens.
 	 */
 	private CharacterControl characters;
+
+	/**
+	 * Controle para autenticação de jogadores online.
+	 */
+	private AuthMap auths;
 
 	/**
 	 * Controle para dados de personagens online.
@@ -111,7 +133,9 @@ public class ServiceCharServer extends AbstractCharService
 	{
 		client = getServer().getFacade().getCharClient();
 		login = getServer().getFacade().getLoginService();
+		map = getServer().getFacade().getMapService();
 		characters = getServer().getFacade().getCharacterControl();
+		auths = getServer().getFacade().getAuthMap();
 		onlines = getServer().getFacade().getOnlineControl();
 	}
 
@@ -120,7 +144,9 @@ public class ServiceCharServer extends AbstractCharService
 	{
 		client = null;
 		login = null;
+		map = null;
 		characters = null;
+		auths = null;
 		onlines = null;
 	}
 
@@ -683,5 +709,124 @@ public class ServiceCharServer extends AbstractCharService
 			return;
 
 		// TODO chclif_parse_pincode_check
+	}
+
+	/**
+	 * Recebe a solicitação de um jogador para selecionar um personagem especificado pelo mesmo.
+	 * Verifica a existência do personagem no slot especificado e a conexão com o servidor de mapa.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 */
+
+	public void selectChar(CFileDescriptor fd)
+	{
+		CH_SelectChar packet = new CH_SelectChar();
+		packet.receive(fd);
+
+		try {
+
+			Character character = null;
+			CharSessionData sd = fd.getSessionData();
+			int charID = characters.getCharID(fd.getID(), packet.getSlot());
+
+			if (sd.getFlag().is(CharSessionData.RETRIEVING_GUILD_BOUND_ITEMS))
+			{
+				client.refuseEnter(fd, RE_REJECTED_FROM_SERVER);
+				return;
+			}
+
+			login.setCharOnline(fd, charID, OnlineCharData.UNKNOW_SERVER);
+
+			if ((character = characters.get(charID)) == null)
+			{
+				login.setCharOffline(fd.getID(), charID);
+				client.refuseEnter(fd, RE_REJECTED_FROM_SERVER);
+				return;
+			}
+
+			logNotice("personagem selecionado (fd: %d, aid: %d, cid: %d).\n", fd.getID(), sd.getID(), charID);
+
+			int mapServerID = 0;
+
+			if ((mapServerID = map.searchMapServerID(character.getLocations().getLastPoint().getMap(), -1, s(-1))) < 0 ||
+				character.getLocations().getLastPoint().getMap() == 0)
+			{
+				if (!map.hasConnection())
+				{
+					client.sendNotifyResult(fd, NA_SERVER_CLOSED);
+					return;
+				}
+
+				short mapID = 0;
+				MapPoint lastPosition = character.getLocations().getLastPoint();
+
+				if ((mapServerID = map.searchMapServerID((mapID = mapname2mapid(MAP_PRONTERA)), -1, s(-1))) >= 0)
+				{
+					lastPosition.setX(273);
+					lastPosition.setY(354);
+				}
+
+				else if ((mapServerID = map.searchMapServerID((mapID = mapname2mapid(MAP_GEFFEN)), -1, s(-1))) >= 0)
+				{
+					lastPosition.setX(120);
+					lastPosition.setY(100);
+				}
+
+				else if ((mapServerID = map.searchMapServerID((mapID = mapname2mapid(MAP_MORROC)), -1, s(-1))) >= 0)
+				{
+					lastPosition.setX(160);
+					lastPosition.setY(94);
+				}
+
+				else if ((mapServerID = map.searchMapServerID((mapID = mapname2mapid(MAP_ALBERTA)), -1, s(-1))) >= 0)
+				{
+					lastPosition.setX(116);
+					lastPosition.setY(57);
+				}
+
+				else if ((mapServerID = map.searchMapServerID((mapID = mapname2mapid(MAP_PAYON)), -1, s(-1))) >= 0)
+				{
+					lastPosition.setX(87);
+					lastPosition.setY(117);
+				}
+
+				else if ((mapServerID = map.searchMapServerID((mapID = mapname2mapid(MAP_IZLUDE)), -1, s(-1))) >= 0)
+				{
+					lastPosition.setX(94);
+					lastPosition.setY(103);
+				}
+
+				else
+				{
+					logInfo("conexão fecahda, nenhum servidor de mapa disponível com uma cidade principal.\n");
+					client.sendNotifyResult(fd, NA_SERVER_CLOSED);
+					return;
+				}
+
+				lastPosition.setMap(mapID);
+			}
+
+			if (!map.hasConnection(mapServerID))
+			{
+				client.sendNotifyResult(fd, NA_SERVER_CLOSED);
+				return;
+			}
+
+			client.notifyZoneServer(fd, character, mapServerID);
+
+			AuthNode auth = new AuthNode();
+			auth.setAccountID(sd.getID());
+			auth.setCharID(charID);
+			auth.setSeed(sd.getSeed());
+			auth.getExpiration().set(sd.getExpiration().get());
+			auth.setGroup(sd.getGroup());
+			auths.add(auth);
+
+		} catch (RagnarokException e) {
+
+			logError("falha ao selecionar personagem (aid: %d, slot: %d):\n", fd.getID(), packet.getSlot());
+			logException(e);
+		}
+
+		client.refuseEnter(fd, RE_REJECTED_FROM_SERVER);
 	}
 }

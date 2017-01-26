@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
+import static org.diverproject.jragnarok.JRagnarokUtil.mapid2mapname;
 import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_UNLIMITED;
@@ -27,6 +28,7 @@ import org.diverproject.jragnarok.packets.character.toclient.HC_CharListNotify;
 import org.diverproject.jragnarok.packets.character.toclient.HC_DeleteChar3;
 import org.diverproject.jragnarok.packets.character.toclient.HC_DeleteCharCancel;
 import org.diverproject.jragnarok.packets.character.toclient.HC_DeleteCharReserved;
+import org.diverproject.jragnarok.packets.character.toclient.HC_NotifyZoneServer;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseDeleteChar;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseMakeChar;
@@ -588,5 +590,30 @@ public class ServiceCharClient extends AbstractCharService
 	public void sendMoveCharSlotResult(CFileDescriptor fd)
 	{
 		// TODO chclif_moveCharSlotReply
+	}
+
+	/**
+	 * Notifica ao cliente que o personagem foi selecionado no servidor para redirecioná-lo ao servidor de mapa.
+	 * Será necessário especificar o personagem que foi selecionado e a identificação do servidor de mapa.
+	 * @param fd conexão do descritor de arquivo do cliente com o servidor de personagem.
+	 * @param character referência do objecto contendo as informações do personagem selecionado.
+	 * @param mapServerID código de identificação do servidor de mapa em que o personagem irá entrar.
+	 */
+
+	public void notifyZoneServer(CFileDescriptor fd, Character character, int mapServerID)
+	{
+		ClientMapServer server = getServer().getMapServers().get(mapServerID);
+
+		if (server != null)
+		{
+			HC_NotifyZoneServer packet = new HC_NotifyZoneServer();
+			packet.setCharID(character.getID());
+			packet.setMapName(mapid2mapname(character.getLocations().getLastPoint().getMap()));
+			packet.setAddressIP(server.getIP().get());
+			packet.setPort(server.getPort());
+		}
+
+		else
+			logWarning("tentativa de entrar em um servidor de mapa não existente (map-server: %d).\n", mapServerID);
 	}
 }

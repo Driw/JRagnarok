@@ -1630,6 +1630,34 @@ public class CharacterControl extends AbstractControl
 	}
 
 	/**
+	 * Busca no banco de dados o código de identificação de um personagem de acordo com a conta e slot.
+	 * @param accountID código de identificação da conta do qual o personagem será buscado.
+	 * @param slot número de slot na conta do personagem que deseja o código de identificação.
+	 * @return aquisição do código de identificação do personagem ou zero se não encontrar.
+	 * @throws RagnarokException
+	 */
+
+	public int getCharID(int accountID, byte slot) throws RagnarokException
+	{
+		String table = Tables.getInstance().getAccountsCharacters();
+		String sql = format("SELECT charid FROM %s WHERE accountid = ? AND slot = ?", table);
+
+		try {
+
+			PreparedStatement ps = prepare(sql);
+			ps.setInt(1, accountID);
+			ps.setByte(2, slot);
+
+			ResultSet rs = ps.executeQuery();
+
+			return rs.next() ? rs.getInt("charid") : 0;
+
+		} catch (SQLException e) {
+			throw new RagnarokException(e.getMessage());
+		}
+	}
+
+	/**
 	 * Procedimento utilizado para atualizar as informações mínimas do personagem conforme abaixo:
 	 * @param sd sessão do qual terá as informações atualizadas de todos os CharData.
 	 * @param characters indexação dos personagens através do seu número de slot.

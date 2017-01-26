@@ -126,6 +126,36 @@ public class JRagnarokConstants
 	 */
 	public static final int MAP_NAME_LENGTH_EXT = MAP_NAME_LENGTH + 4;
 
+	/**
+	 * Nome de identificação do mapa da cidade de Prontera.
+	 */
+	public static final String MAP_PRONTERA = "prontera";
+
+	/**
+	 * Nome de identificação do mapa da cidade de Geffen.
+	 */
+	public static final String MAP_GEFFEN = "geffen";
+
+	/**
+	 * Nome de identificação do mapa da cidade de Morroc.
+	 */
+	public static final String MAP_MORROC = "morocc";
+
+	/**
+	 * Nome de identificação do mapa da cidade de Alberta.
+	 */
+	public static final String MAP_ALBERTA = "alberta";
+
+	/**
+	 * Nome de identificação do mapa da cidade de Payou.
+	 */
+	public static final String MAP_PAYON = "payon";
+
+	/**
+	 * Nome de identificação do mapa da cidade de Izlude.
+	 */
+	public static final String MAP_IZLUDE = "izlude";
+
 	private JRagnarokConstants()
 	{
 		

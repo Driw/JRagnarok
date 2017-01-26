@@ -19,22 +19,22 @@ public class MapPoint extends Point
 	/**
 	 * Nome do mapa.
 	 */
-	private String map;
+	private short map;
 
 	/**
-	 * @return aquisição do nome do mapa.
+	 * @return aquisição do código de identificação do mapa.
 	 */
 
-	public String getMap()
+	public short getMap()
 	{
 		return map;
 	}
 
 	/**
-	 * @param map nome do mapa.
+	 * @param map código de identificação do mapa.
 	 */
 
-	public void setMap(String map)
+	public void setMap(short map)
 	{
 		this.map = map;
 	}

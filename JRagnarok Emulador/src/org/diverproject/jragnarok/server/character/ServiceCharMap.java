@@ -4,14 +4,29 @@ import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP_X;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP_Y;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_FOLDER;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_MAP_INDEX;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_DATABASE;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_HOST;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_PASSWORD;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_PORT;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_USERNAME;
 import static org.diverproject.jragnarok.packets.common.ResultMapServerConnection.RMSC_FAILURE;
 import static org.diverproject.jragnarok.packets.common.ResultMapServerConnection.RMSC_FULL;
 import static org.diverproject.jragnarok.packets.common.ResultMapServerConnection.RMSC_SUCCESSFUL;
+import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
+import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
+import static org.diverproject.util.Util.format;
 
+import java.sql.SQLException;
+
+import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.database.MapIndexes;
 import org.diverproject.jragnaork.database.impl.MapIndex;
+import org.diverproject.jragnaork.database.io.IOMapIndex;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.common.ResultMapServerConnection;
 import org.diverproject.jragnarok.packets.inter.charmap.HZ_ResultMapServerConnection;
@@ -21,6 +36,7 @@ import org.diverproject.jragnarok.packets.inter.mapchar.ZH_SendMaps;
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.common.DisconnectPlayer;
 import org.diverproject.util.collection.Queue;
+import org.diverproject.util.sql.MySQL;
 
 /**
  * <h1>Serviço para Comunicação com o Servidor de Mapa</h1>
@@ -37,6 +53,11 @@ import org.diverproject.util.collection.Queue;
 
 public class ServiceCharMap extends AbstractCharService
 {
+	/**
+	 * Conexão com o banco de dados MySQL para a base de dados do jogo.
+	 */
+	private MySQL dbMysql;
+
 	/**
 	 * Indexação dos mapas disponíveis no servidor.
 	 */
@@ -56,12 +77,82 @@ public class ServiceCharMap extends AbstractCharService
 	public void init()
 	{
 		maps = getServer().getFacade().getMapIndexes();		
+
+		initDatabaseMySQL();
+		readMapIndex();
 	}
 
 	@Override
 	public void destroy()
 	{
 		maps = null;
+	}
+
+	/**
+	 * Cria uma conexão com o banco de dados MySQL utilizando o banco de dados que contém a base de dados do jogo.
+	 * A base de dados do jogo consiste em informações que são carregadas antes do servidor carregar por completo.
+	 * Essas informações podem ser de mapas, itens, classes, mapas, scripts e outros tipos de dados.
+	 */
+
+	private void initDatabaseMySQL()
+	{
+		String host = getConfigs().getString(DATABASE_SQL_HOST);
+		String database = getConfigs().getString(DATABASE_SQL_DATABASE);
+		String username = getConfigs().getString(DATABASE_SQL_USERNAME);
+		String password = getConfigs().getString(DATABASE_SQL_PASSWORD);
+		int port = getConfigs().getInt(DATABASE_SQL_PORT);
+
+		try {
+
+			dbMysql = new MySQL();
+			dbMysql.setHost(host);
+			dbMysql.setPort(port);
+			dbMysql.setDatabase(database);
+			dbMysql.setUsername(username);
+			dbMysql.setPassword(password);
+			dbMysql.connect();
+
+			logNotice("banco de dados para base de dados do jogo conectado (%s@%s:%d).\n", host, database, port);
+
+		} catch (SQLException | ClassNotFoundException e) {
+			logError("falha ao conectar-se com o banco de dados da base de dados do jogo:\n");
+			logException(e);
+		}
+	}
+
+	/**
+	 * Solicita a leitura dos dados para indexação dos mapas disponíveis e que poderão ser carregados no jogo.
+	 * Cada mapa será vinculado a um código de identificação para que possa ser localizado e identificado.
+	 * A leitura pode ser feita através de um arquivo de texto formatado ou um banco de dados MySQL.
+	 */
+
+	private void readMapIndex()
+	{
+		IOMapIndex io = new IOMapIndex();
+		io.getPreferences().set(IOMapIndex.DEFAULT_PREFERENCES);
+		io.getPreferences().set(IOMapIndex.PREFERENCES_INTERNAL_LOG_READ);
+
+		String folder = getConfigs().getString(DATABASE_FOLDER);
+		String filename = getConfigs().getString(DATABASE_MAP_INDEX);
+
+		try {
+
+			if (filename.endsWith(".sql"))
+				io.readSQL(maps, dbMysql.getConnection(), folder);
+
+			else if (filename.endsWith(".txt"))
+				io.readFile(maps, format("%s/%s", folder, filename));
+
+			else
+				throw new RagnarokException("'%s' com formato inválido (value: %s)", DATABASE_MAP_INDEX, filename);
+
+		} catch (RagnarokException e) {
+			logError("falha durante a leitura de '%s':\n", filename);
+			logException(e);
+		}
+
+		while (!io.getExceptions().isEmpty())
+			logException(io.getExceptions().poll());
 	}
 
 	/**
@@ -125,6 +216,7 @@ public class ServiceCharMap extends AbstractCharService
 		packet.receive(fd);
 
 		Queue<MapIndex> queue = packet.getMaps();
+		MapIndexes maps = new MapIndexes();
 
 		while (!queue.isEmpty())
 		{
@@ -199,5 +291,63 @@ public class ServiceCharMap extends AbstractCharService
 	{
 		// TODO mapif_disconnectplayer
 
+	}
+
+	/**
+	 * Verifica todos os servidores de mapas conectados afim de encontrar um mapa especificado.
+	 * @param mapID código de identificação do mapa do qual deseja localizar em um servidor.
+	 * @param ip endereço de IP do servidor a considerar ou -1 (menos um) para qualquer um.
+	 * @param port porta de conexão do servidor a considerar ou -1 (menos um) para qualquer um.
+	 * @return aquisição do código de identificação do servidor de mapas que contém o mapa acima.
+	 */
+
+	public int searchMapServerID(short mapID, int ip, short port)
+	{
+		for (ClientMapServer server : getServer().getMapServers())
+			if (server.getFileDecriptor().isConnected() &&
+				(server.getIP().get() == ip || ip == -1) &&
+				(server.getPort() == port || port == -1))
+			{
+				for (int i = 0; i < server.getMaps().length; i++)
+					if (server.getMaps()[i] == mapID)
+						return i;
+			}
+
+		return OnlineCharData.NO_SERVER;
+	}
+
+	/**
+	 * Verifica se um determinado servidor de mapa possui conexão com este servidor de personagem.
+	 * @param mapServerID código de identificação do servidor de mapa do qual será verificado.
+	 * @return true se houver um conexão estabelecida ou false caso contrário.
+	 */
+
+	public boolean hasConnection(int mapServerID)
+	{
+		ClientMapServer server = getServer().getMapServers().get(mapServerID);
+
+		if (server != null)
+		{
+			if (server.getFileDecriptor() != null && server.getFileDecriptor().isConnected())
+				return false;
+
+			getServer().getMapServers().remove(server);
+		}
+
+		return false;
+	}
+
+	/**
+	 * verifica se há ao menos um servidor de mapas conectado no servidor de personagem.
+	 * @return true se houver ao menos um conectado ou false se não houver nenhum.
+	 */
+
+	public boolean hasConnection()
+	{
+		for (ClientMapServer server : getServer().getMapServers())
+			if (server.getFileDecriptor().isConnected())
+				return true;
+
+		return false;
 	}
 }

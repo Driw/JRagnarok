@@ -212,6 +212,14 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigBoolean(SQL_LEGACY_DATETIME, false));
 		configurations.add(new ConfigString(SQL_TIMEZONE, "Africa/Abidjan"));
 
+		configurations.add(new ConfigString(DATABASE_FOLDER, "database"));
+		configurations.add(new ConfigInt(DATABASE_SQL_PORT, 3306));
+		configurations.add(new ConfigString(DATABASE_SQL_HOST, "localhost"));
+		configurations.add(new ConfigString(DATABASE_SQL_DATABASE, "jragnarok_db"));
+		configurations.add(new ConfigString(DATABASE_SQL_USERNAME, "server"));
+		configurations.add(new ConfigString(DATABASE_SQL_PASSWORD, "passwd"));
+		configurations.add(new ConfigString(DATABASE_MAP_INDEX, "map_index.txt"));
+
 		return configurations;
 	}
 
@@ -285,14 +293,6 @@ public class JRagnarokConfigs
 		configurations.add(new ConfigInt(MAP_PORT, 6900));
 		configurations.add(new ConfigString(MAP_USERNAME, "server"));
 		configurations.add(new ConfigString(MAP_PASSWORD, "passwd"));
-
-		configurations.add(new ConfigString(DATABASE_FOLDER, "database"));
-		configurations.add(new ConfigInt(DATABASE_SQL_PORT, 3306));
-		configurations.add(new ConfigString(DATABASE_SQL_HOST, "localhost"));
-		configurations.add(new ConfigString(DATABASE_SQL_DATABASE, "jragnarok_db"));
-		configurations.add(new ConfigString(DATABASE_SQL_USERNAME, "server"));
-		configurations.add(new ConfigString(DATABASE_SQL_PASSWORD, "passwd"));
-		configurations.add(new ConfigString(DATABASE_MAP_INDEX, "map_index.txt"));
 
 		return configurations;
 	}

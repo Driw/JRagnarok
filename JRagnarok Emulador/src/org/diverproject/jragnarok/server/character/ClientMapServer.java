@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_PER_SERVER;
+import static org.diverproject.util.Util.size;
 
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.util.ObjectDescription;
@@ -41,9 +42,9 @@ public class ClientMapServer
 	private short users;
 
 	/**
-	 * TODO
+	 * Vetor com o índice de todos os mapas disponíveis no servidor.
 	 */
-	private short map[];
+	private Short maps[];
 
 	/**
 	 * Cria uma nova instância de um cliente para representação do servidor de mapa no servidor de personagem.
@@ -54,7 +55,7 @@ public class ClientMapServer
 	public ClientMapServer(CFileDescriptor fileDecriptor)
 	{
 		this.fd = fileDecriptor;
-		this.map = new short[MAX_MAP_PER_SERVER];
+		this.maps = new Short[MAX_MAP_PER_SERVER];
 	}
 
 	/**
@@ -121,12 +122,12 @@ public class ClientMapServer
 	}
 
 	/**
-	 * @return ???
+	 * @return aquisição do vetor contendo os mapas disponíveis no servidor de mapas.
 	 */
 
-	public short[] getMaps()
+	public Short[] getMaps()
 	{
-		return map;
+		return maps;
 	}
 
 	@Override
@@ -138,6 +139,7 @@ public class ClientMapServer
 		description.append("ip", ip);
 		description.append("port", port);
 		description.append("online", users);
+		description.append("maps", size((Object[]) maps));
 
 		return description.toString();
 	}

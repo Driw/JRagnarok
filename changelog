@@ -1,3 +1,9 @@
+26.01.2017 - 1.5.199
+- Movendo algumas configurações de MapServer.conf para SQlConnection.sql já que se refere ao SQL.
+- As funções mapname2mapid e mapid2mapname devem trabalhar com o ID do mapa como shot.
+	- Algumas outras classes foram modificadas: ClientMapServer e MapPoint.
+- Implementação da seleção de um personagem do jogador durante a seleção de personagens.
+
 22.01.2017 - 1.5.198
 - Mudando o nome de OnlineMap para OnlineControl já que este utiliza o banco de dados.
 

@@ -78,7 +78,7 @@ public class RagnarokPacket
 	// -- RAGNAROK PACKET ID : CLIENT TO CHAR SERVER (CH) -- 
 
 	public static final short PACKET_CH_ENTER									= 0x0065;
-//	public static final short PACKET_CH_SELECT_CHAR								= 0x0066;
+	public static final short PACKET_CH_SELECT_CHAR								= 0x0066;
 	public static final short PACKET_CH_MAKE_CHAR								= 0x0067;
 	public static final short PACKET_CH_DELETE_CHAR								= 0x0068;
 	public static final short PACKET_CH_PING									= 0x0187;
@@ -117,7 +117,7 @@ public class RagnarokPacket
 	public static final short PACKET_HC_REFUSE_MAKECHAR							= 0x006E;
 	public static final short PACKET_HC_ACCEPT_DELETECHAR						= 0x006F;
 	public static final short PACKET_HC_REFUSE_DELETECHAR						= 0x0070;
-//	public static final short PACKET_HC_NOTIFY_ZONESVR							= 0x0071;
+	public static final short PACKET_HC_NOTIFY_ZONESVR							= 0x0071;
 	public static final short PACKET_HC_BLOCK_CHARACTER							= 0x020D;
 //	public static final short PACKET_HC_REQUEST_CHARACTER_PASSWORD				= 0x023E;
 //	public static final short PACKET_HC_ACK_IS_VALID_CHARNAME					= 0x028E;

@@ -34,6 +34,17 @@ import org.diverproject.util.Time;
 public class CharSessionData extends SessionData
 {
 	/**
+	 * Propriedade que identifica a sessão como recuperando itens vinculados do clã.
+	 */
+	public static final int RETRIEVING_GUILD_BOUND_ITEMS = 0x01;
+
+	/**
+	 * String contendo o nome de todas as propriedades da flag de uma sessão.
+	 */
+	public static final String FLAG_STRINGS[] = new String[] { "RETRIEVING_GUILD_BOUND_ITEMS" };
+
+
+	/**
 	 * Sessão autenticada pelo servidor de acesso.
 	 */
 	private boolean auth;
@@ -112,7 +123,7 @@ public class CharSessionData extends SessionData
 	public CharSessionData()
 	{
 		this.expiration = new Time();
-		this.flag = new BitWise();
+		this.flag = new BitWise(FLAG_STRINGS);
 		this.chars = new CharData[MAX_CHARS];
 		this.seed = new LoginSeed();
 		this.pincode = new Pincode();

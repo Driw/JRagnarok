@@ -24,6 +24,7 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_ENTER;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR_NOT_STATS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_PING;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_SELECT_CHAR;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -348,9 +349,9 @@ class CharServerFacade
 	{
 		switch (command)
 		{
-			/*
 			case PACKET_CH_SELECT_CHAR:
-			*/
+				charService.selectChar(fd);
+				return true;
 
 			case PACKET_CH_MAKE_CHAR:
 			case PACKET_CH_CREATE_NEW_CHAR:
