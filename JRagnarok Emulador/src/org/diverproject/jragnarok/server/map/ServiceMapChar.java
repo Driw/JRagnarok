@@ -54,6 +54,11 @@ public class ServiceMapChar extends AbstractMapService
 	private MFileDescriptor fd;
 
 	/**
+	 * Serviço para comunicação com o cliente do servidor de mapa.
+	 */
+	private ServiceMapClient client;
+
+	/**
 	 * Mapeamento das autenticações no servidor de mapas.
 	 */
 	private AuthMap auths;
@@ -95,6 +100,7 @@ public class ServiceMapChar extends AbstractMapService
 	@Override
 	public void init()
 	{
+		client = getServer().getFacade().getServiceMapClient();
 		auths = getServer().getFacade().getAuthMap();
 		maps = getServer().getFacade().getMapIndexes();
 
@@ -103,18 +109,18 @@ public class ServiceMapChar extends AbstractMapService
 
 		Timer timerConnection = timers.acquireTimer();
 		timerConnection.setListener(CHECK_CHAR_SERVER_CONNECTION);
-		timerConnection.setTick(ts.getCurrentTime() + seconds(1));
-		timers.addInterval(timerConnection, seconds(10));
+		timerConnection.setTick(ts.getCurrentTime() + seconds(5));
+		timers.addLoop(timerConnection, seconds(10));
 
 		Timer timerAuthCleanup = timers.acquireTimer();
 		timerAuthCleanup.setListener(AUTH_CLEANUP);
 		timerAuthCleanup.setTick(ts.getCurrentTime() + seconds(1));
-		timers.addInterval(timerAuthCleanup, seconds(30));
+		timers.addLoop(timerAuthCleanup, seconds(30));
 
 		Timer timerNotifyUserCount = timers.acquireTimer();
 		timerNotifyUserCount.setListener(NOTIFY_USER_COUNT);
 		timerNotifyUserCount.setTick(ts.getCurrentTime() + seconds(1));
-		timers.addInterval(timerNotifyUserCount, seconds(10));
+		timers.addLoop(timerNotifyUserCount, seconds(10));
 	}
 
 	@Override
@@ -193,7 +199,7 @@ public class ServiceMapChar extends AbstractMapService
 
 				Socket socket = new Socket(host, port);
 
-				MFileDescriptor fd = new MFileDescriptor(socket);
+				fd = new MFileDescriptor(socket);
 				fd.getFlag().set(MFileDescriptor.FLAG_SERVER);
 
 				if (getFileDescriptorSystem().addFileDecriptor(fd))
@@ -346,5 +352,16 @@ public class ServiceMapChar extends AbstractMapService
 		ZH_SendMaps packet = new ZH_SendMaps();
 		packet.setMaps(indexes);
 		packet.send(fd);
+	}
+
+	/**
+	 * Envia um pacote para um servidor de personagem para manter a conexão estabelecida.
+	 * Este procedimento é chamado após o servidor de personagem solicitar um ping.
+	 * @param fd conexão do descritor de arquivo do servidor de personagem com o servidor de mapa.
+	 */
+
+	public void keepAlive(MFileDescriptor fd)
+	{
+		client.keepAliveCharServer(fd);
 	}
 }

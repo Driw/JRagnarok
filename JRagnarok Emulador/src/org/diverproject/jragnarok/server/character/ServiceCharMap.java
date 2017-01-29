@@ -1,6 +1,8 @@
 package org.diverproject.jragnarok.server.character;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
 import static org.diverproject.jragnarok.JRagnarokUtil.s;
+import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP_X;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP_Y;
@@ -29,11 +31,20 @@ import org.diverproject.jragnaork.database.impl.MapIndex;
 import org.diverproject.jragnaork.database.io.IOMapIndex;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.common.ResultMapServerConnection;
+import org.diverproject.jragnarok.packets.inter.charmap.HZ_KeepAlive;
 import org.diverproject.jragnarok.packets.inter.charmap.HZ_ResultMapServerConnection;
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AccountInfo;
 import org.diverproject.jragnarok.packets.inter.mapchar.ZH_MapServerConnection;
+import org.diverproject.jragnarok.packets.inter.mapchar.ZH_NotifyUserCount;
+import org.diverproject.jragnarok.packets.inter.mapchar.ZH_SendInformations;
 import org.diverproject.jragnarok.packets.inter.mapchar.ZH_SendMaps;
+import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.InternetProtocol;
+import org.diverproject.jragnarok.server.Timer;
+import org.diverproject.jragnarok.server.TimerAdapt;
+import org.diverproject.jragnarok.server.TimerListener;
+import org.diverproject.jragnarok.server.TimerMap;
+import org.diverproject.jragnarok.server.TimerSystem;
 import org.diverproject.jragnarok.server.common.DisconnectPlayer;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.sql.MySQL;
@@ -54,6 +65,12 @@ import org.diverproject.util.sql.MySQL;
 public class ServiceCharMap extends AbstractCharService
 {
 	/**
+	 * Quantas vezes o temporizador poderá esperar a resposta de ping do servidor de acesso.
+	 */
+	public static final int PING_MAX_WAITING = 3;
+
+
+	/**
 	 * Conexão com o banco de dados MySQL para a base de dados do jogo.
 	 */
 	private MySQL dbMysql;
@@ -62,6 +79,11 @@ public class ServiceCharMap extends AbstractCharService
 	 * Indexação dos mapas disponíveis no servidor.
 	 */
 	private MapIndexes maps;
+
+	/**
+	 * Vetor para realizar a contagem de ping por servidor.
+	 */
+	private int pingCount[] = new int[MAX_SERVERS];
 
 	/**
 	 * Cria uma nova instância de um serviço para comunicação com o servidor de mapas.
@@ -73,6 +95,20 @@ public class ServiceCharMap extends AbstractCharService
 		super(server);
 	}
 
+	/**
+	 * Verifica se uma conexão de um servidor de mapa com o servidor de personagem está conectada.
+	 * @param server referência dos dados do cliente (servidor de mapa) no servidor de personagem.
+	 * @return true se a conexão ainda estiver ativa ou false caso contrário.
+	 */
+
+	public boolean isConnected(ClientMapServer server)
+	{
+		return	server != null &&
+				server.getFileDescriptor() != null &&
+				server.getFileDescriptor().isConnected() &&
+				!server.getFileDescriptor().getFlag().is(FileDescriptor.FLAG_EOF);
+	}
+
 	@Override
 	public void init()
 	{
@@ -80,6 +116,14 @@ public class ServiceCharMap extends AbstractCharService
 
 		initDatabaseMySQL();
 		readMapIndex();
+
+		TimerSystem ts = getTimerSystem();
+		TimerMap timers = ts.getTimers();
+
+		Timer keepAlive = timers.acquireTimer();
+		keepAlive.setListener(KEEP_ALIVE);
+		keepAlive.setTick(ts.getCurrentTime() + seconds(10));
+		timers.addLoop(keepAlive, seconds(10));
 	}
 
 	@Override
@@ -153,6 +197,68 @@ public class ServiceCharMap extends AbstractCharService
 
 		while (!io.getExceptions().isEmpty())
 			logException(io.getExceptions().poll());
+	}
+
+	/**
+	 * Listener usado para manter a conexão entre o servidor de acesso e o servidor de personagem.
+	 */
+
+	private final TimerListener KEEP_ALIVE = new TimerAdapt()
+	{
+		@Override
+		public void onCall(Timer timer, int now, int tick)
+		{
+			for (ClientMapServer server : getServer().getMapServers())
+				if (isConnected(server))
+					ping(server);
+		}
+
+		/**
+		 * Procedimento interno para realizar o processo de envio do ping a um servidor de mapa.
+		 * @param server referência dos dados do cliente (servidor de mapa) no servidor de personagem.
+		 */
+
+		private void ping(ClientMapServer server)
+		{
+			if (server.getFileDescriptor().getFlag().is(FileDescriptor.FLAG_PING_SENT))
+			{
+				if (pingCount[server.getID()] == PING_MAX_WAITING)
+				{
+					logNotice("conexão com o servidor de acesso fechado por falta de resposta.\n");
+					server.getFileDescriptor().close();
+					return;
+				}
+
+				else
+					logWarning("aguardando servidor de acesso (%d de %d tentativas)...\n", pingCount[server.getID()]++, PING_MAX_WAITING);
+			}
+
+			HZ_KeepAlive packet = new HZ_KeepAlive();
+			packet.send(server.getFileDescriptor());
+
+			server.getFileDescriptor().getFlag().set(FileDescriptor.FLAG_PING_SENT);
+		}
+
+		@Override
+		public String getName()
+		{
+			return "KEEP_ALIVE";
+		}
+	};
+
+	/**
+	 * Mantém a conexão de um descritor de arquivo vida dentro do sistema com um "ping".
+	 * @param lfd conexão do descritor de arquivo do servidor de acesso com o servidor.
+	 * @return true se ainda estiver conectado ou false caso contrário.
+	 */
+
+	public void keepAlive(CFileDescriptor fd)
+	{
+		fd.getFlag().unset(FileDescriptor.FLAG_PING_SENT);
+		ClientMapServer server = getServer().getMapServers().get(fd);
+
+		if (server != null)
+			pingCount[server.getID()] = 0;
 	}
 
 	/**
@@ -251,8 +357,8 @@ public class ServiceCharMap extends AbstractCharService
 	public void sendAll(IResponsePacket packet)
 	{
 		for (ClientMapServer server : getServer().getMapServers())
-			if (server.getFileDecriptor().isConnected())
-				packet.send(server.getFileDecriptor());
+			if (server.getFileDescriptor().isConnected())
+				packet.send(server.getFileDescriptor());
 	}
 
 	/**
@@ -304,7 +410,7 @@ public class ServiceCharMap extends AbstractCharService
 	public int searchMapServerID(short mapID, int ip, short port)
 	{
 		for (ClientMapServer server : getServer().getMapServers())
-			if (server.getFileDecriptor().isConnected() &&
+			if (server.getFileDescriptor().isConnected() &&
 				(server.getIP().get() == ip || ip == -1) &&
 				(server.getPort() == port || port == -1))
 			{
@@ -328,7 +434,7 @@ public class ServiceCharMap extends AbstractCharService
 
 		if (server != null)
 		{
-			if (server.getFileDecriptor() != null && server.getFileDecriptor().isConnected())
+			if (server.getFileDescriptor() != null && server.getFileDescriptor().isConnected())
 				return false;
 
 			getServer().getMapServers().remove(server);
@@ -345,9 +451,39 @@ public class ServiceCharMap extends AbstractCharService
 	public boolean hasConnection()
 	{
 		for (ClientMapServer server : getServer().getMapServers())
-			if (server.getFileDecriptor().isConnected())
+			if (server.getFileDescriptor().isConnected())
 				return true;
 
 		return false;
+	}
+
+	/**
+	 * Recebe uma notificação de um servidor de mapas a quantidade de jogadores online no mesmo.
+	 * Após receber a quantidade deverá atualizar o número de jogadores online no cliente respectivo.
+	 * @param fd conexão do descritor de arquivo do servidor de mapa com o servidor de personagem.
+	 */
+
+	public void receiveUserCount(CFileDescriptor fd)
+	{
+		ZH_NotifyUserCount packet = new ZH_NotifyUserCount();
+		packet.receive(fd);
+
+		ClientMapServer server = getServer().getMapServers().get(fd);
+
+		if (server != null)
+			server.setUsers(packet.getUserCount());
+	}
+
+	/**
+	 * Recebe as informações básicas de um servidor de mapa que foi conectado ao servidor de personagem.
+	 * @param fd conexão do descritor de arquivo do servidor de mapa com o servidor de personagem.
+	 */
+
+	public void receiveInformations(CFileDescriptor fd)
+	{
+		ZH_SendInformations packet = new ZH_SendInformations();
+		packet.receive(fd);
+
+		// TODO
 	}
 }

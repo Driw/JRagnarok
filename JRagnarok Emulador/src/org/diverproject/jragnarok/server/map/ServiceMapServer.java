@@ -82,7 +82,7 @@ public class ServiceMapServer extends AbstractMapService
 		Timer timer = timers.acquireTimer();
 		timer.setTick(ts.getCurrentTime() + seconds(1));
 		timer.setListener(MAP_FREEBLOCK);
-		timers.addInterval(timer, seconds(60));
+		timers.addLoop(timer, seconds(60));
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
+import static org.diverproject.jragnarok.JRagnarokUtil.indexOn;
 
 import java.util.Iterator;
 
@@ -44,12 +45,19 @@ public class MapServerList implements Iterable<ClientMapServer>
 	/**
 	 * Adiciona um novo cliente de um servidor de mapa como acessada.
 	 * @param server referência do cliente que representa o servidor.
-	 * @return true se adicionad ou false caso contrário.
+	 * @return true se adicionado ou false caso contrário.
 	 */
 
 	public boolean add(ClientMapServer server)
 	{
-		return !servers.contains(server) && servers.add(server);
+		if (!servers.contains(server))
+			if (servers.add(server))
+			{
+				server.setID(indexOn(servers, server));
+				return true;
+			}
+
+		return false;
 	}
 
 	/**
@@ -82,7 +90,7 @@ public class MapServerList implements Iterable<ClientMapServer>
 	public ClientMapServer get(FileDescriptor fd)
 	{
 		for (ClientMapServer server : servers)
-			if (server.getFileDecriptor().equals(fd))
+			if (server.getFileDescriptor().equals(fd))
 				return server;
 
 		return null;

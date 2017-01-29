@@ -180,11 +180,6 @@ public class ServiceCharLogin extends AbstractCharService
 	private int pingCount;
 
 	/**
-	 * Determina se o serviço espera resposta de ping do servidor de acesso.
-	 */
-	private boolean ping;
-
-	/**
 	 * Instancia um novo serviço de comunicação do servidor de personagem com o de acesso.
 	 * Este serviço possui dependências portanto precisa ser iniciado e destruído.
 	 * @param server referência do servidor de personagem referente ao serviço.
@@ -448,12 +443,13 @@ public class ServiceCharLogin extends AbstractCharService
 			if (!isConnected())
 				return;
 
-			if (ping)
+			if (getFileDescriptor().getFlag().is(FileDescriptor.FLAG_PING_SENT))
 			{
 				if (pingCount == PING_MAX_WAITING)
 				{
 					logNotice("conexão com o servidor de acesso fechado por falta de resposta.\n");
 					getFileDescriptor().close();
+					return;
 				}
 
 				else
@@ -463,7 +459,7 @@ public class ServiceCharLogin extends AbstractCharService
 			HA_KeepAlive packet = new HA_KeepAlive();
 			packet.send(getFileDescriptor());
 
-			ping = true;
+			getFileDescriptor().getFlag().set(FileDescriptor.FLAG_PING_SENT);
 		}
 		
 		@Override
@@ -501,7 +497,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public void keepAlive(CFileDescriptor lfd)
 	{
-		ping = false;
+		getFileDescriptor().getFlag().unset(FileDescriptor.FLAG_PING_SENT);
 		pingCount = 0;
 	}
 
@@ -544,7 +540,7 @@ public class ServiceCharLogin extends AbstractCharService
 			if (online.getServer() > OnlineCharData.NO_SERVER)
 			{
 				ClientMapServer server = getServer().getMapServers().get(online.getServer());
-				map.disconnectPlayer(server.getFileDecriptor(), online.getCharID(), DP_KICK_ONLINE);
+				map.disconnectPlayer(server.getFileDescriptor(), online.getCharID(), DP_KICK_ONLINE);
 
 				TimerSystem ts = getTimerSystem();
 				TimerMap timers = ts.getTimers();
@@ -759,7 +755,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 			ClientMapServer server = getServer().getMapServers().get(online.getServer());
 
-			if (server != null && server.getFileDecriptor().isConnected())
+			if (server != null && server.getFileDescriptor().isConnected())
 			{
 				if (maxUsers == 0 && sd.getGroup().getAccessLevel() >= overloadBypass)
 					enabled = true;
@@ -1003,7 +999,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 		if (online == null)
 		{
-			logWarning("account#%d não encontrada para mudar estado do personagem (aid: %d).\n", sd.getID());
+			logWarning("conta online não encontrada para mudar estado do personagem (aid: %d).\n", sd.getID());
 			return;
 		}
 
@@ -1118,7 +1114,7 @@ public class ServiceCharLogin extends AbstractCharService
 			return false;
 
 		if (online.getServer() > OnlineCharData.NO_SERVER)
-			map.disconnectPlayer(getServer().getMapServers().get(serverID).getFileDecriptor(), online.getCharID(), DP_KICK_OFFLINE);
+			map.disconnectPlayer(getServer().getMapServers().get(serverID).getFileDescriptor(), online.getCharID(), DP_KICK_OFFLINE);
 
 		else if (online.getWaitingDisconnect() == null)
 			setCharOffline(online.getAccountID(), online.getCharID());

@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.map;
 
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HZ_KEEP_ALIVE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HZ_RESULT_MAP_CONNECTION;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -13,6 +14,11 @@ import org.diverproject.util.lang.HexUtil;
 
 public class MapServerFacade
 {
+	/**
+	 * Serviço para comunicação com o cliente do servidor de mapa.
+	 */
+	private ServiceMapClient serviceMapClient;
+
 	/**
 	 * Serviço para gerenciamento do servidor de mapa.
 	 */
@@ -32,6 +38,15 @@ public class MapServerFacade
 	 * Mapeamento das autenticações no servidor de mapas.
 	 */
 	private AuthMap authMap;
+
+	/**
+	 * @return aquisição do serviço para comunicação com o cliente do servidor de mapa.
+	 */
+
+	public ServiceMapClient getServiceMapClient()
+	{
+		return serviceMapClient;
+	}
 
 	/**
 	 * @return aquisição do serviço para gerenciamento do servidor de mapa.
@@ -76,12 +91,14 @@ public class MapServerFacade
 
 	public void init(MapServer mapServer)
 	{
+		serviceMapClient = new ServiceMapClient(mapServer);
 		serviceMapServer = new ServiceMapServer(mapServer);
 		serviceMapChar = new ServiceMapChar(mapServer);
 
 		mapIndexes = new MapIndexes();
 		authMap = new AuthMap();
 
+		serviceMapClient.init();
 		serviceMapServer.init();
 		serviceMapChar.init();
 	}
@@ -95,9 +112,12 @@ public class MapServerFacade
 
 	public void destroy(MapServer mapServer)
 	{
+		serviceMapClient.destroy();
 		serviceMapServer.destroy();
+		serviceMapChar.destroy();
 
 		mapIndexes.clear();
+		authMap.clear();
 	}
 
 	/**
@@ -215,6 +235,10 @@ public class MapServerFacade
 		{
 			case PACKET_HZ_RESULT_MAP_CONNECTION:
 				return serviceMapChar.parseResultConnection(fd);
+
+			case PACKET_HZ_KEEP_ALIVE:
+				serviceMapChar.keepAlive(fd);
+				return true;
 
 			default:
 				String packet = HexUtil.parseInt(command, 4);

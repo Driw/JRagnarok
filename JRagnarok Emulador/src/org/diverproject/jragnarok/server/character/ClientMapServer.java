@@ -22,6 +22,11 @@ import org.diverproject.util.ObjectDescription;
 public class ClientMapServer
 {
 	/**
+	 * Identificação do servidor de mapa no servidor de personagem.
+	 */
+	private int id;
+
+	/**
 	 * Arquivo descritor de conexão com o servidor de mapa.
 	 */
 	private CFileDescriptor fd;
@@ -54,15 +59,35 @@ public class ClientMapServer
 
 	public ClientMapServer(CFileDescriptor fileDecriptor)
 	{
+		this.id = -1;
 		this.fd = fileDecriptor;
 		this.maps = new Short[MAX_MAP_PER_SERVER];
+	}
+
+	/**
+	 * @return aquisição da identificação do servidor de mapa no servidor de personagem.
+	 */
+
+	public int getID()
+	{
+		return id;
+	}
+
+	/**
+	 * @param id identificação do servidor de mapa no servidor de personagem.
+	 */
+
+	public void setID(int id)
+	{
+		if (this.id == -1)
+			this.id = id;
 	}
 
 	/**
 	 * @return aquisição da conexão do servidor de personagem com o servidor de mapa.
 	 */
 
-	public CFileDescriptor getFileDecriptor()
+	public CFileDescriptor getFileDescriptor()
 	{
 		return fd;
 	}

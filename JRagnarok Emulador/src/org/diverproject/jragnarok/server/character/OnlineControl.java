@@ -115,6 +115,7 @@ public class OnlineControl extends AbstractControl implements Iterable<OnlineCha
 	{
 		OnlineCharData online = new OnlineCharData();
 		online.setAccountID(accountID);
+		cache.add(accountID, online);
 
 		return online;
 	}

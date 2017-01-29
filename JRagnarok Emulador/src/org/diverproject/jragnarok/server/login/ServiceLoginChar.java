@@ -204,9 +204,9 @@ public class ServiceLoginChar extends AbstractServiceLogin
 	}
 
 	/**
-	 * Envia um pacote para uma conexão afim de mantê-la viva no sistema.
-	 * Esse pacote é enviado a um servidor de personagem quando este solicita um ping.
-	 * @param fd conexão do descritor de arquivo do cliente com o servidor.
+	 * Envia um pacote para um servidor de personagem para manter a conexão estabelecida.
+	 * Este procedimento é chamado após o servidor de personagem solicitar um ping.
+	 * @param fd conexão do descritor de arquivo do servidor de personagem com o servidor de acesso.
 	 */
 
 	public void keepAlive(LFileDescriptor fd)

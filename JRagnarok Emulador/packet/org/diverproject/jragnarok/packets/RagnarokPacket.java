@@ -197,7 +197,7 @@ public class RagnarokPacket
 //	public static final short PACKET_HZ_SET_CHAR_ONLINE							= 0x2B19;
 //	public static final short PACKET_HZ_FAME_LIST								= 0x2B1A;
 //	public static final short PACKET_HZ_SAVE_SC_DATA							= 0x2B1C;
-//	public static final short PACKET_HZ_KEEP_ALIVE								= 0x2B23;
+	public static final short PACKET_HZ_KEEP_ALIVE								= 0x2B23;
 //	public static final short PACKET_HZ_AUTH									= 0x2B26;
 //	public static final short PACKET_HZ_CHAR_BAN								= 0x2B28;
 //	public static final short PACKET_HZ_CHAR_UNBAN								= 0x2B2A;
@@ -1047,6 +1047,7 @@ public class RagnarokPacket
 	public static final short PACKET_ZH_SEND_MAPS								= 0x2AFA;
 	public static final short PACKET_ZH_NOTIFY_USER_COUNT						= 0x2AFE;
 	public static final short PACKET_ZH_SEND_INFORMATIONS						= 0x2B16;
+	public static final short PACKET_ZH_KEEP_ALIVE								= 0x2B23;
 
 	// -- RAGNAROK PACKET ID : CLIENT TO SERVERS (CS) --     
 

@@ -1,3 +1,12 @@
+29.01.2017 - 1.5.202
+- CH_SelectChar estava causando exception já que estava configurando com um tamanho mínimo inválido.
+- CharServerFacade agora irá receber ping, informações e quantidade de jogadores dos servidores de mapa.
+	- ServiceCharMap atualizado para funcionar nas modificações acima.
+	- MapServerFacade também poderá receber os pings vindo do servidor de personagem.
+- Necessário implementar um id para ClientMapServer e será definido apenas em MapServerList.
+- OnlineControl.newOnlineCharData não estava funcionando já que cache não adicionava a instância.
+- Algumas outras pequenas correções e melhorias de lógica/log.
+
 29.01.2017 - 1.5.201
 - AbstractReceivePacket estava com má formatação na mensagem da exception criada em receive.
 - Implementação do novo tipo de log que pode ser utilizado na biblioteca JavaUtil Log.

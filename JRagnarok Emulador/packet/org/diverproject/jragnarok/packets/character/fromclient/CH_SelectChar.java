@@ -35,6 +35,6 @@ public class CH_SelectChar extends ReceivePacket
 	@Override
 	protected int length()
 	{
-		return 1;
+		return 3;
 	}
 }

@@ -11,7 +11,10 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_GLOBAL
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_KEEP_ALIVE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_SYNCRONIZE_IPADDRESS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SS_GROUP_DATA;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_KEEP_ALIVE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_MAP_SERVER_CONNECTION;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_NOTIFY_USER_COUNT;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_SEND_INFORMATIONS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_SEND_MAPS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CHARLIST_REQ;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
@@ -565,6 +568,18 @@ class CharServerFacade
 		{
 			case PACKET_ZH_SEND_MAPS:
 				mapService.receiveMapIndexes(fd);
+				return true;
+
+			case PACKET_ZH_NOTIFY_USER_COUNT:
+				mapService.receiveUserCount(fd);
+				return true;
+
+			case PACKET_ZH_SEND_INFORMATIONS:
+				mapService.receiveInformations(fd);
+				return true;
+
+			case PACKET_ZH_KEEP_ALIVE:
+				mapService.keepAlive(fd);
 				return true;
 
 			default:

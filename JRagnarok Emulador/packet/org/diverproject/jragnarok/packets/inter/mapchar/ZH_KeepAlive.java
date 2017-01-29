@@ -1,11 +1,11 @@
-package org.diverproject.jragnarok.packets.inter.loginchar;
+package org.diverproject.jragnarok.packets.inter.mapchar;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_KEEP_ALIVE;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_KEEP_ALIVE;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.stream.Output;
 
-public class AH_KeepAlive extends ResponsePacket
+public class ZH_KeepAlive extends ResponsePacket
 {
 	@Override
 	protected void sendOutput(Output output)
@@ -16,7 +16,7 @@ public class AH_KeepAlive extends ResponsePacket
 	@Override
 	protected int length()
 	{
-		return 0;
+		return 2;
 	}
 
 	@Override
@@ -28,6 +28,6 @@ public class AH_KeepAlive extends ResponsePacket
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_AH_KEEP_ALIVE;
+		return PACKET_ZH_KEEP_ALIVE;
 	}
 }

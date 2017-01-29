@@ -726,7 +726,7 @@ public class ServiceCharServer extends AbstractCharService
 
 			Character character = null;
 			CharSessionData sd = fd.getSessionData();
-			int charID = characters.getCharID(fd.getID(), packet.getSlot());
+			int charID = characters.getCharID(sd.getID(), packet.getSlot());
 
 			logDebug("recebendo solicitação para selecionar personagem (aid: %d, slot: %d).\n", sd.getID(), packet.getSlot());
 
