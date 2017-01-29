@@ -276,7 +276,7 @@ public class CharacterControl extends AbstractControl
 		if (mapPoint == null)
 			return;
 
-		mapPoint.setMap(rs.getString("mapname"));
+		mapPoint.setMapID(rs.getShort("mapid"));
 		mapPoint.setX(rs.getInt("coord_x"));
 		mapPoint.setY(rs.getInt("coord_Y"));
 	}
@@ -549,7 +549,7 @@ public class CharacterControl extends AbstractControl
 	public boolean addLocations(Character character) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharMercenaryRank();
-		String sql = format("REPLACE INTO %s (chaird, num, mapname, coord_x, coord_y) VALUES (?, ?, ?, ?, ?)", table);
+		String sql = format("REPLACE INTO %s (chaird, num, mapid, coord_x, coord_y) VALUES (?, ?, ?, ?, ?)", table);
 
 		try {
 
@@ -584,7 +584,7 @@ public class CharacterControl extends AbstractControl
 		PreparedStatement ps = prepare(sql);
 		ps.setInt(1, charID);
 		ps.setInt(2, num);
-		ps.setString(3, mapPoint.getMap());
+		ps.setShort(3, mapPoint.getMapID());
 		ps.setInt(4, mapPoint.getX());
 		ps.setInt(5, mapPoint.getY());
 
@@ -900,7 +900,7 @@ public class CharacterControl extends AbstractControl
 	private boolean setLocations_Sub(int charID, int num, MapPoint mapPoint, String sql) throws SQLException, RagnarokException
 	{
 		PreparedStatement ps = prepare(sql);
-		ps.setString(1, mapPoint.getMap());
+		ps.setShort(1, mapPoint.getMapID());
 		ps.setInt(2, mapPoint.getX());
 		ps.setInt(3, mapPoint.getY());
 		ps.setInt(4, charID);
@@ -986,7 +986,7 @@ public class CharacterControl extends AbstractControl
 	public boolean reloadLocations(Character character) throws RagnarokException
 	{
 		String table = Tables.getInstance().getCharLocations();
-		String sql = format("SELECT num, mapname, coord_x, coord_y FROM %s WHERE charid = ? ORDER BY num", table);
+		String sql = format("SELECT num, mapid, coord_x, coord_y FROM %s WHERE charid = ? ORDER BY num", table);
 
 		try {
 

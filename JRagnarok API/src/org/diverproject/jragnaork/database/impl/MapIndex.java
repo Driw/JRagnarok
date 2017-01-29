@@ -10,6 +10,7 @@ import org.diverproject.util.ObjectDescription;
 public class MapIndex implements IndexableDatabaseItem
 {
 	private int id;
+	private short mapID;
 	private String mapName;
 
 	@Override
@@ -23,6 +24,16 @@ public class MapIndex implements IndexableDatabaseItem
 	{
 		if (id >= 1)
 			this.id = id;
+	}
+
+	public short getMapID()
+	{
+		return mapID;
+	}
+
+	public void setMapID(short mapID)
+	{
+		this.mapID = mapID;
 	}
 
 	public String getMapName()
@@ -42,6 +53,7 @@ public class MapIndex implements IndexableDatabaseItem
 		ObjectDescription description = new ObjectDescription(getClass());
 
 		description.append("id", id);
+		description.append("mapID", mapID);
 		description.append("mapName", mapName);
 
 		return description.toString();

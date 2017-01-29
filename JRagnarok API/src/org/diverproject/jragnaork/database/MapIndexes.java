@@ -12,7 +12,15 @@ public class MapIndexes extends IndexableDatabase<MapIndex>
 		super(MapIndex.class, "MapIndexDB", MAX_MAPINDEX);
 	}
 
-	public int get(String mapname)
+	public MapIndex get(int index)
+	{
+		if (interval(index, 1, items.length))
+			return items[index - 1];
+
+		return null;
+	}
+
+	public int getMapID(String mapname)
 	{
 		for (MapIndex map : items)
 			if (map != null && map.getMapName().equals(mapname))
@@ -21,7 +29,7 @@ public class MapIndexes extends IndexableDatabase<MapIndex>
 		return 0;
 	}
 
-	public String get(int mapid)
+	public String getMapName(int mapid)
 	{
 		if (interval(mapid, 1, length()))
 			if (items[mapid] != null)

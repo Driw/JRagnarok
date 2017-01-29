@@ -19,24 +19,24 @@ public class MapPoint extends Point
 	/**
 	 * Nome do mapa.
 	 */
-	private short map;
+	private short mapID;
 
 	/**
 	 * @return aquisição do código de identificação do mapa.
 	 */
 
-	public short getMap()
+	public short getMapID()
 	{
-		return map;
+		return mapID;
 	}
 
 	/**
 	 * @param map código de identificação do mapa.
 	 */
 
-	public void setMap(short map)
+	public void setMapID(short map)
 	{
-		this.map = map;
+		this.mapID = map;
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class MapPoint extends Point
 	public MapPoint clone()
 	{
 		MapPoint point = new MapPoint();
-		point.map = map;
+		point.mapID = mapID;
 		point.setX(getX());
 		point.setY(getY());
 
@@ -65,7 +65,7 @@ public class MapPoint extends Point
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("map", map);
+		description.append("map", mapID);
 		description.append("coord", format("%d,%d", getX(), getY()));
 
 		return description.toString();

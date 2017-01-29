@@ -728,6 +728,8 @@ public class ServiceCharServer extends AbstractCharService
 			CharSessionData sd = fd.getSessionData();
 			int charID = characters.getCharID(fd.getID(), packet.getSlot());
 
+			logDebug("recebendo solicitação para selecionar personagem (aid: %d, slot: %d).\n", sd.getID(), packet.getSlot());
+
 			if (sd.getFlag().is(CharSessionData.RETRIEVING_GUILD_BOUND_ITEMS))
 			{
 				client.refuseEnter(fd, RE_REJECTED_FROM_SERVER);
@@ -747,8 +749,8 @@ public class ServiceCharServer extends AbstractCharService
 
 			int mapServerID = 0;
 
-			if ((mapServerID = map.searchMapServerID(character.getLocations().getLastPoint().getMap(), -1, s(-1))) < 0 ||
-				character.getLocations().getLastPoint().getMap() == 0)
+			if ((mapServerID = map.searchMapServerID(character.getLocations().getLastPoint().getMapID(), -1, s(-1))) < 0 ||
+				character.getLocations().getLastPoint().getMapID() == 0)
 			{
 				if (!map.hasConnection())
 				{
@@ -802,7 +804,7 @@ public class ServiceCharServer extends AbstractCharService
 					return;
 				}
 
-				lastPosition.setMap(mapID);
+				lastPosition.setMapID(mapID);
 			}
 
 			if (!map.hasConnection(mapServerID))

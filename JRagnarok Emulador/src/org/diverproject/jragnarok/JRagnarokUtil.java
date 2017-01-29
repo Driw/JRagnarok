@@ -567,7 +567,7 @@ public class JRagnarokUtil
 			{
 				MapServer server = (MapServer) thread.getServer();
 
-				return s(server.getFacade().getMapIndexes().get(mapname));
+				return s(server.getFacade().getMapIndexes().getMapID(mapname));
 			}
 		}
 
@@ -590,7 +590,7 @@ public class JRagnarokUtil
 			{
 				MapServer server = (MapServer) thread.getServer();
 
-				return server.getFacade().getMapIndexes().get(mapid);
+				return server.getFacade().getMapIndexes().getMapName(mapid);
 			}
 		}
 

@@ -1,3 +1,7 @@
+26.01.2017 - 1.5.200
+- Atualizando as tabelas characters_locations e map_index para possuírem mapid (short).
+- CharacterControl, MapPoint e IOMapIndex atualizados conforme as mudanças acima.
+
 26.01.2017 - 1.5.199
 - Movendo algumas configurações de MapServer.conf para SQlConnection.sql já que se refere ao SQL.
 - As funções mapname2mapid e mapid2mapname devem trabalhar com o ID do mapa como shot.

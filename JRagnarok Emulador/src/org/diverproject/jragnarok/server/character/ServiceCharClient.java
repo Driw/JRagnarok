@@ -608,7 +608,7 @@ public class ServiceCharClient extends AbstractCharService
 		{
 			HC_NotifyZoneServer packet = new HC_NotifyZoneServer();
 			packet.setCharID(character.getID());
-			packet.setMapName(mapid2mapname(character.getLocations().getLastPoint().getMap()));
+			packet.setMapName(mapid2mapname(character.getLocations().getLastPoint().getMapID()));
 			packet.setAddressIP(server.getIP().get());
 			packet.setPort(server.getPort());
 		}

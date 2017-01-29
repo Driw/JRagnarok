@@ -55,7 +55,7 @@ public class PacketStructures
 		output.putByte(b(character.getStats().getLuck()));
 		output.putShort(s(slot));
 		output.putShort(s(character.getRename() > 0 ? 0 : 1));
-		output.putString(character.getLocations().getSavePoint().getMap()+ ".gat", MAP_NAME_LENGTH_EXT); // TODO pegar de outro lugar
+		output.putString(character.getLocations().getSavePoint().getMapID()+ ".gat", MAP_NAME_LENGTH_EXT); // TODO pegar de outro lugar
 		output.putInt(i(character.getDeleteDate().get()/1000 - now()/1000));
 		output.putInt(character.getLook().getRobe());
 		output.putInt(!moveEnabled ? 0 : moveUnlimited ? 1 : moveCount);
