@@ -52,6 +52,12 @@ public class JRagnarokLogListener implements LogListener
 			printMessage(ShowThread.getInstance(), log);
 	}
 
+	/**
+	 * Procedimento interno que irá notificar uma exibição para mostrar uma mensagem de log no mesmo.
+	 * @param show referência da exibição para console que irá mostrar a mensagem.
+	 * @param log referência do registro da mensagem no sistema para console.
+	 */
+
 	private void printMessage(Show show, Log log)
 	{
 		if (show != null)
@@ -59,6 +65,7 @@ public class JRagnarokLogListener implements LogListener
 			{
 				case "Log":			show.log(log.getThrowable(), null, log.getMessage()); break;
 				case "Debug":		show.log(log.getThrowable(), MessageType.DEBUG, log.getMessage()); break;
+				case "Packet":		show.log(log.getThrowable(), MessageType.PACKET, log.getMessage()); break;
 				case "Info":		show.log(log.getThrowable(), MessageType.INFO, log.getMessage()); break;
 				case "Notice":		show.log(log.getThrowable(), MessageType.NOTICE, log.getMessage()); break;
 				case "Warning":		show.log(log.getThrowable(), MessageType.WARNING, log.getMessage()); break;

@@ -1,3 +1,7 @@
+29.01.2017 - 1.5.201
+- AbstractReceivePacket estava com má formatação na mensagem da exception criada em receive.
+- Implementação do novo tipo de log que pode ser utilizado na biblioteca JavaUtil Log.
+
 26.01.2017 - 1.5.200
 - Atualizando as tabelas characters_locations e map_index para possuírem mapid (short).
 - CharacterControl, MapPoint e IOMapIndex atualizados conforme as mudanças acima.

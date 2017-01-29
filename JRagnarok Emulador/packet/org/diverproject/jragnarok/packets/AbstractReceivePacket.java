@@ -39,7 +39,7 @@ public abstract class AbstractReceivePacket implements IReceivePacket
 			receiveInput(input);
 
 		} catch (StreamException e) {
-			throw new StreamRuntimeException("falha ao receber %s (ip: %s)", fd.getAddressString());
+			throw new StreamRuntimeException("falha ao receber %s (ip: %s)", packet.getHexIdentify(), fd.getAddressString());
 		}
 	}
 

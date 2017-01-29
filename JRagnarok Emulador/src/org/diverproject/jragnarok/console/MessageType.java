@@ -20,7 +20,12 @@ public enum MessageType
 	/**
 	 * Mensagens exibidas para informações relacionadas a pacotes no servidor.
 	 */
-	INFO("\fcnInfo\fcw"),
+	PACKET("\fcnPacket\fcw"),
+
+	/**
+	 * Mensagens exibidas para informações relacionadas a estados do servidor.
+	 */
+	INFO("\fcbInfo\fcw"),
 
 	/**
 	 * Mensagens exibidas para informações de processamentos no servidor.
