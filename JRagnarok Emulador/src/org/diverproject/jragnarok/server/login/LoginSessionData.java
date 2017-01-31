@@ -2,10 +2,10 @@ package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.PASSWORD_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.USERNAME_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
-import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.jragnarok.server.common.Sex.FEMALE;
 import static org.diverproject.jragnarok.server.common.Sex.SERVER;
+import static org.diverproject.util.Util.format;
+import static org.diverproject.util.Util.strcap;
 
 import org.diverproject.jragnarok.server.common.LoginSeed;
 import org.diverproject.jragnarok.server.common.SessionData;

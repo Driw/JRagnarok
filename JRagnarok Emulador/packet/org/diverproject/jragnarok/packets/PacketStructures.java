@@ -3,10 +3,10 @@ package org.diverproject.jragnarok.packets;
 import static org.diverproject.jragnarok.JRagnarokConstants.DEFAULT_WALK_SPEED;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAP_NAME_LENGTH_EXT;
 import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
-import static org.diverproject.jragnarok.JRagnarokUtil.i;
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
+import static org.diverproject.util.Util.b;
+import static org.diverproject.util.Util.i;
 import static org.diverproject.util.Util.now;
+import static org.diverproject.util.Util.s;
 
 import org.diverproject.jragnarok.server.common.entities.Character;
 import org.diverproject.util.stream.Output;

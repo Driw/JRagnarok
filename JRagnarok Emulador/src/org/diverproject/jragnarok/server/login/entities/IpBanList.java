@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login.entities;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.util.Util.format;
 
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;

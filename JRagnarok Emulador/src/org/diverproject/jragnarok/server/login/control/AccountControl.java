@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.server.login.control;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
-import static org.diverproject.jragnarok.JRagnarokUtil.timestamp;
 import static org.diverproject.log.LogSystem.logExeceptionSource;
+import static org.diverproject.util.Util.format;
+import static org.diverproject.util.Util.timestamp;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

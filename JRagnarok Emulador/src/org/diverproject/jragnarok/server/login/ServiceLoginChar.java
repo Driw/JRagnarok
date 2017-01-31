@@ -1,10 +1,5 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
-import static org.diverproject.jragnarok.JRagnarokUtil.minutes;
-import static org.diverproject.jragnarok.JRagnarokUtil.now;
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
-import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CLIENT_CHAR_PER_ACCOUNT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP_SYNC_INTERVAL;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.VIP_CHAR_INCREASE;
@@ -18,6 +13,11 @@ import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logWarning;
+import static org.diverproject.util.Util.b;
+import static org.diverproject.util.Util.minutes;
+import static org.diverproject.util.Util.now;
+import static org.diverproject.util.Util.s;
+import static org.diverproject.util.Util.seconds;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.common.RefuseLogin;

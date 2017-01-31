@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login.control;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.util.Util.format;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

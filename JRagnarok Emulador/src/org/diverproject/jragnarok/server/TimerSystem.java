@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.free;
-import static org.diverproject.jragnarok.JRagnarokUtil.i;
+import static org.diverproject.util.Util.i;
 
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.Time;

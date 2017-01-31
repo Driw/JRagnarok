@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.common;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
+import static org.diverproject.util.Util.s;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 

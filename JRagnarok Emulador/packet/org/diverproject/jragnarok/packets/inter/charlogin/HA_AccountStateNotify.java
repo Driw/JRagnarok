@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.inter.charlogin;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
+import static org.diverproject.util.Util.b;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_STATE_NOTIFY;
 
 import org.diverproject.jragnarok.packets.RequestPacket;

@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
-import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
+import static org.diverproject.util.Util.s;
+import static org.diverproject.util.Util.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP_X;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP_Y;

@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.console;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.util.Util.format;
 
 import java.awt.event.ActionEvent;
 

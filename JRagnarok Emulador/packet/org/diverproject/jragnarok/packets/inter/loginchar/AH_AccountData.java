@@ -2,10 +2,10 @@ package org.diverproject.jragnarok.packets.inter.loginchar;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.PINCODE_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
-import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
-import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_DATA;
+import static org.diverproject.util.Util.b;
+import static org.diverproject.util.Util.strcap;
+import static org.diverproject.util.Util.strclr;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.util.ObjectDescription;

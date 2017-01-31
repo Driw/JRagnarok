@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.console;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.log.LogSystem.getUpSource;
+import static org.diverproject.util.Util.format;
 
 import org.diverproject.jragnarok.server.ServerThreaed;
 

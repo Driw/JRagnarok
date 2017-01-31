@@ -1,6 +1,5 @@
 package org.diverproject.jragnarok.server.map;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_IP;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.MAP_PASSWORD;
@@ -12,6 +11,7 @@ import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.Util.s;
+import static org.diverproject.util.Util.seconds;
 
 import java.io.IOException;
 import java.net.Socket;

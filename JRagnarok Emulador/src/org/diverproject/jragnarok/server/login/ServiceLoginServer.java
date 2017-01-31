@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_ONLINE_CLEANUP_INTERVAL;
 import static org.diverproject.log.LogSystem.logNotice;
+import static org.diverproject.util.Util.seconds;
 
 import org.diverproject.jragnarok.packets.inter.loginchar.AH_AlreadyOnline;
 import org.diverproject.jragnarok.server.FileDescriptor;

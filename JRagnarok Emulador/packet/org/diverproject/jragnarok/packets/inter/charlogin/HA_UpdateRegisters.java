@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.inter.charlogin;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.size;
+import static org.diverproject.util.Util.size;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_REGISTERS;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;

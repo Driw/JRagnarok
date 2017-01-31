@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.common;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
+import static org.diverproject.util.Util.b;
 
 public enum RefuseMakeChar
 {

@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.packets.inter.charlogin;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
-import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_CHARSERVERCONNECT;
+import static org.diverproject.util.Util.s;
+import static org.diverproject.util.Util.strclr;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.util.ObjectDescription;

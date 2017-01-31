@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.common;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.random;
+import static org.diverproject.util.Util.random;
 
 import org.diverproject.util.CanCopy;
 import org.diverproject.util.ObjectDescription;

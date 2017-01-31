@@ -4,9 +4,9 @@ import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.PASSWORD_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.PINCODE_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.USERNAME_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
-import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_INFO;
+import static org.diverproject.util.Util.b;
+import static org.diverproject.util.Util.strcap;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.util.ObjectDescription;

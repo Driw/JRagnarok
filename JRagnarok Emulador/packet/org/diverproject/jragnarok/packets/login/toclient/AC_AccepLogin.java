@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.login.toclient;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AC_ACCEPT_LOGIN;
+import static org.diverproject.util.Util.s;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.jragnarok.server.login.CharServerList;

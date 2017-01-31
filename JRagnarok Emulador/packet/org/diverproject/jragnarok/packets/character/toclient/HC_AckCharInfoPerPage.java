@@ -1,9 +1,9 @@
 package org.diverproject.jragnarok.packets.character.toclient;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
-import static org.diverproject.jragnarok.JRagnarokUtil.size;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_ACK_CHARINFO_PER_PAGE;
+import static org.diverproject.util.Util.s;
+import static org.diverproject.util.Util.size;
 
 import org.diverproject.jragnarok.packets.PacketStructures;
 import org.diverproject.jragnarok.packets.ResponsePacket;

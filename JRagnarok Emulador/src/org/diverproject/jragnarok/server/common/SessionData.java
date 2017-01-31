@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.common;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
+import static org.diverproject.util.Util.nameOf;
 
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.util.ObjectDescription;

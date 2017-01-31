@@ -2,9 +2,9 @@ package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
-import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.util.lang.IntUtil.interval;
+import static org.diverproject.util.Util.format;
+import static org.diverproject.util.Util.strcap;
 
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.common.LoginSeed;

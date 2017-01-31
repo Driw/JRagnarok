@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.map;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
+import static org.diverproject.util.Util.format;
 
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.jragnarok.server.common.LoginSeed;

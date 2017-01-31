@@ -1,12 +1,12 @@
 package org.diverproject.jragnarok.server;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
 import static org.diverproject.jragnarok.server.ServerState.NONE;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;
 import static org.diverproject.jragnarok.server.ServerState.STOPED;
 import static org.diverproject.log.LogSystem.logException;
+import static org.diverproject.util.Util.format;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.server.character.CharServer;

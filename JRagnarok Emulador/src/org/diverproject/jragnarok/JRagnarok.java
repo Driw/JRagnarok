@@ -17,7 +17,6 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FOLDER;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_CONFIGS;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_LANGUAGE;
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
@@ -26,6 +25,7 @@ import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.MessageUtil.die;
 import static org.diverproject.util.MessageUtil.showException;
+import static org.diverproject.util.Util.format;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.inter;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
+import static org.diverproject.util.Util.b;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_SS_GROUP_DATA;
 
 import org.diverproject.jragnarok.packets.RequestPacket;

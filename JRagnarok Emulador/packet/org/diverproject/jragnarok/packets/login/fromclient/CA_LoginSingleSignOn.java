@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.login.fromclient;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_SSO_LOGIN_REQ;
+import static org.diverproject.util.Util.strclr;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.jragnarok.server.common.ClientType;

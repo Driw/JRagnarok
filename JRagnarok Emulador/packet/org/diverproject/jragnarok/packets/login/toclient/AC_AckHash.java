@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.packets.login.toclient;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
-import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AC_ACK_HASH;
+import static org.diverproject.util.Util.s;
+import static org.diverproject.util.Util.strcap;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.ObjectDescription;

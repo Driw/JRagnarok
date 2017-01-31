@@ -1,6 +1,5 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.JRagnarokUtil.skip;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_CLEANUP_INTERVAL;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
@@ -10,6 +9,7 @@ import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logNotice;
+import static org.diverproject.util.Util.seconds;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.common.RefuseLogin;

@@ -6,13 +6,12 @@ import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.log.LogSystem.setUpSource;
+import static org.diverproject.util.Util.random;
+import static org.diverproject.util.Util.s;
 import static org.diverproject.util.lang.IntUtil.interval;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
-import java.util.Locale;
-import java.util.Random;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.RagnarokRuntimeException;
@@ -22,8 +21,6 @@ import org.diverproject.jragnarok.server.ServerThreaed;
 import org.diverproject.jragnarok.server.map.MapServer;
 import org.diverproject.util.SizeUtil;
 import org.diverproject.util.SystemUtil;
-import org.diverproject.util.collection.Collection;
-import org.diverproject.util.collection.List;
 import org.diverproject.util.lang.StringUtil;
 import org.diverproject.util.stream.StreamException;
 import org.diverproject.util.stream.StreamRuntimeException;
@@ -63,12 +60,6 @@ public class JRagnarokUtil
 	}
 
 	/**
-	 * Instância de um objeto Random para ser usado pelos métodos estáticos.
-	 */
-
-	private static final Random random = new Random();
-
-	/**
 	 * Chamado para realizar uma pausa (dormir) na Thread em que a chamar.
 	 * O tempo da pausa será definido através do valor passado por parâmetro.
 	 * Esse método não necessita a realização do try catch como de costume.
@@ -89,49 +80,6 @@ public class JRagnarokUtil
 	}
 
 	/**
-	 * Permite obter o nome da classe (getSimpleName) de um determinado objeto.
-	 * @param object referência do objeto do qual deseja saber o nome.
-	 * @return string contendo null ou o nome da classe se for válida.
-	 */
-
-	public static String nameOf(Object object)
-	{
-		if (object == null)
-			return "null";
-
-		return object.getClass().getSimpleName();
-	}
-
-	/**
-	 * Formata uma determinada string conforme o formato e argumentos passado.
-	 * @param format string contendo o formato que a mensagem deverá possuir.
-	 * @param args argumentos referentes a formatação que mensagem possui.
-	 * @return string formatada conforme o formato e valor dos argumentos.
-	 */
-
-	public static String format(String format, Object... args)
-	{
-		return String.format(format, args);
-	}
-
-	public static String time(long ms)
-	{
-		if (ms < 1000)
-			return String.format(Locale.US, "%dms", ms);
-
-		if (ms < 60000)
-			return String.format(Locale.US, "%.2fms", (float) ms/1000);
-
-		if (ms < 3600000)
-			return String.format(Locale.US, "%dm%.2fms", (int) ms/60000, (int) ms/1000);
-
-		if (ms < 86400000)
-			return String.format(Locale.US, "%dh%dm%ds", (int) ms/3600000, (int) ms/60000, (int) ms/1000);
-
-		return String.format(Locale.US, "%d%dh%dm", (int) ms/86400000, (int) ms/3600000, (int) ms/60000);
-	}
-
-	/**
 	 * Realiza um chamado forçado do Garbage Collector do java para liberação de memória.
 	 * Além disso irá registrar no console o valor aproximado do espaço que foi liberado.
 	 */
@@ -148,42 +96,6 @@ public class JRagnarokUtil
 		setUpSource(1);
 
 		log("%s liberado pelo GC.\n", SizeUtil.toString(freeMemory));
-	}
-
-	/**
-	 * Limite o valor de uma determinada string em um número de caracteres.
-	 * Caso a string não possua um tamanho maior irá continuar igual.
-	 * @param string referência da string que pode vir a ser cortada.
-	 * @param length limite de caracteres que a string deverá possuir.
-	 * @return aquisição da string recortada ou inteira se não tiver o tamanho.
-	 */
-
-	public static String strcap(String string, int length)
-	{
-		if (string == null)
-			return "";
-
-		if (string.length() > length)
-			return string.substring(0, length);
-
-		return string;
-	}
-
-	/**
-	 * Limpa o conteúdo de uma string considerando o limite dela o NUL.
-	 * Irá recortar uma determinada string quando encontrar o byte 0.
-	 * @param string referência da string do qual deseja limpar.
-	 * @return aquisição de uma nova string completamente limpa.
-	 */
-
-	public static String strclr(String string)
-	{
-		int index = string.indexOf("\0");
-
-		if (index > 0)
-			return string.substring(0, index);
-
-		return string;
 	}
 
 	/**
@@ -269,39 +181,6 @@ public class JRagnarokUtil
 	}
 
 	/**
-	 * Permite obter o número do índice de um determinado objeto dentro de uma lista.
-	 * @param list referência da lista que contém o objeto a ser localizado.
-	 * @param target referência do objeto alvo a ser localizado na lista.
-	 * @return aquisição do índice do objeto alvo na lista passada,
-	 * casso o objeto não se encontre na lista será retornado 0.
-	 */
-
-	@SuppressWarnings("rawtypes")
-	public static int indexOn(List list, Object target)
-	{
-		for (int i = 0; i < list.size(); i++)
-			if (list.get(i).equals(target))
-				return i;
-
-		return -1;
-	}
-
-	/**
-	 * Procedimento que verifica o tamanho de uma coleção seja ela nula ou não.
-	 * Usado apenas para facilitar verificações que consideram null como zero.
-	 * @param collection referência da coleção do qual será verificada.
-	 * @return quantidade de elementos na coleção ou 0 (zero) se for null.
-	 */
-
-	public static int size(Collection<?> collection)
-	{
-		if (collection == null)
-			return 0;
-
-		return collection.size();
-	}
-
-	/**
 	 * Permite pular uma determinada quantidade de bytes de um FileDecriptor.
 	 * @param fd referência do FileDecriptor que terá bytes pulados na stream.
 	 * @param input true para pular da entrada de dados ou false para a saída.
@@ -324,79 +203,6 @@ public class JRagnarokUtil
 
 			throw new StreamRuntimeException(e.getMessage());
 		}
-	}
-
-	/**
-	 * Permite obter um valor numérico inteiro positivo através de Random.
-	 * @return aquisição de um número inteiro e positivo aleatório.
-	 */
-
-	public static int random()
-	{
-		int i = random.nextInt();
-
-		return i >= 0 ? i : i * -1;
-	}
-
-	/**
-	 * Procedimento para efetuar o cast para um valor numérico byte.
-	 * @param value número do tipo inteiro a ser convertido para byte.
-	 * @return aquisição de um valor numérico do tipo byte com base em value.
-	 */
-
-	public static byte b(int value)
-	{
-		return (byte) value;
-	}
-
-	/**
-	 * Procedimento para efetuar o cast para um valor numérico short.
-	 * @param value número do tipo inteiro a ser convertido para short.
-	 * @return aquisição de um valor numérico do tipo short com base em value.
-	 */
-
-	public static short s(int value)
-	{
-		return (short) value;
-	}
-
-	/**
-	 * Procedimento para efetuar o cast para um valor numérico int.
-	 * @param value número do tipo inteiro a ser convertido para int.
-	 * @return aquisição de um valor numérico do tipo int com base em value.
-	 */
-
-	public static int i(long value)
-	{
-		return (int) value;
-	}
-
-	/**
-	 * Converte um objeto do tipo timestamp em um valor do tipo numérico long.
-	 * @param timestamp objeto contendo o horário do qual será convertido.
-	 * @return zero se for o timestamp for nulo ou o valor respectivo ao mesmo.
-	 */
-
-	public static long timestamp(Timestamp timestamp)
-	{
-		if (timestamp == null)
-			return 0;
-
-		return timestamp.getTime();
-	}
-
-	/**
-	 * Converte um valor numérico inteiro em um objeto do tipo timestamp.
-	 * @param time valor numérico para ser convertido em objeto timestmap.
-	 * @return nulo se for zero ou o objeto com o timestamp já definido.
-	 */
-
-	public static Timestamp timestamp(long time)
-	{
-		if (time == 0)
-			return null;
-
-		return new Timestamp(time);
 	}
 
 	/**
@@ -468,87 +274,6 @@ public class JRagnarokUtil
 				return i;
 
 		return PACKETS_VER.length;
-	}
-
-	/**
-	 * Método para agilizar a chamada de currentTimeMillis().
-	 * @return aquisição do tempo atual da máquina.
-	 */
-
-	public static long now()
-	{
-		return System.currentTimeMillis();
-	}
-
-	/**
-	 * Converte um valor inteiro passado em segundos para milissegundos.
-	 * @param seconds quantos segundos que devem ser convertidos.
-	 * @return aquisição do tempo passado por parâmetro em milissegundos.
-	 */
-
-	public static int seconds(int seconds)
-	{
-		return seconds * 1000;
-	}
-
-	/**
-	 * Converte um valor inteiro passado em minutos para milissegundos.
-	 * @param minutes quantos minutos que devem ser convertidos.
-	 * @return aquisição do tempo passado por parâmetro em milissegundos.
-	 */
-
-	public static int minutes(int minutes)
-	{
-		return minutes * 60000;
-	}
-
-	/**
-	 * Converte um valor inteiro passado em minutos e segundos para milissegundos.
-	 * @param minutes quantos minutos que devem ser convertidos.
-	 * @param seconds quantos segundos que devem ser convertidos.
-	 * @return aquisição do tempo passado por parâmetro em milissegundos.
-	 */
-
-	public static int minutes(int minutes, int seconds)
-	{
-		return minutes(minutes) + seconds(seconds);
-	}
-
-	/**
-	 * Converte um valor inteiro passado em horas para milissegundos.
-	 * @param hours quantas horas que devem ser convertidos.
-	 * @return aquisição do tempo passado por parâmetro em milissegundos.
-	 */
-
-	public static int hours(int hours)
-	{
-		return hours * 3600000;
-	}
-
-	/**
-	 * Converte um valor inteiro passado em horas e minutos para milissegundos.
-	 * @param hours quantas horas que devem ser convertidos.
-	 * @param minutes quantos minutos que devem ser convertidos.
-	 * @param seconds quantos segundos que devem ser convertidos.
-	 * @return aquisição do tempo passado por parâmetro em milissegundos.
-	 */
-
-	public static int hours(int hours, int minutes)
-	{
-		return hours(hours) + minutes(minutes);
-	}
-
-	/**
-	 * Converte um valor inteiro passado em horas, minutos e segundos para milissegundos.
-	 * @param hours quantas horas que devem ser convertidos.
-	 * @param minutes quantos minutos que devem ser convertidos.
-	 * @param seconds quantos segundos que devem ser convertidos.
-	 * @return aquisição do tempo passado por parâmetro em milissegundos.
-	 */
-
-	public static int hours(int hours, int minutes, int seconds)
-	{
-		return hours(hours) + minutes(minutes) + seconds(seconds);
 	}
 
 	/**

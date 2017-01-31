@@ -1,11 +1,11 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.emailCheck;
-import static org.diverproject.jragnarok.JRagnarokUtil.time;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
+import static org.diverproject.util.Util.time;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountStateUpdate;

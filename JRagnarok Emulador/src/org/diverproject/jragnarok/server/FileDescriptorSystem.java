@@ -1,13 +1,13 @@
 
 package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.indexOn;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_EOF;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_PING;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_SERVER;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logExeceptionSource;
 import static org.diverproject.log.LogSystem.logInfo;
+import static org.diverproject.util.Util.indexOn;
 
 import java.util.Iterator;
 

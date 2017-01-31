@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.packets.inter.loginchar;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_AUTH_ACCOUNT;
+import static org.diverproject.util.Util.b;
+import static org.diverproject.util.Util.format;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.jragnarok.server.common.ClientType;

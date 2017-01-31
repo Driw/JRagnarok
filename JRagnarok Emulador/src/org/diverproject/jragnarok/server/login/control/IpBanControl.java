@@ -1,10 +1,10 @@
 package org.diverproject.jragnarok.server.login.control;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
-import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.lang.IntUtil.interval;
+import static org.diverproject.util.Util.format;
+import static org.diverproject.util.Util.now;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

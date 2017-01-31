@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.log.LogSystem.logException;
+import static org.diverproject.util.Util.seconds;
 
 import java.io.IOException;
 import java.net.Socket;

@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login.entities;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
+import static org.diverproject.util.Util.strcap;
 
 import org.diverproject.jragnarok.server.InternetProtocol;
 import org.diverproject.util.ObjectDescription;

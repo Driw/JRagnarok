@@ -2,10 +2,8 @@ package org.diverproject.jragnarok.server.character;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.mapid2mapname;
-import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_ENABLED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_UNLIMITED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
@@ -15,6 +13,8 @@ import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.Util.i;
 import static org.diverproject.util.Util.now;
+import static org.diverproject.util.Util.b;
+import static org.diverproject.util.Util.seconds;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.character.toclient.TAG_CHARACTER_BLOCK_INFO;

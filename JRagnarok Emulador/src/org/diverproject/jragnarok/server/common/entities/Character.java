@@ -4,12 +4,12 @@ import static org.diverproject.jragnarok.JRagnarokConstants.MAX_HP;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_NAME_LENGTH;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SP;
 import static org.diverproject.jragnarok.JRagnarokConstants.MIN_NAME_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.server.common.Sex.FEMALE;
 import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 import static org.diverproject.util.lang.IntUtil.interval;
 import static org.diverproject.util.lang.IntUtil.limit;
 import static org.diverproject.util.lang.IntUtil.min;
+import static org.diverproject.util.Util.format;
 
 import org.diverproject.jragnarok.server.common.Job;
 import org.diverproject.jragnarok.server.common.Sex;

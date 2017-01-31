@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.packets.character.toclient;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.s;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_ACCEPT2;
+import static org.diverproject.util.Util.s;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.ObjectDescription;

@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.character.toclient;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.strcap;
+import static org.diverproject.util.Util.strcap;
 
 import org.diverproject.util.ObjectDescription;
 

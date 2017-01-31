@@ -1,10 +1,10 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnarok.JRagnarokUtil.seconds;
 import static org.diverproject.jragnarok.server.common.DisconnectPlayer.DP_KICK_ONLINE;
 import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
+import static org.diverproject.util.Util.seconds;
 
 import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Enter;

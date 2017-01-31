@@ -1,12 +1,9 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.binToHex;
-import static org.diverproject.jragnarok.JRagnarokUtil.format;
 import static org.diverproject.jragnarok.JRagnarokUtil.loginMessage;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Encrypt;
-import static org.diverproject.jragnarok.JRagnarokUtil.now;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN2;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_LOGIN3;
@@ -30,6 +27,9 @@ import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
+import static org.diverproject.util.Util.b;
+import static org.diverproject.util.Util.format;
+import static org.diverproject.util.Util.now;
 
 import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_CharServerConnect;

@@ -1,13 +1,13 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.MIN_CHARS;
-import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
-import static org.diverproject.jragnarok.JRagnarokUtil.i;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Salt;
-import static org.diverproject.jragnarok.JRagnarokUtil.nameOf;
-import static org.diverproject.jragnarok.JRagnarokUtil.random;
 import static org.diverproject.log.LogSystem.logDebug;
+import static org.diverproject.util.Util.b;
+import static org.diverproject.util.Util.i;
+import static org.diverproject.util.Util.nameOf;
+import static org.diverproject.util.Util.random;
 
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.character.toclient.HC_RefuseEnter;

@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.packets.character.fromclient;
 
 import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokUtil.strclr;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR;
+import static org.diverproject.util.Util.strclr;
 
 import org.diverproject.jragnarok.packets.ReceivePacket;
 import org.diverproject.util.stream.Input;

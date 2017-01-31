@@ -1,3 +1,7 @@
+31.01.2017 - 1.5.206
+- Atualizando a importação de alguns métodos utilitários de util.Util.
+	- Alguns dos métodos de JRagnarokUtil foram removidos, já que Util os possuí agora.
+
 31.01.2017 - 1.5.205
 - Melhorando a forma de acesso as configurações do jogo através de objetos que usam valores constantes.
 	- Caso seja possível mudar as configurações durante o jogo será necessário um reload (new nos objetos).
