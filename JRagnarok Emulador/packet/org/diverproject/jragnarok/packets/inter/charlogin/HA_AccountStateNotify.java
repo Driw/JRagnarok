@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.packets.inter.charlogin;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.b;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_ACCOUNT_STATE_NOTIFY;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
@@ -9,18 +10,15 @@ import org.diverproject.util.stream.Output;
 
 public class HA_AccountStateNotify extends RequestPacket
 {
-	public static final byte CHANGE_STATE = 0;
-	public static final byte BAN = 1;
-
 	private int accountID;
-	private byte type;
+	private boolean banned;
 	private int value;
 
 	@Override
 	protected void sendOutput(Output output)
 	{
 		output.putInt(accountID);
-		output.putByte(type);
+		output.putByte(b(banned ? 1 : 0));
 		output.putInt(value);
 	}
 
@@ -28,7 +26,7 @@ public class HA_AccountStateNotify extends RequestPacket
 	protected void receiveInput(Input input)
 	{
 		accountID = input.getInt();
-		type = input.getByte();
+		banned = input.getByte() == 1;
 		value = input.getInt();
 	}
 
@@ -42,14 +40,14 @@ public class HA_AccountStateNotify extends RequestPacket
 		this.accountID = accountID;
 	}
 
-	public byte getType()
+	public boolean isBanned()
 	{
-		return type;
+		return banned;
 	}
 
-	public void setType(byte type)
+	public void setBanned(boolean banned)
 	{
-		this.type = type;
+		this.banned = banned;
 	}
 
 	public int getValue()
@@ -87,7 +85,7 @@ public class HA_AccountStateNotify extends RequestPacket
 		super.toString(description);
 
 		description.append("accountID", accountID);
-		description.append("type", type);
+		description.append("type", banned);
 		description.append("value", value);
 	}
 }

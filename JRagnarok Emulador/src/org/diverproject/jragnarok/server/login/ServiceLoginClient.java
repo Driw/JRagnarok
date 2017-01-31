@@ -380,7 +380,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 	{
 		AH_AccountInfo packet = new AH_AccountInfo();
 		packet.setMapFD(ack.getServerFD());
-		packet.setUFD(packet.getUFD());
+		packet.setUserFD(packet.getUserFD());
 		packet.setAccountID(account.getID());
 		packet.setData(account != null);
 
@@ -415,7 +415,7 @@ public class ServiceLoginClient extends AbstractServiceLogin
 		HA_AccountStateNotify notify = new HA_AccountStateNotify();
 		notify.setAccountID(account.getID());
 		notify.setValue(banned ? i(account.getUnban().get()) : account.getState().CODE);
-		notify.setType(banned ? HA_AccountStateNotify.BAN : HA_AccountStateNotify.CHANGE_STATE);
+		notify.setBanned(banned);
 
 		broadcast(null, notify);		
 	}

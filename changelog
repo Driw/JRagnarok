@@ -1,3 +1,12 @@
+31.01.2017 - 1.5.203
+- Removendo alguns códigos de pacotes (PACKET_*) por não estarem sendo usado ou implementados.
+- Atualizando a documentação dos pacotes entre os servidores de personagem e acesso (HA).
+- ServiceCharLogin.reqAccountInfo não passava um userID correto (é de fd e não sd).
+- Mudanças em pacotes (diverproject.packets):
+	- HA_AccountInfo tinha um atributo irrelevante, pois estava duplicado (userFD).
+	- HA_AccountStateNotify pode usar boolean ao invés de byte.
+	- HA_GlobalRegisters não estava utilizando o código do pacote corretamente.
+
 29.01.2017 - 1.5.202
 - CH_SelectChar estava causando exception já que estava configurando com um tamanho mínimo inválido.
 - CharServerFacade agora irá receber ping, informações e quantidade de jogadores dos servidores de mapa.

@@ -71,3 +71,21 @@ byte	length	type	name
 04		20		uchar	horário para expirar o bloqueio
 
 size: 24 bytes
+
+//==============================================================================
+// [REGISTER_DATA] - Dados de Variável para Registro
+//==============================================================================
+
+byte	length	type	name
+00		04		int		tipo de operação com o registro
+04		01		byte	tamanho do nome da chave do registro [ksize]
+05		ksize	char[]	nome da chave do registro
+[i = 05 + ksize
+-- registro de string
+i+00	01		byte	tamanho da string do valor da variável [vsize]
+i+01	vsize	char[]	valor da variável em string (caracteres)
+-- registro de inteiro
+i+00	04		int		valor numérico inteiro da variável
+]
+
+size: 05 + ksize + [04 ou vsize] bytes

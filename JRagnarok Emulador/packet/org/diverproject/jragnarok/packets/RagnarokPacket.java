@@ -156,14 +156,14 @@ public class RagnarokPacket
 	public static final short PACKET_HA_CHANGE_EMAIL							= 0x2722;
 	public static final short PACKET_HA_ACCOUNT_STATE_UPDATE					= 0x2724;
 	public static final short PACKET_HA_ACCOUNT_STATE_NOTIFY					= 0x2725;
-	public static final short PACKET_HA_CHANGE_SEX								= 0x2727;
+//	public static final short PACKET_HA_CHANGE_SEX								= 0x2727;
 	public static final short PACKET_HA_UPDATE_REGISTERS						= 0x2728;
 	public static final short PACKET_HA_UNBAN_ACCOUNT							= 0x272A;
 	public static final short PACKET_HA_SET_ACCOUNT_ONLINE						= 0x272B;
 	public static final short PACKET_HA_SET_ACCOUNT_OFFLINE						= 0x272C;
 	public static final short PACKET_HA_SEND_ACCOUNTS							= 0x272D;
 	public static final short PACKET_HA_GLOBAL_REGISTERS						= 0x272E;
-	public static final short PACKET_HA_UPDATE_IP								= 0x2736;
+//	public static final short PACKET_HA_UPDATE_IP								= 0x2736;
 	public static final short PACKET_HA_SET_ALL_ACC_OFFLINE						= 0x2737;
 	public static final short PACKET_HA_NOTIFY_PIN_UPDATE						= 0x2738;
 	public static final short PACKET_HA_NOTIFY_PIN_ERROR						= 0x2739;

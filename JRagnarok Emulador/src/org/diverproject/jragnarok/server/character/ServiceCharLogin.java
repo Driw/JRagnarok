@@ -796,7 +796,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 		HA_AccountInfo packet = new HA_AccountInfo();
 		packet.setServerFD(getFileDescriptor().getID());
-		packet.setUserFD(sd.getID());
+		packet.setUserFD(fd.getID());
 		packet.setAccountID(sd.getID());
 
 		return sendPacket(fd, packet);

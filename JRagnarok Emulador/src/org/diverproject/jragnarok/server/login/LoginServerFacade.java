@@ -29,7 +29,6 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_SEND_A
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_SET_ACCOUNT_OFFLINE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_SET_ACCOUNT_ONLINE;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_SET_ALL_ACC_OFFLINE;
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_IP;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_REGISTERS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_USER_COUNT;
 import static org.diverproject.log.LogSystem.logDebug;
@@ -573,9 +572,11 @@ class LoginServerFacade
 				charService.requestAccountInfo(fd);
 				return true;
 
+			/*
 			case PACKET_HA_UPDATE_IP:
 				charService.updateCharIP(fd);
 				return true;
+			*/
 
 			case PACKET_HA_VIP_DATA:
 				charService.requestVipData(fd);

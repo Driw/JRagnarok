@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.inter.loginchar;
 
-import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_GLOBAL_REGISTERS;
+import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_GLOBAL_REGISTERS;
 
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
@@ -118,7 +118,7 @@ public class AH_GlobalRegisters extends RequestPacket
 	@Override
 	public short getIdentify()
 	{
-		return PACKET_HA_GLOBAL_REGISTERS;
+		return PACKET_AH_GLOBAL_REGISTERS;
 	}
 
 	@Override

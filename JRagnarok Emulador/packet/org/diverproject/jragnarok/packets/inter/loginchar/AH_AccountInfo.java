@@ -68,12 +68,12 @@ public class AH_AccountInfo extends RequestPacket
 			this.serverFD = mapfd;
 	}
 
-	public int getUFD()
+	public int getUserFD()
 	{
 		return userFD;
 	}
 
-	public void setUFD(int ufd)
+	public void setUserFD(int ufd)
 	{
 		if (ufd > 0)
 			this.userFD = ufd;

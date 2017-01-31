@@ -16,11 +16,202 @@ byte	length	type	name
 size: 80 bytes
 
 //==============================================================================
-// 0x2710 [PACKET_CA_CHARSERVERCONNECT] - Resposta da Acesso do Char Server
+// 0x2712 [PACKET_HA_AUTH_ACCOUNT] - Autenticação de Conta
 //==============================================================================
 
 byte	length	type	name
 00		02		short	identificação do pacote
-00		01		byte	resultado do acesso
+02		04		int		código de identificação da conta
+06		04		int		valor primário da seed
+10		04		int		valor secundário da seed
+14		04		int		endereço de ip
+18		04		int		código de identificação da conexão do jogador
+22		01		char	sexo do jogador
 
-size: 03 bytes
+size: 23 bytes
+
+//==============================================================================
+// 0x2714 [PACKET_HA_UPDATE_USER_COUNT] - Quantidade de Jogadores Online
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		quantidade de jogadores online
+
+size: 06 bytes
+
+//==============================================================================
+// 0x2716 [PACKET_HA_ACCOUNT_DATA] - Dados da Conta
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conexão do jogador
+06		04		int		código de identificação da conta
+
+size: 10 bytes
+
+//==============================================================================
+// 0x2719 [PACKET_HA_KEEP_ALIVE] - Manter Conectado
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+
+size: 02 bytes
+
+//==============================================================================
+// 0x2720 [PACKET_HA_ACCOUNT_INFO] - Informações da Conta
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação do servidor de acesso
+06		04		int		código de identificação da conexão do jogador
+10		04		int		código de identificação da conta do jogador
+
+size: 14 bytes
+
+//==============================================================================
+// 0x2722 [PACKET_HA_CHANGE_EMAIL] - Alterar Endereço de E-mail
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+06		40		char[]	endereço de e-mail atual
+46		40		char[]	novo endereço de e-mail
+
+size: 86 bytes
+
+//==============================================================================
+// 0x2724 [PACKET_HA_ACCOUNT_STATE_UPDATE] - Atualizar Estado da Conta
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+06		04		int		código do estado que a conta irá assumir
+
+size: 10 bytes
+
+//==============================================================================
+// 0x2725 [PACKET_HA_ACCOUNT_STATE_NOTIFY] - Notificar Estado da Conta
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+06		01		bool	estado da conta (banido: true, outros: false)
+07		04		int		horário em que a conta será desbanida
+
+size: 11 bytes
+
+//==============================================================================
+// 0x2728 [PACKET_HA_UPDATE_REGISTERS] - Atualizar Variáveis
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+06		04		int		número de registros à processar [size]
+
+size: 10 + (size|REGISTER_DATA) bytes
+
+//==============================================================================
+// 0x272A [PACKET_HA_UNBAN_ACCOUNT] - Remover Banimento de Conta
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+
+size: 06 bytes
+
+//==============================================================================
+// 0x272B [PACKET_HA_SET_ACCOUNT_ONLINE] - Definir Conta como Online
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+
+size: 06 bytes
+
+//==============================================================================
+// 0x272C [PACKET_HA_SET_ACCOUNT_OFFLINE] - Definir Conta como Offline
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+
+size: 06 bytes
+
+//==============================================================================
+// 0x272D [PACKET_HA_SEND_ACCOUNTS] - Enviar Lista de Contas
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		número de contas na lista [size]
+-- foreach (size; i; i += 4)
+{
+06+i	04		int		código de identificação da conta
+}
+
+size: 06 + (size * 04) bytes
+
+//==============================================================================
+// 0x272E [PACKET_HA_GLOBAL_REGISTERS] - Solicitar Variáveis em Registro
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+06		04		int		código de identificação do personagem na conta
+
+size: 10 bytes
+
+//==============================================================================
+// 0x2737 [PACKET_HA_SET_ALL_ACC_OFFLINE] - Definir Todas as Contas como Offline
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+
+size: 02 bytes
+
+//==============================================================================
+// 0x2738 [PACKET_HA_NOTIFY_PIN_UPDATE] - Notificar Alteração no Código PIN
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+06		04		char[]	número do novo código PIN
+
+size: 10 bytes
+
+//==============================================================================
+// 0x2739 [PACKET_HA_NOTIFY_PIN_ERROR] - Notificar Erro de Entrada do Código PIN
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+
+size: 06 bytes
+
+//==============================================================================
+// 0x2742 [PACKET_HA_VIP_DATA] - 
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		int		código de identificação da conta do jogador
+06		04		int		tempo em milissegundos de duração do acesso VIP
+10		04		int		código de identificação do servidor de mapa
+14		01		byte	flag do tipo de acesso VIP
+
+size: 15 bytes
