@@ -15,6 +15,7 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.configs.LoginServerConfigs;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.login.entities.Account;
@@ -45,6 +46,11 @@ import org.diverproject.jragnarok.server.login.entities.Account;
 public class LoginServer extends Server
 {
 	/**
+	 * Acesso rápido as configurações do servidor de acesso.
+	 */
+	private LoginServerConfigs loginServerConfigs;
+
+	/**
 	 * Lista dos Servidores de Personagens disponíveis.
 	 */
 	private CharServerList charServers;
@@ -62,6 +68,15 @@ public class LoginServer extends Server
 	public LoginServer()
 	{
 		setListener(LISTENER);
+	}
+
+	/**
+	 * @return aquisição do acesso rápido as configurações do servidor de acesso.
+	 */
+
+	public LoginServerConfigs getLoginServerConfigs()
+	{
+		return loginServerConfigs;
 	}
 
 	/**
@@ -157,6 +172,7 @@ public class LoginServer extends Server
 		@Override
 		public void onRunning() throws RagnarokException
 		{
+			LoginServer.this.loginServerConfigs = new LoginServerConfigs(getConfigs());
 			facade.init(LoginServer.this);
 
 			logInfo("o servidor de acesso está pronto (porta: %d).\n", getPort());
@@ -206,6 +222,8 @@ public class LoginServer extends Server
 
 			charServers = null;
 			facade = null;
+
+			LoginServer.this.loginServerConfigs = null;
 		}
 	};
 }

@@ -1,3 +1,8 @@
+31.01.2017 - 1.5.205
+- Melhorando a forma de acesso as configurações do jogo através de objetos que usam valores constantes.
+	- Caso seja possível mudar as configurações durante o jogo será necessário um reload (new nos objetos).
+	- As configurações serão definidas todas de uma só vez através do sistema atual: Configurations.
+
 31.01.2017 - 1.5.204
 - Revertendo mudanças em map_index feito na rev200, mapid e id devem se referir ao mesmo valor.
 

@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.map;
 
+import org.diverproject.jragnarok.configs.MapServerConfigs;
 import org.diverproject.jragnarok.server.ServerService;
 import org.diverproject.util.ObjectDescription;
 
@@ -47,6 +48,12 @@ public abstract class AbstractMapService extends ServerService
 	protected MapServer getServer()
 	{
 		return (MapServer) super.getServer();
+	}
+
+	@Override
+	protected MapServerConfigs config()
+	{
+		return getServer().getMapServerConfigs();
 	}
 
 	@Override

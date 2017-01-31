@@ -10,6 +10,7 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.configs.CharServerConfigs;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.login.CharServerList;
@@ -39,6 +40,11 @@ import org.diverproject.jragnarok.server.login.CharServerList;
 public class CharServer extends Server
 {
 	/**
+	 * Acesso rápido as configurações do servidor de personagem.
+	 */
+	private CharServerConfigs charServerConfigs;
+
+	/**
 	 * Lista dos Servidores de Mapa disponíveis.
 	 */
 	private MapServerList mapServers;
@@ -55,6 +61,15 @@ public class CharServer extends Server
 	public CharServer()
 	{
 		setListener(listener);
+	}
+
+	/**
+	 * @return aquisição do acesso rápido as configurações do servidor de personagem.
+	 */
+
+	public CharServerConfigs getCharServerConfigs()
+	{
+		return charServerConfigs;
 	}
 
 	/**
@@ -125,7 +140,6 @@ public class CharServer extends Server
 		private void setDefaultConfigs()
 		{
 			Configurations server = newCharServerConfigs();
-	
 			Configurations configs = getConfigs();
 
 			if (configs == null)
@@ -144,6 +158,7 @@ public class CharServer extends Server
 		@Override
 		public void onRunning() throws RagnarokException
 		{
+			CharServer.this.charServerConfigs = new CharServerConfigs(getConfigs());
 			facade.init(CharServer.this);
 
 			logInfo("o servidor de personagem está pronto (porta: %d).\n", getPort());
@@ -176,6 +191,8 @@ public class CharServer extends Server
 
 			facade = null;
 			mapServers = null;
+
+			CharServer.this.charServerConfigs = null;
 		}
 	};
 }

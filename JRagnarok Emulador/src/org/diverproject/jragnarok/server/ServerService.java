@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.configs.CommonConfigs;
 import org.diverproject.jragnarok.console.Show;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.sql.MySQL;
@@ -84,6 +85,12 @@ public abstract class ServerService
 	{
 		return server.getShow();
 	}
+
+	/**
+	 * @return aquisição do acesso rápido as configurações do servidor.
+	 */
+
+	protected abstract CommonConfigs config();
 
 	/**
 	 * Permite obter um objeto que realiza operações no banco de dados.

@@ -10,13 +10,27 @@ import java.net.Socket;
 
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.configs.MapServerConfigs;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 
 public class MapServer extends Server
 {
+	/**
+	 * Acesso rápido as configurações do servidor de mapa.
+	 */
+	private MapServerConfigs mapServerConfigs;
+
+	/**
+	 * Façade contento os serviços e controles disponíveis.
+	 */
 	private MapServerFacade facade;
+
+	/**
+	 * Cria um novo micro servidor para receber os personagens selecionados pelos jogadores.
+	 * Define ainda o listener para executar operações durante mudanças de estado.
+	 */
 
 	public MapServer()
 	{
@@ -24,20 +38,27 @@ public class MapServer extends Server
 	}
 
 	/**
-	 * @return aquisição do façade que possui os serviços e controles do servidor de acesso.
+	 * @return aquisição do acesso rápido as configurações do servidor de mapa.
 	 */
 
-	
+	public MapServerConfigs getMapServerConfigs()
+	{
+		return mapServerConfigs;
+	}
+
+	/**
+	 * @return aquisição do façade que possui os serviços e controles do servidor de mapa.
+	 */
+
+	public MapServerFacade getFacade()
+	{
+		return facade;
+	}
 
 	@Override
 	public String getHost()
 	{
 		return getConfigs().getString(MAP_IP);
-	}
-
-	public MapServerFacade getFacade()
-	{
-		return facade;
 	}
 
 	@Override
@@ -97,6 +118,7 @@ public class MapServer extends Server
 		@Override
 		public void onRunning() throws RagnarokException
 		{
+			MapServer.this.mapServerConfigs = new MapServerConfigs(getConfigs());
 			facade.init(MapServer.this);
 
 			logInfo("o servidor de mapa está pronto (porta: %d).\n", getPort());
@@ -127,6 +149,8 @@ public class MapServer extends Server
 		{
 			facade.destroyed();
 			facade = null;
+
+			MapServer.this.mapServerConfigs = null;
 		}
 	};
 }

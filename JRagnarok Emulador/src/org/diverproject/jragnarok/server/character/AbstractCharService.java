@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.character;
 
+import org.diverproject.jragnarok.configs.CharServerConfigs;
 import org.diverproject.jragnarok.server.ServerService;
 import org.diverproject.util.ObjectDescription;
 
@@ -47,6 +48,12 @@ public abstract class AbstractCharService extends ServerService
 	protected CharServer getServer()
 	{
 		return (CharServer) super.getServer();
+	}
+
+	@Override
+	protected CharServerConfigs config()
+	{
+		return getServer().getCharServerConfigs();
 	}
 
 	@Override

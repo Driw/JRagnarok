@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.login;
 
+import org.diverproject.jragnarok.configs.LoginServerConfigs;
 import org.diverproject.jragnarok.server.ServerService;
 import org.diverproject.util.ObjectDescription;
 
@@ -46,6 +47,12 @@ abstract class AbstractServiceLogin extends ServerService
 	protected LoginServer getServer()
 	{
 		return (LoginServer) super.getServer();
+	}
+
+	@Override
+	protected LoginServerConfigs config()
+	{
+		return getServer().getLoginServerConfigs();
 	}
 
 	@Override
