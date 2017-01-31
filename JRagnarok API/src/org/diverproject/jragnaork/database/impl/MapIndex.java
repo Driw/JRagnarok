@@ -2,6 +2,7 @@ package org.diverproject.jragnaork.database.impl;
 
 import static org.diverproject.jragnaork.RagnarokAPI.MAX_MAPNAME_LENGTH;
 import static org.diverproject.jragnaork.RagnarokAPI.MIN_MAPNAME_LENGTH;
+import static org.diverproject.util.Util.s;
 import static org.diverproject.util.lang.IntUtil.interval;
 
 import org.diverproject.jragnaork.database.IndexableDatabaseItem;
@@ -9,21 +10,20 @@ import org.diverproject.util.ObjectDescription;
 
 public class MapIndex implements IndexableDatabaseItem
 {
-	private int id;
 	private short mapID;
 	private String mapName;
 
 	@Override
 	public int getID()
 	{
-		return id;
+		return mapID;
 	}
 
 	@Override
 	public void setID(int id)
 	{
 		if (id >= 1)
-			this.id = id;
+			this.mapID = s(id);
 	}
 
 	public short getMapID()
@@ -52,7 +52,6 @@ public class MapIndex implements IndexableDatabaseItem
 	{
 		ObjectDescription description = new ObjectDescription(getClass());
 
-		description.append("id", id);
 		description.append("mapID", mapID);
 		description.append("mapName", mapName);
 

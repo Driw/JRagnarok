@@ -31,7 +31,7 @@ public class IOMapIndex extends IODefault<MapIndexes>
 	public int readSQL(MapIndexes maps, Connection connection, String tablename) throws RagnarokException
 	{
 		int read = 0;
-		String sql = format("SELECT id, mapid, map_name FROM %s ORDER BY id", tablename);
+		String sql = format("SELECT id, map_name FROM %s ORDER BY id", tablename);
 
 		try {
 
@@ -45,7 +45,6 @@ public class IOMapIndex extends IODefault<MapIndexes>
 				try {
 
 					map.setID(rs.getInt("id"));
-					map.setMapID(rs.getShort("mapid"));
 					map.setMapName(rs.getString("map_name"));
 
 					if (map.getID() > maps.length())
@@ -98,7 +97,7 @@ public class IOMapIndex extends IODefault<MapIndexes>
 		int write = 0;
 		int lastID = 0;
 
-		String sql = format("REPLACE INTO %s (id, mapid, map_name) VALUES (?, ?, ?)", tablename);
+		String sql = format("REPLACE INTO %s (id, map_name) VALUES (?, ?)", tablename);
 
 		for (int i = 0; i < maps.length(); i++)
 		{
@@ -107,14 +106,14 @@ public class IOMapIndex extends IODefault<MapIndexes>
 			if (map == null)
 				continue;
 
-			if (map.getMapID() <= lastID)
+			if (map.getID() <= lastID)
 			{
 				if (getPreferences().is(PREFERENCES_THROWS_NOTFOUND))
-					newException("map index '%d' não pode ser considerado (mapid: %d)", map.getID(), map.getMapID());
+					newException("map index não pode ser considerado (mapid: %d)", map.getID());
 				continue;
 			}
 
-			lastID = map.getMapID();
+			lastID = map.getID();
 
 			if (map.getMapName() == null || !interval(map.getMapName().length(), MIN_MAPNAME_LENGTH, MAX_MAPNAME_LENGTH))
 			{
@@ -128,7 +127,6 @@ public class IOMapIndex extends IODefault<MapIndexes>
 
 				PreparedStatement ps = connection.prepareStatement(sql);
 				ps.setInt(1, map.getID());
-				ps.setShort(2, map.getMapID());
 				ps.setString(3, map.getMapName());
 
 				write++;

@@ -1,3 +1,6 @@
+31.01.2017 - 1.5.204
+- Revertendo mudanças em map_index feito na rev200, mapid e id devem se referir ao mesmo valor.
+
 31.01.2017 - 1.5.203
 - Removendo alguns códigos de pacotes (PACKET_*) por não estarem sendo usado ou implementados.
 - Atualizando a documentação dos pacotes entre os servidores de personagem e acesso (HA).
