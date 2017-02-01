@@ -405,7 +405,7 @@ public class ServiceCharMap extends AbstractCharService
 				(server.getPort() == port || port == -1))
 			{
 				for (int i = 0; i < server.getMaps().length; i++)
-					if (server.getMaps()[i] == mapID)
+					if (server.getMaps()[i] != null && server.getMaps()[i] == mapID)
 						return i;
 			}
 

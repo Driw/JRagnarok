@@ -739,10 +739,9 @@ public class ServiceCharServer extends AbstractCharService
 
 			logNotice("personagem selecionado (fd: %d, aid: %d, cid: %d).\n", fd.getID(), sd.getID(), charID);
 
-			int mapServerID = 0;
+			int mapServerID = map.searchMapServerID(character.getLocations().getLastPoint().getMapID(), -1, s(-1));
 
-			if ((mapServerID = map.searchMapServerID(character.getLocations().getLastPoint().getMapID(), -1, s(-1))) < 0 ||
-				character.getLocations().getLastPoint().getMapID() == 0)
+			if (mapServerID < 0 || character.getLocations().getLastPoint().getMapID() == 0)
 			{
 				if (!map.hasConnection())
 				{
