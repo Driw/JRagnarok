@@ -1,8 +1,5 @@
 package org.diverproject.jragnarok.server.map;
 
-import static org.diverproject.jragnarok.server.map.ServiceMapCharState.SMC_NONE;
-import static org.diverproject.jragnarok.server.map.ServiceMapCharState.SMC_ONLINE;
-import static org.diverproject.jragnarok.server.map.ServiceMapCharState.SMC_READY;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -67,11 +64,6 @@ public class ServiceMapChar extends AbstractMapService
 	 * Determina ser o serviço já enviou as informações do servidor.
 	 */
 	private boolean sentInformations;
-
-	/**
-	 * Estado em que o serviço se encontra.
-	 */
-	private ServiceMapCharState state;
 
 	/**
 	 * Cria uma nova instância de um serviço para comunicação com um servidor de personagem.
@@ -169,7 +161,8 @@ public class ServiceMapChar extends AbstractMapService
 		@Override
 		public void onCall(Timer timer, int now, int tick)
 		{
-			if (isConnected())
+			// Não usar isConnected() - se cair não conseguirá reconectar
+			if (fd != null && fd.isConnected())
 			{
 				if (!sentInformations)
 				{
@@ -180,10 +173,8 @@ public class ServiceMapChar extends AbstractMapService
 				return;
 			}
 
-			state = state == SMC_READY ? SMC_ONLINE : SMC_NONE;
-
-			String host = config().ip;
-			short port = config().port;
+			String host = config().charServerIP;
+			short port = config().charServerPort;
 
 			if (sentInformations)
 				logInfo("tentando se reconectar com o servidor de personagem (%s:%d).\n", host, port);
@@ -194,7 +185,7 @@ public class ServiceMapChar extends AbstractMapService
 
 				Socket socket = new Socket(host, port);
 
-				fd = new MFileDescriptor(socket);
+				MFileDescriptor fd = new MFileDescriptor(socket);
 				fd.getFlag().set(MFileDescriptor.FLAG_SERVER);
 
 				if (getFileDescriptorSystem().addFileDecriptor(fd))
@@ -320,9 +311,7 @@ public class ServiceMapChar extends AbstractMapService
 		}
 
 		logInfo("servidor de mapa conectado ao servidor de personagem (%s:%d).\n", fd.getAddressString(), config().port);
-
-		state = SMC_ONLINE;
-		sendMaps(fd);
+		sendMaps(this.fd = fd);
 
 		// TODO continuar implementação de chrif.c:chrif_connectack [501]
 

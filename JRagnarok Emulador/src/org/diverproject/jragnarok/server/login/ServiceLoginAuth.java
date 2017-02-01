@@ -750,7 +750,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		sd.setPassword(packet.getPassword());
 		sd.setGroup(account.getGroup().getCurrentGroup());
 
-		if (config().useMD5Password);
+		if (config().useMD5Password)
 			sd.setPassword(md5Encrypt(sd.getPassword()));
 
 		sd.getPassDencrypt().setValue(b(0));

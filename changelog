@@ -1,3 +1,8 @@
+01.02.2017 - 1.5.208
+- Adicionando as configurações de ip e porta para os servidores fazerem a inter comunicação.
+- Problema onde o servidor de mapa poderia não considerar adequadamente isConnected().
+- Em uma mudança recente ServiceLoginAuth criptografava a senha em md5 devido a uma um ; a mais.
+
 31.01.2017 - 1.5.207
 - Não será mais utilizado getConfigs() fora da classe do servidor.
 - Para suprir a mudança acima será usado LoginServerConfigs, CharServerConfigs e MapServerConfigs.

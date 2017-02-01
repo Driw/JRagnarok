@@ -306,8 +306,8 @@ public class ServiceCharLogin extends AbstractCharService
 
 			logInfo("tentando se conectar com o servidor de acesso...\n");
 
-			String host = config().ip;
-			short port = config().port;
+			String host = config().loginServerIP;
+			short port = config().loginServerPort;
 
 			try {
 
@@ -429,7 +429,7 @@ public class ServiceCharLogin extends AbstractCharService
 			if (!isConnected())
 				return;
 
-			if (getFileDescriptor().getFlag().is(FileDescriptor.FLAG_PING_SENT))
+			if (getFileDescriptor().getFlag().is(FileDescriptor.FLAG_PING))
 			{
 				if (pingCount == PING_MAX_WAITING)
 				{
@@ -445,7 +445,7 @@ public class ServiceCharLogin extends AbstractCharService
 			HA_KeepAlive packet = new HA_KeepAlive();
 			packet.send(getFileDescriptor());
 
-			getFileDescriptor().getFlag().set(FileDescriptor.FLAG_PING_SENT);
+			getFileDescriptor().getFlag().set(FileDescriptor.FLAG_PING);
 		}
 		
 		@Override
@@ -483,7 +483,7 @@ public class ServiceCharLogin extends AbstractCharService
 
 	public void keepAlive(CFileDescriptor lfd)
 	{
-		getFileDescriptor().getFlag().unset(FileDescriptor.FLAG_PING_SENT);
+		getFileDescriptor().getFlag().unset(FileDescriptor.FLAG_PING);
 		pingCount = 0;
 	}
 

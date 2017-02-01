@@ -42,14 +42,9 @@ public abstract class FileDescriptor
 	public static final int FLAG_SERVER = 0x02;
 
 	/**
-	 * Flag que define o descritor como ping.
-	 */
-	public static final int FLAG_PING = 0x04;
-
-	/**
 	 * Flag que define o descritor como ping enviado.
 	 */
-	public static final int FLAG_PING_SENT = 0x08;
+	public static final int FLAG_PING = 0x04;
 
 	/**
 	 * Vetor contendo o nome das flags disponíveis.

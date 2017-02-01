@@ -26,6 +26,8 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_SERVER_NAME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_USERNAME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_WISP_SERVER_NAME;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP;
+import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ALLOW_REPEATED;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ALLOW_SEQUENTIAL;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_CHANGE_TIME;
@@ -55,6 +57,9 @@ public class CharServerConfigs extends CommonConfigs
 	public final String defaultMap;
 	public final int defaultMapX;
 	public final int defaultMapY;
+
+	public final String loginServerIP;
+	public final short loginServerPort;
 
 	public final boolean pincodeEnabled;
 	public final int pincodeChangeTime;
@@ -94,6 +99,9 @@ public class CharServerConfigs extends CommonConfigs
 		defaultMap = configs.getString(CHAR_DEFAULT_MAP);
 		defaultMapX = configs.getInt(CHAR_DEFAULT_MAP_X);
 		defaultMapY = configs.getInt(CHAR_DEFAULT_MAP_Y);
+
+		loginServerIP = configs.getString(LOGIN_IP);
+		loginServerPort = s(configs.getInt(LOGIN_PORT));
 
 		pincodeEnabled = configs.getBool(PINCODE_ENABLED);
 		pincodeChangeTime = configs.getInt(PINCODE_CHANGE_TIME);

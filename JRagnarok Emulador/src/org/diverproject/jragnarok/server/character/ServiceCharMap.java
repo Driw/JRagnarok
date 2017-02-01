@@ -210,7 +210,7 @@ public class ServiceCharMap extends AbstractCharService
 
 		private void ping(ClientMapServer server)
 		{
-			if (server.getFileDescriptor().getFlag().is(FileDescriptor.FLAG_PING_SENT))
+			if (server.getFileDescriptor().getFlag().is(FileDescriptor.FLAG_PING))
 			{
 				if (pingCount[server.getID()] == PING_MAX_WAITING)
 				{
@@ -226,7 +226,7 @@ public class ServiceCharMap extends AbstractCharService
 			HZ_KeepAlive packet = new HZ_KeepAlive();
 			packet.send(server.getFileDescriptor());
 
-			server.getFileDescriptor().getFlag().set(FileDescriptor.FLAG_PING_SENT);
+			server.getFileDescriptor().getFlag().set(FileDescriptor.FLAG_PING);
 		}
 
 		@Override
@@ -244,7 +244,7 @@ public class ServiceCharMap extends AbstractCharService
 
 	public void keepAlive(CFileDescriptor fd)
 	{
-		fd.getFlag().unset(FileDescriptor.FLAG_PING_SENT);
+		fd.getFlag().unset(FileDescriptor.FLAG_PING);
 		ClientMapServer server = getServer().getMapServers().get(fd);
 
 		if (server != null)
