@@ -1,10 +1,6 @@
 package org.diverproject.jragnarok.server.login;
 
 import static org.diverproject.jragnarok.JRagnarokUtil.skip;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_CLEANUP_INTERVAL;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_PASS_FAILURE_INTERVAL;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_PASS_FAILURE_LIMIT;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
@@ -71,7 +67,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 		log = getServer().getFacade().getLogService();
 		ipbans = getServer().getFacade().getIpBanControl();
 
-		int interval = getConfigs().getInt(IPBAN_CLEANUP_INTERVAL);
+		int interval = config().ipbanCleanupInterval;
 
 		if (interval > 0)
 		{
@@ -131,7 +127,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 
 	private boolean isEnabled()
 	{
-		return getConfigs().getBool(IPBAN_ENABLED);
+		return config().ipbanEnabled;
 	}
 
 	/**
@@ -160,8 +156,8 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 	{
 		if (SocketUtil.isIP(ipAddress))
 		{
-			int minutes = getConfigs().getInt(IPBAN_PASS_FAILURE_INTERVAL);
-			int limit = getConfigs().getInt(IPBAN_PASS_FAILURE_LIMIT);
+			int minutes = config().ipbanPassFailureInterval;
+			int limit = config().ipbanPassFailureLimit;
 			int failures = log.getFailedAttempts(ipAddress, minutes);
 
 			if (failures >= limit)
@@ -180,7 +176,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 
 	public boolean onBanTime(LFileDescriptor fd)
 	{
-		if (getConfigs().getBool("ipban.enabled") && isBanned(fd.getAddress()))
+		if (isEnabled() && isBanned(fd.getAddress()))
 		{
 			log("conexão recusada, ip não autorizado (ip: %s).\n", fd.getAddressString());
 

@@ -10,14 +10,6 @@ import static org.diverproject.jragnarok.JRagnarokConstants.MAP_PRONTERA;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
 import static org.diverproject.jragnarok.JRagnarokUtil.mapname2mapid;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_CREATE;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_DELETE_DELAY;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_DELETE_LEVEL;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_IGNORING_CASE;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_NAME_LETTERS;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHARACTER_NAME_OPTION;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_WISP_SERVER_NAME;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR2;
@@ -304,7 +296,7 @@ public class ServiceCharServer extends AbstractCharService
 
 		RefuseMakeChar error = RMC_CREATION_DENIED;
 
-		if (!getConfigs().getBool(CHARACTER_CREATE))
+		if (!config().charCreate)
 			error = RMC_CREATION_DENIED;
 
 		error = tryMakeChar(fd.getSessionData(), character, slot);
@@ -384,19 +376,19 @@ public class ServiceCharServer extends AbstractCharService
 		if (name.replaceAll("[\u0000-\u001f]", "").length() != name.length())
 			return RMC_CREATION_DENIED;
 
-		if (name.equals(getConfigs().getString(CHAR_WISP_SERVER_NAME)))
+		if (name.equals(config().wispServerName))
 			return RMC_NAME_IN_USE;
 
-		String letters = getConfigs().getString(CHARACTER_NAME_LETTERS);
+		String letters = config().charNameLetters;
 
-		if (getConfigs().getInt(CHARACTER_NAME_OPTION) == 1)
+		if (config().charNameOption == 1)
 			for (int i = 0; i < name.length(); i++)
 			{
 				if (!letters.contains(java.lang.Character.toString(name.charAt(i))))
 					return RMC_CREATION_DENIED;
 			}
 
-		else if (getConfigs().getInt(CHARACTER_NAME_OPTION) == 2)
+		else if (config().charNameOption == 2)
 			for (int i = 0; i < name.length(); i++)
 			{
 				if (letters.contains(java.lang.Character.toString(name.charAt(i))))
@@ -404,7 +396,7 @@ public class ServiceCharServer extends AbstractCharService
 			}
 
 		try {
-			if (characters.exist(name, getConfigs().getBool(CHARACTER_IGNORING_CASE)))
+			if (characters.exist(name, config().charIgnoringCase))
 				return RMC_NAME_IN_USE;
 		} catch (RagnarokException e) {
 			return RMC_NAME_IN_USE;
@@ -529,7 +521,7 @@ public class ServiceCharServer extends AbstractCharService
 				// TODO verificar se está em um clã
 				// TODO verificar se está em um grupo
 
-				deleteDate = now() + seconds(getConfigs().getInt(CHARACTER_DELETE_DELAY));
+				deleteDate = now() + seconds(config().charDeleteDelay);
 
 				if (characters.setDeleteDate(charID, deleteDate))
 				{
@@ -593,7 +585,7 @@ public class ServiceCharServer extends AbstractCharService
 			}
 
 			int baseLevel = characters.getBaseLevel(charID);
-			int deleteLevel = getConfigs().getInt(CHARACTER_DELETE_LEVEL);
+			int deleteLevel = config().charDeleteLevel;
 
 			if (deleteLevel > 0 && baseLevel >= deleteLevel || deleteLevel < 0 && baseLevel <= deleteLevel)
 			{
@@ -671,7 +663,7 @@ public class ServiceCharServer extends AbstractCharService
 
 		logDebug("definindo primeiro código PIN (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
 
-		if (!getConfigs().getBool(PINCODE_ENABLED))
+		if (config().pincodeEnabled)
 			return;
 
 		// TODO chclif_parse_pincode_setnew
@@ -688,7 +680,7 @@ public class ServiceCharServer extends AbstractCharService
 
 		logDebug("alterando código PIN existente (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
 
-		if (!getConfigs().getBool(PINCODE_ENABLED))
+		if (config().pincodeEnabled)
 			return;
 
 		// TODO chclif_parse_pincode_change
@@ -705,7 +697,7 @@ public class ServiceCharServer extends AbstractCharService
 
 		logDebug("recebendo código PIN inserido (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
 
-		if (!getConfigs().getBool(PINCODE_ENABLED))
+		if (config().pincodeEnabled)
 			return;
 
 		// TODO chclif_parse_pincode_check

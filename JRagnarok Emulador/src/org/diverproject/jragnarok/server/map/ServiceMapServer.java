@@ -1,12 +1,5 @@
 package org.diverproject.jragnarok.server.map;
 
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_FOLDER;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_MAP_INDEX;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_DATABASE;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_HOST;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_PASSWORD;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_PORT;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_USERNAME;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logNotice;
@@ -159,11 +152,11 @@ public class ServiceMapServer extends AbstractMapService
 
 	private void initDatabaseMySQL()
 	{
-		String host = getConfigs().getString(DATABASE_SQL_HOST);
-		String database = getConfigs().getString(DATABASE_SQL_DATABASE);
-		String username = getConfigs().getString(DATABASE_SQL_USERNAME);
-		String password = getConfigs().getString(DATABASE_SQL_PASSWORD);
-		int port = getConfigs().getInt(DATABASE_SQL_PORT);
+		String host = config().databaseHost;
+		String database = config().databaseName;
+		String username = config().databaseUsername;
+		String password = config().databasePassword;
+		short port = config().databasePort;
 
 		try {
 
@@ -195,8 +188,8 @@ public class ServiceMapServer extends AbstractMapService
 		io.getPreferences().set(IOMapIndex.DEFAULT_PREFERENCES);
 		io.getPreferences().set(IOMapIndex.PREFERENCES_INTERNAL_LOG_READ);
 
-		String folder = getConfigs().getString(DATABASE_FOLDER);
-		String filename = getConfigs().getString(DATABASE_MAP_INDEX);
+		String folder = config().databaseFolder;
+		String filename = config().mapIndexes;
 
 		try {
 
@@ -207,7 +200,7 @@ public class ServiceMapServer extends AbstractMapService
 				io.readFile(indexes, format("%s/%s", folder, filename));
 
 			else
-				throw new RagnarokException("'%s' com formato inválido (value: %s)", DATABASE_MAP_INDEX, filename);
+				throw new RagnarokException("'map_index' com formato inválido (value: %s)", filename);
 
 		} catch (RagnarokException e) {
 			logError("falha durante a leitura de '%s':\n", filename);

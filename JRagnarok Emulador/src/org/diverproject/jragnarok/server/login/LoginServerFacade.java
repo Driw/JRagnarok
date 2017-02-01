@@ -1,7 +1,5 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.IPBAN_ENABLED;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOG_LOGIN;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_CHARSERVERCONNECT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_CONNECT_INFO_CHANGED;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CA_EXE_HASHCHECK;
@@ -311,10 +309,10 @@ class LoginServerFacade
 		accountService.init();
 		authService.init();
 
-		if (loginServer.getConfigs().getBool(LOG_LOGIN))
+		if (loginServer.getLoginServerConfigs().logLogin)
 			logService.init();
 
-		if (loginServer.getConfigs().getBool(IPBAN_ENABLED))
+		if (loginServer.getLoginServerConfigs().ipbanEnabled)
 			ipBanService.init();		
 	}
 
@@ -335,10 +333,10 @@ class LoginServerFacade
 		charService.destroy();
 		loginService.destroy();
 
-		if (loginServer.getConfigs().getBool(LOG_LOGIN))
+		if (loginServer.getLoginServerConfigs().logLogin)
 			logService.destroy();
 
-		if (loginServer.getConfigs().getBool(IPBAN_ENABLED))
+		if (loginServer.getLoginServerConfigs().ipbanEnabled)
 			ipBanService.destroy();
 
 		onlineMap.clear();

@@ -28,6 +28,10 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.VIP_GROUPID;
 import static org.diverproject.util.Util.s;
 
 import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.server.login.ClientHash;
+import org.diverproject.jragnarok.server.login.ClientHashNode;
+import org.diverproject.util.collection.Node;
+import org.diverproject.util.lang.StringUtil;
 
 public class LoginServerConfigs extends CommonConfigs
 {
@@ -39,7 +43,7 @@ public class LoginServerConfigs extends CommonConfigs
 	public final int onlineCleanupInterval;
 	public final String dateFormat;
 	public final boolean useMD5Password;
-	public final int grupToConnect;
+	public final int groupToConnect;
 	public final int minGroupToConnect;
 	public final int AllowedRegs;
 	public final int timeAllowed;
@@ -57,7 +61,7 @@ public class LoginServerConfigs extends CommonConfigs
 	public final int ipbanPassFailureDuration;
 
 	public final boolean hashCheck;
-	public final String hashNodes;
+	public final ClientHashNode hashNodes;
 	public final int charPerAccount;
 	public final boolean checkVersion;
 	public final int version;
@@ -74,7 +78,7 @@ public class LoginServerConfigs extends CommonConfigs
 		onlineCleanupInterval = configs.getInt(LOGIN_ONLINE_CLEANUP_INTERVAL);
 		dateFormat = configs.getString(LOGIN_DATE_FORMAT);
 		useMD5Password = configs.getBool(LOGIN_USE_MD5_PASSWORD);
-		grupToConnect = configs.getInt(LOGIN_GROUP_TO_CONNECT);
+		groupToConnect = configs.getInt(LOGIN_GROUP_TO_CONNECT);
 		minGroupToConnect = configs.getInt(LOGIN_MIN_GROUP_TO_CONNECT);
 		AllowedRegs = configs.getInt(LOGIN_ALLOWED_REGS);
 		timeAllowed = configs.getInt(LOGIN_TIME_ALLOWED);
@@ -92,9 +96,32 @@ public class LoginServerConfigs extends CommonConfigs
 		ipbanPassFailureDuration = configs.getInt(IPBAN_PASS_FAILURE_DURATION);
 
 		hashCheck = configs.getBool(CLIENT_HASH_CHECK);
-		hashNodes = configs.getString(CLIENT_HASH_NODES);
+		hashNodes = newClientHashNode(configs.getString(CLIENT_HASH_NODES));
 		charPerAccount = configs.getInt(CLIENT_CHAR_PER_ACCOUNT);
 		checkVersion = configs.getBool(CLIENT_CHECK_VERSION);
 		version = configs.getInt(CLIENT_VERSION);
+	}
+
+	private ClientHashNode newClientHashNode(String value)
+	{
+		String hashs[] = StringUtil.split(value, ClientHash.SIZE);
+		Node<ClientHash> node = new ClientHashNode(null);
+		Node<ClientHash> aux = null;
+
+		for (int i = 0; i < hashs.length; i++)
+		{
+			ClientHash hash = new ClientHash();
+			hash.set(hashs[i].getBytes());
+			node.set(hash);
+
+			if (i < hashs.length - 1)
+				node.setNext(new ClientHashNode(null));
+
+			Node.attach(aux, node);
+			aux = node;
+			node = node.getNext();
+		}
+
+		return null;
 	}
 }

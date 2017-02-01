@@ -1,6 +1,5 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_ONLINE_CLEANUP_INTERVAL;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.util.Util.seconds;
 
@@ -70,7 +69,7 @@ public class ServiceLoginServer extends AbstractServiceLogin
 		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
 
-		int interval = getConfigs().getInt(LOGIN_ONLINE_CLEANUP_INTERVAL);
+		int interval = config().onlineCleanupInterval;
 
 		Timer timer = timers.acquireTimer();
 		timer.setListener(ONLINE_DATA_CLEANUP);

@@ -268,7 +268,7 @@ public abstract class Server
 	 * @return aquisição do objeto com as configurações do servidor.
 	 */
 
-	public Configurations getConfigs()
+	protected Configurations getConfigs()
 	{
 		return configs;
 	}

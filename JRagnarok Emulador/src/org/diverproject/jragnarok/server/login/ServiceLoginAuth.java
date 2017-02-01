@@ -241,7 +241,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		{
 			logNotice("solicitação de conexão de %s (ip: %s, version: %d)\n", sd.getUsername(), fd.getAddressString(), sd.getVersion());
 
-			if (getConfigs().getBool("login.use_md5_password"))
+			if (config().useMD5Password)
 				sd.setPassword(md5Encrypt(sd.getPassword()));
 
 			sd.getPassDencrypt().setValue(b(0));
@@ -256,7 +256,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			sd.setPassword(binToHex(sd.getPassword(), 16));
 		}
 
-		if (sd.getPassDencrypt().getValue() != 0 && getConfigs().getBool("login.use_md5_password"))
+		if (sd.getPassDencrypt().getValue() != 0 && config().useMD5Password)
 		{
 			client.refuseLogin(fd, RL_REJECTED_FROM_SERVER);
 			return false;
@@ -354,9 +354,9 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 	private RefuseLogin authClientVersion(LoginSessionData sd)
 	{
-		if (getConfigs().getBool("client.check_version"))
+		if (config().checkVersion)
 		{
-			int version = getConfigs().getInt("client.version");
+			int version = config().version;
 
 			if (sd.getVersion() != version)
 			{
@@ -465,7 +465,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	{
 		LoginSessionData sd = fd.getSessionData();
 
-		if (getConfigs().getBool("client.hash_check") && !server)
+		if (config().hashCheck && !server)
 		{
 			if (sd.getClientHash() == null)
 			{
@@ -473,24 +473,24 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 				return RL_EXE_LASTED_VERSION;
 			}
 
-			Object object = getConfigs().getObject("client.hash_nodes");
-			Node<ClientHash> node = null;
 			boolean match = false;
+			Node<ClientHash> node = config().hashNodes;
 
-			if (object != null)
-				for (node = (ClientHashNode) object; node != null; node = node.getNext())
+			while (node != null && node.get() != null)
+			{
+				ClientHashNode chn = (ClientHashNode) node;
+	
+				if (account.getGroup().getCurrentGroup().getAccessLevel() < chn.getGroupLevel())
+					continue;
+	
+				if (chn.get().getHashString().isEmpty() || chn.get().equals(sd.getClientHash()))
 				{
-					ClientHashNode chn = (ClientHashNode) node;
-
-					if (account.getGroup().getCurrentGroup().getAccessLevel() < chn.getGroupLevel())
-						continue;
-
-					if (chn.get().getHashString().isEmpty() || chn.get().equals(sd.getClientHash()))
-					{
-						match = true;
-						break;
-					}
+					match = true;
+					break;
 				}
+
+				node = node.getNext();
+			}
 
 			if (!match)
 			{
@@ -526,7 +526,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 	{
 		LoginSessionData sd = fd.getSessionData();
 
-		if (getConfigs().getBool("log.login"))
+		if (config().logLogin)
 		{
 			if (IntUtil.interval(result.CODE, 0, 15))
 				log.add(fd.getAddress(), sd, result.CODE, loginMessage(result.CODE));
@@ -664,8 +664,8 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 
 	private boolean authGroupAccount(LFileDescriptor fd)
 	{
-		int groupToConnect = getConfigs().getInt("login.group_to_connnect");
-		int minGroupToConnect = getConfigs().getInt("login.min_group_to_connect");
+		int groupToConnect = config().groupToConnect;
+		int minGroupToConnect = config().minGroupToConnect;
 
 		if (groupToConnect == 0 && minGroupToConnect == 0)
 			return true;
@@ -750,11 +750,11 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 		sd.setPassword(packet.getPassword());
 		sd.setGroup(account.getGroup().getCurrentGroup());
 
-		if (getConfigs().getBool("login.user_md5_password"))
+		if (config().useMD5Password);
 			sd.setPassword(md5Encrypt(sd.getPassword()));
 
 		sd.getPassDencrypt().setValue(b(0));
-		sd.setVersion(getConfigs().getInt("client.version"));
+		sd.setVersion(config().version);
 
 		String serverName = packet.getServerName();
 		int serverIP = packet.getServerIP();

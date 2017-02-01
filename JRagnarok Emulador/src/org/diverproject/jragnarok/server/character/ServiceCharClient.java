@@ -4,9 +4,6 @@ import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.mapid2mapname;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_ENABLED;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MOVE_UNLIMITED;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
@@ -260,8 +257,8 @@ public class ServiceCharClient extends AbstractCharService
 				packet.setPremiumStartSlot(sd.getCharSlots());
 				packet.setPremiumEndSlot(MAX_CHARS);
 				packet.setCharMoveCount(sd.getCharactersMove());
-				packet.setCharMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
-				packet.setCharMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));
+				packet.setCharMoveEnabled(config().moveEnabled);
+				packet.setCharMoveUnlimited(config().moveUnlimited);
 				packet.setCharacters(characters);
 				packet.send(fd);
 
@@ -307,8 +304,8 @@ public class ServiceCharClient extends AbstractCharService
 
 			HC_AckCharInfoPerPage packet = new HC_AckCharInfoPerPage();
 			packet.setCharMoveCount(sd.getCharactersMove());
-			packet.setCharMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
-			packet.setCharMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));
+			packet.setCharMoveEnabled(config().moveEnabled);
+			packet.setCharMoveUnlimited(config().moveUnlimited);
 			packet.setCharacters(characters);
 			packet.send(fd);
 
@@ -459,8 +456,8 @@ public class ServiceCharClient extends AbstractCharService
 		HC_AcceptMakeCharNeoUnion packet = new HC_AcceptMakeCharNeoUnion();
 		packet.setCharacter(character);
 		packet.setSlot(slot);
-		packet.setMoveEnabled(getConfigs().getBool(CHAR_MOVE_ENABLED));
-		packet.setMoveUnlimited(getConfigs().getBool(CHAR_MOVE_UNLIMITED));
+		packet.setMoveEnabled(config().moveEnabled);
+		packet.setMoveUnlimited(config().moveUnlimited);
 		packet.setMoveCount(character.getMoves());
 		packet.send(fd);		
 	}
@@ -548,7 +545,7 @@ public class ServiceCharClient extends AbstractCharService
 
 		logDebug("solicitar tela para digitar código PIN (fd: %d, aid: %d).\n", fd.getID(), sd.getID());
 
-		if (!getConfigs().getBool(PINCODE_ENABLED))
+		if (!config().pincodeEnabled)
 			return;
 
 		// TODO chclif_parse_reqpincode_window
@@ -566,7 +563,7 @@ public class ServiceCharClient extends AbstractCharService
 
 		logDebug("enviando código PIN paraa atuar em %s (fd: %d, aid: %d).\n", state, fd.getID(), sd.getID());
 
-		if (!getConfigs().getBool(PINCODE_ENABLED))
+		if (!config().pincodeEnabled)
 			return;
 
 		// TODO chclif_pincode_sendstate

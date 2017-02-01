@@ -3,16 +3,6 @@ package org.diverproject.jragnarok.server.character;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
 import static org.diverproject.util.Util.s;
 import static org.diverproject.util.Util.seconds;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP_X;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_DEFAULT_MAP_Y;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_FOLDER;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_MAP_INDEX;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_DATABASE;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_HOST;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_PASSWORD;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_PORT;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.DATABASE_SQL_USERNAME;
 import static org.diverproject.jragnarok.packets.common.ResultMapServerConnection.RMSC_FAILURE;
 import static org.diverproject.jragnarok.packets.common.ResultMapServerConnection.RMSC_FULL;
 import static org.diverproject.jragnarok.packets.common.ResultMapServerConnection.RMSC_SUCCESSFUL;
@@ -140,11 +130,11 @@ public class ServiceCharMap extends AbstractCharService
 
 	private void initDatabaseMySQL()
 	{
-		String host = getConfigs().getString(DATABASE_SQL_HOST);
-		String database = getConfigs().getString(DATABASE_SQL_DATABASE);
-		String username = getConfigs().getString(DATABASE_SQL_USERNAME);
-		String password = getConfigs().getString(DATABASE_SQL_PASSWORD);
-		int port = getConfigs().getInt(DATABASE_SQL_PORT);
+		String host = config().databaseHost;
+		String database = config().databaseName;
+		String username = config().databaseUsername;
+		String password = config().databasePassword;
+		short port = config().databasePort;
 
 		try {
 
@@ -176,8 +166,8 @@ public class ServiceCharMap extends AbstractCharService
 		io.getPreferences().set(IOMapIndex.DEFAULT_PREFERENCES);
 		io.getPreferences().set(IOMapIndex.PREFERENCES_INTERNAL_LOG_READ);
 
-		String folder = getConfigs().getString(DATABASE_FOLDER);
-		String filename = getConfigs().getString(DATABASE_MAP_INDEX);
+		String folder = config().databaseFolder;
+		String filename = config().mapIndexes;
 
 		try {
 
@@ -188,7 +178,7 @@ public class ServiceCharMap extends AbstractCharService
 				io.readFile(maps, format("%s/%s", folder, filename));
 
 			else
-				throw new RagnarokException("'%s' com formato inválido (value: %s)", DATABASE_MAP_INDEX, filename);
+				throw new RagnarokException("'map_index' com formato inválido (value: %s)", filename);
 
 		} catch (RagnarokException e) {
 			logError("falha durante a leitura de '%s':\n", filename);
@@ -334,15 +324,15 @@ public class ServiceCharMap extends AbstractCharService
 
 		logInfo("recebido '%d' índices de mapas do servidor de mapa (fd: %d).\n", maps.size(), fd.getID());
 
-		String mapname = getConfigs().getString(CHAR_DEFAULT_MAP);
+		String mapname = config().defaultMap;
 
 		if (!maps.contains(mapname))
 			logWarning("mapa padrão não encontrado na indexação de mapas (map: %s).\n", mapname);
 
 		else
 		{
-			int x = getConfigs().getInt(CHAR_DEFAULT_MAP_X);
-			int y = getConfigs().getInt(CHAR_DEFAULT_MAP_Y);
+			int x = config().defaultMapX;
+			int y = config().defaultMapY;
 
 			logInfo("mapa padrão definido como '%s %d,%d'.\n", mapname, x, y);
 		}

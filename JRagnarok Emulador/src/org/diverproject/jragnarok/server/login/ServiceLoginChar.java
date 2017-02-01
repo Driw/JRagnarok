@@ -1,9 +1,5 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CLIENT_CHAR_PER_ACCOUNT;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP_SYNC_INTERVAL;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.VIP_CHAR_INCREASE;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.VIP_GROUPID;
 import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_FORCE;
 import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_GM;
 import static org.diverproject.jragnarok.packets.inter.charlogin.HA_VipData.VIP_DATA_NONE;
@@ -106,7 +102,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 		groups = getServer().getFacade().getGroupControl();
 		auths = getServer().getFacade().getAuthAccountMap();		
 
-		int interval = getConfigs().getInt(LOGIN_IP_SYNC_INTERVAL);
+		int interval = config().ipSyncInterval;
 
 		TimerSystem ts = getTimerSystem();
 		TimerMap timers = ts.getTimers();
@@ -304,7 +300,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 			BitWise8 flag = new BitWise8(HA_VipData.VIP_DATA_STRINGS);
 			flag.set(packet.getFlag());
 
-			int vipGID = getConfigs().getInt(VIP_GROUPID);
+			int vipGID = config().vipGroupID;
 
 			// Nível de acesso 
 			if (account.getGroupID() > vipGID)
@@ -336,7 +332,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 					logException(e);
 				}
 
-				account.setCharSlots(b(account.getCharSlots() + getConfigs().getInt(VIP_CHAR_INCREASE)));
+				account.setCharSlots(b(account.getCharSlots() + config().vipCharIncrease));
 			}
 
 			// VIP expirou ou foi reduzido
@@ -347,7 +343,7 @@ public class ServiceLoginChar extends AbstractServiceLogin
 				if (account.getGroupID() == vipGID)
 					account.getGroup().useOldGroup();
 
-				account.setCharSlots(b(getConfigs().getInt(CLIENT_CHAR_PER_ACCOUNT)));
+				account.setCharSlots(b(config().charPerAccount));
 			}
 
 			accounts.set(account);

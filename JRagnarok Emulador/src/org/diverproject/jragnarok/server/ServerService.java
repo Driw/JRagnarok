@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.Configurations;
 import org.diverproject.jragnarok.configs.CommonConfigs;
 import org.diverproject.jragnarok.console.Show;
 import org.diverproject.util.ObjectDescription;
@@ -48,15 +47,6 @@ public abstract class ServerService
 	protected Server getServer()
 	{
 		return server;
-	}
-
-	/**
-	 * @return aquisição das configurações do servidor que detêm esse serviço.
-	 */
-
-	protected final Configurations getConfigs()
-	{
-		return server.getConfigs();
 	}
 
 	/**

@@ -1,16 +1,11 @@
 package org.diverproject.jragnarok.server.map;
 
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_IP;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PORT;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.MAP_PASSWORD;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.MAP_USERNAME;
 import static org.diverproject.jragnarok.server.map.ServiceMapCharState.SMC_NONE;
 import static org.diverproject.jragnarok.server.map.ServiceMapCharState.SMC_ONLINE;
 import static org.diverproject.jragnarok.server.map.ServiceMapCharState.SMC_READY;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logWarning;
-import static org.diverproject.util.Util.s;
 import static org.diverproject.util.Util.seconds;
 
 import java.io.IOException;
@@ -187,8 +182,8 @@ public class ServiceMapChar extends AbstractMapService
 
 			state = state == SMC_READY ? SMC_ONLINE : SMC_NONE;
 
-			String host = getConfigs().getString(CHAR_IP);
-			short port = s(getConfigs().getInt(CHAR_PORT));
+			String host = config().ip;
+			short port = config().port;
 
 			if (sentInformations)
 				logInfo("tentando se reconectar com o servidor de personagem (%s:%d).\n", host, port);
@@ -204,8 +199,8 @@ public class ServiceMapChar extends AbstractMapService
 
 				if (getFileDescriptorSystem().addFileDecriptor(fd))
 				{
-					String username = getConfigs().getString(MAP_USERNAME);
-					String password = getConfigs().getString(MAP_PASSWORD);
+					String username = config().username;
+					String password = config().password;
 					int ipAddress = fd.getAddress();
 
 					ZH_MapServerConnection packet = new ZH_MapServerConnection();
@@ -324,7 +319,7 @@ public class ServiceMapChar extends AbstractMapService
 			default:
 		}
 
-		logInfo("servidor de mapa conectado ao servidor de personagem (%s:%d).\n", fd.getAddressString(), getConfigs().getInt(CHAR_PORT));
+		logInfo("servidor de mapa conectado ao servidor de personagem (%s:%d).\n", fd.getAddressString(), config().port);
 
 		state = SMC_ONLINE;
 		sendMaps(fd);

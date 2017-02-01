@@ -4,20 +4,6 @@ import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.MIN_CHARS;
 import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_IP;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MAINTANCE;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_MAX_USERS;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_NEW_DISPLAY;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_OVERLOAD_BYPASS;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PASSWORD;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_PORT;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_SERVER_NAME;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.CHAR_USERNAME;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_IP;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.LOGIN_PORT;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_CHANGE_TIME;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_ENABLED;
-import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_FORCE;
 import static org.diverproject.jragnarok.packets.common.RefuseEnter.RE_REJECTED_FROM_SERVER;
 import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_OK;
 import static org.diverproject.jragnarok.server.common.DisconnectPlayer.DP_KICK_OFFLINE;
@@ -320,8 +306,8 @@ public class ServiceCharLogin extends AbstractCharService
 
 			logInfo("tentando se conectar com o servidor de acesso...\n");
 
-			String host = getConfigs().getString(LOGIN_IP);
-			short port = s(getConfigs().getInt(LOGIN_PORT));
+			String host = config().ip;
+			short port = config().port;
 
 			try {
 
@@ -332,13 +318,13 @@ public class ServiceCharLogin extends AbstractCharService
 
 				if (getFileDescriptorSystem().addFileDecriptor(fd))
 				{
-					String username = getConfigs().getString(CHAR_USERNAME);
-					String password = getConfigs().getString(CHAR_PASSWORD);
-					int serverIP = SocketUtil.socketIPInt(getConfigs().getString(CHAR_IP));
-					short serverPort = s(getConfigs().getInt(CHAR_PORT));
-					String serverName = getConfigs().getString(CHAR_SERVER_NAME);
-					short type = s(getConfigs().getInt(CHAR_MAINTANCE));
-					boolean newDisplay = getConfigs().getBool(CHAR_NEW_DISPLAY);
+					String username = config().username;
+					String password = config().password;
+					int serverIP = SocketUtil.socketIPInt(config().ip);
+					short serverPort = config().port;
+					String serverName = config().name;
+					short type = config().maintance;
+					boolean newDisplay = config().newDisplay;
 
 					HA_CharServerConnect packet = new HA_CharServerConnect();
 					packet.setUsername(username);
@@ -750,8 +736,8 @@ public class ServiceCharLogin extends AbstractCharService
 
 		if (online != null)
 		{
-			int maxUsers = getConfigs().getInt(CHAR_MAX_USERS);
-			int overloadBypass = getConfigs().getInt(CHAR_OVERLOAD_BYPASS);
+			int maxUsers = config().maxUsers;
+			int overloadBypass = config().overloadBypass;
 
 			ClientMapServer server = getServer().getMapServers().get(online.getServer());
 
@@ -1192,14 +1178,14 @@ public class ServiceCharLogin extends AbstractCharService
 	{
 		CharSessionData sd = fd.getSessionData();
 
-		if (!getConfigs().getBool(PINCODE_ENABLED))
+		if (!config().pincodeEnabled)
 		{
 			logDebug("sistema de código pin iniciado (aid: %d).\n", sd.getID());
 
 			// Não há código PIN definido
 			if (sd.getPincode().getCode() == null)
 			{
-				if (getConfigs().getBool(PINCODE_FORCE))
+				if (config().pincodeForce)
 					client.pincodeSendState(fd, PincodeState.PS_NEW);
 				else
 					client.pincodeSendState(fd, PincodeState.PS_SKIP);
@@ -1212,7 +1198,7 @@ public class ServiceCharLogin extends AbstractCharService
 			// Código PIN habilitado e definido
 			else
 			{
-				int changeTime = getConfigs().getInt(PINCODE_CHANGE_TIME);
+				int changeTime = config().pincodeChangeTime;
 
 				if (changeTime > 0 && sd.getPincode().getChanged().pass(changeTime))
 					client.pincodeSendState(fd, PincodeState.PS_EXPIRED);

@@ -44,7 +44,7 @@ public class CharServerConfigs extends CommonConfigs
 	public final String password;
 	public final String serverName;
 	public final String wispServerName;
-	public final int maintance;
+	public final short maintance;
 	public final boolean newDisplay;
 	public final int maxUsers;
 	public final int overloadBypass;
@@ -83,7 +83,7 @@ public class CharServerConfigs extends CommonConfigs
 		password = configs.getString(CHAR_PASSWORD);
 		serverName = configs.getString(CHAR_SERVER_NAME);
 		wispServerName = configs.getString(CHAR_WISP_SERVER_NAME);
-		maintance = configs.getInt(CHAR_MAINTANCE);
+		maintance = s(configs.getInt(CHAR_MAINTANCE));
 		newDisplay = configs.getBool(CHAR_NEW_DISPLAY);
 		maxUsers = configs.getInt(CHAR_MAX_USERS);
 		overloadBypass = configs.getInt(CHAR_OVERLOAD_BYPASS);
