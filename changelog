@@ -1,3 +1,10 @@
+16.02.2017 - 1.5.210
+- Atualizando os termos de licença para utilização do software por terceiros.
+
+01.02.2017 - 1.5.209
+- ServiceCharMap.searchMapServerID não estava funcionando causava NullPointerException.
+	- O vetor é do tipo Short e não short para ser iniciado em zero ao invés de null.
+
 01.02.2017 - 1.5.208
 - Adicionando as configurações de ip e porta para os servidores fazerem a inter comunicação.
 - Problema onde o servidor de mapa poderia não considerar adequadamente isConnected().
