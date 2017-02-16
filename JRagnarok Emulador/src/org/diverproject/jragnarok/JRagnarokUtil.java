@@ -336,4 +336,22 @@ public class JRagnarokUtil
 
 		return null;
 	}
+
+	/**
+	 * Procedimento utilizado durante o log de alguns serviços em comum entre os servidores disponíveis.
+	 * Esses serviços em comum ao fazer o log não poderão identificar o servidor que o chamou sem isso.
+	 * @return aquisição do nome da thread do servidor que está processando esse método.
+	 */
+
+	public static String thread()
+	{
+		if (Thread.currentThread() instanceof ServerThreaed)
+		{
+			ServerThreaed thread = (ServerThreaed) Thread.currentThread();
+
+			return thread.getServer().getThreadName();
+		}
+
+		return null;
+	}
 }

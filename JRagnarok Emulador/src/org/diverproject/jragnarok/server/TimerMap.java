@@ -5,6 +5,7 @@ import static org.diverproject.jragnarok.server.TimerType.TIMER_LOOP;
 import static org.diverproject.jragnarok.server.TimerType.TIMER_ONCE_AUTODEL;
 import static org.diverproject.jragnarok.server.TimerType.TIMER_REMOVE;
 import static org.diverproject.log.LogSystem.logError;
+import static org.diverproject.log.LogSystem.setUpSource;
 
 import java.util.Iterator;
 
@@ -108,7 +109,10 @@ public class TimerMap implements Iterable<Timer>
 		}
 
 		else
+		{
+			setUpSource(1);
 			logError("intervalo inválido (timer: %d, listener: %s).\n", timer.getID(), timer.getListener().getName());
+		}
 	}
 
 	/**
@@ -131,7 +135,10 @@ public class TimerMap implements Iterable<Timer>
 		}
 
 		else
+		{
+			setUpSource(1);
 			logError("intervalo inválido (timer: %d, listener: %s).\n", timer.getID(), timer.getListener().getName());
+		}
 	}
 
 	/**

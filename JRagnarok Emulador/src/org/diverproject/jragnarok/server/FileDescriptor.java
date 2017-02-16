@@ -1,6 +1,8 @@
 package org.diverproject.jragnarok.server;
 
 import static org.diverproject.log.LogSystem.logException;
+import static org.diverproject.log.LogSystem.logInfo;
+import static org.diverproject.log.LogSystem.setUpSource;
 import static org.diverproject.util.Util.seconds;
 
 import java.io.IOException;
@@ -231,11 +233,23 @@ public abstract class FileDescriptor
 	}
 
 	/**
+	 * Define o descritor de arquivo para ser fechado na próxima atualização do sistema.
+	 */
+
+	public void close()
+	{
+		setUpSource(1);
+		logInfo("fechar conexão (fd: %d, ip: %s)", getID(), getAddressString());
+
+		flag.set(FLAG_EOF);
+	}
+
+	/**
 	 * Solicita o fechamento da conexão socket do cliente com o servidor.
 	 * Também remove o descritor das sessões existentes no sistema.
 	 */
 
-	public void close()
+	void closeSocket()
 	{
 		if (socket == null)
 			return;

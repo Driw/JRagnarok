@@ -1,6 +1,7 @@
 
 package org.diverproject.jragnarok.server;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.thread;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_EOF;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_PING;
 import static org.diverproject.jragnarok.server.FileDescriptor.FLAG_SERVER;
@@ -78,7 +79,7 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 		{
 			if (sessions.isFull() || !sessions.add(fd))
 			{
-				fd.close();
+				fd.closeSocket();
 				return false;
 			}
 
@@ -113,18 +114,18 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 						fd.setCloseListener(null);
 					}
 
-					if (!fd.isConnected())
-						fd.close();
+					if (fd.isConnected())
+						fd.closeSocket();
 
 				} catch (RagnarokException e) {
-					logError("falha ao encerrar conexão (fd: %d).\n", fd.getID());
+					logError("falha ao encerrar conexão (fd: %d, thread: %s).\n", fd.getID(), thread());
 					logExeceptionSource(e);
 				}
 
 				if (fd.getFlag().is(FLAG_SERVER))
-					logInfo("sessão server#%d fechada e removida (ip: %s).\n", fd.getID(), fd.getAddressString());
+					logInfo("sessão server#%d fechada e removida (ip: %s, thread: %s).\n", fd.getID(), fd.getAddressString(), thread());
 				else
-					logInfo("sessão client#%d fechada e removida (ip: %s).\n", fd.getID(), fd.getAddressString());
+					logInfo("sessão client#%d fechada e removida (ip: %s, thread: %s).\n", fd.getID(), fd.getAddressString(), thread());
 
 				sessions.remove(i);
 			}
@@ -136,7 +137,7 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 
 				else if (!fd.getFlag().is(FLAG_SERVER))
 				{
-					logInfo("sessão #%d econtrou-se ociosa no sistema (ip: %s).\n", fd.getID(), fd.getAddressString());
+					logInfo("sessão #%d econtrou-se ociosa no sistema (ip: %s, thread: %s).\n", fd.getID(), fd.getAddressString(), thread());
 					setEndOfFile(fd);
 				}
 			}
@@ -186,7 +187,7 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 
 	public static void setExceptionsEOF(FileDescriptor fd, Exception e, String message)
 	{
-		logError(message+ ":\n");
+		logError(message+ " {%s}:\n", thread());
 		logExeceptionSource(e);
 
 		e.printStackTrace();

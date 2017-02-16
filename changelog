@@ -1,3 +1,16 @@
+16.02.2017 - 1.5.213
+- Novo método utilitário thread() para se obter o nome da thread do servidor.
+- FileDescriptor.close passa para closeSocket e close se torna um set para FLAG_EOF.
+	- O fechamento da conexão socket por segurança será feito somente em FileDescriptorSystem.
+- Aprimorando os log em FileDescriptorSystem e TimerMap para usarem o método thread().
+
+16.02.2017 - 1.5.212
+- Implementando método update em Server para que permita realizar procedimentos de atualizações.
+	- No momento foi implementado para que cada servidor verifique as dependências de conexões (inter).
+- ServiceCharMap.hasConnection sempre retornava false o que causava problema durante o acesso.
+- ServiceCharClient.notifyZoneServer criava o pacote mas não enviava ao FileDescriptor especificado.
+	- HC_NotifyZoneServer não estava invertendo os bytes do IP e o nome do mapa é com MAP_NAME_LENGTH_EXT.
+
 16.02.2017 - 1.5.211
 - Pequeno ajuste em mapname2mapid e mapid2mapname para poderem ser usados por servidores de personagem.
 - CharacterControl agora possui um mapa padrão e é definido no CharServerFacade conforme configurações.
@@ -162,7 +175,7 @@
 - Documentação dos novos pacotes que foram implementados recentemente no sistema.
 	- Estará sendo considerado ainda nos dados dos pacotes a identificação dos mesmo.
 - Configurações padrões não estavam sendo carregadas corretamente em todos servidores.
-- FileDecriptor agora possui um novo listener chamado quando uma conexão é fechada.
+- FileDescriptor agora possui um novo listener chamado quando uma conexão é fechada.
 
 08.01.2017 - 1.5.179
 - Alterando o valor padrão de alguns DATETIME no banco de dados e permitir que estes sejam nulos.
@@ -495,12 +508,12 @@
 - Enviando CFileDescriptor que deveria ter sido enviado na rev117.
 
 05.12.2016 - 1.3.117
-- SessionData adicionada e todo FileDecriptor deverá possuir um SessionData.
-- Agora FileDecriptor deverá ser especificado para cada servidor:
+- SessionData adicionada e todo FileDescriptor deverá possuir um SessionData.
+- Agora FileDescriptor deverá ser especificado para cada servidor:
 	- LoginServer irá usar LFileDescriptor com um LoginSessionData.
 	- CharServer irá usar CFileDescriptor com um CharSessionData.
 	- MapServer irá usar MFileDescriptor com um MapSessionData.
-- FileDecriptor também não irá mais possuir um cache.
+- FileDescriptor também não irá mais possuir um cache.
 - Login não será mais uma classe e sim uma interface para ser usada em ServiceLoginLog.
 
 03.12.2016 - 1.3.116
@@ -599,7 +612,7 @@
 
 20.11.2016 - 1.2.95
 - Server agora registra no console caso uma nova conexão seja solicitada com servidor cheio.
-- Atualizando newFileDecriptor para definir o listener antes que update possa chamar o FD.
+- Atualizando newFileDescriptor para definir o listener antes que update possa chamar o FD.
 - Ao fechar FileDescriptor não deverá ou será necessário mudar o ID do mesmo para 0.
 
 16.11.2016 - 1.2.94
@@ -922,7 +935,7 @@
 	- Group: deverá representar um grupo de contas e suas propriedades.
 	- Login: não deverá mais possuir Sex, pois isso não será definido na conta.
 	- Pincode e Vip irão armazenar atributos que eram de Account respectivos a seus nomes.
-- LoginClientService atualizado para funcionar com a rev36 onde FileDecriptorListener retorna booleano.
+- LoginClientService atualizado para funcionar com a rev36 onde FileDescriptorListener retorna booleano.
 	- Corrigido ainda problema onde a senha raw era considerada como noRaw.
 
 11.10.2016 - 1.0.36
@@ -990,7 +1003,7 @@
 	- Agora timers lista os temporizadores por ID e tickers ordena por tempo de expiração.
 	- Para isso foi implementado uma classe para ordenar os temporizadores: Tickers.
 	- Agora o tempo no servidor será trabalhado com int e não mais long.
-- Corrigindo o nome de FileDecriptor que é FileDescriptor, listener corrigido também.
+- Corrigindo o nome de FileDescriptor que é FileDescriptor, listener corrigido também.
 
 06.09.2016 - 1.0.25
 - Especificando a Login.conf o nome de usuário e senha do servidor de acesso.
@@ -1027,7 +1040,7 @@
 - ServerThread não será mais usado, o emulador não funciona com threads individuais.
 	- Isso também iria resultar em um numero demasiado de threads e poderia privilegiar threads.
 - Como os IPs são usados como int então InternetProtocol terá construtor por parâmetro int.
-- Atualizando FileDecriptor para possuir uma lista com as instâncias internamente por static.
+- Atualizando FileDescriptor para possuir uma lista com as instâncias internamente por static.
 	- Adicionado ainda atributo para dar um timeout ao objeto para evitar ociosidade.
 
 05.09.2016 - 1.0.19
@@ -1039,11 +1052,11 @@
 - Sistema para leitura de arquivos com mensagens identificadas numericamente.
 
 04.09.2016 - 1.0.17
-- FileDecriptor e FileDecriptorListener adicionados.
+- FileDescriptor e FileDescriptorListener adicionados.
 	- Serão usados no lugar de Client e outras classes filhas.
 - Server: adicionando método que permite obter o estado ou compará-lo.
-	- Removido initClient, será usado um ServerThread junto de FileDecriptor.
-- SocketParser agora irá receber um FileDecriptor ao invés de um Client.
+	- Removido initClient, será usado um ServerThread junto de FileDescriptor.
+- SocketParser agora irá receber um FileDescriptor ao invés de um Client.
 - Agora get() passa a ser getString() em InternetProtocol para get() retornar int.
 
 04.09.2016 - 1.0.16
