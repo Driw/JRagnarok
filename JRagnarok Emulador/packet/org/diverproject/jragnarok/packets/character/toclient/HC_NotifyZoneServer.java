@@ -1,11 +1,12 @@
 package org.diverproject.jragnarok.packets.character.toclient;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.MAP_NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_NAME_LENGTH_EXT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_NOTIFY_ZONESVR;
 import static org.diverproject.util.Util.strcap;
 
 import org.diverproject.jragnarok.packets.ResponsePacket;
 import org.diverproject.util.ObjectDescription;
+import org.diverproject.util.lang.Bits;
 import org.diverproject.util.stream.Output;
 
 public class HC_NotifyZoneServer extends ResponsePacket
@@ -19,8 +20,8 @@ public class HC_NotifyZoneServer extends ResponsePacket
 	protected void sendOutput(Output output)
 	{
 		output.putInt(charID);
-		output.putString(mapName, MAP_NAME_LENGTH);
-		output.putInt(addressIP);
+		output.putString(mapName, MAP_NAME_LENGTH_EXT);
+		output.putInt(Bits.swap(addressIP));
 		output.putShort(port);
 	}
 
@@ -31,7 +32,7 @@ public class HC_NotifyZoneServer extends ResponsePacket
 
 	public void setMapName(String mapName)
 	{
-		this.mapName = strcap(mapName, MAP_NAME_LENGTH);
+		this.mapName = strcap(mapName, MAP_NAME_LENGTH_EXT);
 	}
 
 	public void setAddressIP(int addressIP)

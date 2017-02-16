@@ -195,4 +195,17 @@ public class CharServer extends Server
 			CharServer.this.charServerConfigs = null;
 		}
 	};
+
+	@Override
+	protected void update(int now, int tick)
+	{
+		for (ClientMapServer server : mapServers)
+			if (!server.getFileDescriptor().isConnected())
+			{
+				mapServers.remove(server);
+				server.getFileDescriptor().close();
+			}
+
+		facade.getLoginService().update(now, tick);
+	}
 }

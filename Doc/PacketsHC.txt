@@ -18,14 +18,14 @@ byte	length	type	name
 size: 27 + (147|CHARACTER_INFO_NEO_UNION) bytes
 
 //==============================================================================
-// 0x6C [PACKET_HC_REFUSE_ENTER] - Rejeitar Entrada
+// 0x006C [PACKET_HC_REFUSE_ENTER] - Rejeitar Entrada
 //==============================================================================
 
 byte	length	type	name
 00		02		short	identificação do pacote
-00		01		uchar	código do erro
+02		01		uchar	código do erro
 
-size: 03 byte
+size: 03 bytes
 
 //==============================================================================
 // 0x006D [PACKET_HC_ACCEPT_MAKECHAR_NEO_UNION] - Personagem Criado com Sucesso
@@ -64,6 +64,19 @@ byte	length	type	name
 02		01		byte	códgio do erro
 
 size: 03 bytes
+
+//==============================================================================
+// 0x0071 [PACKET_HC_NOTIFY_ZONESVR] - Notificar Servidor de Mapa Selecionado
+//==============================================================================
+
+byte	length	type	name
+00		02		short	identificação do pacote
+02		04		uint	código de identificação do personagem selecionado
+06		16		uchar[]	nome extendido do mapa atual do personagem
+22		04		int		endereço de IP do servidor de mapa
+26		02		short	porta de acesso para o servidor de mapa
+
+size: 28 bytes
 
 //==============================================================================
 // 0x020D [PACKET_HC_BLOCK_CHARACTER] - Personagens Bloqueados

@@ -536,6 +536,7 @@ public abstract class Server
 
 					timerSystem.getTimers().update(timerSystem.getCurrentTime(), tick);
 					fileDescriptorSystem.update(timerSystem.getCurrentTime(), tick);
+					update(timerSystem.getCurrentTime(), tick);
 
 				} catch (Exception e) {
 					logException(e);
@@ -827,6 +828,14 @@ public abstract class Server
 	 */
 
 	protected abstract FileDescriptor acceptSocket(Socket socket);
+
+	/**
+	 * Procedimento utilizado para permitir que os servidores implementem suas próprias atualizações.
+	 * @param now horário atual do servidor, tempo em milissegundos que está rodando (online).
+	 * @param tick intervalo entre a última chamada e esta chamada em milissegundos (delay).
+	 */
+
+	protected abstract void update(int now, int tick);
 
 	@Override
 	public String toString()

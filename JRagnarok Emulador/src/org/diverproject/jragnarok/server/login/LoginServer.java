@@ -226,4 +226,15 @@ public class LoginServer extends Server
 			LoginServer.this.loginServerConfigs = null;
 		}
 	};
+
+	@Override
+	protected void update(int now, int tick)
+	{
+		for (ClientCharServer server : charServers)
+			if (!server.getFileDecriptor().isConnected())
+			{
+				charServers.remove(server);
+				server.getFileDecriptor().close();
+			}
+	}
 }

@@ -269,6 +269,22 @@ public class ServiceCharLogin extends AbstractCharService
 	}
 
 	/**
+	 * Procedimento utilizado para atualizar a conexão com o servidor de acesso.
+	 * A atualização consiste em verificar se há conexão e se não houver encerrar o objeto.
+	 * @param now horário atual do servidor, tempo em milissegundos que está rodando (online).
+	 * @param tick intervalo entre a última chamada e esta chamada em milissegundos (delay).
+	 */
+
+	public void update(int now, int tick)
+	{
+		if (fd != null && !fd.isConnected())
+		{
+			fd.close();
+			fd = null;
+		}
+	}
+
+	/**
 	 * Verifica sa há conexão com o servidor de acesso para enviar os dados do pacote.
 	 * Se houver envia os dados de um pacote para um determinado descritor de arquivo.
 	 * Caso contrário envia ao cliente um pacote mostrando que este foi rejeitado.

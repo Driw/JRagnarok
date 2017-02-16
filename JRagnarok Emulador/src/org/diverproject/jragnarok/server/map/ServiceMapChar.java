@@ -270,6 +270,22 @@ public class ServiceMapChar extends AbstractMapService
 	};
 
 	/**
+	 * Procedimento utilizado para atualizar a conexão com o servidor de personagem.
+	 * A atualização consiste em verificar se há conexão e se não houver encerrar o objeto.
+	 * @param now horário atual do servidor, tempo em milissegundos que está rodando (online).
+	 * @param tick intervalo entre a última chamada e esta chamada em milissegundos (delay).
+	 */
+
+	public void update(int now, int tick)
+	{
+		if (fd != null && !fd.isConnected())
+		{
+			fd.close();
+			fd = null;
+		}
+	}
+
+	/**
 	 * Informa ao servidor de personagens as taxas do servidor das configurações de batalha.
 	 * Essas taxas são referentes a experiência de base, experiência de classe e itens derrubados.
 	 * @param baseRate taxa percentual para a experiência de base obtida de monstros.

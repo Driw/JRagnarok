@@ -153,4 +153,10 @@ public class MapServer extends Server
 			MapServer.this.mapServerConfigs = null;
 		}
 	};
+
+	@Override
+	protected void update(int now, int tick)
+	{
+		facade.getServiceMapChar().update(now, tick);
+	}
 }

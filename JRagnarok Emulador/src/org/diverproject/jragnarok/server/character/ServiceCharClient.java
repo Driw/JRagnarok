@@ -608,6 +608,7 @@ public class ServiceCharClient extends AbstractCharService
 			packet.setMapName(mapid2mapname(character.getLocations().getLastPoint().getMapID()));
 			packet.setAddressIP(server.getIP().get());
 			packet.setPort(server.getPort());
+			packet.send(fd);
 		}
 
 		else

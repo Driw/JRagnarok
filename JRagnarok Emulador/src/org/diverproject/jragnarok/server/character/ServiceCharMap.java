@@ -447,7 +447,7 @@ public class ServiceCharMap extends AbstractCharService
 		if (server != null)
 		{
 			if (server.getFileDescriptor() != null && server.getFileDescriptor().isConnected())
-				return false;
+				return true;
 
 			getServer().getMapServers().remove(server);
 		}
