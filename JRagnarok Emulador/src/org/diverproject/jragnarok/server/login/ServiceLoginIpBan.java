@@ -75,7 +75,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 
 			Timer timer = timers.acquireTimer();
 			timer.setTick(getTimerSystem().getCurrentTime());
-			timer.setListener(cleanup);
+			timer.setListener(CLEANUP);
 			timers.addLoop(timer, seconds(interval));
 		}
 	}
@@ -93,7 +93,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 	 * A limpeza consiste em remover do cache e banco de dados todos os banimentos que estejam expirados.
 	 */
 
-	private TimerListener cleanup = new TimerListener()
+	private TimerListener CLEANUP = new TimerListener()
 	{
 		@Override
 		public void onCall(Timer timer, int now, int tick)
@@ -111,7 +111,7 @@ public class ServiceLoginIpBan extends AbstractServiceLogin
 		@Override
 		public String getName()
 		{
-			return "cleanup";
+			return "CLEANUP";
 		}
 
 		@Override

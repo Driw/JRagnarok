@@ -22,6 +22,11 @@ public class JRagnarokConstants
 	 */
 	public static final int MAX_MAP_PER_SERVER = 1500;
 
+	/**
+	 * Limite de células disponíveis no tamanho do mapa (largura e altura).
+	 */
+	public static final int MAX_MAP_SIZE = 512;
+
 
 	/**
 	 * Formato padrão de datas com horário.

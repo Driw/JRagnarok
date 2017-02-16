@@ -36,7 +36,8 @@ public class MapPoint extends Point
 
 	public void setMapID(short map)
 	{
-		this.mapID = map;
+		if (map > 0)
+			this.mapID = map;
 	}
 
 	/**

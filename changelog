@@ -1,3 +1,10 @@
+16.02.2017 - 1.5.211
+- Pequeno ajuste em mapname2mapid e mapid2mapname para poderem ser usados por servidores de personagem.
+- CharacterControl agora possui um mapa padrão e é definido no CharServerFacade conforme configurações.
+- Correção em receiveMapIndexes para que salve o id dos mapas disponíveis no servidor de mapa conectado.
+	- Também foi incluso uma condição de que somente mapas listados no servidor de personagem serão aceitos.
+	- Outra adição foi a notificação de mapas recebidos além do limite permitido por servidor de mapa.
+
 16.02.2017 - 1.5.210
 - Atualizando os termos de licença para utilização do software por terceiros.
 

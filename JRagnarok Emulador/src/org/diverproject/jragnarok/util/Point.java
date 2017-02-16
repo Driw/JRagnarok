@@ -1,5 +1,8 @@
 package org.diverproject.jragnarok.util;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_SIZE;
+import static org.diverproject.util.lang.IntUtil.limit;
+
 import org.diverproject.util.ObjectDescription;
 
 /**
@@ -37,8 +40,7 @@ public class Point
 
 	public void setX(int x)
 	{
-		if (x >= 0)
-			this.x = x;
+		this.x = limit(x, 0, MAX_MAP_SIZE);
 	}
 
 	/**
@@ -56,8 +58,7 @@ public class Point
 
 	public void setY(int y)
 	{
-		if (y >= 0)
-			this.y = y;
+		this.y = limit(y, 0, MAX_MAP_SIZE);
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package org.diverproject.jragnarok.server.character;
 
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_PER_SERVER;
 import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
+import static org.diverproject.jragnarok.JRagnarokUtil.mapid2mapname;
 import static org.diverproject.util.Util.s;
 import static org.diverproject.util.Util.seconds;
 import static org.diverproject.jragnarok.packets.common.ResultMapServerConnection.RMSC_FAILURE;
@@ -313,13 +315,33 @@ public class ServiceCharMap extends AbstractCharService
 
 		Queue<MapIndex> queue = packet.getMaps();
 		MapIndexes maps = new MapIndexes();
+		ClientMapServer mapServer = getServer().getMapServers().get(fd);
+
+		if (mapServer == null)
+		{
+			logWarning("servidor de mapas não encontrado no servidor de personagem (map-fd: %d, ip: %s)", fd.getID(), fd.getAddressString());
+			return;
+		}
+
+		for (int i = 0; !queue.isEmpty() && i < MAX_MAP_PER_SERVER;)
+		{
+			MapIndex map = queue.poll();
+
+			if (this.maps.contains(map.getID()))
+				continue;
+
+			if (!maps.insert(map))
+				logWarning("não foi possível indexar o mapa '%s' (fd: %d, mid: %d).\n", map.getMapName(), fd.getID(), map.getID());
+			else
+				mapServer.getMaps()[i++] = map.getMapID();
+		}
 
 		while (!queue.isEmpty())
 		{
 			MapIndex map = queue.poll();
+			String mapname = mapid2mapname(s(map.getID()));
 
-			if (!maps.insert(map))
-				logWarning("não foi possível indexar o mapa '%s' (fd: %d, mid: %d).\n", map.getMapName(), fd.getID(), map.getID());
+			logWarning("limite de mapas já alcançado (map-server: %d, mapname: %s).\n", mapServer.getID(), mapname);
 		}
 
 		logInfo("recebido '%d' índices de mapas do servidor de mapa (fd: %d).\n", maps.size(), fd.getID());

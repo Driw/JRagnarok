@@ -54,6 +54,11 @@ import org.diverproject.util.collection.abstraction.StaticArray;
 public class CharacterControl extends AbstractControl
 {
 	/**
+	 * Localização padrão do servidor.
+	 */
+	private MapPoint defaultMap;
+
+	/**
 	 * Cria uma nova instância de um controlador para persistência de dados dos personagens.
 	 * @param connection conexão com o banco de dados que será usada.
 	 */
@@ -61,6 +66,19 @@ public class CharacterControl extends AbstractControl
 	public CharacterControl(Connection connection)
 	{
 		super(connection);
+
+		defaultMap = new MapPoint();
+	}
+
+	/**
+	 * O mapa padrão é utilizado pelo controle de personagens para modificar pontos no mapa que sejam inválidos.
+	 * Pode ser utilizado diretamente pelo método disponível no controle ou durante o carregamento no banco de dados.
+	 * @return aquisição do ponto no mapa que será considerado como localização padrão (inicial) no servidor.
+	 */
+
+	public MapPoint getDefaultMap()
+	{
+		return defaultMap;
 	}
 
 	/**
@@ -279,6 +297,22 @@ public class CharacterControl extends AbstractControl
 		mapPoint.setMapID(rs.getShort("mapid"));
 		mapPoint.setX(rs.getInt("coord_x"));
 		mapPoint.setY(rs.getInt("coord_Y"));
+	}
+
+	/**
+	 * Atualiza as informações de um ponto no mapa especificado por parâmetro num local padrão do servidor.
+	 * Esse local padrão é configurado no servidor e é utilizado caso uma localização inválida seja encontrada.
+	 * @param mapPoint referência do ponto no mapa do qual deseja atualizar para o local padrão do servidor.
+	 */
+
+	public void setDefaultLocation(MapPoint mapPoint)
+	{
+		if (mapPoint != null)
+		{
+			mapPoint.setMapID(defaultMap.getMapID());
+			mapPoint.setX(defaultMap.getX());
+			mapPoint.setY(defaultMap.getY());
+		}
 	}
 
 	/**
@@ -997,6 +1031,9 @@ public class CharacterControl extends AbstractControl
 
 			if (!rs.next())
 			{
+				setDefaultLocation(character.getLocations().getLastPoint());
+				setDefaultLocation(character.getLocations().getSavePoint());
+
 				logDebug("Locations#%d não encontrado em '%s'.\n", character.getID(), table);
 				return false;
 			}
@@ -1013,6 +1050,12 @@ public class CharacterControl extends AbstractControl
 				}
 
 			} while (rs.next());
+
+			if (character.getLocations().getLastPoint().getMapID() == 0)
+				setDefaultLocation(character.getLocations().getLastPoint());
+
+			if (character.getLocations().getSavePoint().getMapID() == 0)
+				setDefaultLocation(character.getLocations().getSavePoint());
 
 			logDebug("Locations#%d recarregado de '%s'.\n", character.getID(), table);
 			return true;

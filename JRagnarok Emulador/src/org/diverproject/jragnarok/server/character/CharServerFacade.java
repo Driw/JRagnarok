@@ -1,5 +1,6 @@
 package org.diverproject.jragnarok.server.character;
 
+import static org.diverproject.jragnarok.JRagnarokUtil.mapname2mapid;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_DATA;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_INFO;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACK_CONNECT;
@@ -60,7 +61,7 @@ import org.diverproject.util.stream.StreamException;
  * @author Andrew
  */
 
-class CharServerFacade
+public class CharServerFacade
 {
 	/**
 	 * Serviço para comunicação inicial com o cliente.
@@ -208,6 +209,10 @@ class CharServerFacade
 		loginService = new ServiceCharLogin(charServer);
 		mapService = new ServiceCharMap(charServer);
 		authService = new ServiceCharServerAuth(charServer);
+
+		characterControl.getDefaultMap().setMapID(mapname2mapid(charServer.getCharServerConfigs().defaultMap));
+		characterControl.getDefaultMap().setX(charServer.getCharServerConfigs().defaultMapX);
+		characterControl.getDefaultMap().setY(charServer.getCharServerConfigs().defaultMapY);
 
 		clientService.init();
 		charService.init();

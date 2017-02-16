@@ -18,6 +18,7 @@ import org.diverproject.jragnaork.RagnarokRuntimeException;
 import org.diverproject.jragnaork.messages.Messages;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.ServerThreaed;
+import org.diverproject.jragnarok.server.character.CharServer;
 import org.diverproject.jragnarok.server.map.MapServer;
 import org.diverproject.util.SizeUtil;
 import org.diverproject.util.SystemUtil;
@@ -288,6 +289,13 @@ public class JRagnarokUtil
 		{
 			ServerThreaed thread = (ServerThreaed) Thread.currentThread();
 
+			if (thread.getServer() instanceof CharServer)
+			{
+				CharServer server = (CharServer) thread.getServer();
+
+				return s(server.getFacade().getMapIndexes().getMapID(mapname));
+			}
+
 			if (thread.getServer() instanceof MapServer)
 			{
 				MapServer server = (MapServer) thread.getServer();
@@ -310,6 +318,13 @@ public class JRagnarokUtil
 		if (Thread.currentThread() instanceof ServerThreaed)
 		{
 			ServerThreaed thread = (ServerThreaed) Thread.currentThread();
+
+			if (thread.getServer() instanceof CharServer)
+			{
+				CharServer server = (CharServer) thread.getServer();
+
+				return server.getFacade().getMapIndexes().getMapName(mapid);
+			}
 
 			if (thread.getServer() instanceof MapServer)
 			{
