@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnaork.JRagnarokConstants.DATE_FORMAT;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.mapid2mapname;
 import static org.diverproject.log.LogSystem.logDebug;

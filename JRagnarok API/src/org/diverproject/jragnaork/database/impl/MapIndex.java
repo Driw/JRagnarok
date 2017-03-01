@@ -1,7 +1,7 @@
 package org.diverproject.jragnaork.database.impl;
 
-import static org.diverproject.jragnaork.RagnarokAPI.MAX_MAPNAME_LENGTH;
-import static org.diverproject.jragnaork.RagnarokAPI.MIN_MAPNAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_MAP_NAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.MIN_MAP_NAME_LENGTH;
 import static org.diverproject.util.Util.s;
 import static org.diverproject.util.lang.IntUtil.interval;
 
@@ -43,7 +43,7 @@ public class MapIndex implements IndexableDatabaseItem
 
 	public void setMapName(String mapName)
 	{
-		if (mapName != null && interval(mapName.length(), MIN_MAPNAME_LENGTH, MAX_MAPNAME_LENGTH))
+		if (mapName != null && interval(mapName.length(), MIN_MAP_NAME_LENGTH, MAX_MAP_NAME_LENGTH))
 			this.mapName = mapName;
 	}
 

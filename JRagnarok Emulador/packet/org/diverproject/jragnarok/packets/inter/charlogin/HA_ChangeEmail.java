@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.inter.charlogin;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.EMAIL_LENGTH;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_CHANGE_EMAIL;
 import static org.diverproject.util.Util.strclr;
 

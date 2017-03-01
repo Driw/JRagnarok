@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login.entities;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.PINCODE_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.PINCODE_LENGTH;
 import static org.diverproject.util.Util.random;
 
 import org.diverproject.util.ObjectDescription;

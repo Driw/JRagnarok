@@ -9,7 +9,6 @@ import java.sql.Connection;
 import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnaork.configuration.ConfigReader;
 import org.diverproject.jragnaork.database.AbstractDatabase;
-import org.diverproject.jragnaork.database.MapIndexes;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Queue;
@@ -134,11 +133,11 @@ public abstract class IODefault<D extends AbstractDatabase<?>>
 		return preferences;
 	}
 
-	public abstract int readSQL(MapIndexes indexes, Connection connection, String tablename) throws RagnarokException;
-	public abstract int writeSQL(MapIndexes indexes, Connection connection, String tablename) throws RagnarokException;
+	public abstract int readSQL(D database, Connection connection, String tablename) throws RagnarokException;
+	public abstract int writeSQL(D database, Connection connection, String tablename) throws RagnarokException;
 
-	public abstract int readFile(MapIndexes indexes, String filepath) throws RagnarokException;
-	public abstract int writeFile(MapIndexes indexes, String filepath) throws RagnarokException;
+	public abstract int readFile(D database, String filepath) throws RagnarokException;
+	public abstract int writeFile(D database, String filepath) throws RagnarokException;
 
 	/**
 	 * Cria uma nova exceção e reage conforme as preferências definidas no leitor.

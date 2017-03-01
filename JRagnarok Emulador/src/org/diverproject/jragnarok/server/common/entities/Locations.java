@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.common.entities;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MEMOPOINTS;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_MEMOPOINTS;
 import static org.diverproject.util.lang.IntUtil.interval;
 
 import org.diverproject.jragnarok.util.MapPoint;

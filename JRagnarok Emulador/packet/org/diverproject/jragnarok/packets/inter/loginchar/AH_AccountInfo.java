@@ -1,9 +1,9 @@
 package org.diverproject.jragnarok.packets.inter.loginchar;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokConstants.PASSWORD_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokConstants.PINCODE_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokConstants.USERNAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.EMAIL_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.PASSWORD_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.PINCODE_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.USERNAME_LENGTH;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_AH_ACCOUNT_INFO;
 import static org.diverproject.util.Util.b;
 import static org.diverproject.util.Util.strcap;

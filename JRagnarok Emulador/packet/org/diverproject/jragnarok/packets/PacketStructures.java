@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.packets;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.DEFAULT_WALK_SPEED;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAP_NAME_LENGTH_EXT;
-import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.DEFAULT_WALK_SPEED;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAP_NAME_LENGTH_EXT;
+import static org.diverproject.jragnaork.JRagnarokConstants.NAME_LENGTH;
 import static org.diverproject.util.Util.b;
 import static org.diverproject.util.Util.i;
 import static org.diverproject.util.Util.now;

@@ -1,3 +1,9 @@
+28.02.2017 - 1.5.214
+- Movendo JRagnarokConstants para o projeto de Ragnarok API, onde faz mais sentido.
+	- RagnarokAPI foi removido, já que era a classe que continha as constantes.
+	- jragnarok.util também foi movido para o projeto Ragnarok API.
+- IODefault estava utilizado IODefault ao invés da parametrizada D.
+
 16.02.2017 - 1.5.213
 - Novo método utilitário thread() para se obter o nome da thread do servidor.
 - FileDescriptor.close passa para closeSocket e close se torna um set para FLAG_EOF.

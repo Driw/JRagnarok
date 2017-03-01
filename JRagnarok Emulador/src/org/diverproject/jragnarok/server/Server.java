@@ -4,6 +4,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newFileConfigs
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newLogConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newServerConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newSqlConnectionConfigs;
+import static org.diverproject.jragnaork.JRagnarokConstants.LOCALHOST;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FOLDER;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_THREAD_PRIORITY;
@@ -16,7 +17,6 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_TIMEZONE;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SQL_USERNAME;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_DEFAULT_FOLDER;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_SERVER_FOLDER;
-import static org.diverproject.jragnarok.JRagnarokConstants.LOCALHOST;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
 import static org.diverproject.jragnarok.server.ServerState.DESTROYED;
 import static org.diverproject.jragnarok.server.ServerState.NONE;
@@ -204,7 +204,7 @@ public abstract class Server
 	{
 		int value = configs.getInt(SERVER_THREAD_PRIORITY);
 
-		return IntUtil.limit(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+		return IntUtil.min(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
 	}
 
 	/**

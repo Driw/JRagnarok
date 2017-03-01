@@ -239,7 +239,7 @@ public abstract class FileDescriptor
 	public void close()
 	{
 		setUpSource(1);
-		logInfo("fechar conexão (fd: %d, ip: %s)", getID(), getAddressString());
+		logInfo("solicitado fechamento de conexão (fd: %d, ip: %s).\n", getID(), getAddressString());
 
 		flag.set(FLAG_EOF);
 	}

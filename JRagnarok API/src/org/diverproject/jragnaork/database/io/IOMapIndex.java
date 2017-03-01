@@ -1,7 +1,7 @@
 package org.diverproject.jragnaork.database.io;
 
-import static org.diverproject.jragnaork.RagnarokAPI.MAX_MAPNAME_LENGTH;
-import static org.diverproject.jragnaork.RagnarokAPI.MIN_MAPNAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_MAP_NAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.MIN_MAP_NAME_LENGTH;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.setUpSource;
 import static org.diverproject.util.Util.format;
@@ -54,7 +54,7 @@ public class IOMapIndex extends IODefault<MapIndexes>
 						continue;
 					}
 
-					if (map.getMapName() == null || !interval(map.getMapName().length(), MIN_MAPNAME_LENGTH, MAX_MAPNAME_LENGTH))
+					if (map.getMapName() == null || !interval(map.getMapName().length(), MIN_MAP_NAME_LENGTH, MAX_MAP_NAME_LENGTH))
 					{
 						if (getPreferences().is(PREFERENCES_THROWS_UNEXPECTED))
 							newException("map index '%s' não foi aceito (id: %d)", map.getMapName(), map.getID());
@@ -115,7 +115,7 @@ public class IOMapIndex extends IODefault<MapIndexes>
 
 			lastID = map.getID();
 
-			if (map.getMapName() == null || !interval(map.getMapName().length(), MIN_MAPNAME_LENGTH, MAX_MAPNAME_LENGTH))
+			if (map.getMapName() == null || !interval(map.getMapName().length(), MIN_MAP_NAME_LENGTH, MAX_MAP_NAME_LENGTH))
 			{
 				if (getPreferences().is(PREFERENCES_THROWS_UNEXPECTED))
 					newException("map index '%s' não foi aceito (id: %d)", map.getMapName(), map.getID());
@@ -191,7 +191,7 @@ public class IOMapIndex extends IODefault<MapIndexes>
 					continue;
 				}
 
-				if (!interval(columns[columns.length == 2 ? 1 : 0].length(), MIN_MAPNAME_LENGTH, MAX_MAPNAME_LENGTH) ||
+				if (!interval(columns[columns.length == 2 ? 1 : 0].length(), MIN_MAP_NAME_LENGTH, MAX_MAP_NAME_LENGTH) ||
 					(columns.length == 2 && !isInteger(columns[0])))
 				{
 					if (getPreferences().is(PREFERENCES_THROWS_UNEXPECTED))
@@ -264,7 +264,7 @@ public class IOMapIndex extends IODefault<MapIndexes>
 					continue;
 				}
 
-				if (map.getMapName() == null || !interval(map.getMapName().length(), MIN_MAPNAME_LENGTH, MAX_MAPNAME_LENGTH))
+				if (map.getMapName() == null || !interval(map.getMapName().length(), MIN_MAP_NAME_LENGTH, MAX_MAP_NAME_LENGTH))
 				{
 					if (getPreferences().is(PREFERENCES_THROWS_UNEXPECTED))
 						newException("map index '%s' não foi aceito (id: %d)", map.getMapName(), map.getID());

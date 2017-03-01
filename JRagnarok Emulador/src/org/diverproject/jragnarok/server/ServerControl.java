@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_SERVERS;
 import static org.diverproject.jragnarok.server.ServerState.CREATED;
 import static org.diverproject.jragnarok.server.ServerState.NONE;
 import static org.diverproject.jragnarok.server.ServerState.RUNNING;

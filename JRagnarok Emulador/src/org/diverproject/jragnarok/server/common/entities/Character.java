@@ -1,13 +1,12 @@
 package org.diverproject.jragnarok.server.common.entities;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_HP;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_NAME_LENGTH;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SP;
-import static org.diverproject.jragnarok.JRagnarokConstants.MIN_NAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_HP;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_NAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_SP;
+import static org.diverproject.jragnaork.JRagnarokConstants.MIN_NAME_LENGTH;
 import static org.diverproject.jragnarok.server.common.Sex.FEMALE;
 import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 import static org.diverproject.util.lang.IntUtil.interval;
-import static org.diverproject.util.lang.IntUtil.limit;
 import static org.diverproject.util.lang.IntUtil.min;
 import static org.diverproject.util.Util.format;
 
@@ -398,7 +397,7 @@ public class Character
 
 	public void setHP(int hp)
 	{
-		this.hp = limit(hp, 0, maxHP);
+		this.hp = min(hp, 0, maxHP);
 	}
 
 	/**
@@ -416,7 +415,7 @@ public class Character
 
 	public void setMaxHP(int maxHP)
 	{
-		this.maxHP = limit(maxHP, 1, MAX_HP);
+		this.maxHP = min(maxHP, 1, MAX_HP);
 	}
 
 	/**

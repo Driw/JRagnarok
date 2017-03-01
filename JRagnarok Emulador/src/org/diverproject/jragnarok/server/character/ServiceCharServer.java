@@ -1,14 +1,14 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.DEFAULT_EMAIL;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAP_ALBERTA;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAP_GEFFEN;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAP_IZLUDE;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAP_MORROC;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAP_PAYON;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAP_PRONTERA;
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
-import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
+import static org.diverproject.jragnaork.JRagnarokConstants.DEFAULT_EMAIL;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAP_ALBERTA;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAP_GEFFEN;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAP_IZLUDE;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAP_MORROC;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAP_PAYON;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAP_PRONTERA;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnaork.JRagnarokConstants.PACKETVER;
 import static org.diverproject.jragnarok.JRagnarokUtil.mapname2mapid;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR;
@@ -813,6 +813,8 @@ public class ServiceCharServer extends AbstractCharService
 			auth.getExpiration().set(sd.getExpiration().get());
 			auth.setGroup(sd.getGroup());
 			auths.add(auth);
+
+			return;
 
 		} catch (RagnarokException e) {
 

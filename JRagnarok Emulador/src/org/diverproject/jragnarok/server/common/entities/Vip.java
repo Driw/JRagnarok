@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.common.entities;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.USERNAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.USERNAME_LENGTH;
 import static org.diverproject.util.Util.strcap;
 
 import org.diverproject.util.ObjectDescription;

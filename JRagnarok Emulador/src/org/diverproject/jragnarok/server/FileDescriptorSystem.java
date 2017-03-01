@@ -137,7 +137,7 @@ public class FileDescriptorSystem implements Iterable<FileDescriptor>
 
 				else if (!fd.getFlag().is(FLAG_SERVER))
 				{
-					logInfo("sessão #%d econtrou-se ociosa no sistema (ip: %s, thread: %s).\n", fd.getID(), fd.getAddressString(), thread());
+					logInfo("sessão client#%d econtrou-se ociosa no sistema (ip: %s, thread: %s).\n", fd.getID(), fd.getAddressString(), thread());
 					setEndOfFile(fd);
 				}
 			}

@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.character.fromclient;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.NAME_LENGTH;
+import static org.diverproject.jragnaork.JRagnarokConstants.NAME_LENGTH;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_MAKE_CHAR;
 import static org.diverproject.util.Util.strclr;
 

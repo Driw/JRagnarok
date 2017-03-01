@@ -1,4 +1,4 @@
-package org.diverproject.jragnarok;
+package org.diverproject.jragnaork;
 
 public class JRagnarokConstants
 {
@@ -130,6 +130,46 @@ public class JRagnarokConstants
 	 * Quantidade de caracteres permitido para definir o nome do mapa.
 	 */
 	public static final int MAP_NAME_LENGTH_EXT = MAP_NAME_LENGTH + 4;
+
+	/**
+	 * Limite na quantidade de mapas com índice definido no sistema.
+	 */
+	public static final int MAX_MAP_INDEX = 2000;
+
+	/**
+	 * Limite mínimo de caracteres permitidos no nome do mapa.
+	 */
+	public static final int MIN_MAP_NAME_LENGTH = 3;
+
+	/**
+	 * Limite máximo de caracteres permitidos no nome do mapa.
+	 */
+	public static final int MAX_MAP_NAME_LENGTH = 16;
+
+	/**
+	 * Limite de células disponíveis no tamanho do mapa (largura e altura).
+	 */
+	public static final int MAX_MAP_LENGTH = 512;
+
+	/**
+	 * Limite de NPCs alocados por mapa.
+	 */
+	public static final int MAX_NPC_PER_MAP = 512;
+
+	/**
+	 * TODO
+	 */
+	public static final int MAX_DROP_PER_MAP = 48;
+
+	/**
+	 * LImite máximo de spawns distintos por mapa.
+	 */
+	public static final int MAX_MOB_LIST_PER_MAP = 128;
+
+	/**
+	 * Limite máximo de caracteres para definir o nome de um evento.
+	 */
+	public static final int EVENT_NAME_LENGTH = (NAME_LENGTH * 2) + 3;
 
 	/**
 	 * Nome de identificação do mapa da cidade de Prontera.

@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
+import static org.diverproject.jragnaork.JRagnarokConstants.DATE_FORMAT;
 import static org.diverproject.jragnarok.JRagnarokUtil.binToHex;
 import static org.diverproject.jragnarok.JRagnarokUtil.loginMessage;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Encrypt;

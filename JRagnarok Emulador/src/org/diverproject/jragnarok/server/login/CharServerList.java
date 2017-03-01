@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_SERVERS;
 
 import java.util.Iterator;
 

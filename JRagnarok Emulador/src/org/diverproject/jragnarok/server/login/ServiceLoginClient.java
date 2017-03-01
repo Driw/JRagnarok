@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login;
 
-import static org.diverproject.jragnarok.JRagnarokConstants.MIN_CHARS;
+import static org.diverproject.jragnaork.JRagnarokConstants.MIN_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.md5Salt;
 import static org.diverproject.log.LogSystem.logDebug;
