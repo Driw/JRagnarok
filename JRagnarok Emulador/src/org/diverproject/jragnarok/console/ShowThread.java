@@ -29,6 +29,12 @@ public class ShowThread extends Show
 	private static final ShowThread INSTANCE = new ShowThread();
 
 	/**
+	 * Contador de mensagens já exibidas no sistema.
+	 */
+	private static int i;
+
+
+	/**
 	 * Construtor privado para evitar instâncias desnecessárias desta classe e respeitar a forma como é usada.
 	 */
 
@@ -50,6 +56,9 @@ public class ShowThread extends Show
 			format = format("%s.%s: %s", className, methodName, message);
 		else
 			format = format("[%s] %s.%s: %s", type.prefix, className, methodName, message);
+
+		getConsolePanel().setMessage("%d | ", ++i);
+		getConsolePanel().callPrintMessage();
 
 		getConsolePanel().setMessage(format, args);
 		getConsolePanel().callPrintMessage();
@@ -79,7 +88,7 @@ public class ShowThread extends Show
 	}
 
 	/**
-	 * A exibição genérica deve ser utilizada por qualquer menasgem log que não seja específica de um servidor.
+	 * A exibição genérica deve ser utilizada por qualquer mensagem log que não seja específica de um servidor.
 	 * @return aquisição da instância para exibição de mensagens log de forma genérica.
 	 */
 

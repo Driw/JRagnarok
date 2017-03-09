@@ -413,7 +413,7 @@ public class RagnarokPacket
 //	public static final short PACKET_CZ_USE_SKILL_TOGROUND_WITHTALKBOX2			= 0x0367;
 //	public static final short PACKET_CZ_REQNAME2								= 0x0368;
 //	public static final short PACKET_CZ_REQNAME_BYGID2							= 0x0369;
-//	public static final short PACKET_CZ_ENTER2									= 0x0436;
+	public static final short PACKET_CZ_ENTER2									= 0x0436;
 //	public static final short PACKET_CZ_REQUEST_ACT2							= 0x0437;
 //	public static final short PACKET_CZ_USE_SKILL2								= 0x0438;
 //	public static final short PACKET_CZ_USE_ITEM2								= 0x0439;

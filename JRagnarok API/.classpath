@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Util Stream"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JLua"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Util Log"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Util ZIP"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

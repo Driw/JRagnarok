@@ -1,3 +1,10 @@
+09.03.2017 - 1.5.216
+- Pequenas atualizações em JRagnarokConstants e JRagnarokLogListener.
+	- ShowThread irá mostrar o número da mensagem (ordem|auto incremental).
+- Documentando AbstractDatabase, GenericDatabase, IndexableDatabase
+- Mudanças em IndexableDatabase para que considere qualquer uso de índice como indice-1.
+	- Novo método que permite excluir um item (objeto) adicionado ao mesmo.
+
 01.03.2017 - 1.5.215
 - Movendo jragnarok.util também foi movido para o projeto Ragnarok API.
 	- Por algum motivo não quis ser enviado na rev214.

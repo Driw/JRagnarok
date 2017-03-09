@@ -27,6 +27,7 @@ public class JRagnarokLogListener implements LogListener
 	 */
 	private static final LogListener INSTANCE = new JRagnarokLogListener();
 
+
 	/**
 	 * Construtor privado para aderir ao Padrão de Projetos: Singleton.
 	 */
@@ -39,7 +40,7 @@ public class JRagnarokLogListener implements LogListener
 	@Override
 	public void onMessage(Log log)
 	{
-		if (log.getType() == null || !log.getType().equals("Debug"))
+		/*if (log.getType() == null || !log.getType().equals("Debug"))*/
 			System.out.print(log.toString());
 
 		if (log.getType().equals("Debug"))

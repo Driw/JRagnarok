@@ -1,6 +1,6 @@
 package org.diverproject.jragnaork.database;
 
-import static org.diverproject.jragnaork.RagnarokAPI.MAX_MAPINDEX;
+import static org.diverproject.jragnaork.JRagnarokConstants.MAX_MAP_INDEX;
 import static org.diverproject.util.lang.IntUtil.interval;
 
 import org.diverproject.jragnaork.database.impl.MapIndex;
@@ -9,7 +9,7 @@ public class MapIndexes extends IndexableDatabase<MapIndex>
 {
 	public MapIndexes()
 	{
-		super(MapIndex.class, "MapIndexDB", MAX_MAPINDEX);
+		super(MapIndex.class, "MapIndexDB", MAX_MAP_INDEX);
 	}
 
 	public MapIndex get(int index)

@@ -1,5 +1,13 @@
 package org.diverproject.jragnaork;
 
+/**
+ * <h1>Constantes JRagnarok</h1>
+ *
+ * <p>Classe utilitária apenas para definir valores constantes utilizados em todo o sistema (API ou SDK).</p>
+ *
+ * @author Andrew
+ */
+
 public class JRagnarokConstants
 {
 	/**
@@ -16,16 +24,6 @@ public class JRagnarokConstants
 	 * Limite de servidores criados por tipo de servidor.
 	 */
 	public static final int MAX_SERVERS = 30;
-
-	/**
-	 * Limite de dígitos permitido em um código pin.
-	 */
-	public static final int MAX_MAP_PER_SERVER = 1500;
-
-	/**
-	 * Limite de células disponíveis no tamanho do mapa (largura e altura).
-	 */
-	public static final int MAX_MAP_SIZE = 512;
 
 
 	/**
@@ -131,10 +129,27 @@ public class JRagnarokConstants
 	 */
 	public static final int MAP_NAME_LENGTH_EXT = MAP_NAME_LENGTH + 4;
 
+
+
+	/**
+	 * Limite de dígitos permitido em um código pin.
+	 */
+	public static final int MAX_MAP_PER_SERVER = 1500;
+
 	/**
 	 * Limite na quantidade de mapas com índice definido no sistema.
 	 */
 	public static final int MAX_MAP_INDEX = 2000;
+
+	/**
+	 * Limite de células disponíveis no tamanho do mapa (largura e altura).
+	 */
+	public static final int MAX_MAP_SIZE = 512;
+
+	/**
+	 * Limite de células disponíveis no tamanho do mapa (largura * altura).
+	 */
+	public static final int MAX_MAP_SIZE2 = MAX_MAP_SIZE * MAX_MAP_SIZE;
 
 	/**
 	 * Limite mínimo de caracteres permitidos no nome do mapa.
@@ -145,11 +160,6 @@ public class JRagnarokConstants
 	 * Limite máximo de caracteres permitidos no nome do mapa.
 	 */
 	public static final int MAX_MAP_NAME_LENGTH = 16;
-
-	/**
-	 * Limite de células disponíveis no tamanho do mapa (largura e altura).
-	 */
-	public static final int MAX_MAP_LENGTH = 512;
 
 	/**
 	 * Limite de NPCs alocados por mapa.
@@ -170,6 +180,11 @@ public class JRagnarokConstants
 	 * Limite máximo de caracteres para definir o nome de um evento.
 	 */
 	public static final int EVENT_NAME_LENGTH = (NAME_LENGTH * 2) + 3;
+
+	/**
+	 * Dimensão em células de largura e comprimento de uma chunk do mapa.
+	 */
+	public static final int MAP_CHUNK_SIZE = 8;
 
 	/**
 	 * Nome de identificação do mapa da cidade de Prontera.

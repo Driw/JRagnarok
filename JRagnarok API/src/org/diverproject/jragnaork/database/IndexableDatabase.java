@@ -8,10 +8,38 @@ import java.util.Iterator;
 
 import org.diverproject.util.ObjectDescription;
 
+/**
+ * <h1></h1>
+ *
+ * <p>Implementação parcial (abstrata) de uma base de dados que armazena itens do tipo indexável.
+ * Itens deste tipo implementam uma interface e por meio desta saber o seu código de identificação.</p>
+ *
+ * @see IndexableDatabaseItem
+ * @see AbstractDatabase
+ *
+ * @author Andrew
+ *
+ * @param <I> Tipo do item que será armazenado na base de dados.
+ */
+
 public abstract class IndexableDatabase<I extends IndexableDatabaseItem> extends AbstractDatabase<I>
 {
+	/**
+	 * Quantidade de items que estão atualmente guardados.
+	 */
 	private int size;
+
+	/**
+	 * Vetor que irá guardar a referência dos objetos na base de dados.
+	 */
 	protected I items[];
+
+	/**
+	 * Cria uma nova instância de uma base de dados para armazenamento de itens indexáveis.
+	 * @param cls tipo de classe que será usada durante a iteração (mesmo da parametrizada).
+	 * @param name nome que será dado a base de dados para identificação visual.
+	 * @param max quantidade limite de itens que poderá ser armazenado.
+	 */
 
 	@SuppressWarnings("unchecked")
 	public IndexableDatabase(Class<I> cls, String name, int max)
@@ -30,15 +58,38 @@ public abstract class IndexableDatabase<I extends IndexableDatabaseItem> extends
 		size = 0;
 	}
 
+	/**
+	 * Insere um novo item na base de dados sendo necessário especificar a referência do item.
+	 * @param item referência do item do qual deseja inserir conforme a parametrizada.
+	 * @return true se conseguir inserir ou false caso o índice esteja ocupado ou inválido.
+	 */
+
 	public boolean insert(I item)
 	{
 		if (interval(item.getID(), 1, items.length))
-			if (items[item.getID()] == null)
+			if (items[item.getID() - 1] == null)
 			{
 				size++;
-				items[item.getID()] = item;
+				items[item.getID() - 1] = item;
 				return true;
 			}
+
+		return false;
+	}
+
+	/**
+	 * Exclui um determinado item da base de dados especificando o índice do item no mesmo.
+	 * @param index número do índice do item do qual deseja excluir da base de dados.
+	 * @return true se conseguir excluir ou false se o índice for inválido ou for null.
+	 */
+
+	public boolean delete(int index)
+	{
+		if (interval(index, 1, items.length) && items[index - 1] != null)
+		{
+			items[index - 1] = null;
+			return true;
+		}
 
 		return false;
 	}
@@ -61,9 +112,15 @@ public abstract class IndexableDatabase<I extends IndexableDatabaseItem> extends
 		return item != null && contains(item.getID());
 	}
 
-	public boolean contains(int id)
+	/**
+	 * Permite verificar se a base de dados possui um item ocupando um índice especificado.
+	 * @param index número do índice do qual deseja verificar se já está sendo usado.
+	 * @return true se já estiver sendo utilizado ou false caso contrário.
+	 */
+
+	public boolean contains(int index)
 	{
-		return interval(id, 1, items.length) ? items[id - 1] != null : false;
+		return interval(index, 1, items.length) ? items[index - 1] != null : false;
 	}
 
 	@Override
