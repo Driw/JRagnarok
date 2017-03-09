@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.server;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.jragnarok.configs.CommonConfigs;
 import org.diverproject.jragnarok.console.Show;
 import org.diverproject.util.ObjectDescription;

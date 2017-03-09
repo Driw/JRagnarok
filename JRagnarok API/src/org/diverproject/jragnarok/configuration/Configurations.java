@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.configuration;
+package org.diverproject.jragnarok.configuration;
 
 import static org.diverproject.log.LogSystem.logWarning;
 

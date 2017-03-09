@@ -27,7 +27,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.VIP_CHAR_INCRE
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.VIP_GROUPID;
 import static org.diverproject.util.Util.s;
 
-import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.configuration.Configurations;
 import org.diverproject.jragnarok.server.login.ClientHash;
 import org.diverproject.jragnarok.server.login.ClientHashNode;
 import org.diverproject.util.collection.Node;

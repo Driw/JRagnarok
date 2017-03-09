@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.database;
+package org.diverproject.jragnarok.database;
 
 public class Databases
 {

@@ -44,7 +44,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_USE_CON
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SYSTEM_USE_LOG;
 import static org.diverproject.util.Util.s;
 
-import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.configuration.Configurations;
 
 public class CommonConfigs
 {

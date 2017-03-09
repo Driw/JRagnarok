@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork;
+package org.diverproject.jragnarok;
 
 /**
  * <h1>Constantes JRagnarok</h1>

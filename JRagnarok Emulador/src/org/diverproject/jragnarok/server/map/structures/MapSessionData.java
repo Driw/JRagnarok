@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server.map.structures;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.PASSWORD_LENGTH;
-import static org.diverproject.jragnaork.JRagnarokConstants.USERNAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.PASSWORD_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.USERNAME_LENGTH;
 import static org.diverproject.util.Util.format;
 import static org.diverproject.util.Util.strcap;
 

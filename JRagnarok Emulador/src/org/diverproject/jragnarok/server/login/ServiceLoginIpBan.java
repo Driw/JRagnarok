@@ -7,7 +7,7 @@ import static org.diverproject.log.LogSystem.logException;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.util.Util.seconds;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.login.toclient.AC_RefuseLogin;
 import org.diverproject.jragnarok.server.Timer;

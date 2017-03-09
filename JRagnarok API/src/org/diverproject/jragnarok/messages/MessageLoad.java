@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.messages;
+package org.diverproject.jragnarok.messages;
 
 import static org.diverproject.log.LogSystem.logInfo;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;

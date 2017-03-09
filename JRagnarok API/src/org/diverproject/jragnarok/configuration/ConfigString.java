@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.configuration;
+package org.diverproject.jragnarok.configuration;
 
 public class ConfigString extends Config<String>
 {

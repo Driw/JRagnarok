@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.character.toclient;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_ACCEPT_ENTER_NEO_UNION;
 import static org.diverproject.util.Util.s;
 import static org.diverproject.util.Util.size;

@@ -4,7 +4,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newFileConfigs
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newLogConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newServerConfigs;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.newSqlConnectionConfigs;
-import static org.diverproject.jragnaork.JRagnarokConstants.LOCALHOST;
+import static org.diverproject.jragnarok.JRagnarokConstants.LOCALHOST;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FILES;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_FOLDER;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.SERVER_THREAD_PRIORITY;
@@ -42,9 +42,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.ConfigReader;
-import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.RagnarokException;
+import org.diverproject.jragnarok.configuration.ConfigReader;
+import org.diverproject.jragnarok.configuration.Configurations;
 import org.diverproject.jragnarok.console.Show;
 import org.diverproject.jragnarok.console.ShowThread;
 import org.diverproject.util.ObjectDescription;

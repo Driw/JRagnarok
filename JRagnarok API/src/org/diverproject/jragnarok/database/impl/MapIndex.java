@@ -1,11 +1,11 @@
-package org.diverproject.jragnaork.database.impl;
+package org.diverproject.jragnarok.database.impl;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_MAP_NAME_LENGTH;
-import static org.diverproject.jragnaork.JRagnarokConstants.MIN_MAP_NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MIN_MAP_NAME_LENGTH;
 import static org.diverproject.util.Util.s;
 import static org.diverproject.util.lang.IntUtil.interval;
 
-import org.diverproject.jragnaork.database.IndexableDatabaseItem;
+import org.diverproject.jragnarok.database.IndexableDatabaseItem;
 import org.diverproject.util.ObjectDescription;
 
 public class MapIndex implements IndexableDatabaseItem

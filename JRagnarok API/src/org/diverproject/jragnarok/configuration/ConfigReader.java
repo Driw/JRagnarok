@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.configuration;
+package org.diverproject.jragnarok.configuration;
 
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Queue;

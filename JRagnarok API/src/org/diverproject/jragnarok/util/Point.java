@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.util;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_MAP_SIZE;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_SIZE;
 import static org.diverproject.util.lang.IntUtil.min;
 
 import org.diverproject.util.ObjectDescription;

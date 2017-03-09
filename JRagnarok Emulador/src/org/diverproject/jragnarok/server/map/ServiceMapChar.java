@@ -8,8 +8,8 @@ import static org.diverproject.util.Util.seconds;
 import java.io.IOException;
 import java.net.Socket;
 
-import org.diverproject.jragnaork.database.MapIndexes;
-import org.diverproject.jragnaork.database.impl.MapIndex;
+import org.diverproject.jragnarok.database.MapIndexes;
+import org.diverproject.jragnarok.database.impl.MapIndex;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.inter.charmap.HZ_ResultMapServerConnection;
 import org.diverproject.jragnarok.packets.inter.mapchar.ZH_MapServerConnection;

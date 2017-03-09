@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.util.ObjectDescription;
 
 /**

@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.EMAIL_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
 import static org.diverproject.log.LogSystem.log;
 import static org.diverproject.log.LogSystem.logError;
 import static org.diverproject.log.LogSystem.logException;
@@ -13,9 +13,9 @@ import static org.diverproject.util.lang.IntUtil.interval;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.RagnarokRuntimeException;
-import org.diverproject.jragnaork.messages.Messages;
+import org.diverproject.jragnarok.RagnarokException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
+import org.diverproject.jragnarok.messages.Messages;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.ServerThreaed;
 import org.diverproject.jragnarok.server.character.CharServer;

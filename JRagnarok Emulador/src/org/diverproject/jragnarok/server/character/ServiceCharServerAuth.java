@@ -6,7 +6,7 @@ import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.util.Util.seconds;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_Enter;
 import org.diverproject.jragnarok.packets.common.NotifyAuth;
 import org.diverproject.jragnarok.server.Timer;

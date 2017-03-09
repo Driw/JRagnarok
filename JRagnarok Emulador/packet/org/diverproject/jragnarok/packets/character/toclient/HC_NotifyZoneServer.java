@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.character.toclient;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAP_NAME_LENGTH_EXT;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_NAME_LENGTH_EXT;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HC_NOTIFY_ZONESVR;
 import static org.diverproject.util.Util.strcap;
 

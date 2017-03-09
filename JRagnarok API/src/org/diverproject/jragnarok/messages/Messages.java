@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.messages;
+package org.diverproject.jragnarok.messages;
 
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.IntegerLittleMap;

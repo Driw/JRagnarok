@@ -1,6 +1,6 @@
-package org.diverproject.jragnaork;
+package org.diverproject.jragnarok;
 
-import org.diverproject.util.UtilRuntimeException;
+import org.diverproject.util.UtilException;
 
 /**
  * <h1>Exceção de Ragnarok</h1>
@@ -9,20 +9,20 @@ import org.diverproject.util.UtilRuntimeException;
  * Utilizado pelas classes utilitárias ou outras classes do conjunto da biblioteca API do Ragnarok.
  * Todas exceções que forem geradas nesse projeto terão essa classe como mãe ou root na hierarquia.</p>
  *
- * @see UtilRuntimeException
+ * @see UtilException
  *
  * @author Andrew
  */
 
 @SuppressWarnings("serial")
-public class RagnarokRuntimeException extends UtilRuntimeException
+public class RagnarokException extends UtilException
 {
 	/**
 	 * Constrói uma nova exceção de ragnarok sendo necessário definir uma mensagem.
 	 * @param message mensagem que será exibida quando a exceção for gerada.
 	 */
 
-	public RagnarokRuntimeException(String message)
+	public RagnarokException(String message)
 	{
 		super(message);
 	}
@@ -33,7 +33,7 @@ public class RagnarokRuntimeException extends UtilRuntimeException
 	 * @param args argumentos respectivos a formatação da mensagem.
 	 */
 
-	public RagnarokRuntimeException(String format, Object... args)
+	public RagnarokException(String format, Object... args)
 	{
 		super(format, args);
 	}
@@ -45,7 +45,7 @@ public class RagnarokRuntimeException extends UtilRuntimeException
 	 * @param e exceção do qual será considerada para criar uma nova.
 	 */
 
-	public RagnarokRuntimeException(Exception e)
+	public RagnarokException(Exception e)
 	{
 		super(e);
 	}
@@ -59,7 +59,7 @@ public class RagnarokRuntimeException extends UtilRuntimeException
 	 * @param args argumentos respectivos a formatação da mensagem.
 	 */
 
-	public RagnarokRuntimeException(Exception e, String format, Object... args)
+	public RagnarokException(Exception e, String format, Object... args)
 	{
 		super(e, format, args);
 	}

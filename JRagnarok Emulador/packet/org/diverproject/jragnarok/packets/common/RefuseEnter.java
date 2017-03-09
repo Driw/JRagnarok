@@ -2,7 +2,7 @@ package org.diverproject.jragnarok.packets.common;
 
 import static org.diverproject.util.Util.b;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 
 public enum RefuseEnter
 {

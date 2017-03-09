@@ -1,7 +1,7 @@
-package org.diverproject.jragnaork.database.io;
+package org.diverproject.jragnarok.database.io;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_MAP_NAME_LENGTH;
-import static org.diverproject.jragnaork.JRagnarokConstants.MIN_MAP_NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MIN_MAP_NAME_LENGTH;
 import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.setUpSource;
 import static org.diverproject.util.Util.format;
@@ -20,10 +20,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.RagnarokRuntimeException;
-import org.diverproject.jragnaork.database.MapIndexes;
-import org.diverproject.jragnaork.database.impl.MapIndex;
+import org.diverproject.jragnarok.RagnarokException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
+import org.diverproject.jragnarok.database.MapIndexes;
+import org.diverproject.jragnarok.database.impl.MapIndex;
 
 public class IOMapIndex extends IODefault<MapIndexes>
 {

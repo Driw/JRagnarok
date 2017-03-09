@@ -3,7 +3,7 @@ package org.diverproject.jragnarok.packets.inter.charlogin;
 import static org.diverproject.util.Util.size;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_UPDATE_REGISTERS;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
 import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;

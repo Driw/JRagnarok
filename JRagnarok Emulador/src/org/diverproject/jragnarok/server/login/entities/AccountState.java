@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.login.entities;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 
 public enum AccountState
 {

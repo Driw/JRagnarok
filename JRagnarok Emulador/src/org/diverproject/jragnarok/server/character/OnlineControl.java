@@ -10,7 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
 import org.diverproject.util.ObjectDescription;

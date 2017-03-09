@@ -1,9 +1,9 @@
 package org.diverproject.jragnarok.server.common.entities;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_HP;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_NAME_LENGTH;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_SP;
-import static org.diverproject.jragnaork.JRagnarokConstants.MIN_NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_HP;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_NAME_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SP;
+import static org.diverproject.jragnarok.JRagnarokConstants.MIN_NAME_LENGTH;
 import static org.diverproject.jragnarok.server.common.Sex.FEMALE;
 import static org.diverproject.jragnarok.server.common.Sex.SERVER;
 import static org.diverproject.util.lang.IntUtil.interval;

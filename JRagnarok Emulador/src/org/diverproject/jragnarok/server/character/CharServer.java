@@ -8,9 +8,9 @@ import static org.diverproject.log.LogSystem.logInfo;
 
 import java.net.Socket;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.jragnarok.configs.CharServerConfigs;
+import org.diverproject.jragnarok.configuration.Configurations;
 import org.diverproject.jragnarok.server.Server;
 import org.diverproject.jragnarok.server.ServerListener;
 import org.diverproject.jragnarok.server.login.CharServerList;

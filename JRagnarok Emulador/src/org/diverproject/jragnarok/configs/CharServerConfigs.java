@@ -36,7 +36,7 @@ import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_FORCE;
 import static org.diverproject.jragnarok.configs.JRagnarokConfigs.PINCODE_MAXTRY;
 import static org.diverproject.util.Util.s;
 
-import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.configuration.Configurations;
 
 public class CharServerConfigs extends CommonConfigs
 {

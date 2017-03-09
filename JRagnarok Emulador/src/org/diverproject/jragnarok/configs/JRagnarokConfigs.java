@@ -1,15 +1,15 @@
 package org.diverproject.jragnarok.configs;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHARS;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHAR_BILLING;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHAR_VIP;
-import static org.diverproject.jragnaork.JRagnarokConstants.PACKETVER;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_BILLING;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHAR_VIP;
+import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 
-import org.diverproject.jragnaork.configuration.ConfigBoolean;
-import org.diverproject.jragnaork.configuration.ConfigInt;
-import org.diverproject.jragnaork.configuration.ConfigString;
-import org.diverproject.jragnaork.configuration.Configurations;
+import org.diverproject.jragnarok.configuration.ConfigBoolean;
+import org.diverproject.jragnarok.configuration.ConfigInt;
+import org.diverproject.jragnarok.configuration.ConfigString;
+import org.diverproject.jragnarok.configuration.Configurations;
 
 public class JRagnarokConfigs
 {

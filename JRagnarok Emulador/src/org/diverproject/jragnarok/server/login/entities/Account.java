@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.server.login.entities;
 
 import static org.diverproject.util.lang.IntUtil.interval;
-import static org.diverproject.jragnaork.JRagnarokConstants.EMAIL_LENGTH;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.EMAIL_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.util.Util.strcap;
 
 import org.diverproject.jragnarok.server.InternetProtocol;

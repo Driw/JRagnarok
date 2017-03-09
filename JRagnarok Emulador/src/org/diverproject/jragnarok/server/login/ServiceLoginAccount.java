@@ -7,7 +7,7 @@ import static org.diverproject.log.LogSystem.logNotice;
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.util.Util.time;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountStateUpdate;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_BanAccount;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_ChangeEmail;

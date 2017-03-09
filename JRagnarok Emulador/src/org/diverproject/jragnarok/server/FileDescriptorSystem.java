@@ -12,8 +12,8 @@ import static org.diverproject.util.Util.indexOn;
 
 import java.util.Iterator;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 import org.diverproject.util.collection.List;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicQueue;

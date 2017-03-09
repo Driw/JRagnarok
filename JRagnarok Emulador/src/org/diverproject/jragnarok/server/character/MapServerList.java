@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_SERVERS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
 import static org.diverproject.util.Util.indexOn;
 
 import java.util.Iterator;

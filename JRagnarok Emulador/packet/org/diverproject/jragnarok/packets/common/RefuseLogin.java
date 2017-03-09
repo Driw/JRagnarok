@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.common;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 
 public enum RefuseLogin
 {

@@ -15,7 +15,7 @@ import static org.diverproject.util.Util.now;
 import static org.diverproject.util.Util.s;
 import static org.diverproject.util.Util.seconds;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.jragnarok.packets.common.RefuseLogin;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountData;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_AccountInfo;

@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.database;
+package org.diverproject.jragnarok.database;
 
 import static org.diverproject.util.Util.format;
 import static org.diverproject.util.lang.IntUtil.interval;

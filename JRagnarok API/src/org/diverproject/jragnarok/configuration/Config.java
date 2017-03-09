@@ -1,9 +1,9 @@
-package org.diverproject.jragnaork.configuration;
+package org.diverproject.jragnarok.configuration;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Map;
 import org.diverproject.util.collection.abstraction.StringSimpleMap;

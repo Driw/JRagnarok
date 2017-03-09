@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets.inter.charlogin;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.PINCODE_LENGTH;
+import static org.diverproject.jragnarok.JRagnarokConstants.PINCODE_LENGTH;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HA_NOTIFY_PIN_UPDATE;
 import static org.diverproject.util.Util.strcap;
 

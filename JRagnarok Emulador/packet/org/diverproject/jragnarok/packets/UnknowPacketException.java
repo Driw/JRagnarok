@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.packets;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 
 @SuppressWarnings("serial")
 public class UnknowPacketException extends RagnarokRuntimeException

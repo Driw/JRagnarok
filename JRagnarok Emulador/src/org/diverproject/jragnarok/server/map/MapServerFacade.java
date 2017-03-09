@@ -5,8 +5,8 @@ import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_HZ_RESULT
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.log.LogSystem.logWarning;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.database.MapIndexes;
+import org.diverproject.jragnarok.RagnarokException;
+import org.diverproject.jragnarok.database.MapIndexes;
 import org.diverproject.jragnarok.packets.AcknowledgePacket;
 import org.diverproject.jragnarok.server.FileDescriptor;
 import org.diverproject.jragnarok.server.FileDescriptorListener;

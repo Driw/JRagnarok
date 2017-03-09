@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.character.control;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.log.LogSystem.logDebug;
 import static org.diverproject.util.lang.IntUtil.interval;
 import static org.diverproject.util.Util.format;
@@ -11,7 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.jragnarok.server.AbstractControl;
 import org.diverproject.jragnarok.server.Tables;
 import org.diverproject.jragnarok.server.character.ChangeSex;

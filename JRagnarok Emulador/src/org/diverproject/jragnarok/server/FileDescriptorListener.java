@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 
 /**
  * <h1>Listener para Arquivo Descritor</h1>

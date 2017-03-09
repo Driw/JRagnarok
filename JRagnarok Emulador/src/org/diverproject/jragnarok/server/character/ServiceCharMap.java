@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_MAP_PER_SERVER;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_SERVERS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_PER_SERVER;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_SERVERS;
 import static org.diverproject.jragnarok.JRagnarokUtil.mapid2mapname;
 import static org.diverproject.util.Util.s;
 import static org.diverproject.util.Util.seconds;
@@ -17,10 +17,10 @@ import static org.diverproject.util.Util.format;
 
 import java.sql.SQLException;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.database.MapIndexes;
-import org.diverproject.jragnaork.database.impl.MapIndex;
-import org.diverproject.jragnaork.database.io.IOMapIndex;
+import org.diverproject.jragnarok.RagnarokException;
+import org.diverproject.jragnarok.database.MapIndexes;
+import org.diverproject.jragnarok.database.impl.MapIndex;
+import org.diverproject.jragnarok.database.io.IOMapIndex;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.common.ResultMapServerConnection;
 import org.diverproject.jragnarok.packets.inter.charmap.HZ_KeepAlive;

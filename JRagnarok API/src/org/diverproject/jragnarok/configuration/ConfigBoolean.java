@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.configuration;
+package org.diverproject.jragnarok.configuration;
 
 import org.diverproject.util.lang.BooleanUtil;
 

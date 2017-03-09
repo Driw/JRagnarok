@@ -1,8 +1,8 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHARS;
-import static org.diverproject.jragnaork.JRagnarokConstants.MIN_CHARS;
-import static org.diverproject.jragnaork.JRagnarokConstants.PACKETVER;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.MIN_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.packets.common.RefuseEnter.RE_REJECTED_FROM_SERVER;
 import static org.diverproject.jragnarok.packets.common.RefuseLogin.RL_OK;
@@ -22,7 +22,7 @@ import static org.diverproject.util.Util.seconds;
 import java.io.IOException;
 import java.net.Socket;
 
-import org.diverproject.jragnaork.RagnarokException;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.jragnarok.packets.IResponsePacket;
 import org.diverproject.jragnarok.packets.common.NotifyAuth;
 import org.diverproject.jragnarok.packets.common.PincodeState;

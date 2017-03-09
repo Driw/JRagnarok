@@ -1,14 +1,14 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.DEFAULT_EMAIL;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAP_ALBERTA;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAP_GEFFEN;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAP_IZLUDE;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAP_MORROC;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAP_PAYON;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAP_PRONTERA;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHARS;
-import static org.diverproject.jragnaork.JRagnarokConstants.PACKETVER;
+import static org.diverproject.jragnarok.JRagnarokConstants.DEFAULT_EMAIL;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_ALBERTA;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_GEFFEN;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_IZLUDE;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_MORROC;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_PAYON;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAP_PRONTERA;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.PACKETVER;
 import static org.diverproject.jragnarok.JRagnarokUtil.mapname2mapid;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_CREATE_NEW_CHAR;
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_CH_DELETE_CHAR;
@@ -46,8 +46,8 @@ import static org.diverproject.util.Util.now;
 import static org.diverproject.util.Util.s;
 import static org.diverproject.util.Util.seconds;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_CreateNewChar;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_DeleteChar;
 import org.diverproject.jragnarok.packets.character.fromclient.CH_DeleteChar2;

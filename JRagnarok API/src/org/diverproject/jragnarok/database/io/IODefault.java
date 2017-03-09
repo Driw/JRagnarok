@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.database.io;
+package org.diverproject.jragnarok.database.io;
 
 import static org.diverproject.log.LogSystem.logWarning;
 import static org.diverproject.log.LogSystem.setUpSource;
@@ -6,9 +6,9 @@ import static org.diverproject.util.Util.size;
 
 import java.sql.Connection;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.configuration.ConfigReader;
-import org.diverproject.jragnaork.database.AbstractDatabase;
+import org.diverproject.jragnarok.RagnarokException;
+import org.diverproject.jragnarok.configuration.ConfigReader;
+import org.diverproject.jragnarok.database.AbstractDatabase;
 import org.diverproject.util.BitWise;
 import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Queue;

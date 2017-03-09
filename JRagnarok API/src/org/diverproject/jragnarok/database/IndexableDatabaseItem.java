@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.database;
+package org.diverproject.jragnarok.database;
 
 /**
  * <h1>Item de Database com Índice</h1>

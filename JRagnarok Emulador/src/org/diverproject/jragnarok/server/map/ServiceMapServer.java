@@ -8,9 +8,9 @@ import static org.diverproject.util.Util.seconds;
 
 import java.sql.SQLException;
 
-import org.diverproject.jragnaork.RagnarokException;
-import org.diverproject.jragnaork.database.MapIndexes;
-import org.diverproject.jragnaork.database.io.IOMapIndex;
+import org.diverproject.jragnarok.RagnarokException;
+import org.diverproject.jragnarok.database.MapIndexes;
+import org.diverproject.jragnarok.database.io.IOMapIndex;
 import org.diverproject.jragnarok.server.Timer;
 import org.diverproject.jragnarok.server.TimerAdapt;
 import org.diverproject.jragnarok.server.TimerListener;

@@ -2,7 +2,7 @@ package org.diverproject.jragnarok.packets.inter.mapchar;
 
 import static org.diverproject.jragnarok.packets.RagnarokPacket.PACKET_ZH_SEND_MAPS;
 
-import org.diverproject.jragnaork.database.impl.MapIndex;
+import org.diverproject.jragnarok.database.impl.MapIndex;
 import org.diverproject.jragnarok.packets.RequestPacket;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicQueue;

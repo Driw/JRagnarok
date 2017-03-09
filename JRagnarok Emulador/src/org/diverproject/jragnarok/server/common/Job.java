@@ -2,7 +2,7 @@ package org.diverproject.jragnarok.server.common;
 
 import static org.diverproject.util.Util.s;
 
-import org.diverproject.jragnaork.RagnarokRuntimeException;
+import org.diverproject.jragnarok.RagnarokRuntimeException;
 
 public enum Job
 {

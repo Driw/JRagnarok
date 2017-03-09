@@ -1,6 +1,6 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_MAP_PER_SERVER;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_MAP_PER_SERVER;
 import static org.diverproject.util.Util.size;
 
 import org.diverproject.jragnarok.server.InternetProtocol;

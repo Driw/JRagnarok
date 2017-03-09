@@ -1,4 +1,4 @@
-package org.diverproject.jragnaork.configuration;
+package org.diverproject.jragnarok.configuration;
 
 public abstract class ConfigObject<T> extends Config<T>
 {

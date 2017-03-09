@@ -1,7 +1,7 @@
 package org.diverproject.jragnarok.server.character;
 
-import static org.diverproject.jragnaork.JRagnarokConstants.DATE_FORMAT;
-import static org.diverproject.jragnaork.JRagnarokConstants.MAX_CHARS;
+import static org.diverproject.jragnarok.JRagnarokConstants.DATE_FORMAT;
+import static org.diverproject.jragnarok.JRagnarokConstants.MAX_CHARS;
 import static org.diverproject.jragnarok.JRagnarokUtil.dateToVersion;
 import static org.diverproject.jragnarok.JRagnarokUtil.mapid2mapname;
 import static org.diverproject.log.LogSystem.logDebug;
@@ -13,8 +13,8 @@ import static org.diverproject.util.Util.now;
 import static org.diverproject.util.Util.b;
 import static org.diverproject.util.Util.seconds;
 
-import org.diverproject.jragnaork.RagnarokException;
 import org.diverproject.jragnarok.packets.character.toclient.TAG_CHARACTER_BLOCK_INFO;
+import org.diverproject.jragnarok.RagnarokException;
 import org.diverproject.jragnarok.packets.character.toclient.HC_Accept2;
 import org.diverproject.jragnarok.packets.character.toclient.HC_AcceptDeleteChar;
 import org.diverproject.jragnarok.packets.character.toclient.HC_AcceptEnterNeoUnion;
