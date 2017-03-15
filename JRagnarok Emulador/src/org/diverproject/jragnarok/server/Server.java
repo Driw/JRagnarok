@@ -204,7 +204,7 @@ public abstract class Server
 	{
 		int value = configs.getInt(SERVER_THREAD_PRIORITY);
 
-		return IntUtil.min(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
+		return IntUtil.limit(value, Thread.MIN_PRIORITY, Thread.MAX_PRIORITY);
 	}
 
 	/**

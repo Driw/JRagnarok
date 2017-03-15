@@ -1,4 +1,8 @@
-09.03.2017 - 1.5.218
+14.03.2017 - 1.5.219
+- Point corrigindo, onde usava IntUtil.min ao invés de IntUtil.limit.
+	- Character e Server também estavam com o mesmo problema.
+
+14.03.2017 - 1.5.218
 - IODefault.newException não estava registrando os logWarning corretamente.
 - Atualizando AbstractDatabase para que space() retorne o número de índices livres.
 - Também foi adicionado isEmpty() e isFull() em GenericDatabase para saber se está vazio ou cheio.
