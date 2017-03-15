@@ -25,6 +25,20 @@ import org.diverproject.jragnarok.RagnarokRuntimeException;
 import org.diverproject.jragnarok.database.MapIndexes;
 import org.diverproject.jragnarok.database.impl.MapIndex;
 
+/**
+ * <h1>IO para Map Index</h1>
+ *
+ * <p>Através desta classe será possível efetuar a leitura e escrita da indexação dos mapas entre servidores.
+ * Esses dados são armazenados em uma base de dados nomeadas por <b>Map Index</b>, seja por SQL ou TXT.
+ * Este IO considera as especificações de preferências genéricas usados por todos os IO do sistema.</p>
+ *
+ * @see IODefault
+ * @see MapIndexes
+ * @see Connection
+ *
+ * @author Andrew
+ */
+
 public class IOMapIndex extends IODefault<MapIndexes>
 {
 	@Override

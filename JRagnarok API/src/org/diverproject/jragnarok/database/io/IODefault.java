@@ -14,6 +14,26 @@ import org.diverproject.util.ObjectDescription;
 import org.diverproject.util.collection.Queue;
 import org.diverproject.util.collection.abstraction.DynamicQueue;
 
+/**
+ * <h1>IO Padrão</h1>
+ *
+ * <p>Esta classe implementa algumas informações pertinentes a qualquer leitor de arquivo do sistema JRagnarok.
+ * Possui uma coleção que enfileira todas as exceções que forem geradas durante sua utilização evitando paradas.
+ * Caso seja necessário interromper o processo poderá ser feito especificando nas preferências de utilização.</p>
+ *
+ * <p>Irá implementar métodos abstratos para permitir a leitura e escrita de informações por arquivos ou conexão SQL.
+ * As IO especificadas que forem criadas deverão determinar como será feito a sua leitura e suas regras.
+ * Cada IO poderá ainda especificar outros atributos/preferências para facilitar, para ficar mais dinâmico.</p>
+ *
+ * @see AbstractDatabase
+ * @see BitWise
+ * @see Connection
+ *
+ * @author Andrew
+ *
+ * @param <D> tipo de base de dados que será considerada em IO
+ */
+
 public abstract class IODefault<D extends AbstractDatabase<?>>
 {
 	/**
@@ -137,6 +157,15 @@ public abstract class IODefault<D extends AbstractDatabase<?>>
 	public abstract int writeSQL(D database, Connection connection, String tablename) throws RagnarokException;
 
 	public abstract int readFile(D database, String filepath) throws RagnarokException;
+
+	/**
+	 * Procedimento que efetua a escrita das informações contidas dos itens contidos na base de dados abaixo:
+	 * @param database referência da base de dados do qual terá suas informações salvas em um arquivo.
+	 * @param filepath nome parcial ou completo do arquivo no qual as informações serão salvas
+	 * @return quantidade de itens da base de dados que foram salvas no arquivo especificado.
+	 * @throws RagnarokException apenas se houver algum problema grave que deva interromper o processo.
+	 */
+
 	public abstract int writeFile(D database, String filepath) throws RagnarokException;
 
 	/**

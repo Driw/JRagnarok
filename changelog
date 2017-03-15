@@ -1,3 +1,10 @@
+15.03.2017 - 1.5.220
+- Documentação de algumas outras classes que foram adicionadas em versões recentes:
+	- MapIndex, IODeafult, IOMapIndex e MapIndexes.
+- Nova estrutura de dados para armazenar os dados de propriedades (GAT) dos mapas:
+	- MapCache (estrutura), MapData (registro), MapCell (propriedades GAT).
+	- Através de IOMapCache pode ser feito a leitura e escrita dos dados acima.
+
 14.03.2017 - 1.5.219
 - Point corrigindo, onde usava IntUtil.min ao invés de IntUtil.limit.
 	- Character e Server também estavam com o mesmo problema.
