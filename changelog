@@ -1,3 +1,10 @@
+09.03.2017 - 1.5.218
+- IODefault.newException não estava registrando os logWarning corretamente.
+- Atualizando AbstractDatabase para que space() retorne o número de índices livres.
+- Também foi adicionado isEmpty() e isFull() em GenericDatabase para saber se está vazio ou cheio.
+- IndexableDatabase não possuía o método select por índice do item na database.
+- MapIndexes.getMapName não retornava o nome do mapa corretamente, faltava o offset (-1).
+
 09.03.2017 - 1.5.217
 - Atualizando o nome do pacote em API que estava nomeando jragnarok incorretamente.
 	- Todas as classes foram movidas conforme o renomeio do pacote.

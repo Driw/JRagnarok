@@ -152,7 +152,7 @@ public abstract class IODefault<D extends AbstractDatabase<?>>
 
 		if (preferences.is(PREFERENCES_LOG_EXCEPTIONS))
 		{
-			setUpSource(3);
+			setUpSource(1);
 			logWarning(exception.getMessage()+ "\n");
 		}
 

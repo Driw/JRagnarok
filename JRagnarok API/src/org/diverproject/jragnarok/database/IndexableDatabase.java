@@ -94,6 +94,20 @@ public abstract class IndexableDatabase<I extends IndexableDatabaseItem> extends
 		return false;
 	}
 
+	/**
+	 * Seleciona um determinado item na database conforme o índice do mesmo especificado.
+	 * @param index número do índice do item do qual deseja selecionar da base de dados.
+	 * @return referência do item no índice especificado ou null se índice inválido ou não utilizado.
+	 */
+
+	public I select(int index)
+	{
+		if (interval(index, 1, items.length) && items[index - 1] != null)
+			return items[index - 1];
+
+		return null;
+	}
+
 	@Override
 	public int size()
 	{

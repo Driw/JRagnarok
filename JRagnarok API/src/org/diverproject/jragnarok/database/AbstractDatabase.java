@@ -44,9 +44,21 @@ public abstract class AbstractDatabase<I> implements GenericDatabase<I>
 	}
 
 	@Override
-	public boolean space()
+	public int space()
 	{
-		return length() != size();
+		return length() - size();
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return size() == 0;
+	}
+
+	@Override
+	public boolean isFull()
+	{
+		return size() == length();
 	}
 
 	/**

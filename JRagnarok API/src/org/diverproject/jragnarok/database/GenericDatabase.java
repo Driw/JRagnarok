@@ -41,7 +41,19 @@ public interface GenericDatabase<I> extends Iterable<I>
 	 * @return aquisição da quantidade te itens que ainda podem ser armazenados.
 	 */
 
-	boolean space();
+	int space();
+
+	/**
+	 * @return true se estiver vazia.
+	 */
+
+	boolean isEmpty();
+
+	/**
+	 * @return true se estiver cheia.
+	 */
+
+	boolean isFull();
 
 	/**
 	 * Verifica se um item especificado por parâmetro está inserido nessa base de dados.

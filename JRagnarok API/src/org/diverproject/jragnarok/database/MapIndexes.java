@@ -32,8 +32,8 @@ public class MapIndexes extends IndexableDatabase<MapIndex>
 	public String getMapName(int mapid)
 	{
 		if (interval(mapid, 1, length()))
-			if (items[mapid] != null)
-				return items[mapid].getMapName();
+			if (items[mapid - 1] != null)
+				return items[mapid - 1].getMapName();
 
 		return null;
 	}

@@ -31,7 +31,7 @@ public class SequencialDatabase <I extends IndexableDatabaseItem> extends Abstra
 
 	public boolean insert(I item)
 	{
-		if (space())
+		if (!isFull())
 			for (int i = 0; i < items.length; i++)
 			{
 				if (items[i].getID() == item.getID())
