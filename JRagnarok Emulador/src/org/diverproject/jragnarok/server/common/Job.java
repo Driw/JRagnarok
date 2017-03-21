@@ -4,6 +4,16 @@ import static org.diverproject.util.Util.s;
 
 import org.diverproject.jragnarok.RagnarokRuntimeException;
 
+/**
+ * <h1>Enumeração de Classes</h1>
+ *
+ * <p>Classe utilitária feita para enumerar todas as classes disponíveis dentro do jogo.
+ * Utiliza uma outra classe utilitária para manter o valor do seu auto-incremento dinâmico.
+ * Cada enumeração aqui terá um valor único no sistema que é usado para sua identificação.</p>
+ *
+ * @author Andrew
+ */
+
 public enum Job
 {
 	JOB_NOVICE,
@@ -166,10 +176,20 @@ public enum Job
 
 	public final short CODE;
 
+	/**
+	 * Cria uma nova instância de um enumerador para classe de personagem.
+	 * Neste caso o código de identificação considera um auto-incremento em relação ao útimo.
+	 */
+
 	private Job()
 	{
 		CODE = AutoIncrement.Job++;
 	}
+
+	/**
+	 * Cria uma nova instância de um enumerador para classe de personagem.
+	 * @param code código de identificação do qual será assumindo.
+	 */
 
 	private Job(int code)
 	{
@@ -178,6 +198,12 @@ public enum Job
 		else
 			CODE = AutoIncrement.Job++;
 	}
+
+	/**
+	 * Procedimento que permite obter a enumeração de uma classe através do seu código de identificação único.
+	 * @param code código de identificação da classe do qual deseja obter o seu enumerador respectivo.
+	 * @return aquisição do enumerador referente ao código da classe que foi especificado por parâmetro.
+	 */
 
 	public static final Job parse(int code)
 	{

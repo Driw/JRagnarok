@@ -1,3 +1,8 @@
+20.03.2017 - 1.5.221
+- Movendo alguns dos atributos estáticos de HA_UpdateRegisters para GlobalRegisterOperation.
+- Documentação efetuada para as classes contidas no pacote jragnarok.server.common.
+	- Também foi renomeado LoginAdapt para LoginAdapter como padrão de projeto.
+
 15.03.2017 - 1.5.220
 - Documentação de algumas outras classes que foram adicionadas em versões recentes:
 	- MapIndex, IODeafult, IOMapIndex e MapIndexes.

@@ -18,7 +18,7 @@ import org.diverproject.jragnarok.packets.inter.charlogin.HA_UnbanAccount;
 import org.diverproject.jragnarok.packets.inter.charlogin.HA_UpdateRegisters;
 import org.diverproject.jragnarok.server.common.GlobalRegister;
 import org.diverproject.jragnarok.server.common.GlobalRegisterOperation;
-import org.diverproject.jragnarok.server.common.LoginAdapt;
+import org.diverproject.jragnarok.server.common.LoginAdapter;
 import org.diverproject.jragnarok.server.login.control.AccountControl;
 import org.diverproject.jragnarok.server.login.control.GlobalRegisterControl;
 import org.diverproject.jragnarok.server.login.control.LoginLogControl;
@@ -241,25 +241,25 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 
 				switch (operation.getOperation())
 				{
-					case HA_UpdateRegisters.OPERATION_INT_REPLACE:
+					case GlobalRegisterOperation.OPERATION_INT_REPLACE:
 						GlobalRegister<Integer> registerIntReplace = (GlobalRegister<Integer>) operation.getRegister();
 						registerIntReplace.setValue((Integer) registerIntReplace.getValue());
 						globalRegisters.replace(registerIntReplace);
 						break;
 
-					case HA_UpdateRegisters.OPERATION_INT_DELETE:
+					case GlobalRegisterOperation.OPERATION_INT_DELETE:
 						GlobalRegister<Integer> registerIntDelete = (GlobalRegister<Integer>) operation.getRegister();
 						registerIntDelete.setValue((Integer) registerIntDelete.getValue());
 						globalRegisters.delete(registerIntDelete);
 						break;
 
-					case HA_UpdateRegisters.OPERATION_STR_REPLACE:
+					case GlobalRegisterOperation.OPERATION_STR_REPLACE:
 						GlobalRegister<String> registerStrReplace = (GlobalRegister<String>) operation.getRegister();
 						registerStrReplace.setValue((String) registerStrReplace.getValue());
 						globalRegisters.replace(registerStrReplace);
 						break;
 
-					case HA_UpdateRegisters.OPERATION_STR_DELETE:
+					case GlobalRegisterOperation.OPERATION_STR_DELETE:
 						GlobalRegister<String> registerStrDelete = (GlobalRegister<String>) operation.getRegister();
 						registerStrDelete.setValue((String) registerStrDelete.getValue());
 						globalRegisters.delete(registerStrDelete);
@@ -371,7 +371,7 @@ public class ServiceLoginAccount extends AbstractServiceLogin
 			try {
 
 				LoginLog log = new LoginLog();
-				log.setLogin(new LoginAdapt(packet.getAccountID()));
+				log.setLogin(new LoginAdapter(packet.getAccountID()));
 				log.setMessage("Falha na verificação do código PIN");
 				log.setRCode(100);
 				logs.add(log);

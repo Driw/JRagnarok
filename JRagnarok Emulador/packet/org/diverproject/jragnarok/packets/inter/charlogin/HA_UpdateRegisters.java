@@ -19,11 +19,6 @@ public class HA_UpdateRegisters extends RequestPacket
 	public static final byte VALUE_INTEGER = 1;
 	public static final byte VALUE_STRING = 2;
 
-	public static final int OPERATION_INT_REPLACE = 0;
-	public static final int OPERATION_INT_DELETE = 1;
-	public static final int OPERATION_STR_REPLACE = 2;
-	public static final int OPERATION_STR_DELETE = 3;
-
 	private int accountID;
 	private Queue<GlobalRegisterOperation<?>> operations;
 
