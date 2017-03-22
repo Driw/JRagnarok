@@ -60,7 +60,7 @@ public class CharServer extends Server
 
 	public CharServer()
 	{
-		setListener(listener);
+		setListener(LISTENER);
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class CharServer extends Server
 	 * Listener que irá executar as operações necessárias conforme mudanças de estado do servidor.
 	 */
 
-	private final ServerListener listener = new ServerListener()
+	private final ServerListener LISTENER = new ServerListener()
 	{
 		@Override
 		public void onCreate() throws RagnarokException

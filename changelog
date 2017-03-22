@@ -1,3 +1,8 @@
+22.03.2017 - 1.5.223
+- Diagrama atualizado conforme server.character (Char Server).
+- Alguns outros pequenos detalhes corrigidos em outros diagramas.
+- OnlineControl renomado para OnlineMapControl que lhe melhor identifica.
+
 22.03.2017 - 1.5.222
 - Diagrama parcialmente atualizado: server, server.login e server.common.
 - Também foi separado cada parte do projeto em um diagrama para que não fique tudo tumultuado.

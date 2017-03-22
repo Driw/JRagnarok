@@ -27,12 +27,12 @@ import org.diverproject.util.collection.abstraction.IntegerLittleMap;
  * @author Andrew
  */
 
-public class OnlineControl extends AbstractControl implements Iterable<OnlineCharData>
+public class OnlineMapControl extends AbstractControl implements Iterable<OnlineCharData>
 {
 	/**
 	 * Mapeamento dos jogadores que se encontram online no sistema.
 	 */
-	private final Map<Integer, OnlineCharData> cache;
+	private final Map<Integer, OnlineCharData> CACHE;
 
 	/**
 	 * Cria um novo controle que permite controlar os jogadores online no sistema.
@@ -40,11 +40,11 @@ public class OnlineControl extends AbstractControl implements Iterable<OnlineCha
 	 * que mantém jogadores como online utilizam temporizadores para tal.
 	 */
 
-	public OnlineControl(Connection connection)
+	public OnlineMapControl(Connection connection)
 	{
 		super(connection);
 
-		cache = new IntegerLittleMap<>();
+		CACHE = new IntegerLittleMap<>();
 
 		initAccountsOffline();
 		initCharsOffline();
@@ -102,7 +102,7 @@ public class OnlineControl extends AbstractControl implements Iterable<OnlineCha
 
 	public OnlineCharData get(int accountID)
 	{
-		return cache.get(accountID);
+		return CACHE.get(accountID);
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class OnlineControl extends AbstractControl implements Iterable<OnlineCha
 	{
 		OnlineCharData online = new OnlineCharData();
 		online.setAccountID(accountID);
-		cache.add(accountID, online);
+		CACHE.add(accountID, online);
 
 		return online;
 	}
@@ -148,7 +148,7 @@ public class OnlineControl extends AbstractControl implements Iterable<OnlineCha
 
 	public void remove(OnlineCharData online)
 	{
-		if (cache.removeKey(online.getAccountID()))
+		if (CACHE.removeKey(online.getAccountID()))
 		{
 			if (online.getAccountID() > 0)
 				setAccountState(online, false);
@@ -156,7 +156,7 @@ public class OnlineControl extends AbstractControl implements Iterable<OnlineCha
 			if (online.getCharID() > 0)
 				setCharState(online, false);
 
-			cache.removeKey(online.getAccountID());
+			CACHE.removeKey(online.getAccountID());
 
 			logDebug("account#%d removido do cache.\n", online.getAccountID());
 		}
@@ -247,24 +247,24 @@ public class OnlineControl extends AbstractControl implements Iterable<OnlineCha
 
 	public void clear()
 	{
-		for (OnlineCharData online : cache)
+		for (OnlineCharData online : CACHE)
 		{
 			setAccountState(online, false);
 			setCharState(online, false);
 		}
 
-		cache.clear();
+		CACHE.clear();
 	}
 
 	@Override
 	public Iterator<OnlineCharData> iterator()
 	{
-		return cache.iterator();
+		return CACHE.iterator();
 	}
 
 	@Override
 	public void toString(ObjectDescription description)
 	{
-		description.append("online", cache.size());
+		description.append("online", CACHE.size());
 	}
 }

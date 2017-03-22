@@ -143,7 +143,7 @@ public class ServiceCharLogin extends AbstractCharService
 	/**
 	 * Controle para dados de personagens online.
 	 */
-	private OnlineControl onlines;
+	private OnlineMapControl onlines;
 
 	/**
 	 * Controle para gerenciar dados dos personagens.
@@ -1133,7 +1133,7 @@ public class ServiceCharLogin extends AbstractCharService
 	 * <code>NO_SERVER</code> ou <code>UNKNOW_SERVER</code> remove todos.
 	 */
 
-	public void onlnesSetAllOffline(int serverID)
+	public void onlineSetAllOffline(int serverID)
 	{
 		if (serverID < 0)
 			logNotice("definindo todos os jogadores como offline.\n");

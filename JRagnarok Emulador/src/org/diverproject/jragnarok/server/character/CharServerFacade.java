@@ -55,7 +55,7 @@ import org.diverproject.util.stream.StreamException;
  * @see ServiceCharMap
  * @see ServiceCharServerAuth
  * @see AuthMap
- * @see OnlineControl
+ * @see OnlineMapControl
  * @see CharacterControl
  *
  * @author Andrew
@@ -97,7 +97,7 @@ public class CharServerFacade
 	/**
 	 * Controle para dados de personagens online.
 	 */
-	private OnlineControl onlineControl;
+	private OnlineMapControl onlineControl;
 
 	/**
 	 * Controle para gerenciar dados dos personagens.
@@ -168,7 +168,7 @@ public class CharServerFacade
 	 * @return aquisição do controle para dados de personagens online.
 	 */
 
-	public OnlineControl getOnlineControl()
+	public OnlineMapControl getOnlineControl()
 	{
 		return onlineControl;
 	}
@@ -200,7 +200,7 @@ public class CharServerFacade
 	public void init(CharServer charServer)
 	{
 		authMap = new AuthMap();
-		onlineControl = new OnlineControl(charServer.getMySQL().getConnection());
+		onlineControl = new OnlineMapControl(charServer.getMySQL().getConnection());
 		characterControl = new CharacterControl(charServer.getMySQL().getConnection());
 		mapIndexes = new MapIndexes();
 
@@ -228,7 +228,7 @@ public class CharServerFacade
 
 	public void destroy()
 	{
-		loginService.onlnesSetAllOffline(OnlineCharData.NO_SERVER);
+		loginService.onlineSetAllOffline(OnlineCharData.NO_SERVER);
 
 		clientService.destroy();
 		charService.destroy();

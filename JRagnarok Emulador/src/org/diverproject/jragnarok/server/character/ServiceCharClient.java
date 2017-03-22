@@ -63,7 +63,7 @@ import org.diverproject.util.collection.abstraction.DynamicQueue;
  * Podendo ainda ser necessário comunicar-se com outro serviço para auxiliá-lo.</p>
  *
  * @see AbstractCharService
- * @see OnlineControl
+ * @see OnlineMapControl
  * @see CharacterControl
  *
  * @author Andrew
@@ -74,7 +74,7 @@ public class ServiceCharClient extends AbstractCharService
 	/**
 	 * Controle para dados de personagens online.
 	 */
-	private OnlineControl onlines;
+	private OnlineMapControl onlines;
 
 	/**
 	 * Controle para gerenciar dados dos personagens.

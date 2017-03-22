@@ -108,7 +108,7 @@ public class ServiceCharServer extends AbstractCharService
 	/**
 	 * Controle para dados de personagens online.
 	 */
-	private OnlineControl onlines;
+	private OnlineMapControl onlines;
 
 	/**
 	 * Cria uma nova instância do principal serviço para um servidor de personagem.
