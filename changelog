@@ -1,3 +1,8 @@
+15.05.2017 - 1.5.224
+- MapCell.initData podia causar NullPointerException devido a não inicialização de terrain.
+- ServiceCharMap não estava considerando a validação do nome de usuário e senha de uma nova conexão.
+- Atualização na documentação do projeto (diagrama de classes, caso de uso e diagrama de sequência).
+
 22.03.2017 - 1.5.223
 - Diagrama atualizado conforme server.character (Char Server).
 - Alguns outros pequenos detalhes corrigidos em outros diagramas.

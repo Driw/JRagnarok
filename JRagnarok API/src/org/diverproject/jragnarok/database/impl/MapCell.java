@@ -137,15 +137,14 @@ public class MapCell
 
 		int size = dimension.getWidth() * dimension.getLength();
 
-		if (terrain.length != size)
-		{
-			terrain = null;
+		if (terrain == null)
 			terrain = new byte[size];
-		}
 
-		else
-			for (int i = 0; i < terrain.length; i++)
-				terrain[i] = TERRAIN_DEFAULT_VALUE;
+		else if (terrain.length != size)
+			terrain = null;
+
+		for (int i = 0; i < terrain.length; i++)
+			terrain[i] = TERRAIN_DEFAULT_VALUE;
 	}
 
 	/**

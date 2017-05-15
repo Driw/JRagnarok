@@ -743,7 +743,7 @@ public class ServiceLoginAuth extends AbstractServiceLogin
 			logWarning("char-server com senha incompatível (name: %s, username: %s).\n", packet.getServerName(), packet.getUsername());
 			return false;
 		}
-		
+
 		LoginSessionData sd = fd.getSessionData();
 		sd.setID(account.getID());
 		sd.setUsername(packet.getUsername());

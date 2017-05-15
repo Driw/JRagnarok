@@ -275,6 +275,13 @@ public class ServiceCharMap extends AbstractCharService
 		server.setPort(packet.getPort());
 		server.setUsers(s(0));
 
+		if (!packet.getUsername().equals(config().username) ||
+			!packet.getPassword().equals(config().password))
+		{
+			notifyConnection(fd, RMSC_FAILURE);
+			return false;
+		}
+
 		if (getServer().getMapServers().add(server))
 		{
 			notifyConnection(fd, RMSC_SUCCESSFUL);
